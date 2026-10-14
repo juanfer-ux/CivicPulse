@@ -51,8 +51,9 @@ s as (
 ),
 t as (
   select s.*,
-         date_trunc('day', now()) - make_interval(days => floor(days_ago)::int)
-           + make_interval(hours => hr, mins => floor(r_min * 60)::int) as occ,
+         -- hr is Bogotá local time; convert the local timestamp to timestamptz.
+         (date_trunc('day', now() at time zone 'America/Bogota') - make_interval(days => floor(days_ago)::int)
+           + make_interval(hours => hr, mins => floor(r_min * 60)::int)) at time zone 'America/Bogota' as occ,
          case when r_dup < 0.04 then 'duplicate'
               when val = 'human_rejected' then 'rejected'
               when val = 'pending' then case when r_stat < 0.6 then 'received' else 'under_review' end
@@ -76,9 +77,9 @@ select
   case when hot then clng + (((code * 5 + k * 17) % 11) - 5) * 0.0012 + (r_lng - 0.5) * 0.0006
        else clng + (r_lng - 0.5) * 0.03 end,
   case when hot then 'Synthetic hotspot ' || code || '-' || k || ', ' || name
-       else 'Synthetic location, ' || name end,
+       else 'Synthetic location CP-' || lpad(g::text, 5, '0') || ', ' || name end,
   occ,
-  least(occ + make_interval(mins => (5 + r_delay * 175)::int), now()),
+  greatest(occ, least(occ + make_interval(mins => (5 + r_delay * 175)::int), now())),
   veh,
   'SIM-' || lpad(floor(r_plate * 1000)::int::text, 3, '0'),   -- not a real plate format
   sub,

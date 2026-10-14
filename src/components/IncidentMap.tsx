@@ -14,10 +14,12 @@ const BOGOTA: [number, number] = [-74.09, 4.65]
 interface Props {
   incidents: Incident[]
   selectedId: string | null
+  /** Incidents backing the agent's latest answer, ringed in the AI colour. */
+  highlightIds: string[]
   onSelect: (id: string | null) => void
 }
 
-export function IncidentMap({ incidents, selectedId, onSelect }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
@@ -42,6 +44,18 @@ export function IncidentMap({ incidents, selectedId, onSelect }: Props) {
           'circle-opacity': 0.85,
           'circle-stroke-width': 1,
           'circle-stroke-color': '#151517',
+        },
+      })
+      map.addLayer({
+        id: 'incident-highlight',
+        type: 'circle',
+        source: 'incidents',
+        filter: ['==', ['get', 'hl'], true],
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 6, 15, 12],
+          'circle-color': 'rgba(0,0,0,0)',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#6D79E2',
         },
       })
       map.addLayer({
@@ -71,15 +85,16 @@ export function IncidentMap({ incidents, selectedId, onSelect }: Props) {
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
+    const highlight = new Set(highlightIds)
     ;(map.getSource('incidents') as maplibregl.GeoJSONSource).setData({
       type: 'FeatureCollection',
       features: incidents.map((i) => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
-        properties: { id: i.id, color: GROUPS[groupOf(i.status)].color },
+        properties: { id: i.id, color: GROUPS[groupOf(i.status)].color, hl: highlight.has(i.id) },
       })),
     })
-  }, [ready, incidents])
+  }, [ready, incidents, highlightIds])
 
   useEffect(() => {
     const map = mapRef.current

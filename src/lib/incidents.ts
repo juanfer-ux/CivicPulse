@@ -90,3 +90,9 @@ export async function fetchDashboardData() {
   if (localities.error) throw localities.error
   return { incidents: incidents.data as Incident[], localities: localities.data as Locality[] }
 }
+
+export async function fetchLocalities() {
+  const { data, error } = await supabase.from('localities').select('code, name').order('code')
+  if (error) throw error
+  return data as Locality[]
+}

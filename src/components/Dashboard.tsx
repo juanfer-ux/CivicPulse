@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { X } from 'lucide-react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { Badge } from '@/components/ui/badge'
@@ -26,7 +26,7 @@ const DAY = 86_400_000
 
 type Data = { incidents: Incident[]; localities: Locality[] }
 
-export function Dashboard() {
+export function Dashboard({ highlightIds, children }: { highlightIds: string[]; children?: ReactNode }) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -70,7 +70,12 @@ export function Dashboard() {
 
   return (
     <>
-      <IncidentMap incidents={filtered} selectedId={selected?.id ?? null} onSelect={setSelectedId} />
+      <IncidentMap
+        incidents={filtered}
+        selectedId={selected?.id ?? null}
+        highlightIds={highlightIds}
+        onSelect={setSelectedId}
+      />
 
       <div className="absolute left-4 top-16 flex w-72 flex-col gap-3">
         <Card className="bg-card/95">
@@ -155,8 +160,10 @@ export function Dashboard() {
         </Card>
       </div>
 
-      {selected && (
-        <Card className="absolute right-4 top-32 w-96 bg-card/95">
+      <div className="pointer-events-none absolute bottom-4 right-4 top-16 flex w-96 flex-col gap-3 [&>*]:pointer-events-auto">
+        {children}
+        {selected && (
+        <Card className="max-h-[45%] shrink-0 overflow-auto bg-card/95">
           <CardHeader className="flex flex-row items-start justify-between gap-2">
             <div>
               <CardTitle>{selected.title}</CardTitle>
@@ -205,7 +212,8 @@ export function Dashboard() {
             </dl>
           </CardContent>
         </Card>
-      )}
+        )}
+      </div>
     </>
   )
 }
