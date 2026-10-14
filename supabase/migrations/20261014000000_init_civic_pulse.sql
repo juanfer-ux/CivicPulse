@@ -281,6 +281,17 @@ create policy "read own audit events or all as super admin" on public.audit_even
 create policy "write own audit events" on public.audit_events
   for insert to authenticated with check (actor = (select auth.uid()));
 
+-- ───────── Function privileges ─────────
+-- Trigger functions are never callable through the API. The permission helpers are
+-- callable by signed-in users only (RLS policies run them as the caller; they only
+-- reveal the caller's own scope). The advisor's remaining 4 warnings are intentional.
+revoke execute on function public.apply_decision(), public.handle_new_user(), public.guard_profile_changes()
+  from public, anon, authenticated;
+revoke execute on function public.current_app_role(), public.can_access_locality(smallint),
+  public.can_access_category(text), public.can_decide() from public, anon;
+grant execute on function public.current_app_role(), public.can_access_locality(smallint),
+  public.can_access_category(text), public.can_decide() to authenticated;
+
 -- ───────── Bootstrap the first super admin (run manually, once) ─────────
 -- 1. Register in the app. 2. In the SQL editor:
 --   update public.profiles set role = 'super_admin'
