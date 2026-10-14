@@ -104,3 +104,14 @@ cross join lateral (
   order by abs(extract(epoch from o.occurred_at - i.occurred_at)) limit 1
 ) o
 where i.is_synthetic and i.status = 'duplicate';
+
+-- Placeholder evidence media: 1-3 photos per incident (from evidence_metadata) and a video on about 1 in 5.
+-- No files exist yet: rows are placeholders (storage_path null).
+insert into public.incident_media (incident_id, kind, duration_seconds)
+select i.id, 'photo'::public.media_kind, null
+from public.incidents i, generate_series(1, (i.evidence_metadata ->> 'photos')::int)
+where i.is_synthetic
+union all
+select i.id, 'video'::public.media_kind, 8 + abs(hashtext(i.id::text)) % 20
+from public.incidents i
+where i.is_synthetic and abs(hashtext(i.id::text)) % 5 = 0;

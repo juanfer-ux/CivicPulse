@@ -38,3 +38,6 @@ Verified in SQL as the real Super Admin (rolled back): propose, approve, 2 audit
 
 ## Before deploying
 Turn "Confirm email" on and enable leaked-password protection in Supabase Auth settings. The four remaining Supabase advisor warnings (permission helpers callable by signed-in users) are intentional.
+
+## Evidence media
+Each incident has photo and video rows in `incident_media` (`supabase/migrations/20261014030000_incident_media.sql`). Files will live in a private Supabase Storage bucket (`incident-evidence`) and `storage_path` points to them; the future Citizen Agent inserts rows from a service context, the web app only reads (RLS follows the incident's scope). Today every row is a placeholder (no file), shown as a placeholder tile in the incident panel, and the UI says nothing has been visually inspected. To show real files later: create the bucket with read policies mirroring the incident scope, then render signed URLs in `MediaGallery`.

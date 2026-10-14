@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { X } from 'lucide-react'
 import { IncidentMap } from '@/components/IncidentMap'
+import { MediaGallery } from '@/components/MediaGallery'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -185,6 +186,7 @@ export function Dashboard({ highlightIds, children }: { highlightIds: string[]; 
                 </Badge>
               ))}
             </div>
+            <MediaGallery incidentId={selected.id} />
             <p>{selected.description}</p>
             <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-muted-foreground">
               <dt>Location</dt>
