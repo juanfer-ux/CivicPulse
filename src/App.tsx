@@ -3,9 +3,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { useAuth } from '@/lib/auth'
 
 // Foundation placeholder: the Bogotá map (MapLibre) replaces the canvas in the dashboard phase.
 export default function App() {
+  const { profile, signOut } = useAuth()
   return (
     <div className="relative h-svh overflow-hidden bg-background">
       <div className="absolute inset-0 grid place-items-center bg-card text-muted-foreground">
@@ -14,7 +16,13 @@ export default function App() {
 
       <header className="absolute inset-x-0 top-0 flex items-center justify-between border-b bg-sidebar/90 px-4 py-3 backdrop-blur">
         <span className="text-sm font-semibold tracking-[0.2em] text-foreground">CIVIC PULSE</span>
-        <Badge variant="secondary">Synthetic data</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">Synthetic data</Badge>
+          <Badge variant="outline">{profile?.role?.replace('_', ' ')}</Badge>
+          <Button size="sm" variant="ghost" onClick={signOut}>
+            Sign out
+          </Button>
+        </div>
       </header>
 
       <Card className="absolute left-4 top-16 w-72 bg-card/95">
