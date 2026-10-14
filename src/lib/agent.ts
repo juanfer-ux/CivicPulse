@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import type { Locality } from '@/lib/incidents'
+import type { Draft } from '@/lib/recommendations'
 
 /**
  * Civic Operations Agent, MOCK MODE.
@@ -25,17 +26,23 @@ export interface Answer {
   evidence: Evidence[]
   limitations: string[]
   highlightIds: string[]
+  /** Set when the answer is a recommendation a human can send for review. */
+  proposal?: Draft
 }
 
 type Plan =
   | { kind: 'ranking'; days: number | null }
   | { kind: 'time'; locality: Locality | null; days: number | null }
   | { kind: 'compare'; locality: Locality | null; days: number }
+  | { kind: 'recurring'; days: number | null }
+  | { kind: 'candidates' }
 
 const DAY = 86_400_000
 const TZ = 'America/Bogota'
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const SYNTHETIC = 'All records are synthetic.'
+const MIN_REPEATS = 3
+const CANDIDATE_DAYS = 90
 const COUNTING = 'Counts exclude reports marked duplicate or rejected.'
 
 const date = (d: string | Date) =>
@@ -47,6 +54,8 @@ export const SUGGESTIONS = [
   'Which localities have the most parking obstruction incidents?',
   'When do parking obstruction incidents occur most frequently in Usaquén?',
   'Have parking obstruction incidents increased in Chapinero over the last 30 days?',
+  'Which locations have repeated parking obstruction reports?',
+  'Which area might deserve further investigation tomorrow evening?',
 ]
 
 export function plan(question: string, localities: Locality[]): Plan | null {
@@ -56,6 +65,8 @@ export function plan(question: string, localities: Locality[]): Plan | null {
   const n = q.match(/(\d+)\s*days?/)
   const days = n ? Math.min(Math.max(Number(n[1]), 1), 365) : /last week/.test(q) ? 7 : /last month/.test(q) ? 30 : null
 
+  if (/\b(tomorrow|tonight|next (shift|evening)|deserve\w*|recommend\w*|prioriti\w+)\b/.test(q)) return { kind: 'candidates' }
+  if (/\b(recurr\w*|repeat\w*|same (place|location))\b|which locations/.test(q)) return { kind: 'recurring', days }
   if (/\b(increase\w*|decrease\w*|chang\w+|trend\w*|compar\w+|versus|vs)\b/.test(q)) {
     return { kind: 'compare', locality, days: days ?? 30 }
   }
@@ -89,6 +100,29 @@ interface TimeRow {
   last_at: string
   incident_ids: string[]
 }
+interface RecurringRow {
+  match_type: 'exact' | 'approximate'
+  label: string
+  locality_code: number
+  locality_name: string
+  incident_count: number
+  first_at: string
+  last_at: string
+  incident_ids: string[]
+}
+interface CandidateRow {
+  label: string
+  locality_code: number
+  locality_name: string
+  total_count: number
+  evening_count: number
+  weekday_evening_count: number
+  recent_count: number
+  lat: number
+  lng: number
+  last_at: string
+  incident_ids: string[]
+}
 interface PeriodRow {
   period: 'current' | 'previous'
   incident_count: number
@@ -111,6 +145,8 @@ export async function answer(question: string, localities: Locality[]): Promise<
   if (!p) return unsupported()
   if (p.kind === 'ranking') return ranking(p.days)
   if (p.kind === 'time') return timeOfDay(p.locality, p.days)
+  if (p.kind === 'recurring') return recurring(p.days)
+  if (p.kind === 'candidates') return candidates()
   return compare(p.locality, p.days)
 }
 
@@ -118,8 +154,8 @@ function unsupported(): Answer {
   return {
     text:
       'I cannot answer that yet. In this prototype I can rank localities by incident count, show when incidents occur ' +
-      'in a locality, and compare the last N days with the N days before. Recurring locations and next-shift ' +
-      'recommendations are planned.',
+      'in a locality, compare the last N days with the N days before, list locations with repeated reports, ' +
+      'and suggest an area for human review tomorrow evening.',
     bars: [],
     evidence: [],
     limitations: ['I do not guess: if the data cannot support a question, I say so.'],
@@ -290,5 +326,128 @@ async function compare(locality: Locality | null, days: number): Promise<Answer>
       SYNTHETIC,
     ],
     highlightIds: ids,
+  }
+}
+
+async function recurring(days: number | null): Promise<Answer> {
+  const to = new Date()
+  const from = days ? new Date(to.getTime() - days * DAY) : null
+  const rows = await rpc<RecurringRow>('tool_recurring_locations', { p_from: iso(from), p_to: iso(to), p_min: MIN_REPEATS })
+  const period = from ? `the last ${days} days (${date(from)} to ${date(to)})` : 'all available data'
+  const limitations = [
+    'Repeated reports at a location do not prove they describe the same event: they may be separate occurrences or several reports of one obstruction.',
+    'Exact matches share the same described location; approximate matches are only close in coordinates (about 200 m).',
+    `Only locations with at least ${MIN_REPEATS} reports are listed (up to 30).`,
+    COUNTING,
+    SYNTHETIC,
+  ]
+  if (!rows.length) {
+    return {
+      text: `No location has at least ${MIN_REPEATS} reports in ${period}, within the localities you are authorized to see.`,
+      bars: [],
+      evidence: [],
+      limitations,
+      highlightIds: [],
+    }
+  }
+  const exact = rows.filter((r) => r.match_type === 'exact').length
+  const top = rows.slice(0, 5)
+  const ids = top.flatMap((r) => r.incident_ids)
+  return {
+    text:
+      `${rows.length} locations have at least ${MIN_REPEATS} reports in ${period}: ${exact} exact ${exact === 1 ? 'match' : 'matches'} (same described location) and ${rows.length - exact} approximate ${rows.length - exact === 1 ? 'match' : 'matches'}. ` +
+      `The most repeated is "${rows[0].label}" with ${rows[0].incident_count} reports between ${date(rows[0].first_at)} and ${date(rows[0].last_at)}.`,
+    bars: rows.slice(0, 8).map((r) => ({ label: r.label.replace('Synthetic ', ''), value: r.incident_count })),
+    evidence: [
+      {
+        tool: 'tool_recurring_locations',
+        scope: `top 5 of ${rows.length} locations (${top.map((r) => r.match_type).join(', ')})`,
+        period,
+        incidentCount: ids.length,
+        references: await references(ids),
+      },
+    ],
+    limitations,
+    highlightIds: ids,
+  }
+}
+
+async function candidates(): Promise<Answer> {
+  const to = new Date()
+  const from = new Date(to.getTime() - CANDIDATE_DAYS * DAY)
+  const tomorrow = new Date(to.getTime() + DAY).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'long' })
+  const weekday = WEEKDAYS.indexOf(tomorrow) + 1
+  const rows = await rpc<CandidateRow>('tool_candidate_areas', {
+    p_from: from.toISOString(),
+    p_to: to.toISOString(),
+    p_dow: weekday,
+    p_min: MIN_REPEATS,
+  })
+  const period = `the last ${CANDIDATE_DAYS} days (${date(from)} to ${date(to)})`
+  if (!rows.length) {
+    return {
+      text: `No location has at least ${MIN_REPEATS} reports in ${period}, so the data cannot support a recommendation for tomorrow evening.`,
+      bars: [],
+      evidence: [],
+      limitations: [COUNTING, SYNTHETIC],
+      highlightIds: [],
+    }
+  }
+  const top = rows[0]
+  const limitations = [
+    'Ranking: incidents in the 16:00–20:00 window, then total incidents, then incidents in the last 30 days. The weekday count is shown but not used for ranking because it is usually very small.',
+    'History shows where reports concentrated. It does not predict that an obstruction will occur tomorrow.',
+    `Only locations with at least ${MIN_REPEATS} reports in ${CANDIDATE_DAYS} days (same described location) are considered.`,
+    ...(top.evening_count < 10 ? [`Small numbers: the top candidate has ${top.evening_count} evening incidents.`] : []),
+    'Photos are placeholders and nothing was visually inspected. No legal violation is asserted.',
+    COUNTING,
+    SYNTHETIC,
+  ]
+  const others = rows.slice(1, 3).map((r) => `"${r.label}" (${r.evening_count} evening)`).join(', ')
+
+  return {
+    text:
+      `Based on ${period}, the location with the most evening (16:00–20:00) incidents is "${top.label}" in ${top.locality_name}: ` +
+      `${top.evening_count} of its ${top.total_count} incidents fell in that window and ${top.recent_count} in the last 30 days. ` +
+      `${top.weekday_evening_count} of the evening incidents ${top.weekday_evening_count === 1 ? 'was' : 'were'} on a ${tomorrow}. ` +
+      `It is a candidate for human review tomorrow evening, not a prediction.${others ? ` Other candidates: ${others}.` : ''}`,
+    bars: rows.map((r) => ({ label: r.label.replace('Synthetic ', ''), value: r.evening_count })),
+    evidence: [
+      {
+        tool: 'tool_candidate_areas',
+        scope: `top candidate of ${rows.length}: ${top.label}`,
+        period,
+        incidentCount: top.incident_ids.length,
+        references: await references(top.incident_ids),
+      },
+    ],
+    limitations,
+    highlightIds: top.incident_ids,
+    proposal: {
+      locality_code: top.locality_code,
+      title: `Review ${top.label.replace('Synthetic ', '')} tomorrow evening`,
+      problem: `${top.total_count} parking obstruction reports at "${top.label}" in the last ${CANDIDATE_DAYS} days; ${top.evening_count} between 16:00 and 20:00 (Bogotá time), ${top.recent_count} in the last 30 days.`,
+      period_start: from.toISOString(),
+      period_end: to.toISOString(),
+      evidence: {
+        tool: 'tool_candidate_areas',
+        params: { from: from.toISOString(), to: to.toISOString(), weekday, min_reports: MIN_REPEATS, evening_window: '16:00-20:00 America/Bogota' },
+        candidate: {
+          label: top.label,
+          locality_code: top.locality_code,
+          total_count: top.total_count,
+          evening_count: top.evening_count,
+          weekday_evening_count: top.weekday_evening_count,
+          recent_count: top.recent_count,
+          last_at: top.last_at,
+          lat: top.lat,
+          lng: top.lng,
+        },
+        ranking: rows.map((r) => ({ label: r.label, evening_count: r.evening_count, total_count: r.total_count })),
+        incident_ids: top.incident_ids,
+      },
+      limitations: limitations.join('\n'),
+      proposed_intervention: `Ask a human operator to review this location during tomorrow's (${tomorrow}) 16:00–20:00 window, check the reports for a genuine recurring obstruction, and decide whether any follow-up is warranted. This system proposes no dispatch and no sanction.`,
+    },
   }
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Dashboard } from '@/components/Dashboard'
 import { InvestigatePanel } from '@/components/InvestigatePanel'
+import { RecommendationsPanel } from '@/components/RecommendationsPanel'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth'
@@ -8,10 +9,33 @@ import { useAuth } from '@/lib/auth'
 export default function App() {
   const { profile, signOut } = useAuth()
   const [highlightIds, setHighlightIds] = useState<string[]>([])
+  const [tab, setTab] = useState<'ask' | 'recommendations'>('ask')
+  const [reloadKey, setReloadKey] = useState(0)
+  const [pending, setPending] = useState(0)
+
   return (
     <div className="relative h-svh overflow-hidden bg-background">
       <Dashboard highlightIds={highlightIds}>
-        <InvestigatePanel onHighlight={setHighlightIds} />
+        <div className="flex shrink-0 gap-1 rounded-lg border bg-card/95 p-1">
+          <Button size="sm" className="flex-1" variant={tab === 'ask' ? 'secondary' : 'ghost'} onClick={() => setTab('ask')}>
+            Investigate
+          </Button>
+          <Button
+            size="sm"
+            className="flex-1"
+            variant={tab === 'recommendations' ? 'secondary' : 'ghost'}
+            onClick={() => setTab('recommendations')}
+          >
+            Recommendations{pending > 0 ? ` (${pending})` : ''}
+          </Button>
+        </div>
+        {/* Both stay mounted so the conversation survives switching tabs. */}
+        <div className={tab === 'ask' ? 'contents' : 'hidden'}>
+          <InvestigatePanel onHighlight={setHighlightIds} onProposed={() => setReloadKey((k) => k + 1)} />
+        </div>
+        <div className={tab === 'recommendations' ? 'contents' : 'hidden'}>
+          <RecommendationsPanel reloadKey={reloadKey} onPending={setPending} />
+        </div>
       </Dashboard>
 
       <header className="absolute inset-x-0 top-0 flex items-center justify-between border-b bg-sidebar/90 px-4 py-3 backdrop-blur">

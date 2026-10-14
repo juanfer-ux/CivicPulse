@@ -6,10 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { SUGGESTIONS, answer, type Answer } from '@/lib/agent'
 import { fetchLocalities } from '@/lib/incidents'
+import { propose } from '@/lib/recommendations'
 
 type Turn = { question: string; result?: Answer; error?: string }
 
-export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[]) => void }) {
+export function InvestigatePanel({
+  onHighlight,
+  onProposed,
+}: {
+  onHighlight: (ids: string[]) => void
+  onProposed: () => void
+}) {
   const [turns, setTurns] = useState<Turn[]>([])
   const [busy, setBusy] = useState(false)
   const end = useRef<HTMLDivElement>(null)
@@ -69,7 +76,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
               <p className="self-end rounded-lg bg-secondary px-3 py-2">{t.question}</p>
               {!t.result && !t.error && <p className="text-muted-foreground">Querying…</p>}
               {t.error && <p className="text-incident">{t.error}</p>}
-              {t.result && <AnswerView result={t.result} onClear={() => onHighlight([])} />}
+              {t.result && <AnswerView result={t.result} onClear={() => onHighlight([])} onProposed={onProposed} />}
             </div>
           ))}
           <div ref={end} />
@@ -85,7 +92,22 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
   )
 }
 
-function AnswerView({ result, onClear }: { result: Answer; onClear: () => void }) {
+function AnswerView({ result, onClear, onProposed }: { result: Answer; onClear: () => void; onProposed: () => void }) {
+  const [state, setState] = useState<'idle' | 'saving' | 'done'>('idle')
+  const [error, setError] = useState<string | null>(null)
+  async function send() {
+    if (!result.proposal) return
+    setState('saving')
+    setError(null)
+    try {
+      await propose(result.proposal)
+      setState('done')
+      onProposed()
+    } catch (e) {
+      setState('idle')
+      setError(e instanceof Error ? e.message : 'Could not save the recommendation')
+    }
+  }
   const max = Math.max(1, ...result.bars.map((b) => b.value))
   return (
     <div className="flex flex-col gap-2 rounded-lg border bg-card/60 p-3">
@@ -127,6 +149,22 @@ function AnswerView({ result, onClear }: { result: Answer; onClear: () => void }
           <li key={l}>{l}</li>
         ))}
       </ul>
+      {result.proposal && (
+        <div className="flex flex-col gap-1 rounded-md border border-ai-border p-2 text-xs">
+          <p className="text-muted-foreground">
+            This is a suggestion for human review. Sending it creates a proposal that an operator can approve or reject;
+            nothing is dispatched.
+          </p>
+          {state === 'done' ? (
+            <p>Sent for review. Open the Recommendations tab to decide.</p>
+          ) : (
+            <Button size="sm" variant="outline" className="self-start" disabled={state === 'saving'} onClick={() => void send()}>
+              {state === 'saving' ? 'Sending…' : 'Send for human review'}
+            </Button>
+          )}
+          {error && <p className="text-incident">{error}</p>}
+        </div>
+      )}
       {result.highlightIds.length > 0 && (
         <Button size="sm" variant="ghost" className="self-start" onClick={onClear}>
           Clear map highlight
