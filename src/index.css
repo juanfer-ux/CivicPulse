@@ -1,0 +1,113 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Civic Pulse is dark-only: <html class="dark"> is set in index.html. */
+@custom-variant dark (&:is(.dark *));
+
+/* Gilroy is a licensed brand font (files copied from the owner's own Portfolio_2026 project). */
+@font-face { font-family: 'Gilroy'; font-weight: 400; font-display: swap; src: url('./assets/fonts/Gilroy-Regular.woff') format('woff'); }
+@font-face { font-family: 'Gilroy'; font-weight: 500; font-display: swap; src: url('./assets/fonts/Gilroy-Medium.woff') format('woff'); }
+@font-face { font-family: 'Gilroy'; font-weight: 600; font-display: swap; src: url('./assets/fonts/Gilroy-SemiBold.woff') format('woff'); }
+@font-face { font-family: 'Gilroy'; font-weight: 700; font-display: swap; src: url('./assets/fonts/Gilroy-Bold.woff') format('woff'); }
+
+@theme inline {
+  --font-sans: 'Gilroy', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --radius-xs: 2px;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-ai: var(--ai);
+  --color-ai-foreground: var(--ai-foreground);
+  --color-ai-border: var(--ai-border);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-incident: var(--incident);
+  --color-inset: var(--inset);
+}
+
+/* Dark tokens from the CivicPulse Figma design system (Theme · Dark). */
+:root {
+  --radius: 0.5rem;
+  --background: #151517;
+  --foreground: #DCDCDC;
+  --card: #1C1C1E;
+  --card-foreground: #DCDCDC;
+  --popover: #0F0F0F;
+  --popover-foreground: #DCDCDC;
+  --primary: #D3D3D3;
+  --primary-foreground: #151517;
+  --secondary: #323232;
+  --secondary-foreground: #DCDCDC;
+  --muted: #323232;
+  --muted-foreground: #A5A5A5;
+  --accent: #383838;
+  --accent-foreground: #EBEBEB;
+  --destructive: #8B0F0F;
+  --destructive-foreground: #FFFFFF;
+  --border: #323232;
+  --input: #404040;
+  --ring: #909090;
+  --chart-1: #6D79E2;
+  --chart-2: #FFA08F;
+  --chart-3: #EF9700;
+  --chart-4: #D3D3D3;
+  --chart-5: #7A7A7A;
+  --sidebar: #000000;
+  --sidebar-foreground: #7A7A7A;
+  --sidebar-primary: #D3D3D3;
+  --sidebar-primary-foreground: #151517;
+  --sidebar-accent: #151517;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #404040;
+  --sidebar-ring: #5F5F5F;
+  --ai: #22253F;
+  --ai-foreground: #EBEBEB;
+  --ai-border: #6D79E2;
+  --warning: #EF9700;
+  --warning-foreground: #151517;
+  --incident: #FFA08F;
+  --inset: #000000;
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground antialiased; }
+  html { @apply font-sans; color-scheme: dark; }
+}
