@@ -26,4 +26,4 @@ Turn "Confirm email" back on in Supabase Auth settings before deploying.
 Dark-only. Tokens in `src/index.css` come from the CivicPulse Figma file (Theme, Dark) with shadcn token names plus extensions `ai`, `warning`, `incident`, `inset`. Font: Gilroy (licensed; web files copied from the owner's Portfolio_2026 project).
 
 ## Status
-Phase 2 foundation done: scaffold, shadcn/ui, tokens, Supabase schema + RLS applied, auth gate. Next: synthetic incident seed, then the MapLibre dashboard.
+Phase 2 foundation done: scaffold, shadcn/ui, tokens, Supabase schema + RLS applied, auth gate. Synthetic seed: `supabase/seed/synthetic_incidents.sql` (500 incidents, re-runnable, run in the SQL editor). Next: MapLibre dashboard.
