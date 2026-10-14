@@ -9,8 +9,10 @@ React 19, TypeScript (strict), Vite, Tailwind v4, shadcn/ui (Radix, Nova preset)
 ```bash
 npm install
 npm run dev
+npm test        # planner and answer unit tests (Vitest)
 npm run build
 ```
+Deployment (Vercel + Supabase): see [DEPLOY.md](DEPLOY.md). Database tests: `supabase/tests/rls_smoke.sql`.
 
 ## Auth and roles
 Email + password via Supabase Auth. `AuthGate` (`src/components/AuthGate.tsx`) guards the whole app: signed out shows login/sign-up, signed in without an active role shows "Access pending". New sign-ups get a profile with **no role**; only a Super Admin (or the SQL editor) can assign one. Permissions are enforced by RLS, not the UI.
