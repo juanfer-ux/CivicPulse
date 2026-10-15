@@ -37,7 +37,7 @@ export function AuthPage() {
     <main className="grid min-h-svh place-items-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <Logo className="ml-2" />
+          <Logo className="mb-9 ml-2" /> {/* Figma: 40px from logo row to title (4px header gap + 36px) */}
           <CardTitle>{signup ? 'Create account' : 'Sign in'}</CardTitle>
           <CardDescription>
             {signup
