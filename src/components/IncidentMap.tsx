@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import { GROUPS, groupOf, type Incident } from '@/lib/incidents'
+import { GROUPS, groupOf, label, type Incident } from '@/lib/incidents'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.
 const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
@@ -10,6 +10,9 @@ const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 maplibregl.setWorkerUrl(workerUrl)
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
+
+// MapLibre needs WebGL2. Without it (GPU acceleration off, some VMs) we show a list instead of crashing.
+const WEBGL2 = !!document.createElement('canvas').getContext('webgl2')
 
 interface Props {
   incidents: Incident[]
@@ -30,6 +33,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
   }, [onSelect])
 
   useEffect(() => {
+    if (!WEBGL2) return
     const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: 11 })
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     map.on('load', () => {
@@ -102,10 +106,40 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
     map.setFilter('incident-selected', ['==', ['get', 'id'], selectedId ?? ''])
   }, [ready, selectedId])
 
+  if (!WEBGL2) return <ListFallback incidents={incidents} selectedId={selectedId} onSelect={onSelect} />
+
   // Wrapper positions the map: maplibre's unlayered CSS overrides Tailwind's `absolute` on the map element itself.
   return (
     <div className="absolute inset-0">
       <div ref={container} className="size-full" />
+    </div>
+  )
+}
+
+function ListFallback({ incidents, selectedId, onSelect }: Pick<Props, 'incidents' | 'selectedId' | 'onSelect'>) {
+  return (
+    <div className="absolute inset-y-0 left-80 right-[26rem] overflow-y-auto px-4 pb-4 pt-16">
+      <p className="mb-3 rounded-md border border-warning/50 p-3 text-sm text-muted-foreground">
+        The map needs WebGL2, which this browser has turned off. In Chrome: Settings → System → turn on “Use graphical
+        acceleration when available”, then relaunch. Until then, here is the list of incidents (newest 100).
+      </p>
+      <ul className="flex flex-col gap-1">
+        {incidents.slice(0, 100).map((i) => (
+          <li key={i.id}>
+            <button
+              onClick={() => onSelect(i.id)}
+              aria-pressed={i.id === selectedId}
+              className={`flex w-full items-center gap-2 rounded-md border px-3 py-2 text-left text-sm hover:bg-accent ${i.id === selectedId ? 'border-ring bg-accent' : 'bg-card/60'}`}
+            >
+              <span className="size-2.5 shrink-0 rounded-full" style={{ background: GROUPS[groupOf(i.status)].color }} aria-hidden />
+              <span className="flex-1">
+                {i.reference} · {label(i.obstruction_subtype)}
+              </span>
+              <span className="text-xs text-muted-foreground">{new Date(i.occurred_at).toLocaleDateString('en-GB')}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
