@@ -110,7 +110,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
 
   // Wrapper positions the map: maplibre's unlayered CSS overrides Tailwind's `absolute` on the map element itself.
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-x-0 top-0 bottom-14 md:bottom-0">
       <div ref={container} className="size-full" />
     </div>
   )
@@ -118,7 +118,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
 
 function ListFallback({ incidents, selectedId, onSelect }: Pick<Props, 'incidents' | 'selectedId' | 'onSelect'>) {
   return (
-    <div className="absolute inset-y-0 left-80 right-[26rem] overflow-y-auto px-4 pb-4 pt-16">
+    <div className="absolute inset-y-0 inset-x-0 overflow-y-auto px-4 pb-16 pt-16 md:left-80 md:right-[26rem] md:pb-4">
       <p className="mb-3 rounded-md border border-warning/50 p-3 text-sm text-muted-foreground">
         The map needs WebGL2, which this browser has turned off. In Chrome: Settings → System → turn on “Use graphical
         acceleration when available”, then relaunch. Until then, here is the list of incidents (newest 100).

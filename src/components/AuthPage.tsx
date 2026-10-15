@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Logo } from '@/components/Logo'
 import { supabase } from '@/lib/supabase'
 
 export function AuthPage() {
@@ -36,7 +37,7 @@ export function AuthPage() {
     <main className="grid min-h-svh place-items-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <span className="text-sm font-semibold tracking-[0.2em]">CIVIC PULSE</span>
+          <Logo className="ml-2" />
           <CardTitle>{signup ? 'Create account' : 'Sign in'}</CardTitle>
           <CardDescription>
             {signup

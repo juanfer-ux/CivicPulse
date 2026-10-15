@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { X } from 'lucide-react'
+import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { MediaGallery } from '@/components/MediaGallery'
 import { Badge } from '@/components/ui/badge'
@@ -27,7 +27,18 @@ const DAY = 86_400_000
 
 type Data = { incidents: Incident[]; localities: Locality[] }
 
-export function Dashboard({ highlightIds, children }: { highlightIds: string[]; children?: ReactNode }) {
+export type Tab = 'explore' | 'ask' | 'recommendations'
+
+interface Props {
+  highlightIds: string[]
+  /** Active panel. On desktop only 'recommendations' differs; on mobile each tab is its own panel. */
+  tab: Tab
+  onTab: (tab: Tab) => void
+  pending: number
+  children?: ReactNode
+}
+
+export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -36,6 +47,7 @@ export function Dashboard({ highlightIds, children }: { highlightIds: string[]; 
   const [subtype, setSubtype] = useState('')
   const [days, setDays] = useState(0)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [collapsed, setCollapsed] = useState(false) // mobile bottom sheet only
 
   useEffect(() => {
     fetchDashboardData().then(setData, (e: Error) => setError(e.message))
@@ -68,6 +80,14 @@ export function Dashboard({ highlightIds, children }: { highlightIds: string[]; 
   }, [filtered])
 
   const selected = filtered.find((i) => i.id === selectedId) ?? null
+  const select = (id: string | null) => {
+    setSelectedId(id)
+    if (id) setCollapsed(false)
+  }
+  const pick = (t: Tab) => {
+    onTab(t)
+    setCollapsed(false)
+  }
 
   return (
     <>
@@ -75,10 +95,33 @@ export function Dashboard({ highlightIds, children }: { highlightIds: string[]; 
         incidents={filtered}
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
-        onSelect={setSelectedId}
+        onSelect={select}
       />
 
-      <div className="absolute left-4 top-16 flex w-72 flex-col gap-3">
+      {/* Mobile: bottom sheet over the map. Desktop (md+): `contents`, so the two columns float over the map. */}
+      <div
+        className={`fixed inset-x-0 bottom-0 z-10 flex flex-col gap-2 rounded-t-2xl border-t bg-sidebar/95 p-2 backdrop-blur md:contents ${collapsed ? 'max-md:[&>:not(:first-child)]:hidden' : 'h-[62svh]'}`}
+      >
+        <div className="flex shrink-0 gap-1 md:hidden">
+          {(
+            [
+              ['explore', 'Explore'],
+              ['ask', 'Investigate'],
+              ['recommendations', pending > 0 ? `Recs (${pending})` : 'Recs'],
+            ] as const
+          ).map(([t, text]) => (
+            <Button key={t} size="sm" className="flex-1" variant={tab === t && !collapsed ? 'secondary' : 'ghost'} onClick={() => pick(t)}>
+              {text}
+            </Button>
+          ))}
+          <Button size="icon-sm" variant="ghost" aria-label={collapsed ? 'Expand panel' : 'Collapse panel'} onClick={() => setCollapsed((c) => !c)}>
+            {collapsed ? <ChevronUp /> : <ChevronDown />}
+          </Button>
+        </div>
+
+      <div
+        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto md:absolute md:left-4 md:top-16 md:flex md:w-72 md:flex-none md:overflow-visible`}
+      >
         <Card className="bg-card/95">
           <CardHeader>
             <CardTitle>Filters</CardTitle>
@@ -161,7 +204,9 @@ export function Dashboard({ highlightIds, children }: { highlightIds: string[]; 
         </Card>
       </div>
 
-      <div className="pointer-events-none absolute bottom-4 right-4 top-16 flex w-96 flex-col gap-3 [&>*]:pointer-events-auto">
+      <div
+        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 md:pointer-events-none md:absolute md:bottom-4 md:right-4 md:top-16 md:flex md:w-96 md:flex-none md:[&>*]:pointer-events-auto`}
+      >
         {children}
         {selected && (
         <Card className="max-h-[45%] shrink-0 overflow-auto bg-card/95">
@@ -215,6 +260,7 @@ export function Dashboard({ highlightIds, children }: { highlightIds: string[]; 
           </CardContent>
         </Card>
         )}
+      </div>
       </div>
     </>
   )

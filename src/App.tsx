@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Dashboard } from '@/components/Dashboard'
+import { Dashboard, type Tab } from '@/components/Dashboard'
 import { InvestigatePanel } from '@/components/InvestigatePanel'
 import { RecommendationsPanel } from '@/components/RecommendationsPanel'
 import { Badge } from '@/components/ui/badge'
@@ -9,15 +9,15 @@ import { useAuth } from '@/lib/auth'
 export default function App() {
   const { profile, signOut } = useAuth()
   const [highlightIds, setHighlightIds] = useState<string[]>([])
-  const [tab, setTab] = useState<'ask' | 'recommendations'>('ask')
+  const [tab, setTab] = useState<Tab>('explore')
   const [reloadKey, setReloadKey] = useState(0)
   const [pending, setPending] = useState(0)
 
   return (
     <div className="relative h-svh overflow-hidden bg-background">
-      <Dashboard highlightIds={highlightIds}>
-        <div className="flex shrink-0 gap-1 rounded-lg border bg-card/95 p-1">
-          <Button size="sm" className="flex-1" variant={tab === 'ask' ? 'secondary' : 'ghost'} onClick={() => setTab('ask')}>
+      <Dashboard highlightIds={highlightIds} tab={tab} onTab={setTab} pending={pending}>
+        <div className="flex shrink-0 gap-1 rounded-lg border bg-card/95 p-1 max-md:hidden">
+          <Button size="sm" className="flex-1" variant={tab !== 'recommendations' ? 'secondary' : 'ghost'} onClick={() => setTab('ask')}>
             Investigate
           </Button>
           <Button
@@ -30,7 +30,7 @@ export default function App() {
           </Button>
         </div>
         {/* Both stay mounted so the conversation survives switching tabs. */}
-        <div className={tab === 'ask' ? 'contents' : 'hidden'}>
+        <div className={tab === 'ask' ? 'contents' : tab === 'explore' ? 'hidden md:contents' : 'hidden'}>
           <InvestigatePanel onHighlight={setHighlightIds} onProposed={() => setReloadKey((k) => k + 1)} />
         </div>
         <div className={tab === 'recommendations' ? 'contents' : 'hidden'}>
@@ -42,7 +42,9 @@ export default function App() {
         <span className="text-sm font-semibold tracking-[0.2em] text-foreground">CIVIC PULSE</span>
         <div className="flex items-center gap-2">
           <Badge variant="secondary">Synthetic data</Badge>
-          <Badge variant="outline">{profile?.role?.replace('_', ' ')}</Badge>
+          <Badge variant="outline" className="max-sm:hidden">
+            {profile?.role?.replace('_', ' ')}
+          </Badge>
           <Button size="sm" variant="ghost" onClick={signOut}>
             Sign out
           </Button>
