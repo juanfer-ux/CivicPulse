@@ -39,12 +39,13 @@ stateDiagram-v2
   [*] --> proposed
   proposed --> approved
   proposed --> rejected
-  proposed --> needs_second_approval : target, specialist escalates
+  proposed --> needs_second_approval : specialist escalates
   needs_second_approval --> approved
   needs_second_approval --> rejected
 ```
-- ✅ **As built:** `proposed`, `approved`, `rejected`. A recommendation always starts as `proposed`. It changes only when a **decision** is recorded; a database trigger updates the status and writes the audit event in one step.
-- ⬜ **Target:** add `needs_second_approval` (escalation rule in the roles spec). Once escalated, only a Locality Admin or Super Admin can decide it.
+- ✅ **As built:** `proposed`, `needs_second_approval`, `approved`, `rejected`. A recommendation always starts as `proposed`. It changes only through a recorded **decision** (a trigger updates the status and writes the audit event) or through **escalation** (`escalate_recommendation`, specialists only, writes an audit event).
+- 🔒 Once escalated (`needs_second_approval`), only a Locality Admin or Super Admin can decide it. A specialist cannot.
+- ⬜ **No screen yet** for escalation; the database function works and is tested.
 - 🛑 **Approval never triggers a real-world action.** No ticketing, dispatch or enforcement.
 
 ## 🟥 Gaps (as built)

@@ -1,9 +1,10 @@
 import { supabase } from '@/lib/supabase'
 
-export type RecommendationStatus = 'proposed' | 'approved' | 'rejected'
+export type RecommendationStatus = 'proposed' | 'needs_second_approval' | 'approved' | 'rejected'
 
 export interface Draft {
   locality_code: number
+  category: string
   title: string
   problem: string
   period_start: string

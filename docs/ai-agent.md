@@ -20,6 +20,9 @@ flowchart LR
 - 🔢 **All numbers come from SQL.** Text is a template filled with those numbers. Nothing is invented.
 - 🏷️ The panel shows a **Mock mode** badge so nobody thinks an LLM wrote it.
 
+## 🗂️ Categories
+Say "illegal dumping" or "parking" in the question to limit it to that category. With no category named (or both), the agent uses **all categories you may see** and says so in every answer ("Category: ..."). Specialists only ever get their assigned categories.
+
 ## 🔎 The five investigations
 | | Question type | Tool (SQL function) | Notes |
 |---|---|---|---|
@@ -42,15 +45,15 @@ Unsupported questions get an honest "I cannot answer that yet". The agent does n
 5. 🧑 Never act. Sending a proposal for review creates a *proposed* recommendation; a person approves or rejects it.
 6. ❓ If the data cannot support an answer, say so.
 
-## 🔮 Target (not built)
+## 🔮 Target and done
 | | Item |
 |---|---|
 | ⬜ | An **Edge Function** replaces the rule-based planner with an LLM that picks tools. The tools, the answer shape and the rules above stay the same; the API key stays on the server. |
-| ⬜ | Tools respect the **category scope** and roles of the new spec (specialists see only their categories). |
+| 🟩 | Done: tools respect role, locality and **category scope**, need the `ask_agent` permission, and accept a category. |
 | ⬜ | The agent **advises escalation** instead of direct approval for large interventions (for example grouped reports in one area). |
-| ⬜ | Tools for **illegal dumping** and later categories. |
+| 🟩 | Done: illegal dumping works with every investigation. Later categories need only a new row in `incident_categories`. |
 | ⬜ | "Why are you recommending this?" follow-up that explains from the stored evidence. |
 
 ## 🟥 Known gaps
-- The planner understands a limited set of phrasings (the five suggested questions and close variants).
+- The planner understands a limited set of phrasings (the six suggested questions and close variants).
 - It cannot yet follow up on a previous answer.

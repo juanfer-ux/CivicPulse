@@ -13,7 +13,6 @@ import {
   type Recommendation,
 } from '@/lib/recommendations'
 
-const DECIDERS = ['super_admin', 'locality_admin', 'specialist_operator', 'general_operator']
 const when = (iso: string) =>
   new Date(iso).toLocaleString('en-GB', { timeZone: 'America/Bogota', dateStyle: 'medium', timeStyle: 'short' })
 
@@ -24,8 +23,7 @@ interface Props {
 }
 
 export function RecommendationsPanel({ reloadKey, onPending }: Props) {
-  const { profile, session } = useAuth()
-  const canDecide = !!profile?.role && DECIDERS.includes(profile.role)
+  const { profile, session, can } = useAuth()
   const [data, setData] = useState<{
     recommendations: Recommendation[]
     decisions: Decision[]
@@ -38,7 +36,7 @@ export function RecommendationsPanel({ reloadKey, onPending }: Props) {
     try {
       const next = await listRecommendations()
       setData(next)
-      onPending(next.recommendations.filter((r) => r.status === 'proposed').length)
+      onPending(next.recommendations.filter((r) => r.status === 'proposed' || r.status === 'needs_second_approval').length)
       setAudit(await listAudit())
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load recommendations')
@@ -73,7 +71,10 @@ export function RecommendationsPanel({ reloadKey, onPending }: Props) {
             rec={r}
             decisions={data.decisions.filter((d) => d.recommendation_id === r.id)}
             who={who}
-            canDecide={canDecide}
+            canDecide={
+              (r.status === 'proposed' && can('decide_recommendation')) ||
+              (r.status === 'needs_second_approval' && can('review_escalations'))
+            }
             onDecided={load}
           />
         ))}
@@ -135,7 +136,9 @@ function RecommendationCard({
     <div className="flex flex-col gap-2 rounded-lg border bg-card/60 p-3">
       <div className="flex items-start justify-between gap-2">
         <p className="font-medium">{rec.title}</p>
-        <Badge variant={rec.status === 'proposed' ? 'secondary' : 'outline'}>{label(rec.status)}</Badge>
+        <Badge variant={rec.status === 'proposed' || rec.status === 'needs_second_approval' ? 'secondary' : 'outline'}>
+          {label(rec.status)}
+        </Badge>
       </div>
       <p>{rec.problem}</p>
       <p>
@@ -145,6 +148,8 @@ function RecommendationCard({
       <details className="text-xs text-muted-foreground">
         <summary className="cursor-pointer">Evidence and limitations</summary>
         <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-2">
+          <dt>Category</dt>
+          <dd className="text-foreground">{label(rec.category)}</dd>
           <dt>Tool</dt>
           <dd className="text-foreground">{ev.tool}</dd>
           <dt>Incidents</dt>
@@ -169,7 +174,7 @@ function RecommendationCard({
           {d.explanation ? ` · “${d.explanation}”` : ''}
         </p>
       ))}
-      {rec.status === 'proposed' && canDecide && (
+      {(rec.status === 'proposed' || rec.status === 'needs_second_approval') && canDecide && (
         <div className="flex flex-col gap-2">
           <textarea
             aria-label="Explanation"
@@ -190,8 +195,8 @@ function RecommendationCard({
           {error && <p className="text-xs text-incident">{error}</p>}
         </div>
       )}
-      {rec.status === 'proposed' && !canDecide && (
-        <p className="text-xs text-muted-foreground">Your role cannot approve or reject recommendations.</p>
+      {(rec.status === 'proposed' || rec.status === 'needs_second_approval') && !canDecide && (
+        <p className="text-xs text-muted-foreground">Your role cannot approve or reject this recommendation.</p>
       )}
     </div>
   )

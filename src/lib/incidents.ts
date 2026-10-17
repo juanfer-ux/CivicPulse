@@ -23,7 +23,10 @@ export interface Incident {
   occurred_at: string
   reported_at: string
   vehicle_type: string
-  obstruction_subtype: string
+  category: string
+  /** Parking only. Other categories use `subtype`. */
+  obstruction_subtype: string | null
+  subtype: string | null
   ai_classification: string | null
   ai_confidence: number | null
   uncertainty_flags: string[]
@@ -50,7 +53,7 @@ export const STATUSES: IncidentStatus[] = [
   'duplicate',
 ]
 
-export const SUBTYPES = [
+const PARKING_SUBTYPES = [
   'sidewalk',
   'pedestrian_access',
   'prohibited_zone',
@@ -58,6 +61,24 @@ export const SUBTYPES = [
   'intersection',
   'other_public_space',
 ]
+const DUMPING_SUBTYPES = ['household_waste', 'construction_debris', 'bulky_items']
+
+/** Type options for the filter: all of them, or only those of one category. */
+export const subtypesFor = (category: string) =>
+  category === 'parking'
+    ? PARKING_SUBTYPES
+    : category === 'illegal_dumping'
+      ? DUMPING_SUBTYPES
+      : [...PARKING_SUBTYPES, ...DUMPING_SUBTYPES]
+
+/** The incident's type, whichever category it belongs to. */
+export const typeOf = (i: Pick<Incident, 'subtype' | 'obstruction_subtype'>) =>
+  i.subtype ?? i.obstruction_subtype ?? 'unknown'
+
+export interface Category {
+  code: string
+  name: string
+}
 
 /** Map colours (MapLibre needs literals; they match the --warning, --incident and muted tokens). */
 export const GROUPS = {
@@ -82,13 +103,19 @@ export const label = (value: string) => {
 
 /** RLS decides which rows come back: a user only receives incidents in their scope. */
 export async function fetchDashboardData() {
-  const [incidents, localities] = await Promise.all([
+  const [incidents, localities, categories] = await Promise.all([
     supabase.from('incidents').select('*').order('occurred_at', { ascending: false }).limit(1000),
     supabase.from('localities').select('code, name').order('code'),
+    supabase.from('incident_categories').select('code, name').eq('active', true).order('code'),
   ])
   if (incidents.error) throw incidents.error
   if (localities.error) throw localities.error
-  return { incidents: incidents.data as Incident[], localities: localities.data as Locality[] }
+  if (categories.error) throw categories.error
+  return {
+    incidents: incidents.data as Incident[],
+    localities: localities.data as Locality[],
+    categories: categories.data as Category[],
+  }
 }
 
 export async function fetchLocalities() {

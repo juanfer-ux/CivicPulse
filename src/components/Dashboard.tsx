@@ -8,10 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   GROUPS,
   STATUSES,
-  SUBTYPES,
+  subtypesFor,
+  typeOf,
   fetchDashboardData,
   groupOf,
   label,
+  type Category,
   type Incident,
   type Locality,
 } from '@/lib/incidents'
@@ -25,7 +27,7 @@ const PERIODS = [
 ]
 const DAY = 86_400_000
 
-type Data = { incidents: Incident[]; localities: Locality[] }
+type Data = { incidents: Incident[]; localities: Locality[]; categories: Category[] }
 
 export type Tab = 'explore' | 'ask' | 'recommendations'
 
@@ -44,6 +46,7 @@ export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props
   const [now] = useState(() => Date.now())
   const [locality, setLocality] = useState('')
   const [status, setStatus] = useState('')
+  const [category, setCategory] = useState('')
   const [subtype, setSubtype] = useState('')
   const [days, setDays] = useState(0)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -60,11 +63,12 @@ export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props
       (data?.incidents ?? []).filter(
         (i) =>
           (!locality || i.locality_code === Number(locality)) &&
+          (!category || i.category === category) &&
           (!status || i.status === status) &&
-          (!subtype || i.obstruction_subtype === subtype) &&
+          (!subtype || typeOf(i) === subtype) &&
           (!days || new Date(i.occurred_at).getTime() >= now - days * DAY),
       ),
-    [data, locality, status, subtype, days, now],
+    [data, locality, category, status, subtype, days, now],
   )
 
   const byGroup = useMemo(() => {
@@ -135,6 +139,22 @@ export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props
                 </option>
               ))}
             </select>
+            <select
+              aria-label="Category"
+              className={selectClass}
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value)
+                setSubtype('')
+              }}
+            >
+              <option value="">All categories</option>
+              {data?.categories.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
             <select aria-label="Status" className={selectClass} value={status} onChange={(e) => setStatus(e.target.value)}>
               <option value="">All statuses</option>
               {STATUSES.map((s) => (
@@ -143,9 +163,9 @@ export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props
                 </option>
               ))}
             </select>
-            <select aria-label="Obstruction type" className={selectClass} value={subtype} onChange={(e) => setSubtype(e.target.value)}>
-              <option value="">All obstruction types</option>
-              {SUBTYPES.map((s) => (
+            <select aria-label="Incident type" className={selectClass} value={subtype} onChange={(e) => setSubtype(e.target.value)}>
+              <option value="">All types</option>
+              {subtypesFor(category).map((s) => (
                 <option key={s} value={s}>
                   {label(s)}
                 </option>
@@ -240,8 +260,12 @@ export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props
               <dd className="text-foreground">{new Date(selected.occurred_at).toLocaleString('en-GB')}</dd>
               <dt>Reported</dt>
               <dd className="text-foreground">{new Date(selected.reported_at).toLocaleString('en-GB')}</dd>
+              <dt>Category</dt>
+              <dd className="text-foreground">
+                {data?.categories.find((c) => c.code === selected.category)?.name ?? label(selected.category)}
+              </dd>
               <dt>Type</dt>
-              <dd className="text-foreground">{label(selected.obstruction_subtype)}</dd>
+              <dd className="text-foreground">{label(typeOf(selected))}</dd>
               <dt>Vehicle</dt>
               <dd className="text-foreground">{label(selected.vehicle_type)}</dd>
               <dt>AI</dt>

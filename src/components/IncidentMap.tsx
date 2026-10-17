@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import { GROUPS, groupOf, label, type Incident } from '@/lib/incidents'
+import { GROUPS, groupOf, label, typeOf, type Incident } from '@/lib/incidents'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.
 const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
@@ -133,7 +133,7 @@ function ListFallback({ incidents, selectedId, onSelect }: Pick<Props, 'incident
             >
               <span className="size-2.5 shrink-0 rounded-full" style={{ background: GROUPS[groupOf(i.status)].color }} aria-hidden />
               <span className="flex-1">
-                {i.reference} · {label(i.obstruction_subtype)}
+                {i.reference} · {label(typeOf(i))}
               </span>
               <span className="text-xs text-muted-foreground">{new Date(i.occurred_at).toLocaleDateString('en-GB')}</span>
             </button>

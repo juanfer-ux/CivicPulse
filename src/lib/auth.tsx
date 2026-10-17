@@ -2,12 +2,24 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 
-export type AppRole =
-  | 'super_admin'
-  | 'locality_admin'
-  | 'sector_admin'
-  | 'specialist_operator'
-  | 'general_operator'
+/** The three active roles. Permissions per role live in the database (role_permissions); see docs/roles-and-permissions.md. */
+export type AppRole = 'super_admin' | 'locality_admin' | 'specialist_operator'
+
+/** Actions a role may be allowed. Mirrors role_permissions.action. */
+export type Action =
+  | 'view_incidents'
+  | 'view_media'
+  | 'ask_agent'
+  | 'propose_recommendation'
+  | 'decide_recommendation'
+  | 'escalate_recommendation'
+  | 'review_escalations'
+  | 'assign_incidents'
+  | 'view_team'
+  | 'view_audit_own'
+  | 'view_audit_all'
+  | 'manage_users'
+  | 'manage_settings'
 
 export interface Profile {
   full_name: string | null
@@ -20,6 +32,8 @@ interface AuthState {
   session: Session | null | undefined
   /** undefined while loading, null if the row is missing */
   profile: Profile | null | undefined
+  /** True if the user's role allows the action. The database enforces it; this only drives the screen. */
+  can: (action: Action) => boolean
   signOut: () => Promise<void>
 }
 
@@ -28,6 +42,7 @@ const AuthContext = createContext<AuthState | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null | undefined>(undefined)
   const [fetched, setFetched] = useState<{ id: string; data: Profile | null } | null>(null)
+  const [fetchedPerms, setFetchedPerms] = useState<{ role: AppRole; actions: Set<string> } | null>(null)
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((_event, next) => setSession(next))
@@ -55,11 +70,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const profile: Profile | null | undefined =
     session === undefined ? undefined : !userId ? null : fetched?.id === userId ? fetched.data : undefined
 
+  const role = profile?.role ?? null
+  useEffect(() => {
+    if (!role) return
+    let stale = false
+    supabase
+      .from('role_permissions')
+      .select('action')
+      .eq('role', role)
+      .then(({ data }) => {
+        if (!stale) setFetchedPerms({ role, actions: new Set((data ?? []).map((r) => r.action as string)) })
+      })
+    return () => {
+      stale = true
+    }
+  }, [role])
+  const permissions = role && fetchedPerms?.role === role ? fetchedPerms.actions : undefined
+  const can = (action: Action) => permissions?.has(action) ?? false
+
   const signOut = async () => {
     await supabase.auth.signOut()
   }
 
-  return <AuthContext value={{ session, profile, signOut }}>{children}</AuthContext>
+  return <AuthContext value={{ session, profile, can, signOut }}>{children}</AuthContext>
 }
 
 export function useAuth() {

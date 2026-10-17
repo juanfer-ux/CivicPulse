@@ -3,7 +3,7 @@
 > 📚 Part of the [documentation index](README.md).
 
 > **Status:** ✅ Approved by the owner (2026-10-17). This file is the **single source of truth**: change it first, then the code, then the tests.
-> ⚠️ The code is **not yet aligned** with this spec (see section 9).
+> 🟩 The **database is aligned** with this spec (2026-10-17, permission test 26/26). Screens for managing users, the team and escalation are still to build (section 9).
 
 ## ⚡ In 30 seconds
 - 🟣 **Super Admin**: runs the whole city and the system.
@@ -48,7 +48,7 @@ A **specialization** is a *group of incident categories*. The Super Admin picks 
 | | Specialization | Incident categories under it | Status |
 |---|---|---|---|
 | 🚦 | **Traffic** | Obstructive parking | 🟩 Active, has data |
-| 🌿 | **Environmental** | Illegal dumping | 🟨 Active; synthetic data still to be created |
+| 🌿 | **Environmental** | Illegal dumping | 🟩 Active, has data (150 synthetic incidents) |
 | 🏗️ | **Infrastructure** | *(none yet)* | ⚪ Created, empty. Categories added later |
 
 ---
@@ -118,17 +118,22 @@ flowchart LR
 | # | Case | Expected | Covered today |
 |---|---|---|---|
 | T1 | 🔵 reads incidents | only their localities, all categories | ✅ |
-| T2 | 🟢 reads incidents | only assigned localities and categories | ⬜ |
-| T3 | 🟢 with no categories | sees nothing | ⬜ |
+| T2 | 🟢 reads incidents | only assigned localities and categories | ✅ |
+| T3 | 🟢 with no categories | sees nothing | ✅ |
 | T4 | Anyone but 🟣 changes their own role | blocked | ✅ |
-| T5 | 🟢 proposes outside their scope | blocked | ⬜ |
-| T6 | 🟢 approves inside their scope | allowed | ⬜ |
-| T7 | 🟢 decides an escalated recommendation | blocked | ⬜ |
-| T8 | 🔵 decides an escalated recommendation | allowed | ⬜ |
-| T9 | 🔵 creates or changes a user | blocked | ⬜ |
+| T5 | 🟢 proposes outside their scope | blocked | ✅ |
+| T6 | 🟢 approves inside their scope | allowed | ✅ |
+| T7 | 🟢 decides an escalated recommendation | blocked | ✅ |
+| T8 | 🔵 decides an escalated recommendation | allowed | ✅ |
+| T9 | 🔵 creates or changes a user | blocked | ✅ |
 | T10 | 🔵 reads another locality | blocked | ✅ |
 | T11 | Agent tools run as a restricted user | scoped like T1 or T2 | ✅ |
 | T12 | Anyone inserts an audit event or a pre-approved recommendation | blocked | ✅ |
+
+---
+
+
+All 12 cases are covered by 26 checks, all passing (2026-10-17).
 
 ---
 
@@ -140,26 +145,29 @@ flowchart LR
 
 ---
 
-## 🧱 9. As built today (2026-10-17) and gaps
+## 🧱 9. As built today (2026-10-17)
 | | Item |
 |---|---|
-| 🟥 | Database has **5** roles including the two removed ones. Locality Admin, Specialist and General Operator behave **identically**. Only Super Admin differs. |
-| 🟥 | Category is hard-coded to `parking`. No specializations or categories tables. |
-| 🟥 | A Locality Admin currently needs category rows like a specialist. They should see all categories in their localities. |
-| 🟥 | Recommendations and decisions are filtered by **locality only**, not category: a specialist could see other categories' recommendations. |
-| 🟥 | No escalation status, no team view, no assignment screen (`incidents.assigned_to` exists but is unused). |
-| 🟥 | No screen to assign roles or scope (SQL only). Frontend repeats the role list (`DECIDERS` in `src/components/RecommendationsPanel.tsx`). |
-| 🟨 | `rls_smoke.sql` covers only some cases (see section 7). |
-| 🟩 | Working: least-privilege default, scope by locality, audit written by triggers, agent tools scoped to the user, first-admin bootstrap. |
+| 🟩 | **3 roles** in the database. Permissions are **data** (`role_permissions`) read by every access rule and by the app (`can(action)`): no more duplicated role lists. |
+| 🟩 | Scope by **locality and category**: Locality Admin sees all categories in their localities; Specialist only assigned categories; none assigned means nothing. |
+| 🟩 | Recommendations and decisions scoped by locality **and category**. |
+| 🟩 | **Escalation:** status `needs_second_approval`; a specialist's escalation is the database function `escalate_recommendation`; once escalated only Locality Admin or Super Admin can decide. |
+| 🟩 | Specializations and categories tables (traffic: parking, environmental: illegal dumping, infrastructure: empty). 150 synthetic dumping incidents. |
+| 🟩 | Agent tools need the `ask_agent` permission and take an optional category. |
+| 🟩 | Permission test: 26 checks (T1 to T12 plus extras), all passing. |
+| 🟥 | **No screen to assign roles, localities or categories** (SQL only). |
+| 🟥 | **No team view and no incident assignment screen** (`incidents.assigned_to` exists; database lets Locality Admin and Super Admin assign). |
+| 🟥 | **No escalate button.** The database function works; screens come with the agent. |
+| 🟥 | No sample user per role to sign in with (the test uses rolled-back fake users). |
+| 🟨 | Incident status changes have no screen; only Super Admin and Locality Admin may update incidents. |
 
 ---
 
-## 🛠️ 10. Implementation notes (not built; separate approval)
-- 🧱 Reduce `app_role` to 3 values (Postgres cannot drop enum values, so the type is recreated and data migrated).
-- 🗃️ New tables: `specializations`, `incident_categories` (code, name, specialization, active). `user_incident_type_access` points at categories.
-- 📋 Store this matrix as data (`role_permissions`) with a `has_permission(action)` function that RLS policies call. One TypeScript `can(role, action)` mirrors it for the screens.
-- ⬆️ Add `needs_second_approval` to the recommendation statuses; scope recommendations and decisions by category.
-- 🖥️ Super Admin screen (users, roles, localities, categories); one sample user per role; tests T1 to T12; synthetic illegal-dumping incidents.
+## 🛠️ 10. What is left to build (separate approval)
+- 🖥️ Super Admin screen (users, roles, localities, categories) and settings.
+- 👨‍👩‍👧 Locality Admin team view and incident assignment.
+- ⬆️ Escalate button and second-approval queue, with the agent's advice to escalate.
+- 👤 One sample user per role for manual sign-in tests.
 
 ---
 
@@ -174,3 +182,7 @@ flowchart LR
 | 2026-10-17 | Only 🟣 manages users and system settings | Least privilege |
 | 2026-10-17 | No other roles for now | Owner's decision |
 | 2026-10-17 | Spec restyled with emojis, legend and diagram for readability | Owner's request |
+| 2026-10-17 | Permissions stored as data (`role_permissions`) and checked by `has_permission()` | One source for database and app; see [decision 0007](decisions/0007-permissions-as-data.md) |
+| 2026-10-17 | Categories and specializations became tables | Extensible without code changes; see [decision 0008](decisions/0008-categories-and-specializations-tables.md) |
+| 2026-10-17 | Illegal dumping is active with 150 synthetic incidents; the agent is category-aware | Owner's decision, so the second category is visible and testable |
+| 2026-10-17 | Database aligned with this spec; permission test 26/26 | Implementation step 1 |

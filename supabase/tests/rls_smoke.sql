@@ -1,65 +1,152 @@
--- RLS smoke test. Run in the Supabase SQL editor after the migrations and seed.
--- It simulates signed-in users inside one DO block that ALWAYS ends with a raised exception, so every
--- row it creates (including the fake user) is rolled back. Read the RESULT line in the error message.
+-- Permission smoke test for docs/roles-and-permissions.md (cases T1 to T12).
+-- Run in the Supabase SQL editor after the migrations and both seeds. A Super Admin must exist.
+-- It simulates signed-in users inside ONE DO block that ALWAYS ends by raising an exception, so every row it
+-- creates (fake users, recommendations, decisions, audit events) is rolled back. Read the RESULT line.
 --
--- Expected:
---   restricted_visible = restricted_expected      (a locality admin sees only their locality)
---   other_localities_visible = 0
---   tool_localities = 1, tool_locality = 8        (the agent's SQL tools are scoped the same way)
---   media_visible = media_expected
---   self_promotion = blocked                      (nobody can make themselves super admin)
---   cross_locality_proposal = blocked
---   admin_status = approved, admin_audits = 2     (propose + decide are audited by triggers)
---   forged_audit = blocked, preapproved_insert = blocked
+-- Expected result:  RESULT PASS 26/26 ...
+-- Any failing check is listed by name, e.g.  RESULT FAIL 24/26 failed: T3 sp0_sees_nothing, T7 ...
+--
+-- Fake users (all in Kennedy, locality 8):
+--   la    Locality Admin, no category rows     -> must see ALL categories in Kennedy
+--   sp1   Specialist, category parking         -> only parking in Kennedy
+--   sp_env Specialist, category illegal_dumping -> only dumping in Kennedy
+--   sp0   Specialist, no categories            -> sees nothing
 do $$
 declare
-  v_user uuid := gen_random_uuid();
-  v_admin uuid := (select id from public.profiles where role = 'super_admin' limit 1);
-  v_visible int; v_expected int; v_other int; v_tool_n int; v_tool_code int; v_media int; v_media_exp int;
-  v_promo text; v_cross text; v_forged text; v_pre text; v_status text; v_audits int;
+  v_admin uuid := (select p.id from public.profiles p where p.role = 'super_admin' limit 1);
+  v_la uuid := gen_random_uuid();  v_sp1 uuid := gen_random_uuid();
+  v_env uuid := gen_random_uuid(); v_sp0 uuid := gen_random_uuid();
+  fails text[] := '{}'; n int; n2 int; ok boolean; v_rec uuid; v_rec2 uuid; v_status text;
+  e_all int; e_park int; e_dump int; e_other int;
+
 begin
   if v_admin is null then raise exception 'No super admin exists: bootstrap one first'; end if;
 
-  -- A fake locality admin limited to locality 8 (Kennedy), created as the postgres role.
-  insert into auth.users (id, email) values (v_user, 'rls-test@example.invalid');
-  update public.profiles set role = 'locality_admin' where id = v_user;
-  insert into public.user_locality_access values (v_user, 8);
-  insert into public.user_incident_type_access values (v_user, 'parking');
+  -- ── Setup as the postgres role ──
+  insert into auth.users (id, email) values
+    (v_la, 'rls-la@example.invalid'), (v_sp1, 'rls-sp1@example.invalid'),
+    (v_env, 'rls-env@example.invalid'), (v_sp0, 'rls-sp0@example.invalid');
+  update public.profiles set role = 'locality_admin' where id = v_la;
+  update public.profiles set role = 'specialist_operator' where id in (v_sp1, v_env, v_sp0);
+  insert into public.user_locality_access values (v_la, 8), (v_sp1, 8), (v_env, 8), (v_sp0, 8);
+  insert into public.user_incident_type_access values (v_sp1, 'parking'), (v_env, 'illegal_dumping');
 
-  perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+  select count(*) into e_all  from public.incidents where locality_code = 8;
+  select count(*) into e_park from public.incidents where locality_code = 8 and category = 'parking';
+  select count(*) into e_dump from public.incidents where locality_code = 8 and category = 'illegal_dumping';
+  select count(*) into e_other from public.incidents where locality_code <> 8;
+  if e_park = 0 or e_dump = 0 then
+    raise exception 'Seed missing: Kennedy needs parking (%) and illegal dumping (%) incidents', e_park, e_dump;
+  end if;
+
+  -- ── Locality Admin (la) ──
+  perform set_config('request.jwt.claims', json_build_object('sub', v_la, 'role', 'authenticated')::text, true);
   set local role authenticated;
-  select count(*), count(*) filter (where locality_code <> 8) into v_visible, v_other from public.incidents;
-  select count(*), min(locality_code) into v_tool_n, v_tool_code from public.tool_incidents_by_locality();
-  select count(*) into v_media from public.incident_media;
-  begin update public.profiles set role = 'super_admin' where id = v_user; v_promo := 'ALLOWED';
-  exception when others then v_promo := 'blocked'; end;
+  select count(*) into n from public.incidents;
+  if n <> e_all then fails := fails || 'T1 la_sees_all_categories_in_zone'; end if;
+  select count(*) into n from public.incidents where locality_code <> 8;
+  if n <> 0 then fails := fails || 'T10 la_cannot_read_other_localities'; end if;
+  select count(*) into n from public.tool_incidents_by_locality();
+  select count(*) into n2 from public.tool_incidents_by_locality() where locality_code <> 8;
+  if n <> 1 or n2 <> 0 then fails := fails || 'T11 agent_tools_scoped_for_la'; end if;
+  select count(*) into n from public.profiles where id in (v_sp1, v_env, v_sp0);
+  if n <> 3 then fails := fails || 'team_view_la_sees_team'; end if;
+  begin insert into public.user_locality_access values (v_la, 1); ok := true; exception when others then ok := false; end;
+  if ok then fails := fails || 'T9 la_cannot_manage_access'; end if;
+  begin update public.profiles set role = 'super_admin' where id = v_sp1; exception when others then null; end;
+  begin insert into public.audit_events (action, entity) values ('fake', 'x'); ok := true; exception when others then ok := false; end;
+  if ok then fails := fails || 'T12a la_cannot_forge_audit'; end if;
+  reset role;
+  if (select role from public.profiles where id = v_sp1) <> 'specialist_operator' then fails := fails || 'T9b la_cannot_change_roles'; end if;
+
+  -- ── Specialist with parking (sp1) ──
+  perform set_config('request.jwt.claims', json_build_object('sub', v_sp1, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  select count(*) into n from public.incidents;
+  select count(*) into n2 from public.incidents where category <> 'parking' or locality_code <> 8;
+  if n <> e_park or n2 <> 0 then fails := fails || 'T2 sp1_sees_only_assigned_category'; end if;
+  select coalesce(sum(incident_count), 0) into n from public.tool_incidents_by_locality();
+  if n > e_park or n = 0 then fails := fails || 'T11 agent_tools_scoped_for_sp1'; end if;
+  select count(*) into n from public.profiles where id = v_la;
+  if n <> 0 then fails := fails || 'team_view_sp1_cannot_see_team'; end if;
+  begin update public.profiles set role = 'super_admin' where id = v_sp1; exception when others then null; end;
+  -- T5: propose outside scope (other locality, then unassigned category) must fail
   begin
-    insert into public.recommendations (locality_code, title, problem, period_start, period_end, evidence, limitations, proposed_intervention)
-    values (1, 'x', 'p', now(), now(), '{}', 'l', 'i');
-    v_cross := 'ALLOWED';
-  exception when others then v_cross := 'blocked'; end;
+    insert into public.recommendations (locality_code, category, title, problem, period_start, period_end, evidence, limitations, proposed_intervention)
+    values (1, 'parking', 'x', 'p', now(), now(), '{}', 'l', 'i'); ok := true;
+  exception when others then ok := false; end;
+  if ok then fails := fails || 'T5a sp1_cannot_propose_other_locality'; end if;
+  begin
+    insert into public.recommendations (locality_code, category, title, problem, period_start, period_end, evidence, limitations, proposed_intervention)
+    values (8, 'illegal_dumping', 'x', 'p', now(), now(), '{}', 'l', 'i'); ok := true;
+  exception when others then ok := false; end;
+  if ok then fails := fails || 'T5b sp1_cannot_propose_other_category'; end if;
+  -- T12: pre-approved recommendation must fail
+  begin
+    insert into public.recommendations (locality_code, category, title, problem, period_start, period_end, evidence, limitations, proposed_intervention, status)
+    values (8, 'parking', 'x', 'p', now(), now(), '{}', 'l', 'i', 'approved'); ok := true;
+  exception when others then ok := false; end;
+  if ok then fails := fails || 'T12b no_preapproved_recommendation'; end if;
+  -- T6: propose and approve inside scope
+  insert into public.recommendations (locality_code, category, title, problem, period_start, period_end, evidence, limitations, proposed_intervention)
+  values (8, 'parking', 'RLS smoke 1', 'p', now() - interval '90 days', now(), '{}', 'l', 'i') returning id into v_rec;
+  insert into public.decisions (recommendation_id, decision, explanation) values (v_rec, 'approved', 'smoke');
+  select status::text into v_status from public.recommendations where id = v_rec;
+  if v_status <> 'approved' then fails := fails || 'T6 sp1_can_approve_in_scope'; end if;
+  -- T7: escalate, then the specialist can no longer decide it
+  insert into public.recommendations (locality_code, category, title, problem, period_start, period_end, evidence, limitations, proposed_intervention)
+  values (8, 'parking', 'RLS smoke 2', 'p', now() - interval '90 days', now(), '{}', 'l', 'i') returning id into v_rec2;
+  perform public.escalate_recommendation(v_rec2, 'needs second opinion');
+  select status::text into v_status from public.recommendations where id = v_rec2;
+  if v_status <> 'needs_second_approval' then fails := fails || 'escalation_sets_status'; end if;
+  begin insert into public.decisions (recommendation_id, decision) values (v_rec2, 'approved'); ok := true; exception when others then ok := false; end;
+  if ok then fails := fails || 'T7 sp1_cannot_decide_escalated'; end if;
+  begin insert into public.audit_events (action, entity) values ('fake', 'x'); ok := true; exception when others then ok := false; end;
+  if ok then fails := fails || 'T12c sp1_cannot_forge_audit'; end if;
+  reset role;
+  if (select role from public.profiles where id = v_sp1) <> 'specialist_operator' then fails := fails || 'T4 sp1_cannot_change_own_role'; end if;
+
+  -- ── Specialist with dumping only (sp_env) and with nothing (sp0) ──
+  perform set_config('request.jwt.claims', json_build_object('sub', v_env, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  select count(*) into n from public.incidents;
+  select count(*) into n2 from public.incidents where category <> 'illegal_dumping';
+  if n <> e_dump or n2 <> 0 then fails := fails || 'T2b sp_env_sees_only_dumping'; end if;
+  select count(*) into n from public.recommendations;
+  if n <> 0 then fails := fails || 'recs_scoped_by_category'; end if;
   reset role;
 
-  select count(*) into v_expected from public.incidents where locality_code = 8;
-  select count(*) into v_media_exp from public.incident_media m join public.incidents i on i.id = m.incident_id where i.locality_code = 8;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_sp0, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  select count(*) into n from public.incidents;
+  select coalesce(sum(incident_count), 0) into n2 from public.tool_incidents_by_locality();
+  if n <> 0 or n2 <> 0 then fails := fails || 'T3 sp0_sees_nothing'; end if;
+  reset role;
 
-  -- The super admin: propose, then decide. Audit events come from triggers only.
+  -- ── Locality Admin decides the escalated recommendation (T8) ──
+  perform set_config('request.jwt.claims', json_build_object('sub', v_la, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  select count(*) into n from public.recommendations where id = v_rec2;
+  if n <> 1 then fails := fails || 'la_sees_escalated_recommendation'; end if;
+  insert into public.decisions (recommendation_id, decision, explanation) values (v_rec2, 'approved', 'second approval');
+  select status::text into v_status from public.recommendations where id = v_rec2;
+  if v_status <> 'approved' then fails := fails || 'T8 la_can_decide_escalated'; end if;
+  reset role;
+
+  -- ── Super Admin ──
   perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
   set local role authenticated;
-  insert into public.recommendations (locality_code, title, problem, period_start, period_end, evidence, limitations, proposed_intervention)
-  values (8, 'RLS smoke test', 'p', now() - interval '90 days', now(), '{}', 'l', 'i');
-  begin
-    insert into public.recommendations (locality_code, title, problem, period_start, period_end, evidence, limitations, proposed_intervention, status)
-    values (8, 'RLS smoke test pre-approved', 'p', now(), now(), '{}', 'l', 'i', 'approved');
-    v_pre := 'ALLOWED';
-  exception when others then v_pre := 'blocked'; end;
-  insert into public.decisions (recommendation_id, decision, explanation)
-  select id, 'approved', 'smoke test' from public.recommendations where title = 'RLS smoke test';
-  select r.status::text, (select count(*) from public.audit_events a where a.entity_id = r.id::text)
-    into v_status, v_audits from public.recommendations r where r.title = 'RLS smoke test';
-  begin insert into public.audit_events (action, entity) values ('fake', 'x'); v_forged := 'FORGED';
-  exception when others then v_forged := 'blocked'; end;
+  select count(*) into n from public.incidents;
+  if n < e_all + e_other then fails := fails || 'super_admin_sees_everything'; end if;
+  select count(*) into n from public.audit_events where entity_id in (v_rec::text, v_rec2::text);
+  if n < 4 then fails := fails || 'audit_trail_written_by_triggers'; end if;
+  select count(*) into n from public.role_permissions;
+  if n < 20 then fails := fails || 'permissions_readable'; end if;
+  reset role;
 
-  raise exception 'RESULT restricted_visible=% restricted_expected=% other_localities_visible=% tool_localities=% tool_locality=% media_visible=% media_expected=% self_promotion=% cross_locality_proposal=% admin_status=% admin_audits=% forged_audit=% preapproved_insert=%',
-    v_visible, v_expected, v_other, v_tool_n, v_tool_code, v_media, v_media_exp, v_promo, v_cross, v_status, v_audits, v_forged, v_pre;
+  raise exception 'RESULT % % | kennedy all=% parking=% dumping=% | failed: %',
+    case when cardinality(fails) = 0 then 'PASS' else 'FAIL' end,
+    (26 - cardinality(fails)) || '/26',
+    e_all, e_park, e_dump,
+    coalesce(nullif(array_to_string(fails, ', '), ''), 'none');
 end $$;

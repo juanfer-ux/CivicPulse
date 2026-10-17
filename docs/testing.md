@@ -4,7 +4,7 @@
 
 ## ✅ Before every publish
 ```bash
-npm test         # 14 unit tests (planner and answers)
+npm test         # 16 unit tests (planner, categories and answers)
 npm run lint     # code checks
 npm run build    # type-check, then bundle
 ```
@@ -13,14 +13,14 @@ npm run build    # type-check, then bundle
 | | Kind | Where | Covers |
 |---|---|---|---|
 | 🟩 | Unit tests (Vitest) | `src/lib/agent.test.ts` | Question routing, accent-insensitive localities, percentage rules, empty periods, small samples, ties, honest "cannot answer", proposals with no dispatch, tool errors surfaced |
-| 🟩 | Permission smoke test (SQL) | `supabase/tests/rls_smoke.sql` | A restricted user sees only their locality; agent tools are scoped the same; nobody promotes themselves; no forged audit events; no pre-approved recommendations |
+| 🟩 | Permission smoke test (SQL) | `supabase/tests/rls_smoke.sql` | **26 checks** for Locality Admin, three kinds of Specialist and Super Admin: scope by locality and category, agent tools scoped the same, nobody promotes themselves, approve and escalate flow, no forged audit events, no pre-approved recommendations |
 | 🟨 | Manual checklist | below | Screens, sign-in, map |
 | ⬜ | Screen tests | none yet | Components and flows |
 
 ## 🔐 Running the permission smoke test
 1. Open the Supabase **SQL Editor**, paste `supabase/tests/rls_smoke.sql`, run it.
 2. It **always ends with an error that contains a `RESULT` line**. That is by design: the error rolls back everything the test created, so no data is left behind.
-3. Compare the `RESULT` line with the "Expected" list at the top of the file. A Super Admin must exist first.
+3. Expect **`RESULT PASS 26/26`**. Any failure is listed by name. A Super Admin must exist, and both seed files must have run.
 
 ## 📝 Manual checklist (after a deploy)
 - [ ] Sign-in page loads with the logo, no console errors.
@@ -33,8 +33,7 @@ npm run build    # type-check, then bundle
 ## 🟥 Gaps
 | | Gap |
 |---|---|
-| 🟥 | Permission tests cover only Super Admin and Locality Admin. The full list of cases (T1 to T12) is in [roles-and-permissions.md](roles-and-permissions.md#-7-test-cases-they-map-to-supabasetestsrls_smokesql). |
-| 🟥 | No sample user per role to sign in with. |
+| 🟥 | No sample user per role to **sign in** with (the SQL test uses fake users that are rolled back). |
 | 🟥 | No automated screen tests. |
 
 ## 💡 Tip: check a screen without signing in

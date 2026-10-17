@@ -1,11 +1,11 @@
 -- Synthetic parking-obstruction incidents for Bogotá. Every row has is_synthetic = true.
--- Re-runnable: replaces all synthetic rows. Run in the Supabase SQL editor (postgres role, bypasses RLS).
+-- Re-runnable: replaces only the synthetic parking rows (illegal dumping has its own seed file). Run in the Supabase SQL editor (postgres role, bypasses RLS).
 -- Deterministic: setseed fixes the random stream. Dates are relative to now(): last 120 days.
 -- Built-in patterns for the investigations: uneven distribution across localities, evening/noon peaks,
 -- 3 recurring hotspots per locality (40% of reports), and a Chapinero spike in the last 30 days.
 -- Sumapaz gets no incidents: its territory lies south of the lat >= 4.4 check on incidents.
 
-delete from public.incidents where is_synthetic;
+delete from public.incidents where is_synthetic and category = 'parking';
 select setseed(0.42);
 
 with w(code, weight, lat, lng) as (values
@@ -100,18 +100,18 @@ select i.id, o.id, 'duplicate'
 from public.incidents i
 cross join lateral (
   select id from public.incidents o
-  where o.locality_code = i.locality_code and o.is_synthetic and o.status <> 'duplicate'
+  where o.locality_code = i.locality_code and o.category = i.category and o.is_synthetic and o.status <> 'duplicate'
   order by abs(extract(epoch from o.occurred_at - i.occurred_at)) limit 1
 ) o
-where i.is_synthetic and i.status = 'duplicate';
+where i.is_synthetic and i.category = 'parking' and i.status = 'duplicate';
 
 -- Placeholder evidence media: 1-3 photos per incident (from evidence_metadata) and a video on about 1 in 5.
 -- No files exist yet: rows are placeholders (storage_path null).
 insert into public.incident_media (incident_id, kind, duration_seconds)
 select i.id, 'photo'::public.media_kind, null
 from public.incidents i, generate_series(1, (i.evidence_metadata ->> 'photos')::int)
-where i.is_synthetic
+where i.is_synthetic and i.category = 'parking'
 union all
 select i.id, 'video'::public.media_kind, 8 + abs(hashtext(i.id::text)) % 20
 from public.incidents i
-where i.is_synthetic and abs(hashtext(i.id::text)) % 5 = 0;
+where i.is_synthetic and i.category = 'parking' and abs(hashtext(i.id::text)) % 5 = 0;

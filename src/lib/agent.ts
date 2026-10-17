@@ -30,12 +30,18 @@ export interface Answer {
   proposal?: Draft
 }
 
-type Plan =
+/** category: a code from incident_categories, or null for "all categories the user can see". */
+type Plan = { category: string | null } & (
   | { kind: 'ranking'; days: number | null }
   | { kind: 'time'; locality: Locality | null; days: number | null }
   | { kind: 'compare'; locality: Locality | null; days: number }
   | { kind: 'recurring'; days: number | null }
   | { kind: 'candidates' }
+)
+
+/** Display names, mirroring incident_categories. */
+const CATEGORY_NAMES: Record<string, string> = { parking: 'obstructive parking', illegal_dumping: 'illegal dumping' }
+const categoryName = (c: string | null) => (c ? (CATEGORY_NAMES[c] ?? c) : 'all categories you can see')
 
 const DAY = 86_400_000
 const TZ = 'America/Bogota'
@@ -56,6 +62,7 @@ export const SUGGESTIONS = [
   'Have parking obstruction incidents increased in Chapinero over the last 30 days?',
   'Which locations have repeated parking obstruction reports?',
   'Which area might deserve further investigation tomorrow evening?',
+  'Which localities have the most illegal dumping incidents?',
 ]
 
 export function plan(question: string, localities: Locality[]): Plan | null {
@@ -65,15 +72,19 @@ export function plan(question: string, localities: Locality[]): Plan | null {
   const n = q.match(/(\d+)\s*days?/)
   const days = n ? Math.min(Math.max(Number(n[1]), 1), 365) : /last week/.test(q) ? 7 : /last month/.test(q) ? 30 : null
 
-  if (/\b(tomorrow|tonight|next (shift|evening)|deserve\w*|recommend\w*|prioriti\w+)\b/.test(q)) return { kind: 'candidates' }
-  if (/\b(recurr\w*|repeat\w*|same (place|location))\b|which locations/.test(q)) return { kind: 'recurring', days }
+  const dumping = /\b(dump\w*|garbage|trash|rubbish|waste|debris)\b/.test(q)
+  const parking = /\b(parking|parked|obstruction\w*|obstructive|blocking)\b/.test(q)
+  const category = dumping && !parking ? 'illegal_dumping' : parking && !dumping ? 'parking' : null
+
+  if (/\b(tomorrow|tonight|next (shift|evening)|deserve\w*|recommend\w*|prioriti\w+)\b/.test(q)) return { kind: 'candidates', category }
+  if (/\b(recurr\w*|repeat\w*|same (place|location))\b|which locations/.test(q)) return { kind: 'recurring', days, category }
   if (/\b(increase\w*|decrease\w*|chang\w+|trend\w*|compar\w+|versus|vs)\b/.test(q)) {
-    return { kind: 'compare', locality, days: days ?? 30 }
+    return { kind: 'compare', locality, days: days ?? 30, category }
   }
   if (/\b(when|what time|hours?|mornings?|afternoons?|evenings?|nights?|peak)\b/.test(q)) {
-    return { kind: 'time', locality, days }
+    return { kind: 'time', locality, days, category }
   }
-  if (/\b(most|highest|rank\w*|top|which localit\w+|worst)\b/.test(q)) return { kind: 'ranking', days }
+  if (/\b(most|highest|rank\w*|top|which localit\w+|worst)\b/.test(q)) return { kind: 'ranking', days, category }
   return null
 }
 
@@ -114,6 +125,7 @@ interface CandidateRow {
   label: string
   locality_code: number
   locality_name: string
+  category: string
   total_count: number
   evening_count: number
   weekday_evening_count: number
@@ -130,8 +142,8 @@ interface PeriodRow {
 }
 
 const iso = (d: Date | null) => d?.toISOString() ?? null
-const byLocality = (from: Date | null, to: Date | null) =>
-  rpc<LocalityRow>('tool_incidents_by_locality', { p_from: iso(from), p_to: iso(to) })
+const byLocality = (from: Date | null, to: Date | null, category: string | null) =>
+  rpc<LocalityRow>('tool_incidents_by_locality', { p_from: iso(from), p_to: iso(to), p_category: category })
 
 async function references(ids: string[]) {
   if (!ids.length) return []
@@ -143,11 +155,26 @@ async function references(ids: string[]) {
 export async function answer(question: string, localities: Locality[]): Promise<Answer> {
   const p = plan(question, localities)
   if (!p) return unsupported()
-  if (p.kind === 'ranking') return ranking(p.days)
-  if (p.kind === 'time') return timeOfDay(p.locality, p.days)
-  if (p.kind === 'recurring') return recurring(p.days)
-  if (p.kind === 'candidates') return candidates()
-  return compare(p.locality, p.days)
+  if (p.kind === 'candidates') return candidates(p.category) // names its own category
+  const result =
+    p.kind === 'ranking'
+      ? await ranking(p.days, p.category)
+      : p.kind === 'time'
+        ? await timeOfDay(p.locality, p.days, p.category)
+        : p.kind === 'recurring'
+          ? await recurring(p.days, p.category)
+          : await compare(p.locality, p.days, p.category)
+  return withCategory(result, p.category)
+}
+
+/** Every answer states which category it covers. */
+function withCategory(a: Answer, category: string | null): Answer {
+  const name = categoryName(category)
+  return {
+    ...a,
+    text: `${a.text} Category: ${name}.`,
+    evidence: a.evidence.map((e) => ({ ...e, scope: `${e.scope} · ${name}` })),
+  }
 }
 
 function unsupported(): Answer {
@@ -171,10 +198,10 @@ const noData = (scope: string, period: string): Answer => ({
   highlightIds: [],
 })
 
-async function ranking(days: number | null): Promise<Answer> {
+async function ranking(days: number | null, category: string | null): Promise<Answer> {
   const to = new Date()
   const from = days ? new Date(to.getTime() - days * DAY) : null
-  const rows = await byLocality(from, to)
+  const rows = await byLocality(from, to, category)
   const period = from
     ? `the last ${days} days (${date(from)} to ${date(to)})`
     : rows.length
@@ -216,13 +243,14 @@ async function ranking(days: number | null): Promise<Answer> {
   }
 }
 
-async function timeOfDay(locality: Locality | null, days: number | null): Promise<Answer> {
+async function timeOfDay(locality: Locality | null, days: number | null, category: string | null): Promise<Answer> {
   const to = new Date()
   const from = days ? new Date(to.getTime() - days * DAY) : null
   const rows = await rpc<TimeRow>('tool_time_distribution', {
     p_locality: locality?.code ?? null,
     p_from: iso(from),
     p_to: iso(to),
+    p_category: category,
   })
   const scope = locality?.name ?? 'all localities in your scope'
   if (!rows.length) return noData(scope, from ? `the last ${days} days` : 'all available data')
@@ -267,7 +295,7 @@ async function timeOfDay(locality: Locality | null, days: number | null): Promis
   }
 }
 
-async function compare(locality: Locality | null, days: number): Promise<Answer> {
+async function compare(locality: Locality | null, days: number, category: string | null): Promise<Answer> {
   const now = new Date()
   const curFrom = new Date(now.getTime() - days * DAY)
   const prevFrom = new Date(now.getTime() - 2 * days * DAY)
@@ -278,8 +306,9 @@ async function compare(locality: Locality | null, days: number): Promise<Answer>
       p_current_to: iso(now),
       p_previous_from: iso(prevFrom),
       p_previous_to: iso(curFrom),
+      p_category: category,
     }),
-    byLocality(null, null),
+    byLocality(null, null, category),
   ])
   const cur = rows.find((r) => r.period === 'current')!
   const prev = rows.find((r) => r.period === 'previous')!
@@ -329,10 +358,15 @@ async function compare(locality: Locality | null, days: number): Promise<Answer>
   }
 }
 
-async function recurring(days: number | null): Promise<Answer> {
+async function recurring(days: number | null, category: string | null): Promise<Answer> {
   const to = new Date()
   const from = days ? new Date(to.getTime() - days * DAY) : null
-  const rows = await rpc<RecurringRow>('tool_recurring_locations', { p_from: iso(from), p_to: iso(to), p_min: MIN_REPEATS })
+  const rows = await rpc<RecurringRow>('tool_recurring_locations', {
+    p_from: iso(from),
+    p_to: iso(to),
+    p_min: MIN_REPEATS,
+    p_category: category,
+  })
   const period = from ? `the last ${days} days (${date(from)} to ${date(to)})` : 'all available data'
   const limitations = [
     'Repeated reports at a location do not prove they describe the same event: they may be separate occurrences or several reports of one obstruction.',
@@ -372,7 +406,7 @@ async function recurring(days: number | null): Promise<Answer> {
   }
 }
 
-async function candidates(): Promise<Answer> {
+async function candidates(category: string | null): Promise<Answer> {
   const to = new Date()
   const from = new Date(to.getTime() - CANDIDATE_DAYS * DAY)
   const tomorrow = new Date(to.getTime() + DAY).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'long' })
@@ -382,6 +416,7 @@ async function candidates(): Promise<Answer> {
     p_to: to.toISOString(),
     p_dow: weekday,
     p_min: MIN_REPEATS,
+    p_category: category,
   })
   const period = `the last ${CANDIDATE_DAYS} days (${date(from)} to ${date(to)})`
   if (!rows.length) {
@@ -396,7 +431,7 @@ async function candidates(): Promise<Answer> {
   const top = rows[0]
   const limitations = [
     'Ranking: incidents in the 16:00–20:00 window, then total incidents, then incidents in the last 30 days. The weekday count is shown but not used for ranking because it is usually very small.',
-    'History shows where reports concentrated. It does not predict that an obstruction will occur tomorrow.',
+    'History shows where reports concentrated. It does not predict that an incident will occur tomorrow.',
     `Only locations with at least ${MIN_REPEATS} reports in ${CANDIDATE_DAYS} days (same described location) are considered.`,
     ...(top.evening_count < 10 ? [`Small numbers: the top candidate has ${top.evening_count} evening incidents.`] : []),
     'Photos are placeholders and nothing was visually inspected. No legal violation is asserted.',
@@ -410,12 +445,13 @@ async function candidates(): Promise<Answer> {
       `Based on ${period}, the location with the most evening (16:00–20:00) incidents is "${top.label}" in ${top.locality_name}: ` +
       `${top.evening_count} of its ${top.total_count} incidents fell in that window and ${top.recent_count} in the last 30 days. ` +
       `${top.weekday_evening_count} of the evening incidents ${top.weekday_evening_count === 1 ? 'was' : 'were'} on a ${tomorrow}. ` +
-      `It is a candidate for human review tomorrow evening, not a prediction.${others ? ` Other candidates: ${others}.` : ''}`,
+      `It is a candidate for human review tomorrow evening, not a prediction.${others ? ` Other candidates: ${others}.` : ''} ` +
+      `Category: ${categoryName(top.category)}.`,
     bars: rows.map((r) => ({ label: r.label.replace('Synthetic ', ''), value: r.evening_count })),
     evidence: [
       {
         tool: 'tool_candidate_areas',
-        scope: `top candidate of ${rows.length}: ${top.label}`,
+        scope: `top candidate of ${rows.length}: ${top.label} · ${categoryName(top.category)}`,
         period,
         incidentCount: top.incident_ids.length,
         references: await references(top.incident_ids),
@@ -425,8 +461,9 @@ async function candidates(): Promise<Answer> {
     highlightIds: top.incident_ids,
     proposal: {
       locality_code: top.locality_code,
+      category: top.category,
       title: `Review ${top.label.replace('Synthetic ', '')} tomorrow evening`,
-      problem: `${top.total_count} parking obstruction reports at "${top.label}" in the last ${CANDIDATE_DAYS} days; ${top.evening_count} between 16:00 and 20:00 (Bogotá time), ${top.recent_count} in the last 30 days.`,
+      problem: `${top.total_count} ${categoryName(top.category)} reports at "${top.label}" in the last ${CANDIDATE_DAYS} days; ${top.evening_count} between 16:00 and 20:00 (Bogotá time), ${top.recent_count} in the last 30 days.`,
       period_start: from.toISOString(),
       period_end: to.toISOString(),
       evidence: {
@@ -435,6 +472,7 @@ async function candidates(): Promise<Answer> {
         candidate: {
           label: top.label,
           locality_code: top.locality_code,
+          category: top.category,
           total_count: top.total_count,
           evening_count: top.evening_count,
           weekday_evening_count: top.weekday_evening_count,

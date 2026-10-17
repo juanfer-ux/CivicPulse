@@ -28,6 +28,7 @@ describe('plan (mock planner)', () => {
       'compare',
       'recurring',
       'candidates',
+      'ranking',
     ])
   })
 
@@ -49,6 +50,16 @@ describe('plan (mock planner)', () => {
     expect(plan('what should we look at tomorrow evening?', localities)?.kind).toBe('candidates')
   })
 
+  it('reads the category from the question, or uses all categories when none is named', () => {
+    expect(plan('Which localities have the most illegal dumping incidents?', localities)).toMatchObject({
+      kind: 'ranking',
+      category: 'illegal_dumping',
+    })
+    expect(plan('most parking obstruction incidents?', localities)).toMatchObject({ category: 'parking' })
+    expect(plan('Which localities have the most incidents?', localities)).toMatchObject({ category: null })
+    expect(plan('most parking and dumping reports', localities)).toMatchObject({ category: null })
+  })
+
   it('returns null for questions it cannot answer instead of guessing', () => {
     expect(plan('Should we send a tow truck?', localities)).toBeNull()
     expect(plan('hello', localities)).toBeNull()
@@ -63,6 +74,17 @@ describe('answers', () => {
     expect(a.text).toMatch(/cannot answer/i)
     expect(a.evidence).toEqual([])
     expect(rpc).not.toHaveBeenCalled()
+  })
+
+  it('sends the category to the SQL tool and states it in the answer', async () => {
+    rpc.mockResolvedValue({ data: [], error: null })
+    const a = await answer('Which localities have the most illegal dumping incidents?', localities)
+    expect(rpc).toHaveBeenCalledWith('tool_incidents_by_locality', expect.objectContaining({ p_category: 'illegal_dumping' }))
+    expect(a.text).toMatch(/illegal dumping/)
+    rpc.mockResolvedValue({ data: [{ locality_code: 2, locality_name: 'Chapinero', incident_count: 3, first_at: ago(5), last_at: ago(1), incident_ids: ['a'] }], error: null })
+    const all = await answer('Which localities have the most incidents?', localities)
+    expect(rpc).toHaveBeenLastCalledWith('tool_incidents_by_locality', expect.objectContaining({ p_category: null }))
+    expect(all.text).toMatch(/Category: all categories you can see/)
   })
 
   it('reports ties in a ranking instead of inventing a winner', async () => {
@@ -120,13 +142,13 @@ describe('answers', () => {
   it('builds a human-review proposal from SQL numbers only, with no dispatch', async () => {
     rpc.mockResolvedValue({
       data: [{
-        label: 'Synthetic hotspot 8-1, Kennedy', locality_code: 8, locality_name: 'Kennedy', total_count: 10,
+        label: 'Synthetic hotspot 8-1, Kennedy', locality_code: 8, locality_name: 'Kennedy', category: 'parking', total_count: 10,
         evening_count: 8, weekday_evening_count: 1, recent_count: 4, lat: 4.6, lng: -74.1, last_at: ago(1), incident_ids: ['x', 'y'],
       }],
       error: null,
     })
     const a = await answer('Which area might deserve further investigation tomorrow evening?', localities)
-    expect(a.proposal).toMatchObject({ locality_code: 8, evidence: { incident_ids: ['x', 'y'] } })
+    expect(a.proposal).toMatchObject({ locality_code: 8, category: 'parking', evidence: { incident_ids: ['x', 'y'] } })
     expect(a.proposal?.evidence).toMatchObject({ candidate: { evening_count: 8, total_count: 10 } })
     expect(a.proposal?.proposed_intervention).toMatch(/no dispatch/i)
     expect(a.text).toMatch(/not a prediction/)
