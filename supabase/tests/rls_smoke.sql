@@ -3,8 +3,8 @@
 -- It simulates signed-in users inside ONE DO block that ALWAYS ends by raising an exception, so every row it
 -- creates (fake users, recommendations, decisions, audit events) is rolled back. Read the RESULT line.
 --
--- Expected result:  RESULT PASS 33/33 ...
--- Any failing check is listed by name, e.g.  RESULT FAIL 31/33 failed: T3 sp0_sees_nothing, T7 ...
+-- Expected result:  RESULT PASS 35/35 ...
+-- Any failing check is listed by name, e.g.  RESULT FAIL 31/35 failed: T3 sp0_sees_nothing, T7 ...
 --
 -- Fake users (all in Kennedy, locality 8):
 --   la    Locality Admin, no category rows     -> must see ALL categories in Kennedy
@@ -166,6 +166,18 @@ begin
   if n <> 0 then fails := fails || 'specialist_cannot_read_others_audit'; end if;
   reset role;
 
+  -- ── Invitations: pending until accepted ──
+  perform set_config('request.jwt.claims', '', true);
+  update public.profiles set invitation_pending = true where id = v_sp1;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_sp1, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  begin update public.profiles set invitation_pending = false where id = v_sp1; ok := true; exception when others then ok := false; end;
+  if ok then fails := fails || 'cannot_clear_own_invitation_flag'; end if;
+  reset role;
+  perform set_config('request.jwt.claims', '', true);
+  update auth.users set email_confirmed_at = now() where id = v_sp1;
+  if (select invitation_pending from public.profiles where id = v_sp1) then fails := fails || 'invitation_clears_on_accept'; end if;
+
   -- ── Super Admin ──
   perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
   set local role authenticated;
@@ -179,7 +191,7 @@ begin
 
   raise exception 'RESULT % % | kennedy all=% parking=% dumping=% | failed: %',
     case when cardinality(fails) = 0 then 'PASS' else 'FAIL' end,
-    (33 - cardinality(fails)) || '/33',
+    (35 - cardinality(fails)) || '/35',
     e_all, e_park, e_dump,
     coalesce(nullif(array_to_string(fails, ', '), ''), 'none');
 end $$;

@@ -15,6 +15,7 @@ export interface UserRow {
   email: string | null
   role: AppRole | null
   is_active: boolean
+  invitation_pending: boolean
   created_at: string
   localities: number[]
   categories: string[]
@@ -37,9 +38,9 @@ export interface AdminData {
 }
 
 export type UserStatus = 'pending' | 'active' | 'off'
-/** New sign-ups have no role yet: "pending". */
-export const statusOf = (u: Pick<UserRow, 'role' | 'is_active'>): UserStatus =>
-  !u.role ? 'pending' : u.is_active ? 'active' : 'off'
+/** "Pending": no role yet (new sign-up), or invited and has not accepted the invitation. */
+export const statusOf = (u: Pick<UserRow, 'role' | 'is_active'> & { invitation_pending?: boolean }): UserStatus =>
+  !u.role || u.invitation_pending ? 'pending' : u.is_active ? 'active' : 'off'
 
 /** What to insert and what to delete to turn `current` into `wanted`. */
 export function diffCodes<T>(current: T[], wanted: T[]) {
@@ -51,7 +52,7 @@ export function diffCodes<T>(current: T[], wanted: T[]) {
 /** Everything the Users screen shows. RLS: only users with 'manage_users' get all rows. */
 export async function fetchUserAdminData(): Promise<AdminData> {
   const [profiles, locAccess, catAccess, localities, categories, specializations] = await Promise.all([
-    supabase.from('profiles').select('id, full_name, email, role, is_active, created_at').order('created_at', { ascending: false }),
+    supabase.from('profiles').select('id, full_name, email, role, is_active, invitation_pending, created_at').order('created_at', { ascending: false }),
     supabase.from('user_locality_access').select('user_id, locality_code'),
     supabase.from('user_incident_type_access').select('user_id, category'),
     supabase.from('localities').select('code, name').order('code'),

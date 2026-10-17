@@ -13,14 +13,14 @@ npm run build    # type-check, then bundle
 | | Kind | Where | Covers |
 |---|---|---|---|
 | 🟩 | Unit tests (Vitest) | `src/lib/agent.test.ts`, `src/lib/users.test.ts` | Question routing, accent-insensitive localities, percentage rules, empty periods, small samples, ties, honest "cannot answer", proposals with no dispatch, tool errors surfaced; Users screen: diff of granted vs wanted access, Pending/Active/Off status; invite form rules (name, email, role, zones, at least one category for a specialist) and specialty shown from categories |
-| 🟩 | Permission smoke test (SQL) | `supabase/tests/rls_smoke.sql` | **33 checks** for Locality Admin, three kinds of Specialist and Super Admin: scope by locality and category, agent tools scoped the same, nobody promotes themselves, approve and escalate flow, no forged audit events, no pre-approved recommendations, last Super Admin protected, role and access changes audited |
+| 🟩 | Permission smoke test (SQL) | `supabase/tests/rls_smoke.sql` | **35 checks** for Locality Admin, three kinds of Specialist and Super Admin: scope by locality and category, agent tools scoped the same, nobody promotes themselves, approve and escalate flow, no forged audit events, no pre-approved recommendations, last Super Admin protected, role and access changes audited, invitation flag protected and cleared on accept |
 | 🟨 | Manual checklist | below | Screens, sign-in, map |
 | ⬜ | Screen tests | none yet | Components and flows |
 
 ## 🔐 Running the permission smoke test
 1. Open the Supabase **SQL Editor**, paste `supabase/tests/rls_smoke.sql`, run it.
 2. It **always ends with an error that contains a `RESULT` line**. That is by design: the error rolls back everything the test created, so no data is left behind.
-3. Expect **`RESULT PASS 33/33`**. Any failure is listed by name. A Super Admin must exist, and both seed files must have run.
+3. Expect **`RESULT PASS 35/35`**. Any failure is listed by name. A Super Admin must exist, and both seed files must have run.
 
 ## 📝 Manual checklist (after a deploy)
 - [ ] Sign-in page loads with the logo, no console errors.
@@ -28,7 +28,7 @@ npm run build    # type-check, then bundle
 - [ ] Filters change the counts; clicking a point opens the incident with placeholder photos.
 - [ ] Ask the suggested questions; evidence and limitations appear; map rings appear.
 - [ ] Phone width: bottom sheet with Explore and Investigate tabs.
-- [ ] Create user (needs the function deployed): invite an email you control as each role. Email arrives, link opens **Choose your password**, after saving you land in the app with the right access; the table shows the new person with the right specialty; the audit trail has `user_invited`. A duplicate email gives a clear message and leaves no extra user. A Locality Admin or Specialist calling the function is refused.
+- [ ] Create user (needs the function deployed): invite an email you control as each role. Email arrives, link opens **Choose your password**, after saving you land in the app with the right access; the table shows the new person as **Pending** (tag Invited) until they accept, then **Active**, with the right specialty; the audit trail has `user_invited`. A duplicate email gives a clear message and leaves no extra user. A Locality Admin or Specialist calling the function is refused.
 - [ ] Super Admin: **Users** button opens the table; a role or locality change persists after reload; you cannot change your own role. Other roles do not see the button.
 - [ ] Category filter: choose Illegal dumping, then Obstructive parking; counts change.
 

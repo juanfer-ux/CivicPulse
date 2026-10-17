@@ -20,6 +20,10 @@ describe('statusOf', () => {
   it('treats a user without a role as pending, even though the account is active', () => {
     expect(statusOf({ role: null, is_active: true })).toBe('pending')
   })
+  it('keeps an invited person pending until they accept, then active', () => {
+    expect(statusOf({ role: 'specialist_operator', is_active: true, invitation_pending: true })).toBe('pending')
+    expect(statusOf({ role: 'specialist_operator', is_active: true, invitation_pending: false })).toBe('active')
+  })
   it('distinguishes active from switched off', () => {
     expect(statusOf({ role: 'specialist_operator', is_active: true })).toBe('active')
     expect(statusOf({ role: 'locality_admin', is_active: false })).toBe('off')

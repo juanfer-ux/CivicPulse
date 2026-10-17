@@ -101,8 +101,9 @@ flowchart LR
 2. 🟣 **Only a Super Admin** assigns role, localities and categories, on the **Users** screen (header button). Nobody can change their own role or status there.
    - ✅ New sign-ups appear first as **Pending**; changes save immediately and are written to the audit trail.
    - 🛟 The database refuses to demote or switch off the **last active Super Admin**.
-   - 📨 **Create user** (same screen): the Super Admin enters name and email, picks **one role** (Super Admin, Locality (Zone) Admin or Specialist Operator), the **zone(s)** for the last two, and for a Specialist the **categories**, as checkboxes grouped by specialty (the specialty is shown from the categories ticked). The person gets an invitation email and chooses their own password; role and access are already assigned when they arrive.
+   - 📨 **Create user** (same screen): the Super Admin enters name and email, picks **one role** (Super Admin, Locality (Zone) Admin or Specialist Operator), the **zone(s)** for the last two (a dropdown with a checkbox per locality), and for a Specialist the **categories**, as checkboxes grouped by specialty (the specialty is shown from the categories ticked). The person gets an invitation email and chooses their own password; role and access are already assigned when they arrive.
    - 🔑 Done by a server function (Edge Function `invite-user`), the only place the admin key lives ([decision 0011](decisions/0011-invite-users-by-edge-function.md)). It checks the caller, validates, sends the invite, assigns access, audits, and removes the new account if any step fails.
+   - ⏳ An invited person shows as **Pending** (tag "Invited") until they accept the invitation, then **Active**. A flag on their profile is set by the function and cleared by a database trigger when they confirm the email link.
    - 🧮 Rule: **you can only grant access you have**. Today only a Super Admin invites, and a Super Admin has everything, so nothing is limited; the function enforces the rule for when restricted admins exist.
 3. 🥇 The **first Super Admin** is set once by SQL in the Supabase SQL editor (README, section "Auth and roles"), never from the app.
 4. 🚀 Before going live: "Confirm email" on and leaked-password protection on ([deploy.md](deploy.md)).
@@ -159,7 +160,7 @@ All 12 cases are covered by 26 checks, all passing (2026-10-17).
 | 🟩 | **Escalation:** status `needs_second_approval`; a specialist's escalation is the database function `escalate_recommendation`; once escalated only Locality Admin or Super Admin can decide. |
 | 🟩 | Specializations and categories tables (traffic: parking, environmental: illegal dumping, infrastructure: empty). 150 synthetic dumping incidents. |
 | 🟩 | Agent tools need the `ask_agent` permission and take an optional category. |
-| 🟩 | Permission test: 33 checks (T1 to T13 plus extras), all passing. |
+| 🟩 | Permission test: 35 checks (T1 to T13 plus extras), all passing. |
 | 🟩 | **Users screen** (Super Admin): table, search and filters, side panel for role, active switch, localities and categories. Last-Super-Admin guard and audit trail in the database. |
 | 🟩 | **Create user:** invitation by email with role, zones and categories; set-password screen for the invited person. |
 | 🟥 | No resend invite, password reset or delete user yet. |

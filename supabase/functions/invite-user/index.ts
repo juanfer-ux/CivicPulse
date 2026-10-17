@@ -76,6 +76,9 @@ Deno.serve(async (req) => {
   try {
     const set = await caller.from('profiles').update({ role }).eq('id', id).select('id')
     if (set.error || !set.data?.length) throw new Error(set.error?.message ?? 'Could not set the role.')
+    // Shows as "Pending" until the person accepts; a database trigger clears it when they confirm the email link.
+    const pending = await admin.from('profiles').update({ invitation_pending: true }).eq('id', id)
+    if (pending.error) throw new Error(pending.error.message)
     if (role !== 'super_admin') {
       const r = await caller.from('user_locality_access').insert(localities.map((c) => ({ user_id: id, locality_code: c })))
       if (r.error) throw new Error(r.error.message)

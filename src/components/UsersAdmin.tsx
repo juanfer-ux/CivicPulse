@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { MultiSelect } from '@/components/MultiSelect'
 import { Input } from '@/components/ui/input'
 import { useAuth, type AppRole } from '@/lib/auth'
 import {
@@ -148,6 +149,7 @@ export function UsersAdmin({ onBack }: { onBack: () => void }) {
                       </td>
                       <td className="px-3 py-2 max-md:p-0">
                         <Badge variant={STATUS_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
+                        {u.invitation_pending && <span className="ml-2 text-xs text-muted-foreground">Invited</span>}
                       </td>
                       <td className="px-3 py-2 text-muted-foreground max-md:p-0">{u.role === 'super_admin' ? 'All' : localities(u.localities.length)}</td>
                       <td className="px-3 py-2 text-muted-foreground max-md:p-0">{u.role === 'super_admin' ? 'All' : u.categories.length ? u.categories.map(categoryName(data)).join(', ') : '—'}</td>
@@ -207,14 +209,7 @@ function UserPanel({
     }
   }
 
-  const toggleLocality = (code: number, on: boolean) => {
-    const wanted = on ? [...user.localities, code] : user.localities.filter((c) => c !== code)
-    return save(() => setLocalities(user.id, user.localities, wanted), { localities: wanted.sort((a, b) => a - b) }, 'Localities saved.')
-  }
-  const setAllLocalities = (all: boolean) => {
-    const wanted = all ? data.localities.map((l) => l.code) : []
-    return save(() => setLocalities(user.id, user.localities, wanted), { localities: wanted }, all ? 'All localities granted.' : 'Localities cleared.')
-  }
+  const localityOptions = data.localities.map((l) => ({ value: l.code, label: l.name }))
   const toggleCategory = (code: string, on: boolean) => {
     const wanted = on ? [...user.categories, code] : user.categories.filter((c) => c !== code)
     return save(() => setCategories(user.id, user.categories, wanted), { categories: wanted.sort() }, 'Categories saved.')
@@ -223,7 +218,9 @@ function UserPanel({
   const status = statusOf(user)
   const names = user.categories.map(categoryName(data))
   const summary =
-    status === 'pending'
+    user.invitation_pending
+      ? 'Invitation sent: they get access as soon as they accept it.'
+      : status === 'pending'
       ? 'Sees nothing yet: waiting for a role.'
       : user.role === 'super_admin'
         ? 'Sees everything and manages users.'
@@ -284,27 +281,16 @@ function UserPanel({
         </label>
 
         {user.role !== 'super_admin' && (
-          <fieldset className="flex flex-col gap-2" disabled={busy || !user.role}>
-            <div className="flex items-center justify-between">
-              <legend className="text-sm font-medium">Localities ({user.localities.length}/{data.localities.length})</legend>
-              <span className="flex gap-1">
-                <Button size="xs" variant="ghost" type="button" onClick={() => setAllLocalities(true)}>
-                  Select all
-                </Button>
-                <Button size="xs" variant="ghost" type="button" onClick={() => setAllLocalities(false)}>
-                  Clear
-                </Button>
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-              {data.localities.map((l) => (
-                <label key={l.code} className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" checked={user.localities.includes(l.code)} onChange={(e) => toggleLocality(l.code, e.target.checked)} />
-                  <span className="truncate">{l.name}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <div className="flex flex-col gap-1 text-sm">
+            Localities
+            <MultiSelect
+              noun="localities"
+              options={localityOptions}
+              selected={user.localities}
+              disabled={busy || !user.role}
+              onChange={(next) => save(() => setLocalities(user.id, user.localities, next), { localities: [...next].sort((x, y) => x - y) }, 'Localities saved.')}
+            />
+          </div>
         )}
 
         {user.role === 'specialist_operator' && (
@@ -344,7 +330,6 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const set = (change: Partial<InviteForm>) => setForm((f) => ({ ...f, ...change }))
-  const toggle = (code: number, on: boolean) => set({ localities: on ? [...form.localities, code] : form.localities.filter((c) => c !== code) })
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
@@ -399,29 +384,15 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
         {form.role === 'super_admin' && <p className="rounded-lg bg-muted/50 p-3 text-sm">Super Admins see everything and manage users, so no zone is needed.</p>}
 
         {(form.role === 'locality_admin' || form.role === 'specialist_operator') && (
-          <fieldset className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <legend className="text-sm font-medium">
-                Zone{form.role === 'locality_admin' ? ' to administer' : 's'} ({form.localities.length}/{data.localities.length})
-              </legend>
-              <span className="flex gap-1">
-                <Button size="xs" variant="ghost" type="button" onClick={() => set({ localities: data.localities.map((l) => l.code) })}>
-                  Select all
-                </Button>
-                <Button size="xs" variant="ghost" type="button" onClick={() => set({ localities: [] })}>
-                  Clear
-                </Button>
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-              {data.localities.map((l) => (
-                <label key={l.code} className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" checked={form.localities.includes(l.code)} onChange={(e) => toggle(l.code, e.target.checked)} />
-                  <span className="truncate">{l.name}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <div className="flex flex-col gap-1 text-sm">
+            Zone{form.role === 'locality_admin' ? ' to administer' : 's'}
+            <MultiSelect
+              noun="zones"
+              options={data.localities.map((l) => ({ value: l.code, label: l.name }))}
+              selected={form.localities}
+              onChange={(localities) => set({ localities })}
+            />
+          </div>
         )}
 
         {form.role === 'specialist_operator' && (

@@ -28,7 +28,7 @@ erDiagram
 | Table | Purpose | Key points |
 |---|---|---|
 | 🏙️ `localities` | The 20 official Bogotá localities | `code` 1 to 20. Boundaries not loaded yet (markers only). |
-| 👤 `profiles` | One row per user, created automatically at sign-up | `role` is **null** until a Super Admin assigns one. `is_active`. `email` copied from sign-up (the browser cannot read the auth table). A trigger blocks demoting or switching off the last active Super Admin. |
+| 👤 `profiles` | One row per user, created automatically at sign-up | `role` is **null** until a Super Admin assigns one. `is_active`. `email` copied from sign-up (the browser cannot read the auth table). A trigger blocks demoting or switching off the last active Super Admin. `invitation_pending` is true from the invitation until the person confirms the email link (a trigger on the auth table clears it); nobody can change it on their own profile. |
 | 📍 `user_locality_access` | Which localities a user may see | (user, locality). |
 | 🏷️ `user_incident_type_access` | Which categories a **specialist** may see | (user, category). Locality Admins and Super Admins do not need rows. |
 | 🧩 `specializations` | Groups of categories | `traffic`, `environmental`, `infrastructure`. |
@@ -72,6 +72,8 @@ erDiagram
 4. `20261014030000_incident_media.sql`: photos and videos.
 5. `20261017000000_escalation_status.sql`: the `needs_second_approval` status.
 6. `20261017010000_roles_alignment.sql`: 3 roles, specializations and categories, permissions as data, category scoping, escalation function, category-aware tools.
+7. `20261018000000_user_management.sql`: `profiles.email`, last-Super-Admin guard, audit events for role and access changes.
+8. `20261018010000_invitation_pending.sql`: `profiles.invitation_pending` and the trigger that clears it when an invitation is accepted.
 
 ## 🎯 Still to build
 | | Item |
