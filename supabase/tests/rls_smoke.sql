@@ -3,8 +3,8 @@
 -- It simulates signed-in users inside ONE DO block that ALWAYS ends by raising an exception, so every row it
 -- creates (fake users, recommendations, decisions, audit events) is rolled back. Read the RESULT line.
 --
--- Expected result:  RESULT PASS 26/26 ...
--- Any failing check is listed by name, e.g.  RESULT FAIL 24/26 failed: T3 sp0_sees_nothing, T7 ...
+-- Expected result:  RESULT PASS 33/33 ...
+-- Any failing check is listed by name, e.g.  RESULT FAIL 31/33 failed: T3 sp0_sees_nothing, T7 ...
 --
 -- Fake users (all in Kennedy, locality 8):
 --   la    Locality Admin, no category rows     -> must see ALL categories in Kennedy
@@ -17,7 +17,7 @@ declare
   v_la uuid := gen_random_uuid();  v_sp1 uuid := gen_random_uuid();
   v_env uuid := gen_random_uuid(); v_sp0 uuid := gen_random_uuid();
   fails text[] := '{}'; n int; n2 int; ok boolean; v_rec uuid; v_rec2 uuid; v_status text;
-  e_all int; e_park int; e_dump int; e_other int;
+  e_all int; e_park int; e_dump int; e_other int; v_cnt int;
 
 begin
   if v_admin is null then raise exception 'No super admin exists: bootstrap one first'; end if;
@@ -133,6 +133,39 @@ begin
   if v_status <> 'approved' then fails := fails || 'T8 la_can_decide_escalated'; end if;
   reset role;
 
+  -- ── User management (T13 and the Users screen) ──
+  if (select email from public.profiles where id = v_la) is distinct from 'rls-la@example.invalid' then
+    fails := fails || 'email_stored_on_profile';
+  end if;
+  perform set_config('request.jwt.claims', '', true);  -- act as the database owner, not as the last fake user
+  select count(*) into v_cnt from public.profiles where role = 'super_admin' and is_active;
+  if v_cnt = 1 then
+    begin update public.profiles set role = null where id = v_admin; ok := true; exception when others then ok := false; end;
+    if ok then fails := fails || 'T13 last_super_admin_cannot_be_demoted'; end if;
+    begin update public.profiles set is_active = false where id = v_admin; ok := true; exception when others then ok := false; end;
+    if ok then fails := fails || 'T13b last_super_admin_cannot_be_deactivated'; end if;
+  end if;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  update public.profiles set role = 'locality_admin' where id = v_sp0;
+  select count(*) into n from public.audit_events
+    where action = 'user_role_changed' and entity_id = v_sp0::text and actor = v_admin;
+  if n <> 1 then fails := fails || 'role_change_is_audited'; end if;
+  insert into public.user_locality_access values (v_sp0, 1);
+  select count(*) into n from public.audit_events
+    where action = 'locality_access_granted' and entity_id = v_sp0::text and actor = v_admin;
+  if n <> 1 then fails := fails || 'access_grant_is_audited'; end if;
+  delete from public.user_locality_access where user_id = v_sp0 and locality_code = 1;
+  select count(*) into n from public.audit_events
+    where action = 'locality_access_revoked' and entity_id = v_sp0::text and actor = v_admin;
+  if n <> 1 then fails := fails || 'access_revoke_is_audited'; end if;
+  reset role;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_sp1, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  select count(*) into n from public.audit_events where actor is distinct from v_sp1;
+  if n <> 0 then fails := fails || 'specialist_cannot_read_others_audit'; end if;
+  reset role;
+
   -- ── Super Admin ──
   perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
   set local role authenticated;
@@ -146,7 +179,7 @@ begin
 
   raise exception 'RESULT % % | kennedy all=% parking=% dumping=% | failed: %',
     case when cardinality(fails) = 0 then 'PASS' else 'FAIL' end,
-    (26 - cardinality(fails)) || '/26',
+    (33 - cardinality(fails)) || '/33',
     e_all, e_park, e_dump,
     coalesce(nullif(array_to_string(fails, ', '), ''), 'none');
 end $$;

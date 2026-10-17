@@ -98,7 +98,10 @@ flowchart LR
 
 ## 🚪 5. How users get access (provisioning)
 1. 🆕 Anyone can register. They get **no role** and see an "Access pending" screen.
-2. 🟣 **Only a Super Admin** assigns role, localities and categories. Nobody can change their own.
+2. 🟣 **Only a Super Admin** assigns role, localities and categories, on the **Users** screen (header button). Nobody can change their own role or status there.
+   - ✅ New sign-ups appear first as **Pending**; changes save immediately and are written to the audit trail.
+   - 🛟 The database refuses to demote or switch off the **last active Super Admin**.
+   - 🚫 Creating accounts for other people is not possible from the browser (needs a server-side key); people register themselves.
 3. 🥇 The **first Super Admin** is set once by SQL in the Supabase SQL editor (README, section "Auth and roles"), never from the app.
 4. 🚀 Before going live: "Confirm email" on and leaked-password protection on ([deploy.md](deploy.md)).
 
@@ -154,8 +157,9 @@ All 12 cases are covered by 26 checks, all passing (2026-10-17).
 | 🟩 | **Escalation:** status `needs_second_approval`; a specialist's escalation is the database function `escalate_recommendation`; once escalated only Locality Admin or Super Admin can decide. |
 | 🟩 | Specializations and categories tables (traffic: parking, environmental: illegal dumping, infrastructure: empty). 150 synthetic dumping incidents. |
 | 🟩 | Agent tools need the `ask_agent` permission and take an optional category. |
-| 🟩 | Permission test: 26 checks (T1 to T12 plus extras), all passing. |
-| 🟥 | **No screen to assign roles, localities or categories** (SQL only). |
+| 🟩 | Permission test: 33 checks (T1 to T13 plus extras), all passing. |
+| 🟩 | **Users screen** (Super Admin): table, search and filters, side panel for role, active switch, localities and categories. Last-Super-Admin guard and audit trail in the database. |
+| 🟥 | No invite or create-account for others, no password reset, no delete user (need a server-side key; future Edge Function). |
 | 🟥 | **No team view and no incident assignment screen** (`incidents.assigned_to` exists; database lets Locality Admin and Super Admin assign). |
 | 🟥 | **No escalate button.** The database function works; screens come with the agent. |
 | 🟥 | No sample user per role to sign in with (the test uses rolled-back fake users). |
