@@ -53,24 +53,6 @@ export const STATUSES: IncidentStatus[] = [
   'duplicate',
 ]
 
-const PARKING_SUBTYPES = [
-  'sidewalk',
-  'pedestrian_access',
-  'prohibited_zone',
-  'access_ramp',
-  'intersection',
-  'other_public_space',
-]
-const DUMPING_SUBTYPES = ['household_waste', 'construction_debris', 'bulky_items']
-
-/** Type options for the filter: all of them, or only those of one category. */
-export const subtypesFor = (category: string) =>
-  category === 'parking'
-    ? PARKING_SUBTYPES
-    : category === 'illegal_dumping'
-      ? DUMPING_SUBTYPES
-      : [...PARKING_SUBTYPES, ...DUMPING_SUBTYPES]
-
 /** The incident's type, whichever category it belongs to. */
 export const typeOf = (i: Pick<Incident, 'subtype' | 'obstruction_subtype'>) =>
   i.subtype ?? i.obstruction_subtype ?? 'unknown'

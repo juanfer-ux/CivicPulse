@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   GROUPS,
   STATUSES,
-  subtypesFor,
   typeOf,
   fetchDashboardData,
   groupOf,
@@ -47,7 +46,6 @@ export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props
   const [locality, setLocality] = useState('')
   const [status, setStatus] = useState('')
   const [category, setCategory] = useState('')
-  const [subtype, setSubtype] = useState('')
   const [days, setDays] = useState(0)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState(false) // mobile bottom sheet only
@@ -65,10 +63,9 @@ export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props
           (!locality || i.locality_code === Number(locality)) &&
           (!category || i.category === category) &&
           (!status || i.status === status) &&
-          (!subtype || typeOf(i) === subtype) &&
           (!days || new Date(i.occurred_at).getTime() >= now - days * DAY),
       ),
-    [data, locality, category, status, subtype, days, now],
+    [data, locality, category, status, days, now],
   )
 
   const byGroup = useMemo(() => {
@@ -143,10 +140,7 @@ export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props
               aria-label="Category"
               className={selectClass}
               value={category}
-              onChange={(e) => {
-                setCategory(e.target.value)
-                setSubtype('')
-              }}
+              onChange={(e) => setCategory(e.target.value)}
             >
               <option value="">All categories</option>
               {data?.categories.map((c) => (
@@ -158,14 +152,6 @@ export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props
             <select aria-label="Status" className={selectClass} value={status} onChange={(e) => setStatus(e.target.value)}>
               <option value="">All statuses</option>
               {STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {label(s)}
-                </option>
-              ))}
-            </select>
-            <select aria-label="Incident type" className={selectClass} value={subtype} onChange={(e) => setSubtype(e.target.value)}>
-              <option value="">All types</option>
-              {subtypesFor(category).map((s) => (
                 <option key={s} value={s}>
                   {label(s)}
                 </option>
