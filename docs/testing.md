@@ -12,7 +12,7 @@ npm run build    # type-check, then bundle
 ## 🧪 What each kind of test covers
 | | Kind | Where | Covers |
 |---|---|---|---|
-| 🟩 | Unit tests (Vitest) | `src/lib/agent.test.ts`, `src/lib/users.test.ts` | Question routing, accent-insensitive localities, percentage rules, empty periods, small samples, ties, honest "cannot answer", proposals with no dispatch, tool errors surfaced; Users screen: diff of granted vs wanted access, Pending/Active/Off status |
+| 🟩 | Unit tests (Vitest) | `src/lib/agent.test.ts`, `src/lib/users.test.ts` | Question routing, accent-insensitive localities, percentage rules, empty periods, small samples, ties, honest "cannot answer", proposals with no dispatch, tool errors surfaced; Users screen: diff of granted vs wanted access, Pending/Active/Off status; invite form rules (name, email, role, zones, specialty with categories) and specialty shown from categories |
 | 🟩 | Permission smoke test (SQL) | `supabase/tests/rls_smoke.sql` | **33 checks** for Locality Admin, three kinds of Specialist and Super Admin: scope by locality and category, agent tools scoped the same, nobody promotes themselves, approve and escalate flow, no forged audit events, no pre-approved recommendations, last Super Admin protected, role and access changes audited |
 | 🟨 | Manual checklist | below | Screens, sign-in, map |
 | ⬜ | Screen tests | none yet | Components and flows |
@@ -28,6 +28,7 @@ npm run build    # type-check, then bundle
 - [ ] Filters change the counts; clicking a point opens the incident with placeholder photos.
 - [ ] Ask the suggested questions; evidence and limitations appear; map rings appear.
 - [ ] Phone width: bottom sheet with Explore and Investigate tabs.
+- [ ] Create user (needs the function deployed): invite an email you control as each role. Email arrives, link opens **Choose your password**, after saving you land in the app with the right access; the table shows the new person with the right specialty; the audit trail has `user_invited`. A duplicate email gives a clear message and leaves no extra user. A Locality Admin or Specialist calling the function is refused.
 - [ ] Super Admin: **Users** button opens the table; a role or locality change persists after reload; you cannot change your own role. Other roles do not see the button.
 - [ ] Category filter: choose Illegal dumping, then Obstructive parking; counts change.
 

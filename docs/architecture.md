@@ -12,9 +12,12 @@ flowchart TB
   U --> MAP["🗺️ MapLibre + CARTO basemap tiles"]
   G["🐙 GitHub"] -->|"push to main"| V
   F["🎨 Figma"] -.->|"design tokens, screens"| U
+  U -->|"invite a user"| INV["✉️ Edge Function invite-user"]
+  INV -->|"admin key, server side only"| AU
   EF["🔮 Edge Function + LLM (future)"] -.-> DB
 ```
 - The app is **static**: nothing runs on Vercel except the build. The browser talks to Supabase directly with the user's own sign-in token.
+- ✉️ The one exception is **inviting users**: the browser calls the `invite-user` Edge Function, which checks the caller and is the only place a server admin key is used ([decision 0011](decisions/0011-invite-users-by-edge-function.md)).
 - 🔐 **The database is the security boundary** (row-level security). The screen is never trusted to enforce access.
 
 ## 🧱 Stack
@@ -39,7 +42,9 @@ flowchart TB
 |---|---|
 | `src/components/` | Screens: dashboard, map, Investigate panel, Recommendations, sign-in |
 | `src/lib/agent.ts` | Rule-based planner and answer templates ([ai-agent.md](ai-agent.md)) |
-| `src/lib/auth.tsx`, `src/components/AuthGate.tsx` | Sign-in state and access gate |
+| `src/lib/auth.tsx`, `src/components/AuthGate.tsx`, `SetPassword.tsx` | Sign-in state, access gate, choose-password screen for invited people |
+| `src/components/UsersAdmin.tsx`, `src/lib/users.ts` | Super Admin Users screen and Create user form |
+| `supabase/functions/invite-user/` | Edge Function that sends invitations |
 | `supabase/migrations/` | Database, in order ([data-model.md](data-model.md)) |
 | `supabase/seed/`, `supabase/tests/` | Synthetic data; permission smoke test |
 | `docs/` | You are here |

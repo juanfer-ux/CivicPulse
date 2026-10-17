@@ -101,7 +101,9 @@ flowchart LR
 2. 🟣 **Only a Super Admin** assigns role, localities and categories, on the **Users** screen (header button). Nobody can change their own role or status there.
    - ✅ New sign-ups appear first as **Pending**; changes save immediately and are written to the audit trail.
    - 🛟 The database refuses to demote or switch off the **last active Super Admin**.
-   - 🚫 Creating accounts for other people is not possible from the browser (needs a server-side key); people register themselves.
+   - 📨 **Create user** (same screen): the Super Admin enters name and email, picks **one role** (Super Admin, Locality (Zone) Admin or Specialist Operator), the **zone(s)** for the last two, and the **specialty** for a Specialist (it grants that specialty's categories). The person gets an invitation email and chooses their own password; role and access are already assigned when they arrive.
+   - 🔑 Done by a server function (Edge Function `invite-user`), the only place the admin key lives ([decision 0011](decisions/0011-invite-users-by-edge-function.md)). It checks the caller, validates, sends the invite, assigns access, audits, and removes the new account if any step fails.
+   - 🧮 Rule: **you can only grant access you have**. Today only a Super Admin invites, and a Super Admin has everything, so nothing is limited; the function enforces the rule for when restricted admins exist.
 3. 🥇 The **first Super Admin** is set once by SQL in the Supabase SQL editor (README, section "Auth and roles"), never from the app.
 4. 🚀 Before going live: "Confirm email" on and leaked-password protection on ([deploy.md](deploy.md)).
 
@@ -159,7 +161,10 @@ All 12 cases are covered by 26 checks, all passing (2026-10-17).
 | 🟩 | Agent tools need the `ask_agent` permission and take an optional category. |
 | 🟩 | Permission test: 33 checks (T1 to T13 plus extras), all passing. |
 | 🟩 | **Users screen** (Super Admin): table, search and filters, side panel for role, active switch, localities and categories. Last-Super-Admin guard and audit trail in the database. |
-| 🟥 | No invite or create-account for others, no password reset, no delete user (need a server-side key; future Edge Function). |
+| 🟩 | **Create user:** invitation by email with role, zones and specialty; set-password screen for the invited person. |
+| 🟥 | No resend invite, password reset or delete user yet. |
+| 🟥 | Restricted Super Admins, and Zone Admins inviting specialists into their own zone (would change this spec). |
+| 🟨 | A specialist's **specialty is derived from their categories**. Infrastructure has no categories yet, so it cannot be assigned until we add some. |
 | 🟥 | **No team view and no incident assignment screen** (`incidents.assigned_to` exists; database lets Locality Admin and Super Admin assign). |
 | 🟥 | **No escalate button.** The database function works; screens come with the agent. |
 | 🟥 | No sample user per role to sign in with (the test uses rolled-back fake users). |

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -6,12 +6,17 @@ import { useAuth, type AppRole } from '@/lib/auth'
 import {
   ROLES,
   ROLE_LABELS,
+  assignableSpecialties,
   fetchUserAdminData,
+  inviteUser,
   setCategories,
   setLocalities,
+  specialtyOf,
   statusOf,
   updateProfile,
+  validateInvite,
   type AdminData,
+  type InviteForm,
   type UserRow,
   type UserStatus,
 } from '@/lib/users'
@@ -25,6 +30,7 @@ const STATUS_VARIANT: Record<UserStatus, 'default' | 'secondary' | 'outline'> = 
 const SELECT =
   'h-8 w-full rounded-lg border border-input bg-transparent px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50 [&>option]:bg-card'
 
+const ASIDE = 'max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:top-[49px] max-md:z-20 md:w-[420px] md:shrink-0 md:border-l bg-card'
 const localities = (n: number) => `${n} ${n === 1 ? 'locality' : 'localities'}`
 
 export function UsersAdmin({ onBack }: { onBack: () => void }) {
@@ -36,10 +42,18 @@ export function UsersAdmin({ onBack }: { onBack: () => void }) {
   const [roleFilter, setRoleFilter] = useState('')
   const [pendingOnly, setPendingOnly] = useState(false)
   const [openId, setOpenId] = useState<string | null>(null)
+  const [creating, setCreating] = useState(false)
 
   useEffect(() => {
     fetchUserAdminData().then(setData, (e: Error) => setError(e.message))
   }, [])
+
+  /** After an invitation: reload the list and open the new person's panel. */
+  const invited = async (id: string) => {
+    setData(await fetchUserAdminData())
+    setCreating(false)
+    setOpenId(id)
+  }
 
   const patch = useCallback(
     (id: string, change: Partial<UserRow>) =>
@@ -70,9 +84,20 @@ export function UsersAdmin({ onBack }: { onBack: () => void }) {
                 {data ? `${data.users.length} ${data.users.length === 1 ? 'person' : 'people'}, ${pendingCount} waiting for a role` : 'Loading…'}
               </p>
             </div>
-            <Button variant="outline" size="sm" onClick={onBack}>
-              Back to map
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={() => {
+                  setOpenId(null)
+                  setCreating(true)
+                }}
+              >
+                Create user
+              </Button>
+              <Button variant="outline" size="sm" onClick={onBack}>
+                Back to map
+              </Button>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -110,12 +135,18 @@ export function UsersAdmin({ onBack }: { onBack: () => void }) {
                   return (
                     <tr
                       key={u.id}
-                      onClick={() => setOpenId(u.id)}
+                      onClick={() => {
+                        setCreating(false)
+                        setOpenId(u.id)
+                      }}
                       className={`cursor-pointer border-b hover:bg-muted/50 max-md:grid max-md:grid-cols-2 max-md:gap-1 max-md:rounded-lg max-md:border max-md:bg-card max-md:p-3 ${openId === u.id ? 'bg-muted/50' : ''}`}
                     >
                       <td className="px-3 py-2 font-medium max-md:col-span-2 max-md:p-0">{u.full_name || 'No name'}</td>
                       <td className="px-3 py-2 text-muted-foreground max-md:col-span-2 max-md:truncate max-md:p-0">{u.email}</td>
-                      <td className="px-3 py-2 max-md:p-0">{u.role ? ROLE_LABELS[u.role] : '—'}</td>
+                      <td className="px-3 py-2 max-md:p-0">
+                        {u.role ? ROLE_LABELS[u.role] : '—'}
+                        {u.role === 'specialist_operator' && <span className="block text-xs text-muted-foreground">{specialtyOf(u, data).join(', ') || 'No specialty yet'}</span>}
+                      </td>
                       <td className="px-3 py-2 max-md:p-0">
                         <Badge variant={STATUS_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
                       </td>
@@ -136,7 +167,8 @@ export function UsersAdmin({ onBack }: { onBack: () => void }) {
           )}
         </div>
 
-        {open && data && (
+        {creating && data && <InvitePanel data={data} onClose={() => setCreating(false)} onInvited={invited} />}
+        {open && data && !creating && (
           <UserPanel key={open.id} user={open} data={data} isMe={open.id === meId} onPatch={patch} onClose={() => setOpenId(null)} />
         )}
       </div>
@@ -203,7 +235,7 @@ function UserPanel({
             : `Can see ${localities(user.localities.length)}, ${user.role === 'specialist_operator' ? names.join(' + ') : 'all categories'}.`
 
   return (
-    <aside className="max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:top-[49px] max-md:z-20 md:w-[420px] md:shrink-0 md:border-l bg-card">
+    <aside className={ASIDE}>
       <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
@@ -216,6 +248,7 @@ function UserPanel({
         </div>
 
         <p className="rounded-lg bg-muted/50 p-3 text-sm">{summary}</p>
+        {user.role === 'specialist_operator' && <p className="text-sm">Specialty: {specialtyOf(user, data).join(', ') || 'none yet'}</p>}
         {isMe && <p className="text-xs text-muted-foreground">This is you: your own role and status are locked so you cannot lock yourself out.</p>}
 
         <label className="flex flex-col gap-1 text-sm">
@@ -303,6 +336,118 @@ function UserPanel({
           {busy ? 'Saving…' : msg?.text}
         </p>
       </div>
+    </aside>
+  )
+}
+
+function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: () => void; onInvited: (id: string) => Promise<void> }) {
+  const [form, setForm] = useState<InviteForm>({ full_name: '', email: '', role: '', localities: [], specialty: '' })
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const specialties = useMemo(() => assignableSpecialties(data), [data])
+  const set = (change: Partial<InviteForm>) => setForm((f) => ({ ...f, ...change }))
+  const toggle = (code: number, on: boolean) => set({ localities: on ? [...form.localities, code] : form.localities.filter((c) => c !== code) })
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault()
+    const problem = validateInvite(form, specialties)
+    if (problem) return setError(problem)
+    setBusy(true)
+    setError(null)
+    try {
+      await onInvited(await inviteUser(form))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not send the invitation.')
+      setBusy(false)
+    }
+  }
+
+  const grants = data.categories.filter((c) => c.specialization === form.specialty).map((c) => c.name)
+
+  return (
+    <aside className={ASIDE}>
+      <form onSubmit={submit} className="flex h-full flex-col gap-4 overflow-y-auto p-4">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-semibold">Create user</h2>
+            <p className="text-sm text-muted-foreground">They get an email to set their own password.</p>
+          </div>
+          <Button type="button" variant="ghost" size="sm" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+
+        <label className="flex flex-col gap-1 text-sm">
+          Name
+          <Input value={form.full_name} onChange={(e) => set({ full_name: e.target.value })} autoComplete="off" />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          Email
+          <Input type="email" value={form.email} onChange={(e) => set({ email: e.target.value })} autoComplete="off" />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          Role
+          <select className={SELECT} value={form.role} onChange={(e) => set({ role: e.target.value as AppRole | '' })}>
+            <option value="">Choose a role</option>
+            {ROLES.map((r) => (
+              <option key={r} value={r}>
+                {ROLE_LABELS[r]}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        {form.role === 'super_admin' && <p className="rounded-lg bg-muted/50 p-3 text-sm">Super Admins see everything and manage users, so no zone is needed.</p>}
+
+        {(form.role === 'locality_admin' || form.role === 'specialist_operator') && (
+          <fieldset className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <legend className="text-sm font-medium">
+                Zone{form.role === 'locality_admin' ? ' to administer' : 's'} ({form.localities.length}/{data.localities.length})
+              </legend>
+              <span className="flex gap-1">
+                <Button size="xs" variant="ghost" type="button" onClick={() => set({ localities: data.localities.map((l) => l.code) })}>
+                  Select all
+                </Button>
+                <Button size="xs" variant="ghost" type="button" onClick={() => set({ localities: [] })}>
+                  Clear
+                </Button>
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+              {data.localities.map((l) => (
+                <label key={l.code} className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={form.localities.includes(l.code)} onChange={(e) => toggle(l.code, e.target.checked)} />
+                  <span className="truncate">{l.name}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        )}
+
+        {form.role === 'specialist_operator' && (
+          <label className="flex flex-col gap-1 text-sm">
+            Specialty
+            <select className={SELECT} value={form.specialty} onChange={(e) => set({ specialty: e.target.value })}>
+              <option value="">Choose the specialty</option>
+              {data.specializations.map((s) => (
+                <option key={s.code} value={s.code} disabled={!specialties.has(s.code)}>
+                  {s.name}
+                  {specialties.has(s.code) ? '' : ' (no categories yet)'}
+                </option>
+              ))}
+            </select>
+            {grants.length > 0 && <span className="text-xs text-muted-foreground">Will see: {grants.join(', ')}</span>}
+          </label>
+        )}
+
+        <p role="alert" className="min-h-5 text-sm text-destructive">
+          {error}
+        </p>
+        <Button type="submit" disabled={busy}>
+          {busy ? 'Sending…' : 'Send invitation'}
+        </Button>
+      </form>
     </aside>
   )
 }

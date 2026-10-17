@@ -16,6 +16,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0008](0008-categories-and-specializations-tables.md) | Incident categories and specializations are tables | ✅ Accepted |
 | [0009](0009-recommendations-screens-removed.md) | Recommendation screens removed for now; backend kept | ✅ Accepted |
 | [0010](0010-users-screen-uses-access-rules.md) | The Users screen writes through the existing access rules; no admin key in the browser | ✅ Accepted |
+| [0011](0011-invite-users-by-edge-function.md) | Users are invited by an Edge Function; the admin key stays on the server | ✅ Accepted |
 
 ## ✍️ Template
 ```

@@ -14,8 +14,9 @@ Static Vite app + Supabase. Nothing runs on Vercel except the build. All data ac
    update public.profiles set role = 'super_admin'
    where id = (select id from auth.users where email = 'YOUR_EMAIL');
    ```
-5. Run `supabase/tests/rls_smoke.sql` ([how](testing.md)).
-6. Check Dashboard → Advisors: only the "permission helper callable by signed-in users" warnings should remain (7 functions: the permission helpers and the escalation function, all intentional), plus leaked-password protection until you enable it.
+5. **Deploy the invite function** (once, and after any change to it): Supabase → Edge Functions → create `invite-user`, paste `supabase/functions/invite-user/index.ts`, keep **Verify JWT** on, deploy. Or with the Supabase CLI: `supabase login`, then `supabase functions deploy invite-user`. Supabase supplies the admin key to the function itself; do not copy it anywhere.
+6. Run `supabase/tests/rls_smoke.sql` ([how](testing.md)).
+7. Check Dashboard → Advisors: only the "permission helper callable by signed-in users" warnings should remain (7 functions: the permission helpers and the escalation function, all intentional), plus leaked-password protection until you enable it.
 
 ## ▲ 2. Vercel
 1. Import the GitHub repo. `vercel.json` already sets the Vite framework, build command and security headers.
@@ -38,6 +39,8 @@ Static Vite app + Supabase. Nothing runs on Vercel except the build. All data ac
 | Saved the variable but nothing changed | No redeploy, or the save did not apply | Check the row says "Added/Updated just now", then **Redeploy** (build cache off) |
 | Vercel says *"Remove the public framework prefix…"* | Type is Secret | Delete the variable and add it again as **Config** |
 | Blank page after sign-in on one computer | Browser has no WebGL2 (hardware acceleration off) | Turn on "Use graphical acceleration when available" in the browser, restart it. The app shows a list meanwhile. |
+| Invitation email does not arrive or *"rate limit"* | Supabase's built-in email sender allows only a few emails per hour | Wait, or connect your own email service (Auth → SMTP settings) |
+| Invitation link opens the sign-in page, not "Choose your password" | Site URL or Redirect URLs do not include the Vercel address | Fix them in Auth → URL Configuration, send a new invitation |
 | Another app answers on `localhost:5173` | A different project's dev server uses the same port | Run this one on another port, for example `npx vite --port 5180` |
 
 ## ✅ 4. Checks before every deploy

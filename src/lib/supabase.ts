@@ -15,4 +15,7 @@ if (!/^[\x21-\x7e]+$/.test(key)) {
   )
 }
 
+// The invitation email link opens the app with "type=invite" in the address. Note it now: the client removes it from the address once it has read the session.
+export const arrivedByInvite = /[#&]type=(invite|recovery)\b/.test(window.location.hash)
+
 export const supabase = createClient(url, key)

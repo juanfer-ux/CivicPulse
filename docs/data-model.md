@@ -39,7 +39,7 @@ erDiagram
 | 📷 `incident_media` | Photos and videos per incident | `storage_path` empty while placeholder. Files go to a private Storage bucket later. |
 | 💡 `recommendations` | Suggestions for human review | Has `category`. `evidence` (counts and incident ids from SQL), `limitations`, `status`. |
 | ✔️ `decisions` | Approve or reject, **append-only** | Who, when, explanation. A trigger updates the recommendation status. |
-| 📜 `audit_events` | Who did what | Written **only by triggers or the escalation function**; users cannot forge entries. User management logs `user_role_changed`, `user_activation_changed`, `locality_access_granted/revoked`, `category_access_granted/revoked`. |
+| 📜 `audit_events` | Who did what | Written **only by triggers or the escalation function**; users cannot forge entries. User management logs `user_role_changed`, `user_activation_changed`, `locality_access_granted/revoked`, `category_access_granted/revoked`, and `user_invited` (written by the invite function). |
 
 ### 🚨 `incidents` columns, grouped
 - **Identity:** `id`, `reference` (CP-00001 parking, CD-00001 dumping), `title`, `description`, `category`.

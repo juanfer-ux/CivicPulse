@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabase'
+import { arrivedByInvite, supabase } from '@/lib/supabase'
 
 /** The three active roles. Permissions per role live in the database (role_permissions); see docs/roles-and-permissions.md. */
 export type AppRole = 'super_admin' | 'locality_admin' | 'specialist_operator'
@@ -35,6 +35,9 @@ interface AuthState {
   /** True if the user's role allows the action. The database enforces it; this only drives the screen. */
   can: (action: Action) => boolean
   signOut: () => Promise<void>
+  /** True right after following an invitation link, until the person has chosen a password. */
+  needsPassword: boolean
+  passwordSet: () => void
 }
 
 const AuthContext = createContext<AuthState | null>(null)
@@ -42,6 +45,7 @@ const AuthContext = createContext<AuthState | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null | undefined>(undefined)
   const [fetched, setFetched] = useState<{ id: string; data: Profile | null } | null>(null)
+  const [needsPassword, setNeedsPassword] = useState(arrivedByInvite)
   const [fetchedPerms, setFetchedPerms] = useState<{ role: AppRole; actions: Set<string> } | null>(null)
 
   useEffect(() => {
@@ -92,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut()
   }
 
-  return <AuthContext value={{ session, profile, can, signOut }}>{children}</AuthContext>
+  return <AuthContext value={{ session, profile, can, signOut, needsPassword, passwordSet: () => setNeedsPassword(false) }}>{children}</AuthContext>
 }
 
 export function useAuth() {

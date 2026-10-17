@@ -107,3 +107,52 @@ export async function setCategories(userId: string, current: string[], wanted: s
     if (error) throw error
   }
 }
+
+export interface InviteForm {
+  full_name: string
+  email: string
+  role: AppRole | ''
+  localities: number[]
+  specialty: string
+}
+
+/** Specialties that grant at least one category (Infrastructure has none yet, so it cannot be assigned). */
+export const assignableSpecialties = (d: Pick<AdminData, 'categories'>) => new Set(d.categories.map((c) => c.specialization))
+
+/** Specialty of a person, shown from the categories they hold. */
+export const specialtyOf = (u: Pick<UserRow, 'role' | 'categories'>, d: Pick<AdminData, 'categories' | 'specializations'>) =>
+  u.role !== 'specialist_operator'
+    ? []
+    : d.specializations
+        .filter((s) => d.categories.some((c) => c.specialization === s.code && u.categories.includes(c.code)))
+        .map((s) => s.name)
+
+/** Returns the first problem in plain words, or null when the form can be sent. */
+export function validateInvite(f: InviteForm, specialties: Set<string>): string | null {
+  if (!f.full_name.trim()) return 'Enter the name.'
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) return 'Enter a valid email.'
+  if (!f.role) return 'Choose a role.'
+  if (f.role !== 'super_admin' && !f.localities.length) return 'Choose at least one locality.'
+  if (f.role === 'specialist_operator' && !specialties.has(f.specialty)) return 'Choose the specialty.'
+  return null
+}
+
+/** Sends the invitation through the server function (the admin key lives only there). Returns the new user's id. */
+export async function inviteUser(f: InviteForm): Promise<string> {
+  const { data, error } = await supabase.functions.invoke('invite-user', {
+    body: {
+      full_name: f.full_name.trim(),
+      email: f.email.trim(),
+      role: f.role,
+      localities: f.role === 'super_admin' ? [] : f.localities,
+      specialty: f.role === 'specialist_operator' ? f.specialty : '',
+      redirect_to: window.location.origin,
+    },
+  })
+  if (error) {
+    // A non-2xx answer carries the function's message in the response body.
+    const detail = await (error as { context?: Response }).context?.json().catch(() => null)
+    throw new Error(detail?.error ?? error.message)
+  }
+  return (data as { id: string }).id
+}

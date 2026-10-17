@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/lib/supabase', () => ({ supabase: {} }))
-const { diffCodes, statusOf } = await import('@/lib/users')
+const { diffCodes, statusOf, validateInvite, specialtyOf, assignableSpecialties } = await import('@/lib/users')
 
 describe('diffCodes', () => {
   it('returns only what to add and what to remove', () => {
@@ -23,5 +23,44 @@ describe('statusOf', () => {
   it('distinguishes active from switched off', () => {
     expect(statusOf({ role: 'specialist_operator', is_active: true })).toBe('active')
     expect(statusOf({ role: 'locality_admin', is_active: false })).toBe('off')
+  })
+})
+
+const form = { full_name: 'Ana', email: 'ana@example.test', role: 'specialist_operator' as const, localities: [8], specialty: 'traffic' }
+const cats = [{ code: 'parking', name: 'Parking', specialization: 'traffic' }]
+const specs = [
+  { code: 'traffic', name: 'Traffic', sort: 1 },
+  { code: 'infrastructure', name: 'Infrastructure', sort: 2 },
+]
+
+describe('validateInvite', () => {
+  const ok = assignableSpecialties({ categories: cats })
+  it('accepts a complete specialist', () => expect(validateInvite(form, ok)).toBeNull())
+  it('needs a name, a valid email and a role', () => {
+    expect(validateInvite({ ...form, full_name: ' ' }, ok)).toMatch(/name/)
+    expect(validateInvite({ ...form, email: 'nope' }, ok)).toMatch(/email/)
+    expect(validateInvite({ ...form, role: '' }, ok)).toMatch(/role/)
+  })
+  it('needs localities for everyone except a Super Admin', () => {
+    expect(validateInvite({ ...form, localities: [] }, ok)).toMatch(/locality/)
+    expect(validateInvite({ ...form, role: 'locality_admin', localities: [] }, ok)).toMatch(/locality/)
+    expect(validateInvite({ ...form, role: 'super_admin', localities: [], specialty: '' }, ok)).toBeNull()
+  })
+  it('needs a specialty that has categories (Infrastructure has none yet)', () => {
+    expect(validateInvite({ ...form, specialty: '' }, ok)).toMatch(/specialty/)
+    expect(validateInvite({ ...form, specialty: 'infrastructure' }, ok)).toMatch(/specialty/)
+  })
+  it('does not ask a Zone Admin for a specialty', () => {
+    expect(validateInvite({ ...form, role: 'locality_admin', specialty: '' }, ok)).toBeNull()
+  })
+})
+
+describe('specialtyOf', () => {
+  it('names the specialty from the categories a specialist holds', () => {
+    expect(specialtyOf({ role: 'specialist_operator', categories: ['parking'] }, { categories: cats, specializations: specs })).toEqual(['Traffic'])
+  })
+  it('is empty for other roles and for specialists without categories', () => {
+    expect(specialtyOf({ role: 'locality_admin', categories: ['parking'] }, { categories: cats, specializations: specs })).toEqual([])
+    expect(specialtyOf({ role: 'specialist_operator', categories: [] }, { categories: cats, specializations: specs })).toEqual([])
   })
 })

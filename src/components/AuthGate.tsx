@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { AuthPage } from '@/components/AuthPage'
+import { SetPassword } from '@/components/SetPassword'
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/lib/auth'
@@ -10,7 +11,7 @@ const Screen = ({ children }: { children: ReactNode }) => (
 
 /** Guards the whole app: signed out → login; signed in without an active role → waiting screen. */
 export function AuthGate({ children }: { children: ReactNode }) {
-  const { session, profile, signOut } = useAuth()
+  const { session, profile, signOut, needsPassword, passwordSet } = useAuth()
 
   if (session === undefined || (session && profile === undefined)) {
     return (
@@ -20,6 +21,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     )
   }
   if (!session) return <AuthPage />
+  if (needsPassword) return <SetPassword onDone={passwordSet} />
 
   if (!profile?.role || !profile.is_active) {
     return (
