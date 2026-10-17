@@ -25,7 +25,7 @@
 Reference sizes in Figma: desktop **1440×900**, mobile **390×844**.
 
 ## 👥 Users screens
-- **Users** (Super Admin): table (cards on phones) and a side panel for one person. **Create user** opens a form in the same side panel position (full screen on phones): name, email, role, zones, specialty. Not captured to Figma yet.
+- **Users** (Super Admin): table (cards on phones) and a side panel for one person. **Create user** opens a form in the same side panel position (full screen on phones): name, email, role, zones, and for Specialists a checkbox list of categories grouped by specialty. Not captured to Figma yet.
 - **Choose your password**: card like the sign-in card, shown once after an invitation link.
 
 ## 🧭 Matching Figma exactly

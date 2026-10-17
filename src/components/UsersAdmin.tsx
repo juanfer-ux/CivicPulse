@@ -6,7 +6,6 @@ import { useAuth, type AppRole } from '@/lib/auth'
 import {
   ROLES,
   ROLE_LABELS,
-  assignableSpecialties,
   fetchUserAdminData,
   inviteUser,
   setCategories,
@@ -341,16 +340,15 @@ function UserPanel({
 }
 
 function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: () => void; onInvited: (id: string) => Promise<void> }) {
-  const [form, setForm] = useState<InviteForm>({ full_name: '', email: '', role: '', localities: [], specialty: '' })
+  const [form, setForm] = useState<InviteForm>({ full_name: '', email: '', role: '', localities: [], categories: [] })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const specialties = useMemo(() => assignableSpecialties(data), [data])
   const set = (change: Partial<InviteForm>) => setForm((f) => ({ ...f, ...change }))
   const toggle = (code: number, on: boolean) => set({ localities: on ? [...form.localities, code] : form.localities.filter((c) => c !== code) })
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
-    const problem = validateInvite(form, specialties)
+    const problem = validateInvite(form)
     if (problem) return setError(problem)
     setBusy(true)
     setError(null)
@@ -362,7 +360,8 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
     }
   }
 
-  const grants = data.categories.filter((c) => c.specialization === form.specialty).map((c) => c.name)
+  const toggleCategory = (code: string, on: boolean) => set({ categories: on ? [...form.categories, code] : form.categories.filter((c) => c !== code) })
+  const specialty = specialtyOf({ role: form.role || null, categories: form.categories }, data).join(', ')
 
   return (
     <aside className={ASIDE}>
@@ -426,19 +425,28 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
         )}
 
         {form.role === 'specialist_operator' && (
-          <label className="flex flex-col gap-1 text-sm">
-            Specialty
-            <select className={SELECT} value={form.specialty} onChange={(e) => set({ specialty: e.target.value })}>
-              <option value="">Choose the specialty</option>
-              {data.specializations.map((s) => (
-                <option key={s.code} value={s.code} disabled={!specialties.has(s.code)}>
-                  {s.name}
-                  {specialties.has(s.code) ? '' : ' (no categories yet)'}
-                </option>
-              ))}
-            </select>
-            {grants.length > 0 && <span className="text-xs text-muted-foreground">Will see: {grants.join(', ')}</span>}
-          </label>
+          <fieldset className="flex flex-col gap-3">
+            <legend className="text-sm font-medium">Specialty and categories</legend>
+            {data.specializations.map((sp) => {
+              const cats = data.categories.filter((c) => c.specialization === sp.code)
+              return (
+                <div key={sp.code} className="flex flex-col gap-1">
+                  <span className="text-xs text-muted-foreground">{sp.name}</span>
+                  {cats.length ? (
+                    cats.map((c) => (
+                      <label key={c.code} className="flex items-center gap-2 text-sm">
+                        <input type="checkbox" checked={form.categories.includes(c.code)} onChange={(e) => toggleCategory(c.code, e.target.checked)} />
+                        {c.name}
+                      </label>
+                    ))
+                  ) : (
+                    <span className="text-sm text-muted-foreground">No categories yet</span>
+                  )}
+                </div>
+              )
+            })}
+            {specialty && <span className="text-xs text-muted-foreground">Specialty: {specialty}</span>}
+          </fieldset>
         )}
 
         <p role="alert" className="min-h-5 text-sm text-destructive">

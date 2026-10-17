@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
   const fullName = String(body?.full_name ?? '').trim()
   const role = String(body?.role ?? '')
   const localities: number[] = Array.isArray(body?.localities) ? body.localities.map(Number) : []
-  const specialty = String(body?.specialty ?? '')
+  const wantedCategories: string[] = Array.isArray(body?.categories) ? body.categories.map(String) : []
   if (!fullName) return reply({ error: 'Name is required.' }, 400)
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return reply({ error: 'Enter a valid email.' }, 400)
   if (!ROLES.includes(role)) return reply({ error: 'Choose a role.' }, 400)
@@ -48,14 +48,17 @@ Deno.serve(async (req) => {
     if ((known?.length ?? 0) !== new Set(localities).size) return reply({ error: 'Unknown locality.' }, 400)
   }
   let categories: string[] = []
+  let specialties: string[] = []
   if (role === 'specialist_operator') {
+    if (!wantedCategories.length) return reply({ error: 'Choose at least one category.' }, 400)
     const { data: cats } = await caller
       .from('incident_categories')
-      .select('code')
-      .eq('specialization', specialty)
+      .select('code, specialization')
+      .in('code', wantedCategories)
       .eq('active', true)
-    categories = (cats ?? []).map((c) => c.code)
-    if (!categories.length) return reply({ error: 'Choose a specialty that has categories.' }, 400)
+    if ((cats?.length ?? 0) !== new Set(wantedCategories).size) return reply({ error: 'Unknown category.' }, 400)
+    categories = cats!.map((c) => c.code)
+    specialties = [...new Set(cats!.map((c) => c.specialization))]
   }
 
   // 3. Create the account and send the invitation email. The handle_new_user trigger creates the profile.
@@ -86,7 +89,7 @@ Deno.serve(async (req) => {
       action: 'user_invited',
       entity: 'user',
       entity_id: id,
-      details: { email, role, localities, specialty: specialty || null },
+      details: { email, role, localities, categories, specialties },
     })
     if (log.error) throw new Error(log.error.message)
   } catch (e) {

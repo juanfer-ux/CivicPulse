@@ -113,11 +113,8 @@ export interface InviteForm {
   email: string
   role: AppRole | ''
   localities: number[]
-  specialty: string
+  categories: string[]
 }
-
-/** Specialties that grant at least one category (Infrastructure has none yet, so it cannot be assigned). */
-export const assignableSpecialties = (d: Pick<AdminData, 'categories'>) => new Set(d.categories.map((c) => c.specialization))
 
 /** Specialty of a person, shown from the categories they hold. */
 export const specialtyOf = (u: Pick<UserRow, 'role' | 'categories'>, d: Pick<AdminData, 'categories' | 'specializations'>) =>
@@ -128,12 +125,12 @@ export const specialtyOf = (u: Pick<UserRow, 'role' | 'categories'>, d: Pick<Adm
         .map((s) => s.name)
 
 /** Returns the first problem in plain words, or null when the form can be sent. */
-export function validateInvite(f: InviteForm, specialties: Set<string>): string | null {
+export function validateInvite(f: InviteForm): string | null {
   if (!f.full_name.trim()) return 'Enter the name.'
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) return 'Enter a valid email.'
   if (!f.role) return 'Choose a role.'
   if (f.role !== 'super_admin' && !f.localities.length) return 'Choose at least one locality.'
-  if (f.role === 'specialist_operator' && !specialties.has(f.specialty)) return 'Choose the specialty.'
+  if (f.role === 'specialist_operator' && !f.categories.length) return 'Choose at least one category.'
   return null
 }
 
@@ -145,14 +142,18 @@ export async function inviteUser(f: InviteForm): Promise<string> {
       email: f.email.trim(),
       role: f.role,
       localities: f.role === 'super_admin' ? [] : f.localities,
-      specialty: f.role === 'specialist_operator' ? f.specialty : '',
+      categories: f.role === 'specialist_operator' ? f.categories : [],
       redirect_to: window.location.origin,
     },
   })
   if (error) {
     // A non-2xx answer carries the function's message in the response body.
-    const detail = await (error as { context?: Response }).context?.json().catch(() => null)
-    throw new Error(detail?.error ?? error.message)
+    const ctx = (error as { context?: unknown }).context
+    const detail = ctx instanceof Response ? await ctx.json().catch(() => null) : null
+    throw new Error(
+      detail?.error ??
+        (error.name === 'FunctionsFetchError' ? 'Could not reach the invite service. Is the invite-user function deployed?' : error.message),
+    )
   }
   return (data as { id: string }).id
 }

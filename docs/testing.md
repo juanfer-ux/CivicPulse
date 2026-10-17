@@ -12,7 +12,7 @@ npm run build    # type-check, then bundle
 ## 🧪 What each kind of test covers
 | | Kind | Where | Covers |
 |---|---|---|---|
-| 🟩 | Unit tests (Vitest) | `src/lib/agent.test.ts`, `src/lib/users.test.ts` | Question routing, accent-insensitive localities, percentage rules, empty periods, small samples, ties, honest "cannot answer", proposals with no dispatch, tool errors surfaced; Users screen: diff of granted vs wanted access, Pending/Active/Off status; invite form rules (name, email, role, zones, specialty with categories) and specialty shown from categories |
+| 🟩 | Unit tests (Vitest) | `src/lib/agent.test.ts`, `src/lib/users.test.ts` | Question routing, accent-insensitive localities, percentage rules, empty periods, small samples, ties, honest "cannot answer", proposals with no dispatch, tool errors surfaced; Users screen: diff of granted vs wanted access, Pending/Active/Off status; invite form rules (name, email, role, zones, at least one category for a specialist) and specialty shown from categories |
 | 🟩 | Permission smoke test (SQL) | `supabase/tests/rls_smoke.sql` | **33 checks** for Locality Admin, three kinds of Specialist and Super Admin: scope by locality and category, agent tools scoped the same, nobody promotes themselves, approve and escalate flow, no forged audit events, no pre-approved recommendations, last Super Admin protected, role and access changes audited |
 | 🟨 | Manual checklist | below | Screens, sign-in, map |
 | ⬜ | Screen tests | none yet | Components and flows |

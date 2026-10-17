@@ -7,7 +7,7 @@ The Super Admin needs to add people from the Users screen. Creating an account f
 ## Decision
 The Create user form calls a Supabase Edge Function, `invite-user`. It:
 1. checks the caller may manage users and is a Super Admin;
-2. validates role, zones and specialty (a specialist's specialty must have categories);
+2. validates role, zones and categories (a specialist needs at least one; their specialty follows from the categories chosen);
 3. sends the invitation email (the person chooses their own password, so nobody handles a password);
 4. assigns role and access **as the caller**, so the existing rules and audit triggers apply, and adds a `user_invited` audit event;
 5. deletes the new account if any later step fails.
