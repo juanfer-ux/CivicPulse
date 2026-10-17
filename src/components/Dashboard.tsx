@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   GROUPS,
   STATUSES,
-  typeOf,
   fetchDashboardData,
   groupOf,
   label,
@@ -28,18 +27,17 @@ const DAY = 86_400_000
 
 type Data = { incidents: Incident[]; localities: Locality[]; categories: Category[] }
 
-export type Tab = 'explore' | 'ask' | 'recommendations'
+export type Tab = 'explore' | 'ask'
 
 interface Props {
   highlightIds: string[]
-  /** Active panel. On desktop only 'recommendations' differs; on mobile each tab is its own panel. */
+  /** Active panel on mobile (on desktop everything is visible). */
   tab: Tab
   onTab: (tab: Tab) => void
-  pending: number
   children?: ReactNode
 }
 
-export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props) {
+export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -108,7 +106,6 @@ export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props
             [
               ['explore', 'Explore'],
               ['ask', 'Investigate'],
-              ['recommendations', pending > 0 ? `Recs (${pending})` : 'Recs'],
             ] as const
           ).map(([t, text]) => (
             <Button key={t} size="sm" className="flex-1" variant={tab === t && !collapsed ? 'secondary' : 'ghost'} onClick={() => pick(t)}>
@@ -250,8 +247,6 @@ export function Dashboard({ highlightIds, tab, onTab, pending, children }: Props
               <dd className="text-foreground">
                 {data?.categories.find((c) => c.code === selected.category)?.name ?? label(selected.category)}
               </dd>
-              <dt>Type</dt>
-              <dd className="text-foreground">{label(typeOf(selected))}</dd>
               <dt>Vehicle</dt>
               <dd className="text-foreground">{label(selected.vehicle_type)}</dd>
               <dt>AI</dt>

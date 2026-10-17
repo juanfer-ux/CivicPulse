@@ -26,9 +26,9 @@ npm run build    # type-check, then bundle
 - [ ] Sign-in page loads with the logo, no console errors.
 - [ ] Sign in; the map shows points (needs hardware acceleration), or the list appears with a message.
 - [ ] Filters change the counts; clicking a point opens the incident with placeholder photos.
-- [ ] Ask the three suggested questions; evidence and limitations appear; map rings appear.
-- [ ] Phone width: bottom sheet with Explore, Investigate and Recs tabs.
-- [ ] Send a recommendation for review; approve or reject it; the audit trail shows both steps. ⚠️ This writes real rows to the shared database.
+- [ ] Ask the suggested questions; evidence and limitations appear; map rings appear.
+- [ ] Phone width: bottom sheet with Explore and Investigate tabs.
+- [ ] Category filter: choose Illegal dumping, then Obstructive parking; counts change.
 
 ## 🟥 Gaps
 | | Gap |

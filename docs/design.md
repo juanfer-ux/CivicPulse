@@ -18,7 +18,7 @@
 
 | | Desktop (768 px and wider) | Mobile (under 768 px) |
 |---|---|---|
-| Layout | Filters on the left, agent and recommendations on the right, floating over the map | Map on top; **bottom sheet** with tabs **Explore / Investigate / Recs** and a collapse button |
+| Layout | Filters on the left, the agent on the right, floating over the map | Map on top; **bottom sheet** with tabs **Explore / Investigate** and a collapse button |
 | Header | Logo text, "Synthetic data", role, Sign out | Role badge hidden to save space |
 | Detail | Card under the agent panel | Appears in the sheet; closing returns to the tab |
 
@@ -35,6 +35,6 @@ When a Figma frame is the reference, **measure it** (positions and heights relat
 ## 🟥 Gaps
 | | Gap |
 |---|---|
-| 🟥 | Signed-in screens (dashboard, Investigate, Recommendations) are **not captured to Figma yet**, desktop or mobile. |
+| 🟥 | Signed-in screens (dashboard, Investigate) are **not captured to Figma yet**, desktop or mobile. |
 | 🟥 | Captures are not linked to design-system components. |
 | 🟥 | Logo is not used in the app header yet (still plain text). |

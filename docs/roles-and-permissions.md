@@ -186,3 +186,4 @@ All 12 cases are covered by 26 checks, all passing (2026-10-17).
 | 2026-10-17 | Categories and specializations became tables | Extensible without code changes; see [decision 0008](decisions/0008-categories-and-specializations-tables.md) |
 | 2026-10-17 | Illegal dumping is active with 150 synthetic incidents; the agent is category-aware | Owner's decision, so the second category is visible and testable |
 | 2026-10-17 | Database aligned with this spec; permission test 26/26 | Implementation step 1 |
+| 2026-10-18 | Recommendations screens removed for now; the database rules stay | Owner: not needed yet. See [decision 0009](decisions/0009-recommendations-screens-removed.md) |

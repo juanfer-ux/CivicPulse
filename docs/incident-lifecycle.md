@@ -34,6 +34,7 @@ stateDiagram-v2
 > 🔶 These are the **intended** transitions. The database lists the values but does **not** enforce the order yet.
 
 ## 💡 Recommendation status
+> 🖥️ **The recommendation screens were removed on 2026-10-18** ([decision 0009](decisions/0009-recommendations-screens-removed.md)). The database, rules and tests below are kept and still work; there is just no screen for them now.
 ```mermaid
 stateDiagram-v2
   [*] --> proposed

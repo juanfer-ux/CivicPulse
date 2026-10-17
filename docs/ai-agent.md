@@ -42,7 +42,7 @@ Unsupported questions get an honest "I cannot answer that yet". The agent does n
 2. 📎 Always show the evidence and the limitations. Always say the data is synthetic.
 3. 🚫 Never claim a legal violation. The agent identifies *potential obstruction problems*.
 4. 📷 Never claim to have inspected photos or video: media are placeholders today.
-5. 🧑 Never act. Sending a proposal for review creates a *proposed* recommendation; a person approves or rejects it.
+5. 🧑 Never act. The agent only recommends; a person decides. (The screens for sending a proposal for review were removed on 2026-10-18; the database part is kept, see [decision 0009](decisions/0009-recommendations-screens-removed.md).)
 6. ❓ If the data cannot support an answer, say so.
 
 ## 🔮 Target and done

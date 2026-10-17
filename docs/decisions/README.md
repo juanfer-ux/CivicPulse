@@ -14,6 +14,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0006](0006-gilroy-fonts-in-repo.md) | Gilroy font files live in the public repo | 🟨 Needs licence check |
 | [0007](0007-permissions-as-data.md) | Permissions are stored as data and checked by one function | ✅ Accepted |
 | [0008](0008-categories-and-specializations-tables.md) | Incident categories and specializations are tables | ✅ Accepted |
+| [0009](0009-recommendations-screens-removed.md) | Recommendation screens removed for now; backend kept | ✅ Accepted |
 
 ## ✍️ Template
 ```
