@@ -12,7 +12,7 @@ npm run dev
 npm test        # planner and answer unit tests (Vitest)
 npm run build
 ```
-Deployment (Vercel + Supabase): see [DEPLOY.md](DEPLOY.md). Database tests: `supabase/tests/rls_smoke.sql`.
+📚 **Documentation index:** [docs/README.md](docs/README.md). Deployment: [docs/deploy.md](docs/deploy.md). Tests: [docs/testing.md](docs/testing.md).
 
 ## Auth and roles
 Email + password via Supabase Auth. `AuthGate` (`src/components/AuthGate.tsx`) guards the whole app: signed out shows login/sign-up, signed in without an active role shows "Access pending". New sign-ups get a profile with **no role**; only a Super Admin (or the SQL editor) can assign one. Permissions are enforced by RLS, not the UI.

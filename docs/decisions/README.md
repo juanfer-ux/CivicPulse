@@ -1,0 +1,23 @@
+# 📜 Decision records
+
+Short notes on **why** we chose something, so nobody (including future us) re-argues it. One file per decision, numbered, never rewritten: if we change our mind we add a new record that replaces the old one.
+
+Role and permission decisions have their own dated log in [../roles-and-permissions.md](../roles-and-permissions.md#-11-decision-log).
+
+| # | Decision | Status |
+|---|---|---|
+| [0001](0001-agent-mock-first.md) | The agent starts as rules plus SQL tools, no LLM yet | ✅ Accepted |
+| [0002](0002-sql-tools-run-as-user.md) | Agent tools run as the signed-in user | ✅ Accepted |
+| [0003](0003-database-is-the-security-boundary.md) | The database, not the screen, enforces access | ✅ Accepted |
+| [0004](0004-synthetic-data.md) | All data is synthetic and flagged | ✅ Accepted |
+| [0005](0005-dark-only-figma-tokens.md) | Dark theme only, tokens from Figma | ✅ Accepted |
+| [0006](0006-gilroy-fonts-in-repo.md) | Gilroy font files live in the public repo | 🟨 Needs licence check |
+
+## ✍️ Template
+```
+# NNNN: Title
+**Status:** Accepted / Replaced by NNNN   **Date:** YYYY-MM-DD
+## Context      (what problem, in two or three lines)
+## Decision     (what we chose)
+## Consequences (what gets easier, what gets harder)
+```

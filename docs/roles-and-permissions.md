@@ -1,5 +1,7 @@
 # 🔐 Civic Pulse: Roles & Permissions Spec
 
+> 📚 Part of the [documentation index](README.md).
+
 > **Status:** ✅ Approved by the owner (2026-10-17). This file is the **single source of truth**: change it first, then the code, then the tests.
 > ⚠️ The code is **not yet aligned** with this spec (see section 9).
 
@@ -98,7 +100,7 @@ flowchart LR
 1. 🆕 Anyone can register. They get **no role** and see an "Access pending" screen.
 2. 🟣 **Only a Super Admin** assigns role, localities and categories. Nobody can change their own.
 3. 🥇 The **first Super Admin** is set once by SQL in the Supabase SQL editor (README, section "Auth and roles"), never from the app.
-4. 🚀 Before going live: "Confirm email" on and leaked-password protection on (DEPLOY.md).
+4. 🚀 Before going live: "Confirm email" on and leaked-password protection on ([deploy.md](deploy.md)).
 
 ---
 
