@@ -40,7 +40,7 @@ Static Vite app + Supabase. Nothing runs on Vercel except the build. All data ac
 | Vercel says *"Remove the public framework prefix…"* | Type is Secret | Delete the variable and add it again as **Config** |
 | Blank page after sign-in on one computer | Browser has no WebGL2 (hardware acceleration off) | Turn on "Use graphical acceleration when available" in the browser, restart it. The app shows a list meanwhile. |
 | Invitation email does not arrive or *"rate limit"* | Supabase's built-in email sender allows only a few emails per hour | Wait, or connect your own email service (Auth → SMTP settings) |
-| Invitation link opens the sign-in page, not "Choose your password" | Site URL or Redirect URLs do not include the Vercel address | Fix them in Auth → URL Configuration, send a new invitation |
+| Invitation link opens a *"localhost can't be reached"* page, or the sign-in page instead of "Choose your password" | Site URL is still Supabase's default `http://localhost:3000`, or the Vercel address is not in Redirect URLs, so Supabase ignores the app's redirect | Auth → URL Configuration: Site URL = the Vercel address, add it (and `http://localhost:5173`) to Redirect URLs, then send a **new** invitation. Already-sent links keep the old address. An email that was already invited cannot be invited again: use another address or delete the pending user in Auth → Users. |
 | Another app answers on `localhost:5173` | A different project's dev server uses the same port | Run this one on another port, for example `npx vite --port 5180` |
 
 ## ✅ 4. Checks before every deploy
