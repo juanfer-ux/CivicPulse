@@ -55,9 +55,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -71,70 +69,46 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
+  --color-closed: var(--closed);
   --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
   --color-ai: var(--ai);
-  --color-ai-foreground: var(--ai-foreground);
   --color-ai-border: var(--ai-border);
   --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
   --color-incident: var(--incident);
   --color-inset: var(--inset);
 }
 
-/* Dark tokens from the CivicPulse Figma design system (Theme · Dark). */
 :root {
   --radius: 0.5rem;
+  /* The whole palette is these 13 colors; every other token below points at one of them. */
+  /* Neutrals */
   --background: #151517;
-  --foreground: #DCDCDC;
   --card: #1C1C1E;
-  --card-foreground: #DCDCDC;
-  --popover: #0F0F0F;
-  --popover-foreground: #DCDCDC;
-  --primary: #D3D3D3;
-  --primary-foreground: #151517;
-  --secondary: #323232;
-  --secondary-foreground: #DCDCDC;
-  --muted: #323232;
-  --muted-foreground: #A5A5A5;
-  --accent: #383838;
-  --accent-foreground: #EBEBEB;
-  --destructive: #8B0F0F;
-  --destructive-foreground: #FFFFFF;
-  --border: #323232;
-  --input: #404040;
-  --ring: #909090;
-  --chart-1: #6D79E2;
-  --chart-2: #FFA08F;
-  --chart-3: #EF9700;
-  --chart-4: #D3D3D3;
-  --chart-5: #7A7A7A;
   --sidebar: #000000;
-  --sidebar-foreground: #7A7A7A;
-  --sidebar-primary: #D3D3D3;
-  --sidebar-primary-foreground: #151517;
-  --sidebar-accent: #151517;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #404040;
-  --sidebar-ring: #5F5F5F;
+  --secondary: #323232;
+  --input: #404040;
+  --closed: #7A7A7A;
+  --muted-foreground: #A5A5A5;
+  --foreground: #DCDCDC;
+  /* Colored */
   --ai: #22253F;
-  --ai-foreground: #EBEBEB;
   --ai-border: #6D79E2;
+  --destructive: #8B0F0F; /* fill of dangerous buttons and badges only: too dark for text */
   --warning: #EF9700;
-  --warning-foreground: #151517;
-  --incident: #FFA08F;
-  --inset: #000000;
+  --incident: #FFA08F; /* incidents, invalid fields and ALL error text */
+
+  /* Names shadcn components expect, reusing the colors above. */
+  --popover: var(--card);
+  --primary: var(--foreground);
+  --primary-foreground: var(--background);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--secondary);
+  --accent: var(--secondary);
+  --accent-foreground: var(--foreground);
+  --destructive-foreground: var(--foreground);
+  --border: var(--secondary);
+  --ring: var(--closed);
+  --inset: var(--sidebar);
 }
 
 /* Native selects: draw our own chevron 12 px from the edge (the browser's own sits almost on the border). Same icon and muted color as the MultiSelect. */

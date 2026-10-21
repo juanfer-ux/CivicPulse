@@ -48,7 +48,7 @@ export function SetPassword({ onDone }: { onDone: () => void }) {
               Repeat password
               <Input name="confirm" type="password" autoComplete="new-password" required />
             </label>
-            <p role="alert" className="min-h-5 text-body text-destructive">
+            <p role="alert" className="min-h-5 text-body text-incident">
               {error}
             </p>
             <Button type="submit" disabled={busy}>

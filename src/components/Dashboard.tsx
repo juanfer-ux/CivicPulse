@@ -177,7 +177,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
                 <ul className="flex flex-col gap-1">
                   {(Object.keys(GROUPS) as (keyof typeof GROUPS)[]).map((g) => (
                     <li key={g} className="flex items-center gap-2">
-                      <span className="size-2.5 rounded-full" style={{ background: GROUPS[g].color }} aria-hidden />
+                      <span className="size-2.5 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />
                       <span className="flex-1 text-muted-foreground">{GROUPS[g].label}</span>
                       <span>{byGroup[g]}</span>
                     </li>

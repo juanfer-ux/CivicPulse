@@ -113,7 +113,7 @@ export function UsersAdmin() {
             </label>
           </div>
 
-          {error && <p className="text-body text-destructive">Could not load users: {error}</p>}
+          {error && <p className="text-body text-incident">Could not load users: {error}</p>}
 
           {data && (
             <table className="w-full text-left text-body max-desk:block">
@@ -314,7 +314,7 @@ function UserPanel({
           </fieldset>
         )}
 
-        <p role="status" className={`min-h-5 text-body ${msg?.ok === false ? 'text-destructive' : 'text-muted-foreground'}`}>
+        <p role="status" className={`min-h-5 text-body ${msg?.ok === false ? 'text-incident' : 'text-muted-foreground'}`}>
           {busy ? 'Saving…' : msg?.text}
         </p>
       </div>
@@ -417,7 +417,7 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
           </fieldset>
         )}
 
-        <p role="alert" className="min-h-5 text-body text-destructive">
+        <p role="alert" className="min-h-5 text-body text-incident">
           {error}
         </p>
         <Button type="submit" disabled={busy}>

@@ -20,6 +20,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0012](0012-dm-sans-self-hosted.md) | DM Sans from Google Fonts, served from our own site | ⚪ Replaced by 0014 |
 | [0013](0013-figma-is-the-source-of-truth.md) | Figma is the source of truth for the design | ✅ Accepted |
 | [0014](0014-inter-font.md) | Inter from Google Fonts, served from our own site | ✅ Accepted |
+| [0015](0015-thirteen-color-palette.md) | The palette is 13 colors | ✅ Accepted |
 
 ## ✍️ Template
 ```

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
+import { token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { GROUPS, groupOf, label, typeOf, type Incident } from '@/lib/incidents'
@@ -47,7 +48,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'circle-color': ['get', 'color'],
           'circle-opacity': 0.85,
           'circle-stroke-width': 1,
-          'circle-stroke-color': '#151517',
+          'circle-stroke-color': token('--background'),
         },
       })
       map.addLayer({
@@ -59,7 +60,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 6, 15, 12],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-stroke-width': 2,
-          'circle-stroke-color': '#6D79E2',
+          'circle-stroke-color': token('--ai-border'),
         },
       })
       map.addLayer({
@@ -71,7 +72,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 7, 15, 13],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-stroke-width': 2,
-          'circle-stroke-color': '#FFFFFF',
+          'circle-stroke-color': token('--foreground'),
         },
       })
       map.on('click', 'incidents', (e) => onSelectRef.current(String(e.features?.[0]?.properties?.id ?? '') || null))
@@ -95,7 +96,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       features: incidents.map((i) => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
-        properties: { id: i.id, color: GROUPS[groupOf(i.status)].color, hl: highlight.has(i.id) },
+        properties: { id: i.id, color: token(GROUPS[groupOf(i.status)].token), hl: highlight.has(i.id) },
       })),
     })
   }, [ready, incidents, highlightIds])
@@ -131,7 +132,7 @@ function ListFallback({ incidents, selectedId, onSelect }: Pick<Props, 'incident
               aria-pressed={i.id === selectedId}
               className={`flex w-full items-center gap-2 rounded-md border px-3 py-2 text-left text-body hover:bg-accent ${i.id === selectedId ? 'border-ring bg-accent' : 'bg-card/60'}`}
             >
-              <span className="size-2.5 shrink-0 rounded-full" style={{ background: GROUPS[groupOf(i.status)].color }} aria-hidden />
+              <span className="size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[groupOf(i.status)].token})` }} aria-hidden />
               <span className="flex-1">
                 {i.reference} · {label(typeOf(i))}
               </span>

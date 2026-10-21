@@ -13,7 +13,7 @@
 2. **Built on shadcn/ui.** The Figma components mirror shadcn's structure and the code uses shadcn components (`src/components/ui/`) with Figma's values. Token names are shared on purpose (`--background`, `--card`, `--ring`…).
 3. **Dark only.** The Light theme in Figma is a derived check, not shipped ([decision 0005](decisions/0005-dark-only-figma-tokens.md)).
 4. **Every screen has a desktop and a mobile version.** Desktop from **1,440 px**, mobile below it; reference frames **1440×900** and **390×844**.
-5. **No hard-coded values.** Use the tokens below (`text-body`, `bg-card`, `rounded-sm`…), never a loose `13px` or `#1c1c1e`.
+5. **No hard-coded values.** Use the tokens below (`text-body`, `bg-card`, `rounded-sm`…), never a loose `13px` or `#1c1c1e`. **13 colors, no more** (section 2.3).
 
 ---
 
@@ -50,32 +50,31 @@ Use the class in the last column. Each sets size, line height **and weight** tog
 > 🟥 In Figma **every style is weight 400** (and the Button matrix labels are underlined). The code deliberately differs; Figma gets the weights above in the Figma step, and then this column is ✅.
 > ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes. Without that, the class merger dropped `text-label` from every colored button (a silent bug fixed on 2026-10-21, with a test).
 
-### 2.3 🎨 Colors (dark theme)
-All values are identical in Figma and `src/index.css` (checked token by token, 2026-10-21).
+### 2.3 🎨 Colors (dark theme): 13 in total
+The whole palette is **13 colors** (decision [0015](decisions/0015-thirteen-color-palette.md), 2026-10-21). Every other token name (`primary`, `muted`, `accent`, `border`…) is only an alias that points at one of them, because shadcn components expect those names. Add a new color only if none of these can do the job.
 
-| Token | Value | Use |
-|---|---|---|
-| `background` | `#151517` | Page |
-| `foreground` | `#DCDCDC` | Main text |
-| `card` / `card-foreground` | `#1C1C1E` / `#DCDCDC` | Cards, inputs, panels |
-| `popover` | `#0F0F0F` | Dropdown surfaces |
-| `primary` / `primary-foreground` | `#D3D3D3` / `#151517` | Main action |
-| `secondary`, `muted` | `#323232` | Secondary surfaces |
-| `secondary-foreground` | `#DCDCDC` | Text on secondary |
-| `muted-foreground` | `#A5A5A5` | Supporting text |
-| `accent` / `accent-foreground` | `#383838` / `#EBEBEB` | Hover |
-| `destructive` / `destructive-foreground` | `#8B0F0F` / `#FFFFFF` | Dangerous action, error badge |
-| `border` | `#323232` | Dividers and card borders |
-| `input` | `#404040` | Input and outline-button borders |
-| `ring` | `#909090` | Focus ring (3 px, 50 %) |
-| `inset` | `#000000` | Outline buttons, deepest surface |
-| `sidebar` family | `#000000` / `#7A7A7A` / `#404040`… | Sidebar |
-| `ai`, `ai-foreground`, `ai-border` | `#22253F` / `#EBEBEB` / `#6D79E2` | Agent surfaces |
-| `warning` | `#EF9700` | Needs review |
-| `incident` | `#FFA08F` | Incidents, invalid fields |
-| `chart-1…5` | `#6D79E2` `#FFA08F` `#EF9700` `#D3D3D3` `#7A7A7A` | Map and charts |
+| # | Color | Token (source) | Used for |
+|---|---|---|---|
+| 1 | `#151517` | `background` | Page; text on the main button |
+| 2 | `#1C1C1E` | `card` (also `popover`) | Cards, inputs, panels, dropdown surfaces |
+| 3 | `#000000` | `sidebar` (also `inset`) | Sidebar, outline buttons, deepest surface |
+| 4 | `#323232` | `secondary` (also `muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
+| 5 | `#404040` | `input` | Borders of inputs and dropdowns |
+| 6 | `#7A7A7A` | `closed` (also `ring`) | Closed incidents, focus ring |
+| 7 | `#A5A5A5` | `muted-foreground` | Supporting text, table headers, placeholders |
+| 8 | `#DCDCDC` | `foreground` (also `primary`, `accent-foreground`, `secondary-foreground`, `destructive-foreground`) | All normal text, the main button, "white" |
+| 9 | `#22253F` | `ai` | Agent surfaces |
+| 10 | `#6D79E2` | `ai-border` | Agent accents; map highlight rings |
+| 11 | `#8B0F0F` | `destructive` | **Fill** of dangerous buttons and badges only (too dark for text) |
+| 12 | `#EF9700` | `warning` | Needs review |
+| 13 | `#FFA08F` | `incident` | Validated / in progress, invalid fields and **all error text** |
 
-Map status colors: 🟧 needs review (`#EF9700`), 🩷 validated or in progress (`#FFA08F`), ⬜ closed (`#7A7A7A`). See `GROUPS` in `src/lib/incidents.ts`.
+**Rules**
+- Error text is **always** `text-incident` (contrast 8.7:1). Never `text-destructive`: dark red on our dark surfaces is 1.8:1.
+- Code that cannot use a CSS variable (the map's paint settings) reads the token with `token('--name')` from `src/lib/tokens.ts`. No color literals in `.ts` / `.tsx` files.
+- Map and status colors: 🟧 `warning` needs review, 🩷 `incident` validated or in progress, ⬜ `closed`. See `GROUPS` in `src/lib/incidents.ts`.
+
+> 🟥 Figma still has the old 20 colors (and `primary` `#D3D3D3`, `accent` `#383838`, `ring` `#909090`, white `#FFFFFF`, popover `#0F0F0F`, the 6 `sidebar-*` and 5 `chart-*` variables). The Figma step reduces its variables to these 13.
 
 ### 2.4 📏 Spacing, radius, controls
 | | Value | Class |
