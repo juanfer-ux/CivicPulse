@@ -16,13 +16,15 @@
 ## 📱 Mobile rule
 > **Every screen is designed and captured in both desktop and mobile versions.** (Owner's standing rule.)
 
-| | Desktop (768 px and wider) | Mobile (under 768 px) |
+| | Desktop (**1,440 px and wider**) | Mobile (**under 1,440 px**) |
 |---|---|---|
 | Layout | **Sidebar menu on the left**; to its right the map with filters on the left and the agent on the right, floating over it | Slim top bar; map below; **bottom sheet** with tabs **Explore / Investigate** and a collapse button |
 | Menu | Sidebar (see below) | Top bar with logo and a menu button; the menu slides in from the left |
 | Detail | Card under the agent panel | Appears in the sheet; closing returns to the tab |
 
 Reference sizes in Figma: desktop **1440×900**, mobile **390×844**.
+
+> **The switch is at 1,440 px** (owner's decision): the desktop layout needs that much room for the sidebar, filters, map and agent. Any window narrower than that, including tablets and a laptop browser that is not full width, gets the mobile layout. In code it is the `desk:` breakpoint (`--breakpoint-desk: 90rem` in `src/index.css`); the shadcn components keep Tailwind's own `md:`.
 
 ## 🧭 Navigation (sidebar)
 - **Desktop:** full-height column on the left, **expanded (224 px)** or **collapsed to icons (56 px)** with a Collapse button; the choice is remembered per browser. Top: logo. Middle: **Map**, **Users** (only with the `manage_users` permission). Bottom: Synthetic data note, name and role, Sign out.

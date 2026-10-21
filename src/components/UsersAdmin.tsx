@@ -30,7 +30,7 @@ const STATUS_VARIANT: Record<UserStatus, 'default' | 'secondary' | 'outline'> = 
 const SELECT =
   'h-8 w-full rounded-lg border border-input bg-transparent px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50 [&>option]:bg-card'
 
-const ASIDE = 'max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:top-[49px] max-md:z-20 md:w-[420px] md:shrink-0 md:border-l bg-card'
+const ASIDE = 'max-desk:fixed max-desk:inset-x-0 max-desk:bottom-0 max-desk:top-[49px] max-desk:z-20 desk:w-[420px] desk:shrink-0 desk:border-l bg-card'
 const localities = (n: number) => `${n} ${n === 1 ? 'locality' : 'localities'}`
 
 export function UsersAdmin() {
@@ -74,9 +74,9 @@ export function UsersAdmin() {
   const pendingCount = data?.users.filter((u) => statusOf(u) === 'pending').length ?? 0
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-background max-md:pt-[49px]">
+    <div className="absolute inset-0 overflow-hidden bg-background max-desk:pt-[49px]">
       <div className="flex h-full">
-        <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-6">
+        <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-4 desk:p-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h1 className="text-xl font-semibold">Users</h1>
@@ -116,8 +116,8 @@ export function UsersAdmin() {
           {error && <p className="text-sm text-destructive">Could not load users: {error}</p>}
 
           {data && (
-            <table className="w-full text-left text-sm max-md:block">
-              <thead className="text-xs text-muted-foreground max-md:hidden">
+            <table className="w-full text-left text-sm max-desk:block">
+              <thead className="text-xs text-muted-foreground max-desk:hidden">
                 <tr className="border-b">
                   {['Name', 'Email', 'Role', 'Status', 'Localities', 'Categories'].map((h) => (
                     <th key={h} className="px-3 py-2 font-medium">
@@ -126,7 +126,7 @@ export function UsersAdmin() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="max-md:flex max-md:flex-col max-md:gap-2">
+              <tbody className="max-desk:flex max-desk:flex-col max-desk:gap-2">
                 {rows.map((u) => {
                   const status = statusOf(u)
                   return (
@@ -136,20 +136,20 @@ export function UsersAdmin() {
                         setCreating(false)
                         setOpenId(u.id)
                       }}
-                      className={`cursor-pointer border-b hover:bg-muted/50 max-md:grid max-md:grid-cols-2 max-md:gap-1 max-md:rounded-lg max-md:border max-md:bg-card max-md:p-3 ${openId === u.id ? 'bg-muted/50' : ''}`}
+                      className={`cursor-pointer border-b hover:bg-muted/50 max-desk:grid max-desk:grid-cols-2 max-desk:gap-1 max-desk:rounded-lg max-desk:border max-desk:bg-card max-desk:p-3 ${openId === u.id ? 'bg-muted/50' : ''}`}
                     >
-                      <td className="px-3 py-2 font-medium max-md:col-span-2 max-md:p-0">{u.full_name || 'No name'}</td>
-                      <td className="px-3 py-2 text-muted-foreground max-md:col-span-2 max-md:truncate max-md:p-0">{u.email}</td>
-                      <td className="px-3 py-2 max-md:p-0">
+                      <td className="px-3 py-2 font-medium max-desk:col-span-2 max-desk:p-0">{u.full_name || 'No name'}</td>
+                      <td className="px-3 py-2 text-muted-foreground max-desk:col-span-2 max-desk:truncate max-desk:p-0">{u.email}</td>
+                      <td className="px-3 py-2 max-desk:p-0">
                         {u.role ? ROLE_LABELS[u.role] : '—'}
                         {u.role === 'specialist_operator' && <span className="block text-xs text-muted-foreground">{specialtyOf(u, data).join(', ') || 'No specialty yet'}</span>}
                       </td>
-                      <td className="px-3 py-2 max-md:p-0">
+                      <td className="px-3 py-2 max-desk:p-0">
                         <Badge variant={STATUS_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
                         {u.invitation_pending && <span className="ml-2 text-xs text-muted-foreground">Invited</span>}
                       </td>
-                      <td className="px-3 py-2 text-muted-foreground max-md:p-0">{u.role === 'super_admin' ? 'All' : localities(u.localities.length)}</td>
-                      <td className="px-3 py-2 text-muted-foreground max-md:p-0">{u.role === 'super_admin' ? 'All' : u.categories.length ? u.categories.map(categoryName(data)).join(', ') : '—'}</td>
+                      <td className="px-3 py-2 text-muted-foreground max-desk:p-0">{u.role === 'super_admin' ? 'All' : localities(u.localities.length)}</td>
+                      <td className="px-3 py-2 text-muted-foreground max-desk:p-0">{u.role === 'super_admin' ? 'All' : u.categories.length ? u.categories.map(categoryName(data)).join(', ') : '—'}</td>
                     </tr>
                   )
                 })}

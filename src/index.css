@@ -11,6 +11,11 @@
 @font-face { font-family: 'Gilroy'; font-weight: 600; font-display: swap; src: url('./assets/fonts/Gilroy-SemiBold.woff') format('woff'); }
 @font-face { font-family: 'Gilroy'; font-weight: 700; font-display: swap; src: url('./assets/fonts/Gilroy-Bold.woff') format('woff'); }
 
+/* The desktop layout (sidebar, floating panels) starts here; narrower windows get the mobile layout. */
+@theme {
+  --breakpoint-desk: 90rem; /* 1440 px */
+}
+
 @theme inline {
   --font-sans: 'Gilroy', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);

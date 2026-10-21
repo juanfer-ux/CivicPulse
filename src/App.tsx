@@ -20,7 +20,7 @@ export default function App() {
         <div className={showUsers ? 'hidden' : 'contents'}>
           <Dashboard highlightIds={highlightIds} tab={tab} onTab={setTab}>
             {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
-            <div className={tab === 'ask' ? 'contents' : 'hidden md:contents'}>
+            <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
               <InvestigatePanel onHighlight={setHighlightIds} />
             </div>
           </Dashboard>

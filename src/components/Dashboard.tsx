@@ -97,11 +97,11 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         onSelect={select}
       />
 
-      {/* Mobile: bottom sheet over the map. Desktop (md+): `contents`, so the two columns float over the map. */}
+      {/* Mobile: bottom sheet over the map. Desktop (1440 px and wider): `contents`, so the two columns float over the map. */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-10 flex flex-col gap-2 rounded-t-2xl border-t bg-sidebar/95 p-2 backdrop-blur md:contents ${collapsed ? 'max-md:[&>:not(:first-child)]:hidden' : 'h-[62svh]'}`}
+        className={`fixed inset-x-0 bottom-0 z-10 flex flex-col gap-2 rounded-t-2xl border-t bg-sidebar/95 p-2 backdrop-blur desk:contents ${collapsed ? 'max-desk:[&>:not(:first-child)]:hidden' : 'h-[62svh]'}`}
       >
-        <div className="flex shrink-0 gap-1 md:hidden">
+        <div className="flex shrink-0 gap-1 desk:hidden">
           {(
             [
               ['explore', 'Explore'],
@@ -118,7 +118,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         </div>
 
       <div
-        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto md:absolute md:left-4 md:top-4 md:flex md:w-72 md:flex-none md:overflow-visible`}
+        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:left-4 desk:top-4 desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
       >
         <Card className="bg-card/95">
           <CardHeader>
@@ -208,7 +208,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
       </div>
 
       <div
-        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 md:pointer-events-none md:absolute md:bottom-4 md:right-4 md:top-4 md:flex md:w-96 md:flex-none md:[&>*]:pointer-events-auto`}
+        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:pointer-events-none desk:absolute desk:bottom-4 desk:right-4 desk:top-4 desk:flex desk:w-96 desk:flex-none desk:[&>*]:pointer-events-auto`}
       >
         {children}
         {selected && (
