@@ -43,7 +43,7 @@ Use the class in the last column. Each sets size, line height **and weight** tog
 | meta | 12 / 16 | 0 | 400 | Secondary info | `text-meta` | ✅ |
 | caption | 11 / 16 | 0 | 500 | Small tags and badges | `text-caption` | ✅ |
 
-**Letter-spacing is 0 on purpose** (decided 2026-10-21). Figma's 0.2 and 0.3 px make letters look blurry or uneven on screens without a Retina display; Figma gets 0 in the Figma step. The brand wordmark in the sidebar keeps its wide spacing.
+**Letter-spacing is 0 on purpose** (decided 2026-10-21). Figma's 0.2 and 0.3 px make letters look blurry or uneven on screens without a Retina display; Figma uses 0 too. The brand wordmark in the sidebar keeps its wide spacing.
 
 **Weight rule (decided 2026-10-21):** 600 for headings and numbers, **500 for anything you act on or that labels something** (buttons, links, field names, menu items, badges, table headers, names in a table), 400 for reading text and what you type. Placeholder text is 400.
 
