@@ -57,5 +57,5 @@ flowchart TB
 
 ## ⚠️ Constraints worth remembering
 - 🧊 **Map needs WebGL2.** Without hardware acceleration the app shows a list instead (no blank screen).
-- 🔤 **Font:** DM Sans, served from our own site ([decisions/0012](decisions/0012-dm-sans-self-hosted.md)).
+- 🔤 **Font:** Inter, served from our own site ([decisions/0014](decisions/0014-inter-font.md)).
 - 📵 No real incident data, photos or personal data: everything is synthetic.

@@ -20,12 +20,10 @@
 ## 2. 🧱 Foundations
 
 ### 2.1 🔤 Typeface
-> 🟨 **Trial (2026-10-21):** the live site is showing **Inter** to compare with DM Sans (the owner did not like DM Sans for a dashboard). This section, decision 0012 and the Figma text styles are updated once the owner confirms the choice.
-
 | | |
 |---|---|
-| Family | **DM Sans** (Google Fonts, open licence), regular weight |
-| How it is served | From our own site by the `@fontsource-variable/dm-sans` package, so there is no request to Google when the page loads ([decision 0012](decisions/0012-dm-sans-self-hosted.md)) |
+| Family | **Inter** (Google Fonts, open licence); weights per text style (section 2.2) |
+| How it is served | From our own site by the `@fontsource-variable/inter` package, so there is no request to Google when the page loads ([decision 0014](decisions/0014-inter-font.md)) |
 | Optical size | Automatic: the browser picks the right cut for each size (not pinned) |
 | Sharpness | `antialiased` (smooth on Mac), `text-rendering: optimizeLegibility`, `-moz-osx-font-smoothing: grayscale` on the page; no fractional letter-spacing |
 | Code | `--font-sans` and the base layer in `src/index.css` |
@@ -171,5 +169,6 @@ Stat Card, Incident Row, Nav Item, Panel Header, Message, Action Card, Map Marke
 | 🟥 | Button `xs` is not in Figma and not in code any more; the zone dropdown's Select all and Clear use `sm`. |
 | 🟨 | Figma text styles are all weight 400. If a bold weight is wanted later, add it to Figma first. |
 | 🟨 | The Light theme exists in Figma but is not shipped. |
-| 🟩 | Font: DM Sans (decision 0012). Colors: identical. Heights and radius: match. |
+| 🟩 | Font: Inter (decision 0014). Colors: identical. Heights and radius: match. |
+| 🟥 | Figma text styles still use **DM Sans**, weight 400 and letter-spacing 0.2 / 0.3 px: change them to Inter with the weights and 0 spacing above. |
 | ⬜ | Code Connect mapping between Figma components and code components. |

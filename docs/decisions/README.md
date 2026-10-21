@@ -11,14 +11,15 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0003](0003-database-is-the-security-boundary.md) | The database, not the screen, enforces access | ✅ Accepted |
 | [0004](0004-synthetic-data.md) | All data is synthetic and flagged | ✅ Accepted |
 | [0005](0005-dark-only-figma-tokens.md) | Dark theme only, tokens from Figma | ✅ Accepted |
-| [0006](0006-gilroy-fonts-in-repo.md) | Gilroy font files live in the public repo | ⚪ Replaced by 0012 |
+| [0006](0006-gilroy-fonts-in-repo.md) | Gilroy font files live in the public repo | ⚪ Replaced by 0012, then 0014 |
 | [0007](0007-permissions-as-data.md) | Permissions are stored as data and checked by one function | ✅ Accepted |
 | [0008](0008-categories-and-specializations-tables.md) | Incident categories and specializations are tables | ✅ Accepted |
 | [0009](0009-recommendations-screens-removed.md) | Recommendation screens removed for now; backend kept | ✅ Accepted |
 | [0010](0010-users-screen-uses-access-rules.md) | The Users screen writes through the existing access rules; no admin key in the browser | ✅ Accepted |
 | [0011](0011-invite-users-by-edge-function.md) | Users are invited by an Edge Function; the admin key stays on the server | ✅ Accepted |
-| [0012](0012-dm-sans-self-hosted.md) | DM Sans from Google Fonts, served from our own site | ✅ Accepted |
+| [0012](0012-dm-sans-self-hosted.md) | DM Sans from Google Fonts, served from our own site | ⚪ Replaced by 0014 |
 | [0013](0013-figma-is-the-source-of-truth.md) | Figma is the source of truth for the design | ✅ Accepted |
+| [0014](0014-inter-font.md) | Inter from Google Fonts, served from our own site | ✅ Accepted |
 
 ## ✍️ Template
 ```

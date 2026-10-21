@@ -12,7 +12,7 @@
 
 ## 🔤 Brand
 - **Logo lockup:** ring mark plus wordmark, from the Figma sign-in frame. Files: `src/assets/logo-mark.svg`, `logo-wordmark.svg`; component `src/components/Logo.tsx`.
-- **Font:** DM Sans (Google Fonts), served from our own site. See [decisions/0012](decisions/0012-dm-sans-self-hosted.md).
+- **Font:** Inter (Google Fonts), served from our own site. See [decisions/0014](decisions/0014-inter-font.md).
 - **Basemap:** dark CARTO (OpenStreetMap data); keep the attribution visible.
 
 ## 📱 Mobile rule

@@ -1,5 +1,5 @@
 # 0012: DM Sans from Google Fonts, served from our own site
-**Status:** ✅ Accepted   **Date:** 2026-10-21   Replaces [0006](0006-gilroy-fonts-in-repo.md).
+**Status:** ⚪ Replaced by [0014](0014-inter-font.md) (2026-10-21)   Replaced [0006](0006-gilroy-fonts-in-repo.md).
 
 ## Context
 The brand font was Gilroy, a licensed font whose files sat in the public repo with the licence unconfirmed. The owner switched the brand font to **DM Sans**, which is open source (Google Fonts) and is already the font in the Figma file.
