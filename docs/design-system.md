@@ -146,7 +146,8 @@ Pages: **Cover**, **Foundations** (colors, type, radius, spacing, states), **Com
 | **Saving feedback** | Changes save immediately; a status line (`role="status"`) says what happened or why it failed in plain words. |
 | **Tables** | Header `text-meta` muted, rows `text-body`, whole row clickable; on phones each row becomes a card. |
 | **Side panels** | 420 px on desktop, full screen on phones with a Close button. One panel at a time. |
-| **Menus** | Sidebar on desktop; on phones a top bar with a menu button and a slide-out that closes on choice, backdrop tap or Escape. |
+| **Menus** | Desktop: sidebar, expanded (224) or collapsed to icons (56), remembered per browser; **Users** only with the `manage_users` permission. Phones: top bar with a menu button and a slide-out that closes on a choice, backdrop tap or Escape. |
+| **Users flow** | Table (cards on phones) and a side panel for one person; **Create user** opens the invitation form in the same place (full screen on phones). An invited person sees **Set up your account** until a password is set; the sign-in page has **Forgot password?**. |
 | **Empty and error states** | Say what is missing and what to do, in one or two sentences; never a blank screen (map without WebGL shows a list). |
 | **Status** | Pending (waiting for a role or an invitation to be accepted), Active, Off. |
 
