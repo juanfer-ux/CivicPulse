@@ -118,7 +118,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         </div>
 
       <div
-        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto md:absolute md:left-4 md:top-16 md:flex md:w-72 md:flex-none md:overflow-visible`}
+        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto md:absolute md:left-4 md:top-4 md:flex md:w-72 md:flex-none md:overflow-visible`}
       >
         <Card className="bg-card/95">
           <CardHeader>
@@ -208,7 +208,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
       </div>
 
       <div
-        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 md:pointer-events-none md:absolute md:bottom-4 md:right-4 md:top-16 md:flex md:w-96 md:flex-none md:[&>*]:pointer-events-auto`}
+        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 md:pointer-events-none md:absolute md:bottom-4 md:right-4 md:top-4 md:flex md:w-96 md:flex-none md:[&>*]:pointer-events-auto`}
       >
         {children}
         {selected && (

@@ -18,11 +18,16 @@
 
 | | Desktop (768 px and wider) | Mobile (under 768 px) |
 |---|---|---|
-| Layout | Filters on the left, the agent on the right, floating over the map | Map on top; **bottom sheet** with tabs **Explore / Investigate** and a collapse button |
-| Header | Logo text, "Synthetic data", role, Sign out | Role badge hidden to save space |
+| Layout | **Sidebar menu on the left**; to its right the map with filters on the left and the agent on the right, floating over it | Slim top bar; map below; **bottom sheet** with tabs **Explore / Investigate** and a collapse button |
+| Menu | Sidebar (see below) | Top bar with logo and a menu button; the menu slides in from the left |
 | Detail | Card under the agent panel | Appears in the sheet; closing returns to the tab |
 
 Reference sizes in Figma: desktop **1440×900**, mobile **390×844**.
+
+## 🧭 Navigation (sidebar)
+- **Desktop:** full-height column on the left, **expanded (224 px)** or **collapsed to icons (56 px)** with a Collapse button; the choice is remembered per browser. Top: logo. Middle: **Map**, **Users** (only with the `manage_users` permission). Bottom: Synthetic data note, name and role, Sign out.
+- **Phones:** a 49 px top bar (logo, menu button). The menu opens over the screen with a dimmed backdrop; it closes on a menu choice, backdrop tap or Escape. The bottom sheet is unchanged.
+- Code: `src/components/Sidebar.tsx` (one menu used by both); layout in `src/App.tsx`.
 
 ## 👥 Users screens
 - **Users** (Super Admin): table (cards on phones) and a side panel for one person. **Create user** opens a form in the same side panel position (full screen on phones): name, email, role, zones (a dropdown with a checkbox per locality; the same control in the user panel), and for Specialists a checkbox list of categories grouped by specialty. Not captured to Figma yet.
@@ -40,6 +45,6 @@ When a Figma frame is the reference, **measure it** (positions and heights relat
 | | Gap |
 |---|---|
 | 🟥 | Signed-in screens (dashboard, Investigate) are **not captured to Figma yet**, desktop or mobile. |
-| 🟥 | Users, Create user and Choose-password screens are not captured to Figma yet. |
+| 🟥 | The sidebar layout, Users, Create user and Set up your account screens are not captured to Figma yet. |
 | 🟥 | Captures are not linked to design-system components. |
 | 🟥 | Logo is not used in the app header yet (still plain text). |

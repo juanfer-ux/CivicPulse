@@ -33,7 +33,7 @@ const SELECT =
 const ASIDE = 'max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:top-[49px] max-md:z-20 md:w-[420px] md:shrink-0 md:border-l bg-card'
 const localities = (n: number) => `${n} ${n === 1 ? 'locality' : 'localities'}`
 
-export function UsersAdmin({ onBack }: { onBack: () => void }) {
+export function UsersAdmin() {
   const { session } = useAuth()
   const meId = session?.user.id
   const [data, setData] = useState<AdminData | null>(null)
@@ -74,7 +74,7 @@ export function UsersAdmin({ onBack }: { onBack: () => void }) {
   const pendingCount = data?.users.filter((u) => statusOf(u) === 'pending').length ?? 0
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-background pt-[49px]">
+    <div className="absolute inset-0 overflow-hidden bg-background max-md:pt-[49px]">
       <div className="flex h-full">
         <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -93,9 +93,6 @@ export function UsersAdmin({ onBack }: { onBack: () => void }) {
                 }}
               >
                 Create user
-              </Button>
-              <Button variant="outline" size="sm" onClick={onBack}>
-                Back to map
               </Button>
             </div>
           </div>
