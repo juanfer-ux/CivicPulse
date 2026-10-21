@@ -5,14 +5,14 @@
 /* Civic Pulse is dark-only: <html class="dark"> is set in index.html. */
 @custom-variant dark (&:is(.dark *));
 
-/* Inter (Google Fonts, open licence) trial, served from our own site by the fontsource package. Variable font with the optical-size axis, pinned at 14 (text cut). */
+/* Inter (Google Fonts, open licence) trial, served from our own site by the fontsource package. Variable font with the optical-size axis: the browser picks the cut for each size. */
 @import "@fontsource-variable/inter/opsz.css";
 
 /* The desktop layout (sidebar, floating panels) starts here; narrower windows get the mobile layout. */
 @theme {
   --breakpoint-desk: 90rem; /* 1440 px */
 
-  /* Text styles: size / line height, letter-spacing from the CivicPulse Figma file (Foundations · Typography). Weights are ours (Figma has all 400): 600 headings and numbers, 500 actions and labels, 400 reading text. */
+  /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is 0 on purpose: Figma's 0.2 and 0.3 px blur letters on screens without a Retina display. Weights are ours (Figma has all 400): 600 headings and numbers, 500 actions and labels, 400 reading text. */
   --text-display: 32px;
   --text-display--font-weight: 600;
   --text-display--line-height: 32px;
@@ -22,7 +22,6 @@
   --text-heading: 20px;
   --text-heading--font-weight: 600;
   --text-heading--line-height: 28px;
-  --text-heading--letter-spacing: 0.2px;
   --text-title: 18px;
   --text-title--font-weight: 600;
   --text-title--line-height: 28px;
@@ -32,19 +31,15 @@
   --text-label: 14px;
   --text-label--font-weight: 500;
   --text-label--line-height: 20px;
-  --text-label--letter-spacing: 0.2px;
   --text-body: 13px;
   --text-body--font-weight: 400;
   --text-body--line-height: 22px;
-  --text-body--letter-spacing: 0.3px;
   --text-meta: 12px;
   --text-meta--font-weight: 400;
   --text-meta--line-height: 16px;
-  --text-meta--letter-spacing: 0.2px;
   --text-caption: 11px;
   --text-caption--font-weight: 500;
   --text-caption--line-height: 16px;
-  --text-caption--letter-spacing: 0.3px;
 }
 
 @theme inline {
@@ -154,5 +149,5 @@
 @layer base {
   * { @apply border-border outline-ring/50; }
   body { @apply bg-background text-foreground antialiased; }
-  html { @apply font-sans; color-scheme: dark; font-variation-settings: 'opsz' 14; }
+  html { @apply font-sans; color-scheme: dark; text-rendering: optimizeLegibility; -moz-osx-font-smoothing: grayscale; }
 }

@@ -26,23 +26,26 @@
 |---|---|
 | Family | **DM Sans** (Google Fonts, open licence), regular weight |
 | How it is served | From our own site by the `@fontsource-variable/dm-sans` package, so there is no request to Google when the page loads ([decision 0012](decisions/0012-dm-sans-self-hosted.md)) |
-| Optical size | Pinned at **14** on the whole page, as in Figma |
-| Code | `--font-sans` in `src/index.css` |
+| Optical size | Automatic: the browser picks the right cut for each size (not pinned) |
+| Sharpness | `antialiased` (smooth on Mac), `text-rendering: optimizeLegibility`, `-moz-osx-font-smoothing: grayscale` on the page; no fractional letter-spacing |
+| Code | `--font-sans` and the base layer in `src/index.css` |
 
 ### 2.2 🔠 Text styles
-Use the class in the last column. Each sets size, line height, letter-spacing **and weight** together, so a component never needs its own `font-medium`.
+Use the class in the last column. Each sets size, line height **and weight** together, so a component never needs its own `font-medium`.
 
 | Style | Size / line | Letter-spacing | Weight | Use | Class | Figma |
 |---|---|---|---|---|---|---|
 | display | 32 / 32 | 0 | 600 | Big numbers on empty or hero states | `text-display` | 🟨 size ✅, weight 400 |
 | stat | 24 / 32 | 0 | 600 | Counts in stat cards | `text-stat` | 🟨 |
-| heading | 20 / 28 | 0.2 px | 600 | Page title ("Users") | `text-heading` | 🟨 |
+| heading | 20 / 28 | 0 | 600 | Page title ("Users") | `text-heading` | 🟨 |
 | title | 18 / 28 | 0 | 600 | Panel and section titles | `text-title` | 🟨 |
 | subtitle | 16 / 24 | 0 | 500 | Card titles | `text-subtitle` | 🟨 |
-| label | 14 / 20 | 0.2 px | **500** | **Buttons, field names, menu items, tabs** | `text-label` | 🟨 |
-| body | 13 / 22 | 0.3 px | 400 | Paragraphs, inputs, table cells | `text-body` | 🟨 |
-| meta | 12 / 16 | 0.2 px | 400 | Secondary info | `text-meta` | 🟨 |
-| caption | 11 / 16 | 0.3 px | 500 | Small tags and badges | `text-caption` | 🟨 |
+| label | 14 / 20 | 0 | **500** | **Buttons, field names, menu items, tabs** | `text-label` | 🟨 |
+| body | 13 / 22 | 0 | 400 | Paragraphs, inputs, table cells | `text-body` | 🟨 |
+| meta | 12 / 16 | 0 | 400 | Secondary info | `text-meta` | 🟨 |
+| caption | 11 / 16 | 0 | 500 | Small tags and badges | `text-caption` | 🟨 |
+
+**Letter-spacing is 0 on purpose** (decided 2026-10-21). Figma's 0.2 and 0.3 px make letters look blurry or uneven on screens without a Retina display; Figma gets 0 in the Figma step. The brand wordmark in the sidebar keeps its wide spacing.
 
 **Weight rule (decided 2026-10-21):** 600 for headings and numbers, **500 for anything you act on or that labels something** (buttons, links, field names, menu items, badges, table headers, names in a table), 400 for reading text and what you type. Placeholder text is 400.
 
