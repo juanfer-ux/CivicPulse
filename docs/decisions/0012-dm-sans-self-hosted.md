@@ -10,4 +10,4 @@ Use DM Sans, regular weight, optical size pinned at 14 (as in Figma). Install it
 ## Consequences
 - ✅ No licence risk and no more "licensed font in a public repo" warning.
 - ✅ Code and Figma use the same font; no request to Google when a page loads.
-- ⚠️ The Gilroy files remain in the git history of the public repo. Removing them from history would need a history rewrite; not done.
+- ✅ The Gilroy files were also **removed from the whole git history** on 2026-10-21 (history rewritten and force-pushed; a local backup copy was made first). GitHub may still serve the old commits by their old addresses until it cleans up; a request to GitHub Support removes cached views.

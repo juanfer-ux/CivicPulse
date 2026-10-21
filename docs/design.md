@@ -5,7 +5,7 @@
 ## 🧩 Design system
 > 📘 **The detailed spec (tokens, text styles, components, patterns, screens) is [design-system.md](design-system.md).** This page keeps the brand, the rules and the workflow. **Figma is the source of truth** ([decision 0013](decisions/0013-figma-is-the-source-of-truth.md)).
 
-- 🎨 Figma file: **"CivicPulse · shadcn Design System"** (pages: Cover, Foundations, Components, Icons, Preview, **Code to Figma**).
+- 🎨 Figma file: **"CivicPulse · shadcn Design System"** (pages: Cover, Foundations, Components, **Screens**, Icons, Archive · earlier concept, Code to Figma).
 - Tokens live in `src/index.css` and use shadcn names plus a few extras: `ai`, `warning`, `incident`, `inset`.
 - **Dark only.** Main surfaces: background `#151517`, cards `#1C1C1E`, muted text `#A5A5A5`.
 - Map point colors: 🟧 needs review, 🩷 validated or in progress, ⬜ closed (grey). See `GROUPS` in `src/lib/incidents.ts`.
@@ -34,21 +34,17 @@ Reference sizes in Figma: desktop **1440×900**, mobile **390×844**.
 - Code: `src/components/Sidebar.tsx` (one menu used by both); layout in `src/App.tsx`.
 
 ## 👥 Users screens
-- **Users** (Super Admin): table (cards on phones) and a side panel for one person. **Create user** opens a form in the same side panel position (full screen on phones): name, email, role, zones (a dropdown with a checkbox per locality; the same control in the user panel), and for Specialists a checkbox list of categories grouped by specialty. Not captured to Figma yet.
+- **Users** (Super Admin): table (cards on phones) and a side panel for one person. **Create user** opens a form in the same side panel position (full screen on phones): name, email, role, zones (a dropdown with a checkbox per locality; the same control in the user panel), and for Specialists a checkbox list of categories grouped by specialty. Built in Figma (Screens page).
 - **Set up your account**: card like the sign-in card; name and email read-only, then password and repeat. Shown to an invited person until a password is set, and after a "forgot password" link. The sign-in page has a **Forgot password?** link.
 
 ## 🧭 Matching Figma exactly
 When a Figma frame is the reference, **measure it** (positions and heights relative to the card) and compare with the running app, not just the look. Example: the sign-in card is 362 px tall, with the logo row 40 px above the title.
 
 ## 🖼️ Figma ↔ code workflow
-1. Capture the running app into the **Code to Figma** page (desktop and mobile).
-2. Edit in Figma; send me the frame; I measure it and update the code.
-3. Captured layers are raw frames, not yet linked to design-system components.
+1. Change the design in Figma (tokens, a component, or a screen built from components).
+2. Read it into code (`src/index.css`, `src/components/ui/*`, then screens) and update [design-system.md](design-system.md) in the same change.
+3. Check at 1,440 and 390 by measuring, not only by eye.
+4. All ten screens (Sign in, Set up your account, Map, Users, Create user; desktop and mobile) are on the Figma **Screens** page. The **Code to Figma** page keeps flat captures from earlier.
 
 ## 🟥 Gaps
-| | Gap |
-|---|---|
-| 🟥 | Signed-in screens (dashboard, Investigate) are **not captured to Figma yet**, desktop or mobile. |
-| 🟥 | The sidebar layout, Users, Create user and Set up your account screens are not captured to Figma yet. |
-| 🟥 | Captures are not linked to design-system components. |
-| 🟥 | Logo is not used in the app header yet (still plain text). |
+See [design-system.md, section 7](design-system.md#7--gaps-and-decisions). Main ones: Figma's Mobile sizes are not in the code, and Code Connect is not available on the current Figma plan.
