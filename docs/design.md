@@ -22,6 +22,7 @@
 |---|---|---|
 | Layout | **Sidebar menu on the left**; to its right the map with filters on the left and the agent on the right, floating over it | Slim top bar; map below; **bottom sheet** with tabs **Explore / Investigate** and a collapse button |
 | Menu | Sidebar (see below) | Top bar with logo and a menu button; the menu slides in from the left |
+| Sizes | Body 13, label 14, controls 36 | **Larger for touch:** body 16, label 16, controls 44 (Figma's Device Mobile mode); see [design-system.md](design-system.md#22--text-styles) |
 | Detail | Card under the agent panel | Appears in the sheet; closing returns to the tab |
 
 Reference sizes in Figma: desktop **1440×900**, mobile **390×844**.

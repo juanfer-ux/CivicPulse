@@ -31,17 +31,19 @@
 ### 2.2 🔠 Text styles
 Use the class in the last column. Each sets size, line height **and weight** together, so a component never needs its own `font-medium`.
 
-| Style | Size / line | Letter-spacing | Weight | Use | Class | Figma |
-|---|---|---|---|---|---|---|
-| display | 32 / 32 | 0 | 600 | Big numbers on empty or hero states | `text-display` | ✅ |
-| stat | 24 / 32 | 0 | 600 | Counts in stat cards | `text-stat` | ✅ |
-| heading | 20 / 28 | 0 | 600 | Page title ("Users") | `text-heading` | ✅ |
-| title | 18 / 28 | 0 | 600 | Panel and section titles | `text-title` | ✅ |
-| subtitle | 16 / 24 | 0 | 500 | Card titles | `text-subtitle` | ✅ |
-| label | 14 / 20 | 0 | **500** | **Buttons, field names, menu items, tabs** | `text-label` | ✅ |
-| body | 13 / 22 | 0 | 400 | Paragraphs, inputs, table cells | `text-body` | ✅ |
-| meta | 12 / 16 | 0 | 400 | Secondary info | `text-meta` | ✅ |
-| caption | 11 / 16 | 0 | 500 | Small tags and badges | `text-caption` | ✅ |
+| Style | Desktop size / line | Mobile size / line | Letter-spacing | Weight | Use | Class | Figma |
+|---|---|---|---|---|---|---|---|
+| display | 32 / 32 | 32 / 32 | 0 | 600 | Big numbers on empty or hero states | `text-display` | ✅ |
+| stat | 24 / 32 | 24 / 32 | 0 | 600 | Counts in stat cards | `text-stat` | ✅ |
+| heading | 20 / 28 | 20 / 28 | 0 | 600 | Page title ("Users") | `text-heading` | ✅ |
+| title | 18 / 28 | 18 / 28 | 0 | 600 | Panel and section titles | `text-title` | ✅ |
+| subtitle | 16 / 24 | 16 / 24 | 0 | 500 | Card titles | `text-subtitle` | ✅ |
+| label | 14 / 20 | **16 / 24** | 0 | **500** | **Buttons, field names, menu items, tabs** | `text-label` | ✅ |
+| body | 13 / 22 | **16 / 24** | 0 | 400 | Paragraphs, inputs, table cells | `text-body` | ✅ |
+| meta | 12 / 16 | **14 / 20** | 0 | 400 | Secondary info | `text-meta` | ✅ |
+| caption | 11 / 16 | **12 / 16** | 0 | 500 | Small tags and badges | `text-caption` | ✅ |
+
+**Desktop is 1,440 px and wider; Mobile is every window narrower than that** (the `desk` breakpoint). The sizes come from Figma's Device collection (Desktop and Mobile modes) and switch through CSS variables in `src/index.css` (`--fs-body`, `--lh-body`, …); the class names do not change. Display, stat, heading, title and subtitle are the same on both.
 
 **Letter-spacing is 0 on purpose** (decided 2026-10-21). Figma's 0.2 and 0.3 px make letters look blurry or uneven on screens without a Retina display; Figma uses 0 too. The brand wordmark in the sidebar keeps its wide spacing.
 
@@ -84,7 +86,8 @@ The whole palette is **13 colors** (decision [0015](decisions/0015-thirteen-colo
 | Control radius | **sm (4 px)** for buttons, inputs, selects, dropdowns | `rounded-sm` |
 | Card radius | **lg (8 px)** | `rounded-lg` |
 | Badge radius | **xs (2 px)** | `rounded-xs` |
-| Control heights | sm **32**, default **36**, lg **44** (touch size) | `h-8`, `h-9`, `h-11` |
+| Control heights, desktop | sm **32**, default **36**, lg **44**; icon 36, icon-lg 44 | `h-(--control-sm)`, `h-(--control-default)`, `h-(--control-lg)`, `size-(--control-icon)`, `size-(--control-icon-lg)` |
+| Control heights, mobile (under 1,440 px) | sm **40**, default **44** (touch size), lg **48**; icon 44, icon-lg 48 | same classes: the variables switch at 1,440 px |
 | Borders | 1 px, `border` color; inputs use `input` | `border`, `border-input` |
 
 ### 2.5 📱 Breakpoint
@@ -175,7 +178,7 @@ All ten are on the Figma **Screens** page, built only from the components above.
 | | Item |
 |---|---|
 | 🟩 | Done 2026-10-21: font Inter; weights and zero letter-spacing in Figma; 13-color Dark theme in Figma; underlined Button labels fixed; old Preview screens archived; all components in section 3.2 and the ten screens built in Figma. |
-| 🟥 | **Mobile sizes.** Figma's Device collection has a Mobile mode with larger text and touch-size controls (body 16, label 16, controls 44). The code uses the desktop sizes on phones. Decide: implement the Mobile mode in code (recommended for touch) or reduce it in Figma. |
+| 🟩 | Mobile sizes from Figma's Device collection are implemented (2026-10-21): text and controls grow below 1,440 px. |
 | 🟥 | **Code Connect** is not available: Figma only allows it on Organization or Enterprise plans. The "Code" columns above are the mapping until then. |
 | 🟨 | Table headers use `text-meta` plus `font-medium` in code; Figma has a `meta-medium` text style. Add a matching code token if headers are reused. |
 | 🟨 | Table Row columns share the width equally in Figma; the code table lays columns out automatically. |

@@ -57,7 +57,7 @@ export function MultiSelect<T extends string | number>({
         <ChevronDown aria-hidden className="size-4 shrink-0 text-muted-foreground" />
       </button>
       {open && (
-        <div role="listbox" aria-multiselectable className="absolute inset-x-0 top-9 z-30 flex max-h-72 flex-col overflow-hidden rounded-sm border bg-popover shadow-lg">
+        <div role="listbox" aria-multiselectable className="absolute inset-x-0 top-full z-30 mt-1 flex max-h-72 flex-col overflow-hidden rounded-sm border bg-popover shadow-lg">
           <div className="flex items-center justify-between border-b px-2 py-1">
             <span className="text-meta text-muted-foreground">
               {selected.length}/{options.length} selected

@@ -28,18 +28,50 @@
   --text-subtitle: 16px;
   --text-subtitle--font-weight: 500;
   --text-subtitle--line-height: 24px;
-  --text-label: 14px;
+  --text-label: var(--fs-label);
   --text-label--font-weight: 500;
-  --text-label--line-height: 20px;
-  --text-body: 13px;
+  --text-label--line-height: var(--lh-label);
+  --text-body: var(--fs-body);
   --text-body--font-weight: 400;
-  --text-body--line-height: 22px;
-  --text-meta: 12px;
+  --text-body--line-height: var(--lh-body);
+  --text-meta: var(--fs-meta);
   --text-meta--font-weight: 400;
-  --text-meta--line-height: 16px;
-  --text-caption: 11px;
+  --text-meta--line-height: var(--lh-meta);
+  --text-caption: var(--fs-caption);
   --text-caption--font-weight: 500;
   --text-caption--line-height: 16px;
+}
+
+/* Sizes from Figma's Device collection: Mobile values by default (windows under 1,440 px), Desktop values from 1,440 px. */
+:root {
+  --fs-body: 16px;
+  --lh-body: 24px;
+  --fs-label: 16px;
+  --lh-label: 24px;
+  --fs-meta: 14px;
+  --lh-meta: 20px;
+  --fs-caption: 12px;
+  --control-sm: 40px;
+  --control-default: 44px;
+  --control-lg: 48px;
+  --control-icon: 44px;
+  --control-icon-lg: 48px;
+}
+@media (min-width: 90rem) {
+  :root {
+    --fs-body: 13px;
+    --lh-body: 22px;
+    --fs-label: 14px;
+    --lh-label: 20px;
+    --fs-meta: 12px;
+    --lh-meta: 16px;
+    --fs-caption: 11px;
+    --control-sm: 32px;
+    --control-default: 36px;
+    --control-lg: 44px;
+    --control-icon: 36px;
+    --control-icon-lg: 44px;
+  }
 }
 
 @theme inline {
