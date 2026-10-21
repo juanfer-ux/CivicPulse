@@ -186,7 +186,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
                 </ul>
                 {topLocalities.length > 0 && (
                   <div>
-                    <p className="mb-1 text-meta uppercase tracking-wide text-muted-foreground">Top localities</p>
+                    <p className="mb-1 text-meta font-medium uppercase tracking-wide text-muted-foreground">Top localities</p>
                     <ol className="flex flex-col gap-1">
                       {topLocalities.map(([code, n]) => (
                         <li key={code} className="flex justify-between">

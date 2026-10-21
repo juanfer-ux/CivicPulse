@@ -5,7 +5,7 @@ import { Slot } from "radix-ui"
 
 /* Radius-xs and caption / meta text follow the CivicPulse Figma file (Components · Badge): default 20 px, lg 30 px. */
 const badgeVariants = cva(
-  "group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden rounded-xs border border-transparent font-normal whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 [&>svg]:pointer-events-none",
+  "group/badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden rounded-xs border border-transparent whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 [&>svg]:pointer-events-none",
   {
     variants: {
       variant: {

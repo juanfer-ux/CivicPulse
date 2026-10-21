@@ -30,21 +30,24 @@
 | Code | `--font-sans` in `src/index.css` |
 
 ### 2.2 🔠 Text styles
-Use the class in the last column. Each sets size, line height and letter-spacing together.
+Use the class in the last column. Each sets size, line height, letter-spacing **and weight** together, so a component never needs its own `font-medium`.
 
-| Style | Size / line | Letter-spacing | Use | Class | Figma |
-|---|---|---|---|---|---|
-| display | 32 / 32 | 0 | Big numbers on empty or hero states | `text-display` | ✅ |
-| stat | 24 / 32 | 0 | Counts in stat cards | `text-stat` | ✅ |
-| heading | 20 / 28 | 0.2 px | Page title ("Users") | `text-heading` | ✅ |
-| title | 18 / 28 | 0 | Panel and section titles | `text-title` | ✅ |
-| subtitle | 16 / 24 | 0 | Card titles | `text-subtitle` | ✅ |
-| label | 14 / 20 | 0.2 px | Buttons, field names, menu items | `text-label` | ✅ |
-| body | 13 / 22 | 0.3 px | Paragraphs, inputs, table cells | `text-body` | ✅ |
-| meta | 12 / 16 | 0.2 px | Secondary info, table headers | `text-meta` | ✅ |
-| caption | 11 / 16 | 0.3 px | Small tags and badges | `text-caption` | ✅ |
+| Style | Size / line | Letter-spacing | Weight | Use | Class | Figma |
+|---|---|---|---|---|---|---|
+| display | 32 / 32 | 0 | 600 | Big numbers on empty or hero states | `text-display` | 🟨 size ✅, weight 400 |
+| stat | 24 / 32 | 0 | 600 | Counts in stat cards | `text-stat` | 🟨 |
+| heading | 20 / 28 | 0.2 px | 600 | Page title ("Users") | `text-heading` | 🟨 |
+| title | 18 / 28 | 0 | 600 | Panel and section titles | `text-title` | 🟨 |
+| subtitle | 16 / 24 | 0 | 500 | Card titles | `text-subtitle` | 🟨 |
+| label | 14 / 20 | 0.2 px | **500** | **Buttons, field names, menu items, tabs** | `text-label` | 🟨 |
+| body | 13 / 22 | 0.3 px | 400 | Paragraphs, inputs, table cells | `text-body` | 🟨 |
+| meta | 12 / 16 | 0.2 px | 400 | Secondary info | `text-meta` | 🟨 |
+| caption | 11 / 16 | 0.3 px | 500 | Small tags and badges | `text-caption` | 🟨 |
 
-> 🟨 In Figma every style uses weight 400. The code follows: hierarchy comes from size and color, not bold.
+**Weight rule (decided 2026-10-21):** 600 for headings and numbers, **500 for anything you act on or that labels something** (buttons, links, field names, menu items, badges, table headers, names in a table), 400 for reading text and what you type. Placeholder text is 400.
+
+> 🟥 In Figma **every style is weight 400** (and the Button matrix labels are underlined). The code deliberately differs; Figma gets the weights above in the Figma step, and then this column is ✅.
+> ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes. Without that, the class merger dropped `text-label` from every colored button (a silent bug fixed on 2026-10-21, with a test).
 
 ### 2.3 🎨 Colors (dark theme)
 All values are identical in Figma and `src/index.css` (checked token by token, 2026-10-21).

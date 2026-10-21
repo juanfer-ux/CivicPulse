@@ -12,28 +12,37 @@
 @theme {
   --breakpoint-desk: 90rem; /* 1440 px */
 
-  /* Text styles from the CivicPulse Figma file (Foundations · Typography): size / line height, letter-spacing. */
+  /* Text styles: size / line height, letter-spacing from the CivicPulse Figma file (Foundations · Typography). Weights are ours (Figma has all 400): 600 headings and numbers, 500 actions and labels, 400 reading text. */
   --text-display: 32px;
+  --text-display--font-weight: 600;
   --text-display--line-height: 32px;
   --text-stat: 24px;
+  --text-stat--font-weight: 600;
   --text-stat--line-height: 32px;
   --text-heading: 20px;
+  --text-heading--font-weight: 600;
   --text-heading--line-height: 28px;
   --text-heading--letter-spacing: 0.2px;
   --text-title: 18px;
+  --text-title--font-weight: 600;
   --text-title--line-height: 28px;
   --text-subtitle: 16px;
+  --text-subtitle--font-weight: 500;
   --text-subtitle--line-height: 24px;
   --text-label: 14px;
+  --text-label--font-weight: 500;
   --text-label--line-height: 20px;
   --text-label--letter-spacing: 0.2px;
   --text-body: 13px;
+  --text-body--font-weight: 400;
   --text-body--line-height: 22px;
   --text-body--letter-spacing: 0.3px;
   --text-meta: 12px;
+  --text-meta--font-weight: 400;
   --text-meta--line-height: 16px;
   --text-meta--letter-spacing: 0.2px;
   --text-caption: 11px;
+  --text-caption--font-weight: 500;
   --text-caption--line-height: 16px;
   --text-caption--letter-spacing: 0.3px;
 }
