@@ -5,8 +5,8 @@
 /* Civic Pulse is dark-only: <html class="dark"> is set in index.html. */
 @custom-variant dark (&:is(.dark *));
 
-/* DM Sans (Google Fonts, open licence), served from our own site by the fontsource package. Variable font with the optical-size axis, which Figma pins at 14. */
-@import "@fontsource-variable/dm-sans/opsz.css";
+/* Inter (Google Fonts, open licence) trial, served from our own site by the fontsource package. Variable font with the optical-size axis, pinned at 14 (text cut). */
+@import "@fontsource-variable/inter/opsz.css";
 
 /* The desktop layout (sidebar, floating panels) starts here; narrower windows get the mobile layout. */
 @theme {
@@ -39,7 +39,7 @@
 }
 
 @theme inline {
-  --font-sans: 'DM Sans Variable', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --font-mono: 'Geist Mono', ui-monospace, monospace;
   --radius-xs: 2px;

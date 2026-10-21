@@ -20,6 +20,8 @@
 ## 2. 🧱 Foundations
 
 ### 2.1 🔤 Typeface
+> 🟨 **Trial (2026-10-21):** the live site is showing **Inter** to compare with DM Sans (the owner did not like DM Sans for a dashboard). This section, decision 0012 and the Figma text styles are updated once the owner confirms the choice.
+
 | | |
 |---|---|
 | Family | **DM Sans** (Google Fonts, open licence), regular weight |
