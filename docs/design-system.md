@@ -109,8 +109,8 @@ Code is in `src/components/ui/` (shadcn) or `src/components/`. "Figma" is the co
 ### 3.2 Hand-built components (in code, not shadcn)
 | Component | What it is | Code | Figma |
 |---|---|---|---|
-| **Select (native)** | Dropdown for one value, styled like Input (`controlClass`) | `src/lib/ui.ts` | ⬜ |
-| **MultiSelect** | Dropdown with a checkbox per option, Select all, Clear | `MultiSelect.tsx` | ⬜ |
+| **Select (native)** | Dropdown for one value, styled like Input. Own chevron (16 px, muted) **12 px from the right edge**, 40 px reserved on the right so text never runs under it; the browser's own chevron is turned off | `src/lib/ui.ts` (`selectClass`), `select-chevron` in `src/index.css` | ⬜ |
+| **MultiSelect** | Dropdown with a checkbox per option, Select all, Clear. Same chevron icon and position as the Select | `MultiSelect.tsx` | ⬜ |
 | **Checkbox** | Native checkbox with a label | inline | ⬜ |
 | **Sidebar** | Left menu: logo, Map, Users, role and Sign out. Expanded 224 px or icons 56 px; slide-out on phones | `Sidebar.tsx` | ⬜ (Figma has a 64 px icon rail, "Nav Item", from the earlier concept) |
 | **Status badge** | Pending, Active, Off, plus an "Invited" tag | `UsersAdmin.tsx` (Badge variants) | ⬜ |
@@ -128,6 +128,7 @@ Stat Card, Incident Row, Nav Item, Panel Header, Message, Action Card, Map Marke
 ## 4. 🧰 Patterns
 | Pattern | Rule |
 |---|---|
+| **Dropdowns** | Same height (36), radius (4) and chevron position (12 px from the right edge) for every dropdown, native or custom. Never use the browser's default chevron: it sits against the border. |
 | **Forms** | Field name (`text-label`) above the control; control h 36; error line below in `incident` color; one primary button at the bottom. |
 | **Saving feedback** | Changes save immediately; a status line (`role="status"`) says what happened or why it failed in plain words. |
 | **Tables** | Header `text-meta` muted, rows `text-body`, whole row clickable; on phones each row becomes a card. |

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { controlClass } from '@/lib/ui'
+import { selectClass } from '@/lib/ui'
 import { MultiSelect } from '@/components/MultiSelect'
 import { Input } from '@/components/ui/input'
 import { useAuth, type AppRole } from '@/lib/auth'
@@ -28,7 +28,7 @@ const STATUS_VARIANT: Record<UserStatus, 'default' | 'secondary' | 'outline'> = 
   active: 'secondary',
   off: 'outline',
 }
-const SELECT = controlClass
+const SELECT = selectClass
 
 const ASIDE = 'max-desk:fixed max-desk:inset-x-0 max-desk:bottom-0 max-desk:top-[49px] max-desk:z-20 desk:w-[420px] desk:shrink-0 desk:border-l bg-card'
 const localities = (n: number) => `${n} ${n === 1 ? 'locality' : 'localities'}`

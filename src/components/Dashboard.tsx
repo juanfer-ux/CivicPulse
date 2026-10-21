@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { MediaGallery } from '@/components/MediaGallery'
 import { Badge } from '@/components/ui/badge'
-import { controlClass } from '@/lib/ui'
+import { selectClass } from '@/lib/ui'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -17,7 +17,6 @@ import {
   type Locality,
 } from '@/lib/incidents'
 
-const selectClass = controlClass
 const PERIODS = [
   { days: 7, label: 'Last 7 days' },
   { days: 30, label: 'Last 30 days' },
