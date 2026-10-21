@@ -26,4 +26,4 @@ The switch is at **1,440 px** (owner's decision): any narrower window, including
 3. Check at **1,440** and **390** by **measuring** (heights, radius, text size), not only by eye.
 
 ## 🟥 Gaps
-Listed in [design-system.md, section 7](design-system.md#7--gaps-and-decisions).
+Listed in [design-system.md, section 6](design-system.md#6--gaps-and-decisions).
