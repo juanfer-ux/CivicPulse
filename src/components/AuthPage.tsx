@@ -73,11 +73,11 @@ export function AuthPage() {
               required
             />
             {error && (
-              <p role="alert" className="text-sm text-incident">
+              <p role="alert" className="text-body text-incident">
                 {error}
               </p>
             )}
-            {notice && <p className="text-sm text-muted-foreground">{notice}</p>}
+            {notice && <p className="text-body text-muted-foreground">{notice}</p>}
             <Button type="submit" disabled={busy}>
               {busy ? 'Please wait…' : signup ? 'Create account' : 'Sign in'}
             </Button>

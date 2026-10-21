@@ -5,19 +5,41 @@
 /* Civic Pulse is dark-only: <html class="dark"> is set in index.html. */
 @custom-variant dark (&:is(.dark *));
 
-/* Gilroy is a licensed brand font (files copied from the owner's own Portfolio_2026 project). */
-@font-face { font-family: 'Gilroy'; font-weight: 400; font-display: swap; src: url('./assets/fonts/Gilroy-Regular.woff') format('woff'); }
-@font-face { font-family: 'Gilroy'; font-weight: 500; font-display: swap; src: url('./assets/fonts/Gilroy-Medium.woff') format('woff'); }
-@font-face { font-family: 'Gilroy'; font-weight: 600; font-display: swap; src: url('./assets/fonts/Gilroy-SemiBold.woff') format('woff'); }
-@font-face { font-family: 'Gilroy'; font-weight: 700; font-display: swap; src: url('./assets/fonts/Gilroy-Bold.woff') format('woff'); }
+/* DM Sans (Google Fonts, open licence), served from our own site by the fontsource package. Variable font with the optical-size axis, which Figma pins at 14. */
+@import "@fontsource-variable/dm-sans/opsz.css";
 
 /* The desktop layout (sidebar, floating panels) starts here; narrower windows get the mobile layout. */
 @theme {
   --breakpoint-desk: 90rem; /* 1440 px */
+
+  /* Text styles from the CivicPulse Figma file (Foundations · Typography): size / line height, letter-spacing. */
+  --text-display: 32px;
+  --text-display--line-height: 32px;
+  --text-stat: 24px;
+  --text-stat--line-height: 32px;
+  --text-heading: 20px;
+  --text-heading--line-height: 28px;
+  --text-heading--letter-spacing: 0.2px;
+  --text-title: 18px;
+  --text-title--line-height: 28px;
+  --text-subtitle: 16px;
+  --text-subtitle--line-height: 24px;
+  --text-label: 14px;
+  --text-label--line-height: 20px;
+  --text-label--letter-spacing: 0.2px;
+  --text-body: 13px;
+  --text-body--line-height: 22px;
+  --text-body--letter-spacing: 0.3px;
+  --text-meta: 12px;
+  --text-meta--line-height: 16px;
+  --text-meta--letter-spacing: 0.2px;
+  --text-caption: 11px;
+  --text-caption--line-height: 16px;
+  --text-caption--letter-spacing: 0.3px;
 }
 
 @theme inline {
-  --font-sans: 'Gilroy', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'DM Sans Variable', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --font-mono: 'Geist Mono', ui-monospace, monospace;
   --radius-xs: 2px;
@@ -114,5 +136,5 @@
 @layer base {
   * { @apply border-border outline-ring/50; }
   body { @apply bg-background text-foreground antialiased; }
-  html { @apply font-sans; color-scheme: dark; }
+  html { @apply font-sans; color-scheme: dark; font-variation-settings: 'opsz' 14; }
 }

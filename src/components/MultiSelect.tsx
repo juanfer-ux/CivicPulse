@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { controlClass } from '@/lib/ui'
 import { Button } from '@/components/ui/button'
 
 export interface Option<T> {
@@ -49,31 +50,31 @@ export function MultiSelect<T extends string | number>({
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="flex h-8 w-full items-center justify-between gap-2 rounded-lg border border-input bg-transparent px-2 text-left text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
+        className={`${controlClass} flex items-center justify-between gap-2 text-left`}
       >
         <span className="truncate">{summary}</span>
-        <span aria-hidden className="text-xs text-muted-foreground">
+        <span aria-hidden className="text-meta text-muted-foreground">
           ▾
         </span>
       </button>
       {open && (
-        <div role="listbox" aria-multiselectable className="absolute inset-x-0 top-9 z-30 flex max-h-72 flex-col overflow-hidden rounded-lg border bg-popover shadow-lg">
+        <div role="listbox" aria-multiselectable className="absolute inset-x-0 top-9 z-30 flex max-h-72 flex-col overflow-hidden rounded-sm border bg-popover shadow-lg">
           <div className="flex items-center justify-between border-b px-2 py-1">
-            <span className="text-xs text-muted-foreground">
+            <span className="text-meta text-muted-foreground">
               {selected.length}/{options.length} selected
             </span>
             <span className="flex gap-1">
-              <Button size="xs" variant="ghost" type="button" onClick={() => onChange(options.map((o) => o.value))}>
+              <Button size="sm" variant="ghost" type="button" onClick={() => onChange(options.map((o) => o.value))}>
                 Select all
               </Button>
-              <Button size="xs" variant="ghost" type="button" onClick={() => onChange([])}>
+              <Button size="sm" variant="ghost" type="button" onClick={() => onChange([])}>
                 Clear
               </Button>
             </span>
           </div>
           <div className="overflow-y-auto p-1">
             {options.map((o) => (
-              <label key={String(o.value)} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm hover:bg-muted">
+              <label key={String(o.value)} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-body hover:bg-muted">
                 <input
                   type="checkbox"
                   checked={selected.includes(o.value)}

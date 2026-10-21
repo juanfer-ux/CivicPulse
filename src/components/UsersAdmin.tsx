@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { controlClass } from '@/lib/ui'
 import { MultiSelect } from '@/components/MultiSelect'
 import { Input } from '@/components/ui/input'
 import { useAuth, type AppRole } from '@/lib/auth'
@@ -27,8 +28,7 @@ const STATUS_VARIANT: Record<UserStatus, 'default' | 'secondary' | 'outline'> = 
   active: 'secondary',
   off: 'outline',
 }
-const SELECT =
-  'h-8 w-full rounded-lg border border-input bg-transparent px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50 [&>option]:bg-card'
+const SELECT = controlClass
 
 const ASIDE = 'max-desk:fixed max-desk:inset-x-0 max-desk:bottom-0 max-desk:top-[49px] max-desk:z-20 desk:w-[420px] desk:shrink-0 desk:border-l bg-card'
 const localities = (n: number) => `${n} ${n === 1 ? 'locality' : 'localities'}`
@@ -79,8 +79,8 @@ export function UsersAdmin() {
         <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-4 desk:p-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h1 className="text-xl font-semibold">Users</h1>
-              <p className="text-sm text-muted-foreground">
+              <h1 className="text-heading">Users</h1>
+              <p className="text-body text-muted-foreground">
                 {data ? `${data.users.length} ${data.users.length === 1 ? 'person' : 'people'}, ${pendingCount} waiting for a role` : 'Loading…'}
               </p>
             </div>
@@ -99,7 +99,7 @@ export function UsersAdmin() {
 
           <div className="flex flex-wrap items-center gap-2">
             <Input className="max-w-xs" placeholder="Search name or email" value={search} onChange={(e) => setSearch(e.target.value)} />
-            <select className={`${SELECT} w-auto`} value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} aria-label="Filter by role">
+            <select className={`${SELECT} w-auto!`} value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} aria-label="Filter by role">
               <option value="">All roles</option>
               {ROLES.map((r) => (
                 <option key={r} value={r}>
@@ -107,17 +107,17 @@ export function UsersAdmin() {
                 </option>
               ))}
             </select>
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-body">
               <input type="checkbox" checked={pendingOnly} onChange={(e) => setPendingOnly(e.target.checked)} />
               Pending only
             </label>
           </div>
 
-          {error && <p className="text-sm text-destructive">Could not load users: {error}</p>}
+          {error && <p className="text-body text-destructive">Could not load users: {error}</p>}
 
           {data && (
-            <table className="w-full text-left text-sm max-desk:block">
-              <thead className="text-xs text-muted-foreground max-desk:hidden">
+            <table className="w-full text-left text-body max-desk:block">
+              <thead className="text-meta text-muted-foreground max-desk:hidden">
                 <tr className="border-b">
                   {['Name', 'Email', 'Role', 'Status', 'Localities', 'Categories'].map((h) => (
                     <th key={h} className="px-3 py-2 font-medium">
@@ -142,11 +142,11 @@ export function UsersAdmin() {
                       <td className="px-3 py-2 text-muted-foreground max-desk:col-span-2 max-desk:truncate max-desk:p-0">{u.email}</td>
                       <td className="px-3 py-2 max-desk:p-0">
                         {u.role ? ROLE_LABELS[u.role] : '—'}
-                        {u.role === 'specialist_operator' && <span className="block text-xs text-muted-foreground">{specialtyOf(u, data).join(', ') || 'No specialty yet'}</span>}
+                        {u.role === 'specialist_operator' && <span className="block text-meta text-muted-foreground">{specialtyOf(u, data).join(', ') || 'No specialty yet'}</span>}
                       </td>
                       <td className="px-3 py-2 max-desk:p-0">
                         <Badge variant={STATUS_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
-                        {u.invitation_pending && <span className="ml-2 text-xs text-muted-foreground">Invited</span>}
+                        {u.invitation_pending && <span className="ml-2 text-meta text-muted-foreground">Invited</span>}
                       </td>
                       <td className="px-3 py-2 text-muted-foreground max-desk:p-0">{u.role === 'super_admin' ? 'All' : localities(u.localities.length)}</td>
                       <td className="px-3 py-2 text-muted-foreground max-desk:p-0">{u.role === 'super_admin' ? 'All' : u.categories.length ? u.categories.map(categoryName(data)).join(', ') : '—'}</td>
@@ -232,19 +232,19 @@ function UserPanel({
       <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <h2 className="truncate text-lg font-semibold">{user.full_name || 'No name'}</h2>
-            <p className="truncate text-sm text-muted-foreground">{user.email}</p>
+            <h2 className="truncate text-title">{user.full_name || 'No name'}</h2>
+            <p className="truncate text-body text-muted-foreground">{user.email}</p>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
             Close
           </Button>
         </div>
 
-        <p className="rounded-lg bg-muted/50 p-3 text-sm">{summary}</p>
-        {user.role === 'specialist_operator' && <p className="text-sm">Specialty: {specialtyOf(user, data).join(', ') || 'none yet'}</p>}
-        {isMe && <p className="text-xs text-muted-foreground">This is you: your own role and status are locked so you cannot lock yourself out.</p>}
+        <p className="rounded-lg bg-muted/50 p-3 text-body">{summary}</p>
+        {user.role === 'specialist_operator' && <p className="text-body">Specialty: {specialtyOf(user, data).join(', ') || 'none yet'}</p>}
+        {isMe && <p className="text-meta text-muted-foreground">This is you: your own role and status are locked so you cannot lock yourself out.</p>}
 
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-label">
           Role
           <select
             className={SELECT}
@@ -264,7 +264,7 @@ function UserPanel({
           </select>
         </label>
 
-        <label className="flex items-center gap-2 text-sm">
+        <label className="flex items-center gap-2 text-body">
           <input
             type="checkbox"
             disabled={busy || isMe || !user.role}
@@ -278,7 +278,7 @@ function UserPanel({
         </label>
 
         {user.role !== 'super_admin' && (
-          <div className="flex flex-col gap-1 text-sm">
+          <div className="flex flex-col gap-1 text-body">
             Localities
             <MultiSelect
               noun="localities"
@@ -292,21 +292,21 @@ function UserPanel({
 
         {user.role === 'specialist_operator' && (
           <fieldset className="flex flex-col gap-3" disabled={busy}>
-            <legend className="text-sm font-medium">Categories</legend>
+            <legend className="text-label">Categories</legend>
             {data.specializations.map((s) => {
               const cats = data.categories.filter((c) => c.specialization === s.code)
               return (
                 <div key={s.code} className="flex flex-col gap-1">
-                  <span className="text-xs text-muted-foreground">{s.name}</span>
+                  <span className="text-meta text-muted-foreground">{s.name}</span>
                   {cats.length ? (
                     cats.map((c) => (
-                      <label key={c.code} className="flex items-center gap-2 text-sm">
+                      <label key={c.code} className="flex items-center gap-2 text-body">
                         <input type="checkbox" checked={user.categories.includes(c.code)} onChange={(e) => toggleCategory(c.code, e.target.checked)} />
                         {c.name}
                       </label>
                     ))
                   ) : (
-                    <span className="text-sm text-muted-foreground">No categories yet</span>
+                    <span className="text-body text-muted-foreground">No categories yet</span>
                   )}
                 </div>
               )
@@ -314,7 +314,7 @@ function UserPanel({
           </fieldset>
         )}
 
-        <p role="status" className={`min-h-5 text-sm ${msg?.ok === false ? 'text-destructive' : 'text-muted-foreground'}`}>
+        <p role="status" className={`min-h-5 text-body ${msg?.ok === false ? 'text-destructive' : 'text-muted-foreground'}`}>
           {busy ? 'Saving…' : msg?.text}
         </p>
       </div>
@@ -350,23 +350,23 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
       <form onSubmit={submit} className="flex h-full flex-col gap-4 overflow-y-auto p-4">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h2 className="text-lg font-semibold">Create user</h2>
-            <p className="text-sm text-muted-foreground">They get an email to set their own password.</p>
+            <h2 className="text-title">Create user</h2>
+            <p className="text-body text-muted-foreground">They get an email to set their own password.</p>
           </div>
           <Button type="button" variant="ghost" size="sm" onClick={onClose}>
             Close
           </Button>
         </div>
 
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-label">
           Name
           <Input value={form.full_name} onChange={(e) => set({ full_name: e.target.value })} autoComplete="off" />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-label">
           Email
           <Input type="email" value={form.email} onChange={(e) => set({ email: e.target.value })} autoComplete="off" />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-label">
           Role
           <select className={SELECT} value={form.role} onChange={(e) => set({ role: e.target.value as AppRole | '' })}>
             <option value="">Choose a role</option>
@@ -378,10 +378,10 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
           </select>
         </label>
 
-        {form.role === 'super_admin' && <p className="rounded-lg bg-muted/50 p-3 text-sm">Super Admins see everything and manage users, so no zone is needed.</p>}
+        {form.role === 'super_admin' && <p className="rounded-lg bg-muted/50 p-3 text-body">Super Admins see everything and manage users, so no zone is needed.</p>}
 
         {(form.role === 'locality_admin' || form.role === 'specialist_operator') && (
-          <div className="flex flex-col gap-1 text-sm">
+          <div className="flex flex-col gap-1 text-body">
             Zone{form.role === 'locality_admin' ? ' to administer' : 's'}
             <MultiSelect
               noun="zones"
@@ -394,30 +394,30 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
 
         {form.role === 'specialist_operator' && (
           <fieldset className="flex flex-col gap-3">
-            <legend className="text-sm font-medium">Specialty and categories</legend>
+            <legend className="text-label">Specialty and categories</legend>
             {data.specializations.map((sp) => {
               const cats = data.categories.filter((c) => c.specialization === sp.code)
               return (
                 <div key={sp.code} className="flex flex-col gap-1">
-                  <span className="text-xs text-muted-foreground">{sp.name}</span>
+                  <span className="text-meta text-muted-foreground">{sp.name}</span>
                   {cats.length ? (
                     cats.map((c) => (
-                      <label key={c.code} className="flex items-center gap-2 text-sm">
+                      <label key={c.code} className="flex items-center gap-2 text-body">
                         <input type="checkbox" checked={form.categories.includes(c.code)} onChange={(e) => toggleCategory(c.code, e.target.checked)} />
                         {c.name}
                       </label>
                     ))
                   ) : (
-                    <span className="text-sm text-muted-foreground">No categories yet</span>
+                    <span className="text-body text-muted-foreground">No categories yet</span>
                   )}
                 </div>
               )
             })}
-            {specialty && <span className="text-xs text-muted-foreground">Specialty: {specialty}</span>}
+            {specialty && <span className="text-meta text-muted-foreground">Specialty: {specialty}</span>}
           </fieldset>
         )}
 
-        <p role="alert" className="min-h-5 text-sm text-destructive">
+        <p role="alert" className="min-h-5 text-body text-destructive">
           {error}
         </p>
         <Button type="submit" disabled={busy}>

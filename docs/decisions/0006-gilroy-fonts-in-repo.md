@@ -1,5 +1,5 @@
 # 0006: Gilroy font files live in the public repo
-**Status:** 🟨 Accepted for now, **licence not yet confirmed**   **Date:** 2026-10-15
+**Status:** ⚪ Replaced by [0012](0012-dm-sans-self-hosted.md) (2026-10-21)   **Date:** 2026-10-15
 
 ## Context
 Gilroy is the brand font and is licensed. The app loads it from four `.woff` files in `src/assets/fonts/`. The GitHub repository was made **public** on 2026-10-15.

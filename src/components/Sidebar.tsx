@@ -20,7 +20,7 @@ function Brand({ collapsed }: { collapsed: boolean }) {
   return (
     <div className="flex items-center gap-2 px-1">
       <img src={mark} alt="" className="size-8 shrink-0" />
-      {!collapsed && <span className="text-sm font-semibold tracking-[0.2em] whitespace-nowrap text-foreground">CIVIC PULSE</span>}
+      {!collapsed && <span className="text-body font-semibold tracking-[0.2em] whitespace-nowrap text-foreground">CIVIC PULSE</span>}
     </div>
   )
 }
@@ -45,14 +45,14 @@ function Menu_({ collapsed, view, onView, footerExtra }: { collapsed: boolean; v
         {can('manage_users') && <NavItem icon={Users} label="Users" active={view === 'users'} collapsed={collapsed} onClick={() => onView('users')} />}
       </nav>
       <div className="mt-auto flex flex-col gap-2">
-        <div className="flex items-center gap-2 px-2 text-xs text-muted-foreground" title="Synthetic data">
+        <div className="flex items-center gap-2 px-2 text-meta text-muted-foreground" title="Synthetic data">
           <FlaskConical className="size-4 shrink-0" />
           {!collapsed && 'Synthetic data'}
         </div>
         {!collapsed && profile && (
-          <div className="px-2 text-sm">
+          <div className="px-2 text-body">
             <p className="truncate font-medium">{profile.full_name || 'Signed in'}</p>
-            <p className="truncate text-xs text-muted-foreground">{profile.role ? ROLE_LABELS[profile.role] : ''}</p>
+            <p className="truncate text-meta text-muted-foreground">{profile.role ? ROLE_LABELS[profile.role] : ''}</p>
           </div>
         )}
         <NavItem icon={LogOut} label="Sign out" collapsed={collapsed} onClick={signOut} />

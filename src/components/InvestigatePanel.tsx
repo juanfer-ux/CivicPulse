@@ -53,7 +53,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
         </Badge>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3">
-        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1 text-sm">
+        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1 text-body">
           {turns.length === 0 && (
             <div className="flex flex-col gap-2">
               <p className="text-muted-foreground">Try one of these, or ask your own:</p>
@@ -93,7 +93,7 @@ function AnswerView({ result, onClear }: { result: Answer; onClear: () => void }
       {result.bars.length > 0 && (
         <ul className="flex flex-col gap-1">
           {result.bars.map((b) => (
-            <li key={b.label} className="grid grid-cols-[7.5rem_1fr_2rem] items-center gap-2 text-xs">
+            <li key={b.label} className="grid grid-cols-[7.5rem_1fr_2rem] items-center gap-2 text-meta">
               <span className="truncate text-muted-foreground">{b.label}</span>
               <span className="h-2 rounded-full bg-muted">
                 <span className="block h-2 rounded-full bg-ai-border" style={{ width: `${(b.value / max) * 100}%` }} />
@@ -104,7 +104,7 @@ function AnswerView({ result, onClear }: { result: Answer; onClear: () => void }
         </ul>
       )}
       {result.evidence.map((e) => (
-        <details key={e.tool + e.scope} className="text-xs text-muted-foreground">
+        <details key={e.tool + e.scope} className="text-meta text-muted-foreground">
           <summary className="cursor-pointer">Evidence: {e.incidentCount} incidents</summary>
           <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-2">
             <dt>Tool</dt>
@@ -122,7 +122,7 @@ function AnswerView({ result, onClear }: { result: Answer; onClear: () => void }
           </dl>
         </details>
       ))}
-      <ul className="list-disc pl-4 text-xs text-muted-foreground">
+      <ul className="list-disc pl-4 text-meta text-muted-foreground">
         {result.limitations.map((l) => (
           <li key={l}>{l}</li>
         ))}

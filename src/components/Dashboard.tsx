@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { MediaGallery } from '@/components/MediaGallery'
 import { Badge } from '@/components/ui/badge'
+import { controlClass } from '@/lib/ui'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -16,7 +17,7 @@ import {
   type Locality,
 } from '@/lib/incidents'
 
-const selectClass = 'h-8 w-full rounded-md border border-input bg-card px-2 text-sm text-foreground'
+const selectClass = controlClass
 const PERIODS = [
   { days: 7, label: 'Last 7 days' },
   { days: 30, label: 'Last 30 days' },
@@ -112,7 +113,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
               {text}
             </Button>
           ))}
-          <Button size="icon-sm" variant="ghost" aria-label={collapsed ? 'Expand panel' : 'Collapse panel'} onClick={() => setCollapsed((c) => !c)}>
+          <Button size="icon" variant="ghost" aria-label={collapsed ? 'Expand panel' : 'Collapse panel'} onClick={() => setCollapsed((c) => !c)}>
             {collapsed ? <ChevronUp /> : <ChevronDown />}
           </Button>
         </div>
@@ -170,7 +171,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
               {error ? 'Could not load incidents' : data ? `${filtered.length} incidents` : 'Loading…'}
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3 text-sm">
+          <CardContent className="flex flex-col gap-3 text-body">
             {error && <p className="text-incident">{error}</p>}
             {data && !error && (
               <>
@@ -185,7 +186,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
                 </ul>
                 {topLocalities.length > 0 && (
                   <div>
-                    <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">Top localities</p>
+                    <p className="mb-1 text-meta uppercase tracking-wide text-muted-foreground">Top localities</p>
                     <ol className="flex flex-col gap-1">
                       {topLocalities.map(([code, n]) => (
                         <li key={code} className="flex justify-between">
@@ -216,7 +217,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
           <CardHeader className="flex flex-row items-start justify-between gap-2">
             <div>
               <CardTitle>{selected.title}</CardTitle>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-meta text-muted-foreground">
                 {selected.reference} · {localityName.get(selected.locality_code)}
               </p>
             </div>
@@ -224,7 +225,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
               <X />
             </Button>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3 text-sm">
+          <CardContent className="flex flex-col gap-3 text-body">
             <div className="flex flex-wrap gap-1">
               <Badge variant="secondary">{label(selected.status)}</Badge>
               {selected.is_synthetic && <Badge variant="outline">Synthetic</Badge>}

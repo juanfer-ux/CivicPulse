@@ -40,15 +40,15 @@ export function SetPassword({ onDone }: { onDone: () => void }) {
           <form onSubmit={onSubmit} className="flex flex-col gap-3">
             <Input value={String(session?.user.user_metadata?.full_name ?? '')} aria-label="Name" disabled readOnly />
             <Input value={session?.user.email ?? ''} aria-label="Email" disabled readOnly />
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1 text-label">
               Password
               <Input name="password" type="password" autoComplete="new-password" required />
             </label>
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1 text-label">
               Repeat password
               <Input name="confirm" type="password" autoComplete="new-password" required />
             </label>
-            <p role="alert" className="min-h-5 text-sm text-destructive">
+            <p role="alert" className="min-h-5 text-body text-destructive">
               {error}
             </p>
             <Button type="submit" disabled={busy}>

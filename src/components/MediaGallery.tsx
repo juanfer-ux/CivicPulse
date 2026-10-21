@@ -49,7 +49,7 @@ export function MediaGallery({ incidentId }: { incidentId: string }) {
             title={m?.is_placeholder === false ? 'File stored' : 'Placeholder: no file yet'}
           >
             {m?.kind === 'video' ? <Video className="size-5" aria-hidden /> : <Image className="size-5" aria-hidden />}
-            <span className="absolute bottom-1 left-1.5 text-[10px]">
+            <span className="absolute bottom-1 left-1.5 text-caption">
               {m?.kind === 'video'
                 ? `Video${m.duration_seconds ? ` ${clock(m.duration_seconds)}` : ''}`
                 : m
@@ -59,7 +59,7 @@ export function MediaGallery({ incidentId }: { incidentId: string }) {
           </div>
         ))}
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-meta text-muted-foreground">
         {loaded.rows.length
           ? 'Placeholder media: no files attached yet, so nothing has been visually inspected.'
           : 'No evidence attached yet.'}

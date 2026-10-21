@@ -1,8 +1,10 @@
 # 🎨 Design
 
-> **Status:** 🟨 Draft (2026-10-17). 🔐 This repo is public: the Figma link is kept out. Ask the owner for it.
+> **Status:** 🟨 Draft (2026-10-21). 🔐 This repo is public: the Figma link is kept out. Ask the owner for it.
 
 ## 🧩 Design system
+> 📘 **The detailed spec (tokens, text styles, components, patterns, screens) is [design-system.md](design-system.md).** This page keeps the brand, the rules and the workflow. **Figma is the source of truth** ([decision 0013](decisions/0013-figma-is-the-source-of-truth.md)).
+
 - 🎨 Figma file: **"CivicPulse · shadcn Design System"** (pages: Cover, Foundations, Components, Icons, Preview, **Code to Figma**).
 - Tokens live in `src/index.css` and use shadcn names plus a few extras: `ai`, `warning`, `incident`, `inset`.
 - **Dark only.** Main surfaces: background `#151517`, cards `#1C1C1E`, muted text `#A5A5A5`.
@@ -10,7 +12,7 @@
 
 ## 🔤 Brand
 - **Logo lockup:** ring mark plus wordmark, from the Figma sign-in frame. Files: `src/assets/logo-mark.svg`, `logo-wordmark.svg`; component `src/components/Logo.tsx`.
-- **Font:** Gilroy (licensed). See [decisions/0006](decisions/0006-gilroy-fonts-in-repo.md).
+- **Font:** DM Sans (Google Fonts), served from our own site. See [decisions/0012](decisions/0012-dm-sans-self-hosted.md).
 - **Basemap:** dark CARTO (OpenStreetMap data); keep the attribution visible.
 
 ## 📱 Mobile rule
