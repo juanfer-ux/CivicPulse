@@ -22,7 +22,7 @@ Bootstrap the first Super Admin once: register in the app, then in the Supabase 
 update public.profiles set role = 'super_admin'
 where id = (select id from auth.users where email = 'YOUR_EMAIL');
 ```
-Turn "Confirm email" back on in Supabase Auth settings before deploying.
+Auth hardening is deliberately minimal for now: see [docs/decisions/0016-auth-stays-simple-on-free-plan.md](docs/decisions/0016-auth-stays-simple-on-free-plan.md).
 
 ## Design system
 Dark-only. Tokens in `src/index.css` come from the CivicPulse Figma file (Theme, Dark) with shadcn token names plus extensions `ai`, `warning`, `incident`, `inset`. Font: Inter (Google Fonts, served from our own site). Figma is the source of truth: details in [docs/design-system.md](docs/design-system.md).
@@ -39,7 +39,7 @@ Investigation E proposes a candidate area; **Send for human review** creates a `
 Verified in SQL as the real Super Admin (rolled back): propose, approve, 2 audit events; blocked: forged audit event, insert with status `approved`, insert by a user with no role.
 
 ## Before deploying
-Turn "Confirm email" on and enable leaked-password protection in Supabase Auth settings. The four remaining Supabase advisor warnings (permission helpers callable by signed-in users) are intentional.
+Auth settings stay as they are on the Free plan ([decision 0016](docs/decisions/0016-auth-stays-simple-on-free-plan.md)): "Confirm email" is optional and leaked-password protection needs the Pro plan. The remaining Supabase advisor warnings (permission helpers callable by signed-in users) are intentional.
 
 ## Evidence media
 Each incident has photo and video rows in `incident_media` (`supabase/migrations/20261014030000_incident_media.sql`). Files will live in a private Supabase Storage bucket (`incident-evidence`) and `storage_path` points to them; the future Citizen Agent inserts rows from a service context, the web app only reads (RLS follows the incident's scope). Today every row is a placeholder (no file), shown as a placeholder tile in the incident panel, and the UI says nothing has been visually inspected. To show real files later: create the bucket with read policies mirroring the incident scope, then render signed URLs in `MediaGallery`.

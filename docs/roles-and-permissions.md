@@ -107,7 +107,7 @@ flowchart LR
    - ⏳ An invited person shows as **Pending** (tag "Invited") until they accept the invitation, then **Active**. A flag on their profile is set by the function and cleared by a database trigger when they confirm the email link.
    - 🧮 Rule: **you can only grant access you have**. Today only a Super Admin invites, and a Super Admin has everything, so nothing is limited; the function enforces the rule for when restricted admins exist.
 3. 🥇 The **first Super Admin** is set once by SQL in the Supabase SQL editor (README, section "Auth and roles"), never from the app.
-4. 🚀 Before going live: "Confirm email" on and leaked-password protection on ([deploy.md](deploy.md)).
+4. 🚀 Auth hardening stays minimal on the Free plan: leaked-password protection needs Pro and **Confirm email** is optional ([decision 0016](decisions/0016-auth-stays-simple-on-free-plan.md)).
 
 ---
 

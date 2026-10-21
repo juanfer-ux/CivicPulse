@@ -21,6 +21,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0013](0013-figma-is-the-source-of-truth.md) | Figma is the source of truth for the design | ✅ Accepted |
 | [0014](0014-inter-font.md) | Inter from Google Fonts, served from our own site | ✅ Accepted |
 | [0015](0015-thirteen-color-palette.md) | The palette is 13 colors | ✅ Accepted |
+| [0016](0016-auth-stays-simple-on-free-plan.md) | Authentication stays simple on the Free plan | ✅ Accepted |
 
 ## ✍️ Template
 ```

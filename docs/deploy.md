@@ -8,7 +8,7 @@ Static Vite app + Supabase. Nothing runs on Vercel except the build. All data ac
 ## 🗄️ 1. Supabase (once per environment)
 1. Run the migrations in order in the SQL editor: `supabase/migrations/*.sql` ([list](data-model.md#-migrations-run-in-this-order)).
 2. Seed, both re-runnable: `supabase/seed/synthetic_incidents.sql` (500 parking incidents) and `supabase/seed/synthetic_illegal_dumping.sql` (150 illegal dumping incidents), each with placeholder media.
-3. Auth settings: turn **Confirm email** on, enable **leaked password protection**, and set **Site URL** and **Redirect URLs** to the Vercel address (keep `http://localhost:5173` for local work).
+3. Auth settings: set **Site URL** and **Redirect URLs** to the Vercel address (keep `http://localhost:5173` for local work).
 4. Register in the deployed app, then make the first Super Admin (once):
    ```sql
    update public.profiles set role = 'super_admin'
@@ -16,7 +16,7 @@ Static Vite app + Supabase. Nothing runs on Vercel except the build. All data ac
    ```
 5. **Deploy the invite function** (once, and after any change to it): Supabase → Edge Functions → create `invite-user`, paste `supabase/functions/invite-user/index.ts`, keep **Verify JWT** on, deploy. Or with the Supabase CLI: `supabase login`, then `supabase functions deploy invite-user`. Supabase supplies the admin key to the function itself; do not copy it anywhere.
 6. Run `supabase/tests/rls_smoke.sql` ([how](testing.md)).
-7. Check Dashboard → Advisors: only the "permission helper callable by signed-in users" warnings should remain (7 functions: the permission helpers and the escalation function, all intentional), plus leaked-password protection until you enable it.
+7. Check Dashboard → Advisors: only the "permission helper callable by signed-in users" warnings should remain (7 functions: the permission helpers and the escalation function, all intentional), plus the leaked-password warning, which stays while we are on the Free plan ([decision 0016](decisions/0016-auth-stays-simple-on-free-plan.md)).
 
 ## ▲ 2. Vercel
 1. Import the GitHub repo. `vercel.json` already sets the Vite framework, build command and security headers.
