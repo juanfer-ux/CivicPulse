@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,20 @@ export function AuthPage() {
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const signup = mode === 'signup'
+  const formRef = useRef<HTMLFormElement>(null)
+
+  /** Emails a link to choose a new password (also how an invited person gets back in if the invitation link was already used). */
+  async function forgot() {
+    const email = String(new FormData(formRef.current!).get('email')).trim()
+    if (!email) return setError('Enter your email above first.')
+    setBusy(true)
+    setError(null)
+    setNotice(null)
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin })
+    setBusy(false)
+    if (error) setError(error.message)
+    else setNotice('If that email has an account, we sent a link to choose a new password.')
+  }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -46,7 +60,7 @@ export function AuthPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit} className="flex flex-col gap-3">
+          <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-3">
             {signup && <Input name="name" placeholder="Full name" aria-label="Full name" autoComplete="name" required />}
             <Input name="email" type="email" placeholder="Email" aria-label="Email" autoComplete="email" required />
             <Input
@@ -78,6 +92,11 @@ export function AuthPage() {
             >
               {signup ? 'I already have an account' : 'Create an account'}
             </Button>
+            {!signup && (
+              <Button type="button" variant="link" size="sm" disabled={busy} onClick={forgot}>
+                Forgot password?
+              </Button>
+            )}
           </form>
         </CardContent>
       </Card>

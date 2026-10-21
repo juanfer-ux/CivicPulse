@@ -103,6 +103,7 @@ flowchart LR
    - 🛟 The database refuses to demote or switch off the **last active Super Admin**.
    - 📨 **Create user** (same screen): the Super Admin enters name and email, picks **one role** (Super Admin, Locality (Zone) Admin or Specialist Operator), the **zone(s)** for the last two (a dropdown with a checkbox per locality), and for a Specialist the **categories**, as checkboxes grouped by specialty (the specialty is shown from the categories ticked). The person gets an invitation email and chooses their own password; role and access are already assigned when they arrive.
    - 🔑 Done by a server function (Edge Function `invite-user`), the only place the admin key lives ([decision 0011](decisions/0011-invite-users-by-edge-function.md)). It checks the caller, validates, sends the invite, assigns access, audits, and removes the new account if any step fails.
+   - 🔐 The invitation link works **once**. The password step follows the **account**: an invited person without a password is asked to "Set up your account" (name and email shown read-only) on every visit until it is set. If they lose the link, **Forgot password?** on the sign-in page emails a new one.
    - ⏳ An invited person shows as **Pending** (tag "Invited") until they accept the invitation, then **Active**. A flag on their profile is set by the function and cleared by a database trigger when they confirm the email link.
    - 🧮 Rule: **you can only grant access you have**. Today only a Super Admin invites, and a Super Admin has everything, so nothing is limited; the function enforces the rule for when restricted admins exist.
 3. 🥇 The **first Super Admin** is set once by SQL in the Supabase SQL editor (README, section "Auth and roles"), never from the app.
@@ -163,7 +164,8 @@ All 12 cases are covered by 26 checks, all passing (2026-10-17).
 | 🟩 | Permission test: 35 checks (T1 to T13 plus extras), all passing. |
 | 🟩 | **Users screen** (Super Admin): table, search and filters, side panel for role, active switch, localities and categories. Last-Super-Admin guard and audit trail in the database. |
 | 🟩 | **Create user:** invitation by email with role, zones and categories; set-password screen for the invited person. |
-| 🟥 | No resend invite, password reset or delete user yet. |
+| 🟩 | **Forgot password?** on the sign-in page. |
+| 🟥 | No resend invite, admin-triggered password reset or delete user yet. |
 | 🟥 | Restricted Super Admins, and Zone Admins inviting specialists into their own zone (would change this spec). |
 | 🟨 | A specialist's **specialty is derived from their categories**. Infrastructure has no categories yet, so it cannot be chosen until we add some. |
 | 🟥 | **No team view and no incident assignment screen** (`incidents.assigned_to` exists; database lets Locality Admin and Super Admin assign). |

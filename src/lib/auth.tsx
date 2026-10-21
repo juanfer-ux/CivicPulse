@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { arrivedByInvite, supabase } from '@/lib/supabase'
+import { arrivedByRecovery, supabase } from '@/lib/supabase'
 
 /** The three active roles. Permissions per role live in the database (role_permissions); see docs/roles-and-permissions.md. */
 export type AppRole = 'super_admin' | 'locality_admin' | 'specialist_operator'
@@ -35,7 +35,7 @@ interface AuthState {
   /** True if the user's role allows the action. The database enforces it; this only drives the screen. */
   can: (action: Action) => boolean
   signOut: () => Promise<void>
-  /** True right after following an invitation link, until the person has chosen a password. */
+  /** True for an invited person who has not chosen a password yet (checked on every visit), and after a "forgot password" link. */
   needsPassword: boolean
   passwordSet: () => void
 }
@@ -45,7 +45,7 @@ const AuthContext = createContext<AuthState | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null | undefined>(undefined)
   const [fetched, setFetched] = useState<{ id: string; data: Profile | null } | null>(null)
-  const [needsPassword, setNeedsPassword] = useState(arrivedByInvite)
+  const [recovering, setRecovering] = useState(arrivedByRecovery)
   const [fetchedPerms, setFetchedPerms] = useState<{ role: AppRole; actions: Set<string> } | null>(null)
 
   useEffect(() => {
@@ -92,11 +92,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const permissions = role && fetchedPerms?.role === role ? fetchedPerms.actions : undefined
   const can = (action: Action) => permissions?.has(action) ?? false
 
+  // The invite function marks the account (invited); setting a password marks it done (password_set). It follows the account, not the one-time link.
+  const meta = session?.user.user_metadata
+  const needsPassword = recovering || (meta?.invited === true && meta?.password_set !== true)
+
   const signOut = async () => {
     await supabase.auth.signOut()
   }
 
-  return <AuthContext value={{ session, profile, can, signOut, needsPassword, passwordSet: () => setNeedsPassword(false) }}>{children}</AuthContext>
+  return <AuthContext value={{ session, profile, can, signOut, needsPassword, passwordSet: () => setRecovering(false) }}>{children}</AuthContext>
 }
 
 export function useAuth() {

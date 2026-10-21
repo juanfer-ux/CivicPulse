@@ -28,7 +28,8 @@ npm run build    # type-check, then bundle
 - [ ] Filters change the counts; clicking a point opens the incident with placeholder photos.
 - [ ] Ask the suggested questions; evidence and limitations appear; map rings appear.
 - [ ] Phone width: bottom sheet with Explore and Investigate tabs.
-- [ ] Create user (needs the function deployed): invite an email you control as each role. Email arrives, link opens **Choose your password**, after saving you land in the app with the right access; the table shows the new person as **Pending** (tag Invited) until they accept, then **Active**, with the right specialty; the audit trail has `user_invited`. A duplicate email gives a clear message and leaves no extra user. A Locality Admin or Specialist calling the function is refused.
+- [ ] Create user (needs the function deployed): invite an email you control as each role. Email arrives, link opens **Set up your account** (name and email read-only), after saving you land in the app with the right access; the table shows the new person as **Pending** (tag Invited) until they accept, then **Active**, with the right specialty; the audit trail has `user_invited`. A duplicate email gives a clear message and leaves no extra user. A Locality Admin or Specialist calling the function is refused.
+- [ ] Forgot password: on the sign-in page, enter an email and click **Forgot password?**; the email link opens **Set up your account**.
 - [ ] Super Admin: **Users** button opens the table; a role or locality change persists after reload; you cannot change your own role. Other roles do not see the button.
 - [ ] Category filter: choose Illegal dumping, then Obstructive parking; counts change.
 

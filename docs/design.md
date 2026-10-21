@@ -26,7 +26,7 @@ Reference sizes in Figma: desktop **1440×900**, mobile **390×844**.
 
 ## 👥 Users screens
 - **Users** (Super Admin): table (cards on phones) and a side panel for one person. **Create user** opens a form in the same side panel position (full screen on phones): name, email, role, zones (a dropdown with a checkbox per locality; the same control in the user panel), and for Specialists a checkbox list of categories grouped by specialty. Not captured to Figma yet.
-- **Choose your password**: card like the sign-in card, shown once after an invitation link.
+- **Set up your account**: card like the sign-in card; name and email read-only, then password and repeat. Shown to an invited person until a password is set, and after a "forgot password" link. The sign-in page has a **Forgot password?** link.
 
 ## 🧭 Matching Figma exactly
 When a Figma frame is the reference, **measure it** (positions and heights relative to the card) and compare with the running app, not just the look. Example: the sign-in card is 362 px tall, with the logo row 40 px above the title.

@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
 
   // 3. Create the account and send the invitation email. The handle_new_user trigger creates the profile.
   const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
-    data: { full_name: fullName },
+    data: { full_name: fullName, invited: true }, // the app asks invited people for a password until they set one
     redirectTo: typeof body?.redirect_to === 'string' ? body.redirect_to : undefined,
   })
   if (inviteError || !invited.user) {
