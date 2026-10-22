@@ -1,6 +1,7 @@
 import { useEffect, useState, type ComponentType } from 'react'
 import { FlaskConical, LogOut, MapIcon, Menu, PanelLeftClose, PanelLeftOpen, Users, X } from 'lucide-react'
 import mark from '@/assets/logo-mark.svg'
+import wordmark from '@/assets/logo-wordmark.svg'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth'
 import { ROLE_LABELS } from '@/lib/users'
@@ -18,9 +19,9 @@ const read = () => {
 
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className="flex items-center gap-2 px-1">
-      <img src={mark} alt="" className="size-8 shrink-0" />
-      {!collapsed && <span className="text-body font-semibold tracking-[0.2em] whitespace-nowrap text-foreground">CIVIC PULSE</span>}
+    <div className="flex items-center gap-1">
+      <img src={mark} alt="" width={38} height={38} className="shrink-0" />
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={140} height={11} className="shrink-0" />}
     </div>
   )
 }
@@ -90,7 +91,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside className={`hidden shrink-0 border-r bg-sidebar transition-[width] desk:block ${collapsed ? 'w-14' : 'w-56'}`}>
+      <aside className={`hidden shrink-0 border-r bg-sidebar transition-[width] desk:block ${collapsed ? 'w-14' : 'w-52'}`}>
         <Menu_
           collapsed={collapsed}
           view={view}
