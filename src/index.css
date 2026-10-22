@@ -108,10 +108,12 @@
   --color-warning: var(--warning);
   --color-incident: var(--incident);
   --color-inset: var(--inset);
+  --default-border-width: var(--border-width);
 }
 
 :root {
   --radius: 0.5rem;
+  --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
   /* The whole palette is these 13 colors; every other token below points at one of them. */
   /* Neutrals */
   --background: #18181B;
