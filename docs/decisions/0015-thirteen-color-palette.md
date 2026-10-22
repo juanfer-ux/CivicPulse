@@ -9,4 +9,4 @@ Keep **13 colors** (8 neutrals and 5 colored, listed in [design-system/foundatio
 
 ## Consequences
 - ✅ Simpler to maintain; one place to change a color; errors readable everywhere.
-- 🟥 Figma still has the old variables; they are reduced in the Figma step, since Figma is the source of truth ([0013](0013-figma-is-the-source-of-truth.md)).
+- ✅ Figma now has the same 13 in one `Colors` collection (done 2026-10-22); the old Primitives and Theme collections, including the Light theme, were removed. Figma is the source of truth ([0013](0013-figma-is-the-source-of-truth.md)).

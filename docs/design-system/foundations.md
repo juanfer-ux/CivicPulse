@@ -47,7 +47,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 - Error text is always `text-incident` (contrast 8.7:1); `text-destructive` on dark is 1.8:1.
 - Code that cannot use a CSS variable (map paint settings) reads the token with `token('--name')` from `src/lib/tokens.ts`. No color literals in `.ts` / `.tsx`.
 - Status dots: 🟧 `warning` needs review, 🩷 `incident` validated or in progress, ⬜ `closed`. See `GROUPS` in `src/lib/incidents.ts`.
-- In Figma the Dark theme resolves to these same 13 colors; unused variables remain there as aliases, plus a `closed` variable to match the code.
+- In Figma the **Colors** collection holds exactly these 13 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 13`). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
 
 ## 📏 Spacing, radius, controls
 | | Value |
