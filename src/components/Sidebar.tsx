@@ -39,7 +39,7 @@ function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: Comp
 function Menu_({ collapsed, view, onView, footerExtra }: { collapsed: boolean; view: View; onView: (v: View) => void; footerExtra?: React.ReactNode }) {
   const { profile, can, signOut } = useAuth()
   return (
-    <div className="flex h-full flex-col gap-4 p-2">
+    <div className="flex h-full flex-col gap-4 p-3">
       <Brand collapsed={collapsed} />
       <nav className="flex flex-col gap-1">
         <NavItem icon={MapIcon} label="Map" active={view === 'map'} collapsed={collapsed} onClick={() => onView('map')} />
@@ -91,7 +91,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside className={`hidden shrink-0 border-r bg-sidebar transition-[width] desk:block ${collapsed ? 'w-14' : 'w-52'}`}>
+      <aside className={`hidden shrink-0 border-r bg-sidebar transition-[width] desk:block ${collapsed ? 'w-16' : 'w-52'}`}>
         <Menu_
           collapsed={collapsed}
           view={view}
