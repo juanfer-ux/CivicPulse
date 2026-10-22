@@ -1,43 +1,62 @@
-import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 
 export const AGENT_MIN = 360
 export const AGENT_MAX = 800
-export const AGENT_DEFAULT = 543.5
+/** 543.5 px next to the collapsed sidebar at 1,440 px (Figma). */
+export const AGENT_DEFAULT = 0.395
 
-/** Drag handle on the right edge of the docked agent panel (desktop only). Lives in the same `relative` parent as the panel; `width` is the panel width in px. */
-export function AgentResizer({ width, onChange }: { width: number; onChange: (px: number) => void }) {
+/** CSS width of the panel: a share of the space next to the sidebar, never under 360 or over 800 px. */
+export const agentWidthCss = (frac: number) => `clamp(${AGENT_MIN}px, ${frac * 100}%, ${AGENT_MAX}px)`
+
+/**
+ * Drag handle on the right edge of the docked agent panel (desktop only). It lives in the same `relative` parent
+ * as the panel. `frac` is the panel width as a share of that parent, so the panel also scales when the window does.
+ */
+export function AgentResizer({ frac, onChange }: { frac: number; onChange: (frac: number) => void }) {
+  const ref = useRef<HTMLDivElement>(null)
   const [dragging, setDragging] = useState(false)
-  const origin = useRef(0)
   const active = useRef(false) // read by the move handler without waiting for a re-render
+  const [parent, setParent] = useState(0)
+
+  useEffect(() => {
+    const el = ref.current?.parentElement
+    if (!el) return
+    const watch = new ResizeObserver(() => setParent(el.getBoundingClientRect().width))
+    watch.observe(el)
+    return () => watch.disconnect()
+  }, [])
+
+  const px = Math.min(AGENT_MAX, Math.max(AGENT_MIN, frac * parent))
+  const setPx = (next: number) => parent > 0 && onChange(Math.min(AGENT_MAX, Math.max(AGENT_MIN, next)) / parent)
 
   const down = (e: PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId)
-    origin.current = e.currentTarget.parentElement!.getBoundingClientRect().left
     active.current = true
     setDragging(true)
+  }
+  const move = (e: PointerEvent<HTMLDivElement>) => {
+    if (active.current) setPx(e.clientX - e.currentTarget.parentElement!.getBoundingClientRect().left)
   }
   const stop = () => {
     active.current = false
     setDragging(false)
   }
-  const move = (e: PointerEvent<HTMLDivElement>) => {
-    if (active.current) onChange(e.clientX - origin.current)
-  }
   const key = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'ArrowLeft') onChange(width - 16)
-    else if (e.key === 'ArrowRight') onChange(width + 16)
-    else if (e.key === 'Home') onChange(AGENT_MIN)
-    else if (e.key === 'End') onChange(AGENT_MAX)
+    if (e.key === 'ArrowLeft') setPx(px - 16)
+    else if (e.key === 'ArrowRight') setPx(px + 16)
+    else if (e.key === 'Home') setPx(AGENT_MIN)
+    else if (e.key === 'End') setPx(AGENT_MAX)
     else return
     e.preventDefault()
   }
 
   return (
     <div
+      ref={ref}
       role="separator"
       aria-orientation="vertical"
       aria-label="Resize Investigate and Ask"
-      aria-valuenow={Math.round(width)}
+      aria-valuenow={Math.round(px)}
       aria-valuemin={AGENT_MIN}
       aria-valuemax={AGENT_MAX}
       tabIndex={0}
