@@ -8,7 +8,7 @@
 - **Logo:** ring mark plus wordmark (`src/assets/logo-*.svg`, `src/components/Logo.tsx`).
 - **Font:** Inter, served from our own site ([decision 0014](decisions/0014-inter-font.md)).
 - **Theme:** dark only ([decision 0005](decisions/0005-dark-only-figma-tokens.md)).
-- **Basemap:** dark CARTO (OpenStreetMap data); keep the attribution visible.
+- **Basemap:** dark CARTO (OpenStreetMap data). The credit is required by their licenses, so it stays on the map as a small dark ⓘ that opens on tap (compact MapLibre control, styled in `src/index.css`). Never remove it.
 
 ## 📱 Mobile rule
 > **Every screen exists in a desktop and a mobile version** (owner's standing rule). Figma frames: desktop **1440×900**, mobile **390×844**.
