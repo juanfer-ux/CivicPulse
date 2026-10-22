@@ -15,8 +15,7 @@ Each class sets size, line height and weight together, so a component never need
 | heading | 20 / 28 | 20 / 28 | 600 | Page title | `text-heading` |
 | title | 18 / 28 | 18 / 28 | 600 | Panel and section titles | `text-title` |
 | subtitle | 16 / 24 | 16 / 24 | 500 | Card titles | `text-subtitle` |
-| label | 14 / 20 | **16 / 24** | 500 | Field names, menu items, tabs | `text-label` |
-| button text | 14 / 20 | **14 / 20** | 500 | Buttons only: fixed 14 px on desktop and phone (not `text-label`) | `text-[14px] leading-5 font-medium` in `ui/button.tsx` |
+| label | 14 / 20 | **16 / 24** | 500 | Buttons, field names, menu items, tabs | `text-label` |
 | body | 13 / 22 | **16 / 24** | 400 | Paragraphs, inputs, table cells | `text-body` |
 | meta | 12 / 16 | **14 / 20** | 400 | Secondary info | `text-meta` |
 | caption | 11 / 16 | **12 / 16** | 500 | Small tags and badges | `text-caption` |
