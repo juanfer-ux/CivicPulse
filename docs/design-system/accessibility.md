@@ -27,10 +27,10 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 | `muted-foreground` `#A5A5A5` on page / on card | 7.2 / 6.9 | Supporting text |
 | `incident` `#FFA08F` on card | 8.7 | **All error text** |
 | `background` on `primary` `#DCDCDC` | 12.9 | Text on the main button |
-| `foreground` on `destructive` `#8B0F0F` | 7.0 | Dangerous buttons |
-| `warning` `#EF9700` on page | 7.7 | Needs-review dots |
+| `foreground` `#DCDCDC` on `destructive` `#ED4C4E` | **2.7** ❌ | Dangerous buttons and badges: fails 4.5. Dark text (`background`) on it is 4.9. |
+| `warning` `#EDB24C` on page | 9.3 | Needs-review dots |
 | `closed` / `ring` `#7A7A7A` on page / on card | 4.1 / 4.0 | Closed dots, focus ring: **graphics only, never text** |
-| `destructive` `#8B0F0F` as text on card | 1.8 | ❌ Never use as text |
+| `destructive` `#ED4C4E` as text on card | 4.65 | OK as text, but error text stays `incident` |
 
 ## 🟥 Not audited yet
 | Area | What is missing |

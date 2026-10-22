@@ -127,8 +127,8 @@
   /* Colored */
   --ai: #111113;
   --ai-border: #6D79E2;
-  --destructive: #8B0F0F; /* fill of dangerous buttons and badges only: too dark for text */
-  --warning: #EF9700;
+  --destructive: #ED4C4E; /* dangerous buttons and badges; text on it needs a dark color, see accessibility.md */
+  --warning: #EDB24C;
   --incident: #FFA08F; /* incidents, invalid fields and ALL error text */
 
   /* Names shadcn components expect, reusing the colors above. */

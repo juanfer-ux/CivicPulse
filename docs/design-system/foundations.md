@@ -40,11 +40,11 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 8 | `#DCDCDC` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`, `destructive-foreground`) | Normal text, main button, "white" |
 | 9 | `#111113` | `ai` | Agent surfaces |
 | 10 | `#6D79E2` | `ai-border` | Agent accents, map highlight rings |
-| 11 | `#8B0F0F` | `destructive` | **Fill** of dangerous buttons and badges only (too dark for text) |
-| 12 | `#EF9700` | `warning` | Needs review |
+| 11 | `#ED4C4E` | `destructive` | Fill of dangerous buttons and badges |
+| 12 | `#EDB24C` | `warning` | Needs review |
 | 13 | `#FFA08F` | `incident` | Validated / in progress, invalid fields, **all error text** |
 
-- Error text is always `text-incident` (contrast 8.7:1); `text-destructive` on dark is 1.8:1.
+- Error text is always `text-incident` (contrast 8.7:1); `text-destructive` on dark is 4.65:1.
 - Code that cannot use a CSS variable (map paint settings) reads the token with `token('--name')` from `src/lib/tokens.ts`. No color literals in `.ts` / `.tsx`.
 - Status dots: 🟧 `warning` needs review, 🩷 `incident` validated or in progress, ⬜ `closed`. See `GROUPS` in `src/lib/incidents.ts`.
 - In Figma the **Colors** collection holds exactly these 13 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 13`). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
