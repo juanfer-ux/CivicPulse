@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Image, Video } from 'lucide-react'
+import { MediaImage, VideoCamera } from 'iconoir-react'
 import { supabase } from '@/lib/supabase'
 
 interface Media {
@@ -48,7 +48,7 @@ export function MediaGallery({ incidentId }: { incidentId: string }) {
             className="relative grid aspect-video place-items-center rounded-md border border-dashed bg-inset text-muted-foreground"
             title={m?.is_placeholder === false ? 'File stored' : 'Placeholder: no file yet'}
           >
-            {m?.kind === 'video' ? <Video className="size-5" aria-hidden /> : <Image className="size-5" aria-hidden />}
+            {m?.kind === 'video' ? <VideoCamera className="size-5" aria-hidden /> : <MediaImage className="size-5" aria-hidden />}
             <span className="absolute bottom-1 left-1.5 text-caption">
               {m?.kind === 'video'
                 ? `Video${m.duration_seconds ? ` ${clock(m.duration_seconds)}` : ''}`

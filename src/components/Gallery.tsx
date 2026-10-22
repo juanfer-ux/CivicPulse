@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus } from 'iconoir-react'
 import { Button } from '@/components/ui/button'
 
 const VARIANTS = ['default', 'secondary', 'destructive', 'outline', 'ghost', 'link'] as const

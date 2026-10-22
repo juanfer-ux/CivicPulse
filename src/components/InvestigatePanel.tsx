@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Sparkles } from 'lucide-react'
+import { Sparks } from 'iconoir-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -46,7 +46,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
     <Card className="min-h-0 flex-1 gap-3 gradient-border overflow-visible bg-ai">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
-          <Sparkles className="size-4" aria-hidden /> Investigate and Ask
+          <Sparks className="size-4" aria-hidden /> Investigate and Ask
         </CardTitle>
         <Badge variant="outline" title="Answers come from deterministic SQL tools and templates, not an LLM">
           Mock mode

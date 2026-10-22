@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { ChevronDown, ChevronUp, X } from 'lucide-react'
+import { NavArrowDown, NavArrowUp, Xmark } from 'iconoir-react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { MediaGallery } from '@/components/MediaGallery'
 import { Badge } from '@/components/ui/badge'
@@ -113,7 +113,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
             </Button>
           ))}
           <Button size="icon" variant="ghost" aria-label={collapsed ? 'Expand panel' : 'Collapse panel'} onClick={() => setCollapsed((c) => !c)}>
-            {collapsed ? <ChevronUp /> : <ChevronDown />}
+            {collapsed ? <NavArrowUp /> : <NavArrowDown />}
           </Button>
         </div>
 
@@ -221,7 +221,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
               </p>
             </div>
             <Button size="icon" variant="ghost" aria-label="Close" onClick={() => setSelectedId(null)}>
-              <X />
+              <Xmark />
             </Button>
           </CardHeader>
           <CardContent className="flex flex-col gap-3 text-body">
