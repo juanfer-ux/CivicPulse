@@ -25,5 +25,8 @@ The switch is at **1,440 px** (owner's decision): any narrower window, including
 2. Update the code (`src/index.css`, `src/components/ui/*`, then screens) and the [design system](design-system/README.md) in the same change.
 3. Check at **1,440** and **390** by **measuring** (heights, radius, text size), not only by eye.
 
+## 🖼️ Component gallery
+Open `/#components` (no sign-in) to see real components on their own, with their measured height and text style. Resize under 1,440 px for the phone sizes. Code: `src/components/Gallery.tsx`. It only has the Button so far; add a component by adding a section there.
+
 ## 🟥 Gaps
 Listed in the [design system README](design-system/README.md#-gaps-and-decisions); accessibility gaps in [accessibility.md](design-system/accessibility.md).
