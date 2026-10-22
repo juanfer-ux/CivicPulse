@@ -43,7 +43,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
   }
 
   return (
-    <Card className="min-h-0 flex-1 gap-3 border-ai-border bg-ai/95">
+    <Card className="min-h-0 flex-1 gap-3 border-ai-border bg-ai/70 backdrop-blur-md">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="size-4" aria-hidden /> Investigate and Ask
