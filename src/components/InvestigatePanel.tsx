@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Sparks } from 'iconoir-react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -48,9 +47,6 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
         <CardTitle className="flex items-center gap-2">
           <Sparks className="size-4" aria-hidden /> Investigate and Ask
         </CardTitle>
-        <Badge variant="outline" title="Answers come from deterministic SQL tools and templates, not an LLM">
-          Mock mode
-        </Badge>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3">
         <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1 text-body">

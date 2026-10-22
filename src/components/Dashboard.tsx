@@ -227,7 +227,6 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
           <CardContent className="flex flex-col gap-3 text-body">
             <div className="flex flex-wrap gap-1">
               <Badge variant="secondary">{label(selected.status)}</Badge>
-              {selected.is_synthetic && <Badge variant="outline">Synthetic</Badge>}
               {selected.uncertainty_flags.map((f) => (
                 <Badge key={f} variant="outline">
                   {label(f)}

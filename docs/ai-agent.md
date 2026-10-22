@@ -18,7 +18,7 @@ flowchart LR
 - 🧭 The **planner** picks one tool from the question's words. Today it is plain rules in code.
 - 🛠️ The **tools** are database functions that run **as the user**, so row-level security applies. The agent can never return rows the user cannot see.
 - 🔢 **All numbers come from SQL.** Text is a template filled with those numbers. Nothing is invented.
-- 🏷️ The panel shows a **Mock mode** badge so nobody thinks an LLM wrote it.
+- 🏷️ The panel no longer shows a "Mock mode" badge (removed 2026-10-22 at the owner's request). Each answer still lists its limitations, including that the records are synthetic.
 
 ## 🗂️ Categories
 Say "illegal dumping" or "parking" in the question to limit it to that category. With no category named (or both), the agent uses **all categories you may see** and says so in every answer ("Category: ..."). Specialists only ever get their assigned categories.

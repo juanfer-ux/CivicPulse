@@ -5,7 +5,7 @@
 The brief wants an AI agent that answers questions with real numbers. An LLM needs a server-side key, cost, and careful testing, and it must never invent figures.
 
 ## Decision
-Build the agent in **mock mode** first: a rule-based planner picks one SQL tool, and answer text is templated from the returned numbers. A badge says "Mock mode".
+Build the agent in **mock mode** first: a rule-based planner picks one SQL tool, and answer text is templated from the returned numbers. A badge said "Mock mode" (removed 2026-10-22 at the owner's request).
 
 ## Consequences
 - ✅ Every number is real and testable; no key or cost; works offline from any LLM.

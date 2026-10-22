@@ -56,7 +56,7 @@ export function AuthPage() {
           <CardDescription>
             {signup
               ? 'New accounts have no access until a Super Admin assigns a role.'
-              : 'Civic Operations Agent. Synthetic data only.'}
+              : 'Civic Operations Agent.'}
           </CardDescription>
         </CardHeader>
         <CardContent>

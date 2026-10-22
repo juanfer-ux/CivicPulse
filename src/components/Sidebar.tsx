@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType } from 'react'
-import { Flask, Group, LogOut, Map as MapIcon, Menu, SidebarCollapse, SidebarExpand, Xmark } from 'iconoir-react'
+import { Group, LogOut, Map as MapIcon, Menu, SidebarCollapse, SidebarExpand, Xmark } from 'iconoir-react'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Button } from '@/components/ui/button'
@@ -48,10 +48,6 @@ function Menu_({ collapsed, view, onView, footerExtra }: { collapsed: boolean; v
         {can('manage_users') && <NavItem icon={Group} label="Users" active={view === 'users'} collapsed={collapsed} onClick={() => onView('users')} />}
       </nav>
       <div className={`mt-auto flex flex-col gap-2 ${collapsed ? 'items-center' : ''}`}>
-        <div className="flex items-center gap-2 px-2 text-meta text-muted-foreground" title="Synthetic data">
-          <Flask className="size-4 shrink-0" />
-          {!collapsed && 'Synthetic data'}
-        </div>
         {!collapsed && profile && (
           <div className="px-2 text-body">
             <p className="truncate font-medium">{profile.full_name || 'Signed in'}</p>
