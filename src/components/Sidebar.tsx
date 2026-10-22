@@ -19,7 +19,7 @@ const read = () => {
 
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={`flex items-center ${collapsed ? 'justify-center px-1' : 'gap-1'}`}>
+    <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-1'}`}>
       <img src={mark} alt="" width={38} height={38} className="shrink-0" />
       {!collapsed && <img src={wordmark} alt="Civic Pulse" width={140} height={11} className="shrink-0" />}
     </div>
@@ -29,25 +29,26 @@ function Brand({ collapsed }: { collapsed: boolean }) {
 function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: ComponentType<{ className?: string }>; label: string; active?: boolean; collapsed: boolean; onClick: () => void }) {
   return (
     <Button variant={active ? 'secondary' : 'ghost'} className={`gap-2 px-2 ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
-      <Icon className={`shrink-0 ${collapsed ? 'size-6' : 'size-5'}`} />
+      <Icon className="size-5 shrink-0" />
       {!collapsed && label}
     </Button>
   )
 }
 
 /** The menu itself: logo, sections, and who is signed in. Used by the desktop column and the phone slide-out. */
-function Menu_({ collapsed, view, onView, footerExtra }: { collapsed: boolean; view: View; onView: (v: View) => void; footerExtra?: React.ReactNode }) {
+function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; view: View; onView: (v: View) => void; toggleItem?: React.ReactNode }) {
   const { profile, can, signOut } = useAuth()
   return (
     <div className="flex h-full flex-col gap-8 px-3 py-4">
       <div className={collapsed ? 'self-center' : ''}>
         <Brand collapsed={collapsed} />
       </div>
+      {toggleItem}
       <nav className={`flex flex-col gap-3 ${collapsed ? 'items-center' : ''}`}>
         <NavItem icon={MapIcon} label="Map" active={view === 'map'} collapsed={collapsed} onClick={() => onView('map')} />
         {can('manage_users') && <NavItem icon={Group} label="Users" active={view === 'users'} collapsed={collapsed} onClick={() => onView('users')} />}
       </nav>
-      <div className={`mt-auto flex flex-col gap-2 ${collapsed ? 'items-center' : ''}`}>
+      <div className={`mt-auto flex flex-col gap-4 ${collapsed ? 'items-center' : ''}`}>
         {!collapsed && profile && (
           <div className="px-2 text-body">
             <p className="truncate font-medium">{profile.full_name || 'Signed in'}</p>
@@ -55,7 +56,6 @@ function Menu_({ collapsed, view, onView, footerExtra }: { collapsed: boolean; v
           </div>
         )}
         <NavItem icon={LogOut} label="Sign out" collapsed={collapsed} onClick={signOut} />
-        {footerExtra}
       </div>
     </div>
   )
@@ -89,14 +89,14 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside className={`hidden shrink-0 border-r bg-sidebar transition-[width] desk:block ${collapsed ? 'w-[71px]' : 'w-54'}`}>
+      <aside className={`hidden shrink-0 border-r bg-sidebar transition-[width] desk:block ${collapsed ? 'w-[64.5px]' : 'w-54'}`}>
         <Menu_
           collapsed={collapsed}
           view={view}
           onView={onView}
-          footerExtra={
+          toggleItem={
             <Button variant="ghost" className={`gap-2 px-2 ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'} onClick={toggle}>
-              {collapsed ? <SidebarExpand className="size-6 shrink-0" /> : <SidebarCollapse className="size-5 shrink-0" />}
+              {collapsed ? <SidebarExpand className="size-5 shrink-0" /> : <SidebarCollapse className="size-5 shrink-0" />}
               {!collapsed && 'Collapse'}
             </Button>
           }
