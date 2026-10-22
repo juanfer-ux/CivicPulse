@@ -23,7 +23,7 @@ Textarea, Skeleton and Alert exist in Figma only (🟨 not in code).
 | **Checkbox** | 16 px box, radius xs, with label | native input |
 | **Form Field** | Label above a swappable control; error line in `incident` | inline in `UsersAdmin.tsx`, `AuthPage.tsx` |
 | **Status Badge** | Pending, Active, Off; "Invited" is a small text tag | `Badge` variants in `UsersAdmin.tsx` |
-| **Sidebar**, **Sidebar Item** | Desktop menu, 208 px expanded or 64 px collapsed, 12 px padding; logo = 38 px ring mark + wordmark image (ring only when collapsed and on phones); one row = icon + label | `Sidebar.tsx` (`NavItem`) |
+| **Sidebar**, **Sidebar Item** | Desktop menu, 208 px expanded or 64 px collapsed, 12 px padding; logo = 38 px ring mark + wordmark image (ring only when collapsed and on phones); one row = 20 px icon + label | `Sidebar.tsx` (`NavItem`) |
 | **Mobile Top Bar** | 49 px bar with logo and menu button | `header` in `Sidebar.tsx` |
 | **Logo** | 64 px ring mark + wordmark | `Logo.tsx` |
 | **Table Row** | Users table on desktop (header, row, selected; Show invited); columns flexible | `UsersAdmin.tsx` |
