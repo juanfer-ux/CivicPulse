@@ -25,7 +25,7 @@ where id = (select id from auth.users where email = 'YOUR_EMAIL');
 Auth hardening is deliberately minimal for now: see [docs/decisions/0016-auth-stays-simple-on-free-plan.md](docs/decisions/0016-auth-stays-simple-on-free-plan.md).
 
 ## Design system
-Dark-only. Tokens in `src/index.css` come from the CivicPulse Figma file (Theme, Dark) with shadcn token names plus extensions `ai`, `warning`, `incident`, `inset`. Font: Inter (Google Fonts, served from our own site). Figma is the source of truth: details in [docs/design-system.md](docs/design-system.md).
+Dark-only. Tokens in `src/index.css` come from the CivicPulse Figma file (Theme, Dark) with shadcn token names plus extensions `ai`, `warning`, `incident`, `inset`. Font: Inter (Google Fonts, served from our own site). Figma is the source of truth: details in [docs/design-system/](docs/design-system/README.md).
 
 ## Status
 Phase 2 foundation done: scaffold, shadcn/ui, tokens, Supabase schema + RLS applied, auth gate. Synthetic seeds (re-runnable, run in the SQL editor): `supabase/seed/synthetic_incidents.sql` (500 parking incidents) and `supabase/seed/synthetic_illegal_dumping.sql` (150 illegal dumping incidents). Dashboard: MapLibre map (CARTO dark basemap, no key) with status-coloured incident points, category/locality/status/period filters, metrics and an incident detail panel; data comes through RLS. 

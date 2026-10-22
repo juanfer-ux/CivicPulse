@@ -2,7 +2,7 @@
 
 > **Status:** 🟩 In use (2026-10-21). 🔐 The repo is public: the Figma link is kept out, ask the owner for it.
 
-**Figma is the source of truth** ([decision 0013](decisions/0013-figma-is-the-source-of-truth.md)). Every value (colors, text styles, sizes, components, screens) is in **[design-system.md](design-system.md)**. This page only keeps the rules and the workflow.
+**Figma is the source of truth** ([decision 0013](decisions/0013-figma-is-the-source-of-truth.md)). The detailed spec is in **[design-system/](design-system/README.md)**: [foundations](design-system/foundations.md) (colors, text styles, sizes), [components and patterns](design-system/components.md), and [accessibility](design-system/accessibility.md). This page only keeps the rules and the workflow.
 
 ## 🔤 Brand
 - **Logo:** ring mark plus wordmark (`src/assets/logo-*.svg`, `src/components/Logo.tsx`).
@@ -22,8 +22,8 @@ The switch is at **1,440 px** (owner's decision): any narrower window, including
 
 ## 🖼️ Figma ↔ code workflow
 1. Change the design in Figma (a token, a component, or a screen built from components).
-2. Update the code (`src/index.css`, `src/components/ui/*`, then screens) and [design-system.md](design-system.md) in the same change.
+2. Update the code (`src/index.css`, `src/components/ui/*`, then screens) and the [design system](design-system/README.md) in the same change.
 3. Check at **1,440** and **390** by **measuring** (heights, radius, text size), not only by eye.
 
 ## 🟥 Gaps
-Listed in [design-system.md, section 6](design-system.md#6--gaps-and-decisions).
+Listed in the [design system README](design-system/README.md#-gaps-and-decisions); accessibility gaps in [accessibility.md](design-system/accessibility.md).

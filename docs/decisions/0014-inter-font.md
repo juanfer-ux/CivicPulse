@@ -5,7 +5,7 @@
 DM Sans was the first font after leaving Gilroy. The owner did not like it for a dashboard. Inter was tried live, the weights and text sharpness were checked with it, and the owner kept it.
 
 ## Decision
-Use **Inter** (Google Fonts, open licence), served from our own site with the `@fontsource-variable/inter` package, so no request goes to Google when a page loads. Optical size is automatic; letter-spacing is 0; weights follow the rule in [design-system.md](../design-system.md#22--text-styles).
+Use **Inter** (Google Fonts, open licence), served from our own site with the `@fontsource-variable/inter` package, so no request goes to Google when a page loads. Optical size is automatic; letter-spacing is 0; weights follow the rule in [design-system/foundations.md](../design-system/foundations.md#-text-styles).
 
 ## Consequences
 - ✅ A font built for dense interfaces, with aligned digits for counts and tables.

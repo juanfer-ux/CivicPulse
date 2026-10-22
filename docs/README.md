@@ -16,7 +16,7 @@ Start here. Every topic has **one** document; other documents link to it instead
 | 🚀 | [deploy.md](deploy.md) | How do I publish it and fix common problems? | 🟩 In use |
 | 🧪 | [testing.md](testing.md) | What is tested and how do I run it? | 🟨 Draft |
 | 🎨 | [design.md](design.md) | Brand, mobile rule, Figma workflow (index) | 🟨 Draft |
-| 🧩 | [design-system.md](design-system.md) | Tokens, text styles, components, patterns, screens: the detailed design spec | 🟨 Draft |
+| 🧩 | [design-system/](design-system/README.md) | The detailed design spec: foundations, components and patterns, accessibility | 🟩 In use |
 | 📜 | [decisions/](decisions/README.md) | Why did we choose X? (short numbered records) | 🟩 Started |
 
 ## 🧭 Which one do I read?
@@ -24,7 +24,7 @@ Start here. Every topic has **one** document; other documents link to it instead
 - 🗄️ Adding or changing a table or column → **data-model**.
 - 💬 Changing what the AI agent answers → **ai-agent**.
 - 🌐 Something broke after publishing → **deploy** (troubleshooting).
-- 🖌️ Building or changing a screen or a component → **design-system** (values) and **design** (rules).
+- 🖌️ Building or changing a screen or a component → **design-system/** (values and components) and **design** (rules); accessibility → **design-system/accessibility.md**.
 
 ## ✍️ Rules for keeping these useful
 1. **One topic, one document.** Link, don't copy.
