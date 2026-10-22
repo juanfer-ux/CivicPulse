@@ -208,7 +208,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
       </div>
 
       <div
-        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:inset-y-0 desk:left-0 desk:flex desk:w-[543.5px] desk:flex-none desk:border-r desk:bg-ai desk:p-3`}
+        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:inset-y-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border-r desk:bg-ai desk:p-3`}
       >
         {children}
         {selected && (
