@@ -147,6 +147,24 @@
   --ai-gradient: linear-gradient(180deg, var(--ai-border) 10%, var(--incident) 64%, var(--warning) 105%);
 }
 
+/* Border drawn with --ai-gradient (Figma paint style ai_gradient). The ring is a masked pseudo-element, so the translucent fill and blur of the element still show through. */
+@utility gradient-border {
+  position: relative;
+  border-color: transparent;
+  &::before {
+    content: '';
+    position: absolute;
+    inset: calc(var(--border-width) * -1);
+    border-radius: inherit;
+    padding: var(--border-width);
+    background: var(--ai-gradient);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+  }
+}
+
 /* Native selects: draw our own chevron 12 px from the edge (the browser's own sits almost on the border). Same icon and muted color as the MultiSelect. */
 @utility select-chevron {
   appearance: none;
