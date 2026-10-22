@@ -42,7 +42,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
   }
 
   return (
-    <Card className="min-h-0 flex-1 gap-3 gradient-border overflow-visible bg-ai">
+    <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <Sparks className="size-4" aria-hidden /> Investigate and Ask
@@ -71,7 +71,9 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
           <div ref={end} />
         </div>
         <form onSubmit={onSubmit} className="flex items-center gap-2">
-          <Input name="q" placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" />
+          <div className="gradient-border h-(--control-default) min-w-0 flex-1 rounded-sm border">
+            <Input name="q" placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" className="h-full border-0" />
+          </div>
           <Button type="submit" size="sm" variant="outline" disabled={busy}>
             Ask
           </Button>

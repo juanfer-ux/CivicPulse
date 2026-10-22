@@ -11,9 +11,9 @@ export type View = 'map' | 'users'
 const KEY = 'sidebar-collapsed'
 const read = () => {
   try {
-    return localStorage.getItem(KEY) === '1'
+    return localStorage.getItem(KEY) !== '0'
   } catch {
-    return false
+    return true
   }
 }
 

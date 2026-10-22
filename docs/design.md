@@ -15,7 +15,7 @@
 
 | | Desktop (1,440 px and wider) | Mobile (under 1,440 px) |
 |---|---|---|
-| Layout | Sidebar on the left; map with the agent on the left (456 px) and filters on the right (288 px), floating over it | Top bar with a menu button; map with a bottom sheet (Explore / Investigate) |
+| Layout | Sidebar on the left; the agent panel docked next to it (543.5 px, full height) and the map to its right with filters on the right (288 px) floating over it; the sidebar starts collapsed | Top bar with a menu button; map with a bottom sheet (Explore / Investigate) |
 | Sizes | Body 13, label 14, controls 36 | Body 16, label 16, controls 44 (touch) |
 
 The switch is at **1,440 px** (owner's decision): any narrower window, including a half-width laptop browser, gets the mobile layout. In code it is the `desk:` breakpoint in `src/index.css`.
