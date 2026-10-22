@@ -38,7 +38,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 6 | `#7A7A7A` | `closed` (`ring`) | Closed incidents, focus ring |
 | 7 | `#A5A5A5` | `muted-foreground` | Supporting text, table headers, placeholders |
 | 8 | `#DCDCDC` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`, `destructive-foreground`) | Normal text, main button, "white" |
-| 9 | `#22253F` | `ai` | Agent surfaces |
+| 9 | `#111113` | `ai` | Agent surfaces |
 | 10 | `#6D79E2` | `ai-border` | Agent accents, map highlight rings |
 | 11 | `#8B0F0F` | `destructive` | **Fill** of dangerous buttons and badges only (too dark for text) |
 | 12 | `#EF9700` | `warning` | Needs review |
