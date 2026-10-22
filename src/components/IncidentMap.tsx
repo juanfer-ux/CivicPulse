@@ -119,7 +119,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
 
 function ListFallback({ incidents, selectedId, onSelect }: Pick<Props, 'incidents' | 'selectedId' | 'onSelect'>) {
   return (
-    <div className="absolute inset-y-0 inset-x-0 overflow-y-auto px-4 pb-16 pt-16 desk:left-80 desk:right-[26rem] desk:pb-4">
+    <div className="absolute inset-y-0 inset-x-0 overflow-y-auto px-4 pb-16 pt-16 desk:left-[30.5rem] desk:right-80 desk:pb-4">
       <p className="mb-3 rounded-md border border-warning/50 p-3 text-body text-muted-foreground">
         The map needs WebGL2, which this browser has turned off. In Chrome: Settings → System → turn on “Use graphical
         acceleration when available”, then relaunch. Until then, here is the list of incidents (newest 100).
