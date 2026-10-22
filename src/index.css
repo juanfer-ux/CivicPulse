@@ -114,10 +114,10 @@
   --radius: 0.5rem;
   /* The whole palette is these 13 colors; every other token below points at one of them. */
   /* Neutrals */
-  --background: #151517;
+  --background: #18181B;
   --card: #1C1C1E;
-  --sidebar: #000000;
-  --secondary: #323232;
+  --sidebar: #0F0F10;
+  --secondary: #313135;
   --input: #404040;
   --closed: #7A7A7A;
   --muted-foreground: #A5A5A5;

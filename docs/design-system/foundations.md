@@ -30,10 +30,10 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 
 | # | Color | Token (aliases) | Used for |
 |---|---|---|---|
-| 1 | `#151517` | `background` | Page; text on the main button |
+| 1 | `#18181B` | `background` | Page; text on the main button |
 | 2 | `#1C1C1E` | `card` (`popover`) | Cards, inputs, panels, dropdowns |
-| 3 | `#000000` | `sidebar` (`inset`) | Sidebar, outline buttons, deepest surface |
-| 4 | `#323232` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
+| 3 | `#0F0F10` | `sidebar` (`inset`) | Sidebar, outline buttons, deepest surface |
+| 4 | `#313135` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
 | 5 | `#404040` | `input` | Borders of inputs and dropdowns |
 | 6 | `#7A7A7A` | `closed` (`ring`) | Closed incidents, focus ring |
 | 7 | `#A5A5A5` | `muted-foreground` | Supporting text, table headers, placeholders |

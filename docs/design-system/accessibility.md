@@ -22,14 +22,14 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 
 | Pair | Ratio | Use |
 |---|---|---|
-| `foreground` `#DCDCDC` on `background` `#151517` | 13.3 | Normal text |
+| `foreground` `#DCDCDC` on `background` `#18181B` | 12.9 | Normal text |
 | `foreground` on `card` `#1C1C1E` | 12.4 | Text in cards and inputs |
-| `muted-foreground` `#A5A5A5` on page / on card | 7.4 / 6.9 | Supporting text |
+| `muted-foreground` `#A5A5A5` on page / on card | 7.2 / 6.9 | Supporting text |
 | `incident` `#FFA08F` on card | 8.7 | **All error text** |
-| `background` on `primary` `#DCDCDC` | 13.3 | Text on the main button |
+| `background` on `primary` `#DCDCDC` | 12.9 | Text on the main button |
 | `foreground` on `destructive` `#8B0F0F` | 7.0 | Dangerous buttons |
-| `warning` `#EF9700` on page | 7.9 | Needs-review dots |
-| `closed` / `ring` `#7A7A7A` on page / on card | 4.2 / 4.0 | Closed dots, focus ring: **graphics only, never text** |
+| `warning` `#EF9700` on page | 7.7 | Needs-review dots |
+| `closed` / `ring` `#7A7A7A` on page / on card | 4.1 / 4.0 | Closed dots, focus ring: **graphics only, never text** |
 | `destructive` `#8B0F0F` as text on card | 1.8 | ❌ Never use as text |
 
 ## 🟥 Not audited yet
