@@ -31,7 +31,7 @@ Textarea, Skeleton and Alert exist in Figma only (🟨 not in code).
 | **Side Panel** | 420 px (full screen on phones): person editor or invitation form | `UserPanel`, `InvitePanel` in `UsersAdmin.tsx` |
 | **Auth Card** | Centered card: logo, title, form (sign in; set up your account) | `AuthPage.tsx`, `SetPassword.tsx` |
 | **Filters Card**, **Summary Card**, **Sheet Tabs** | Map filters; count, legend, top localities; phone sheet tabs | `Dashboard.tsx` |
-| **Suggestion**, **Agent Panel** | Suggested question; the Investigate and Ask panel (448 px wide on desktop, full width on phones) | `InvestigatePanel.tsx` |
+| **Suggestion**, **Agent Panel** | Suggested question; the Investigate and Ask panel (456 px wide on desktop, full width on phones) | `InvestigatePanel.tsx` |
 
 Figma also keeps components from the earlier concept that no screen uses now (Stat Card, Incident Row, Nav Item rail, Panel Header, Message, Action Card, Map Marker, Incident Radius, Tab Bar, Drawer); prune when sure.
 
