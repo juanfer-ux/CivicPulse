@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType } from 'react'
-import { FlaskConical, LogOut, MapIcon, Menu, PanelLeftClose, PanelLeftOpen, Users, X } from 'lucide-react'
+import { Flask, Group, LogOut, Map as MapIcon, Menu, SidebarCollapse, SidebarExpand, Xmark } from 'iconoir-react'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Button } from '@/components/ui/button'
@@ -43,11 +43,11 @@ function Menu_({ collapsed, view, onView, footerExtra }: { collapsed: boolean; v
       <Brand collapsed={collapsed} />
       <nav className="flex flex-col gap-1">
         <NavItem icon={MapIcon} label="Map" active={view === 'map'} collapsed={collapsed} onClick={() => onView('map')} />
-        {can('manage_users') && <NavItem icon={Users} label="Users" active={view === 'users'} collapsed={collapsed} onClick={() => onView('users')} />}
+        {can('manage_users') && <NavItem icon={Group} label="Users" active={view === 'users'} collapsed={collapsed} onClick={() => onView('users')} />}
       </nav>
       <div className="mt-auto flex flex-col gap-2">
         <div className="flex items-center gap-2 px-2 text-meta text-muted-foreground" title="Synthetic data">
-          <FlaskConical className="size-4 shrink-0" />
+          <Flask className="size-4 shrink-0" />
           {!collapsed && 'Synthetic data'}
         </div>
         {!collapsed && profile && (
@@ -98,7 +98,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
           onView={onView}
           footerExtra={
             <Button variant="ghost" className="justify-start gap-2 px-2" aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'} onClick={toggle}>
-              {collapsed ? <PanelLeftOpen className="size-5 shrink-0" /> : <PanelLeftClose className="size-5 shrink-0" />}
+              {collapsed ? <SidebarExpand className="size-5 shrink-0" /> : <SidebarCollapse className="size-5 shrink-0" />}
               {!collapsed && 'Collapse'}
             </Button>
           }
@@ -117,7 +117,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
           <button aria-label="Close menu" className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
           <aside className="relative h-full w-64 border-r bg-sidebar">
             <Button size="icon" variant="ghost" className="absolute right-2 top-2" aria-label="Close menu" onClick={() => setOpen(false)}>
-              <X className="size-5" />
+              <Xmark className="size-5" />
             </Button>
             <Menu_ collapsed={false} view={view} onView={go} />
           </aside>
