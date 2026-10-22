@@ -29,7 +29,7 @@ function Brand({ collapsed }: { collapsed: boolean }) {
 function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: ComponentType<{ className?: string }>; label: string; active?: boolean; collapsed: boolean; onClick: () => void }) {
   return (
     <Button variant={active ? 'secondary' : 'ghost'} className={`gap-2 px-2 ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
-      <Icon className="size-5 shrink-0" />
+      <Icon className={`shrink-0 ${collapsed ? 'size-6' : 'size-5'}`} />
       {!collapsed && label}
     </Button>
   )
@@ -100,7 +100,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
           onView={onView}
           footerExtra={
             <Button variant="ghost" className={`gap-2 px-2 ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'} onClick={toggle}>
-              {collapsed ? <SidebarExpand className="size-5 shrink-0" /> : <SidebarCollapse className="size-5 shrink-0" />}
+              {collapsed ? <SidebarExpand className="size-6 shrink-0" /> : <SidebarCollapse className="size-5 shrink-0" />}
               {!collapsed && 'Collapse'}
             </Button>
           }

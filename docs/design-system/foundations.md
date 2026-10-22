@@ -51,7 +51,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 - In Figma the **Colors** collection holds exactly these 13 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 13`). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
 
 ## 🔣 Icons
-Iconoir (`iconoir-react`, [decision 0017](../decisions/0017-iconoir-icons.md)): 1.5 px line. 20 px in sidebar items, 16 px elsewhere. Colour follows the text (`currentColor`).
+Iconoir (`iconoir-react`, [decision 0017](../decisions/0017-iconoir-icons.md)): the line is always 1.5 px, at any icon size (`vector-effect: non-scaling-stroke` in `index.css`), so small icons stay crisp. Sidebar items 20 px (24 px collapsed), 16 px elsewhere. Colour follows the text (`currentColor`).
 
 ## 📏 Spacing, radius, controls
 | | Value |
