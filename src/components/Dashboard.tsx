@@ -97,6 +97,12 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         onSelect={select}
       />
 
+      {/* Desktop only: an 80 px header over the map area (to the right of the agent panel). Test content. */}
+      <header className="absolute top-0 right-0 z-10 hidden h-20 items-center gap-3 border-b bg-sidebar px-6 desk:left-(--agent-w) desk:flex">
+        <h1 className="text-heading">Map</h1>
+        <span className="text-body text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
+      </header>
+
       {/* Mobile: bottom sheet over the map. Desktop (1440 px and wider): `contents`, so the two columns float over the map. */}
       <div
         className={`fixed inset-x-0 bottom-0 z-10 flex flex-col gap-2 rounded-t-2xl border-t bg-sidebar/95 p-2 backdrop-blur desk:contents ${collapsed ? 'max-desk:[&>:not(:first-child)]:hidden' : 'h-[62svh]'}`}
@@ -118,7 +124,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         </div>
 
       <div
-        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 desk:top-4 desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
+        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 desk:top-24 desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
       >
         <Card className="bg-card/95">
           <CardHeader>
