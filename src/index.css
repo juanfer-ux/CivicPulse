@@ -184,6 +184,6 @@ svg[stroke-width="1.5"] * { vector-effect: non-scaling-stroke; }
 @layer base {
   /* Letter-spacing in em on every element, not inherited from the root: an inherited em would turn into one fixed pixel value (0.16 px) for all sizes. */
   * { @apply border-border outline-ring/50; letter-spacing: 0.02em; }
-  body { @apply bg-background text-foreground antialiased; }
-  html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; -moz-osx-font-smoothing: grayscale; }
+  body { @apply bg-background text-foreground; }
+  html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; }
 }

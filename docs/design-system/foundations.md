@@ -3,7 +3,7 @@
 > Typeface, text styles, colors, spacing and controls. Part of the [design system](README.md); components are in [components.md](components.md).
 
 ## 🔤 Typeface
-**Manrope** (Google Fonts), served from our own site by `@fontsource-variable/manrope`, so nothing is requested from Google ([decision 0019](../decisions/0019-manrope-font.md)). Variable font, weights 200 to 800. For sharp text the page uses `antialiased`, `text-rendering: optimizeLegibility` and no fractional letter-spacing. Code: `--font-sans` and the base layer in `src/index.css`.
+**Manrope** (Google Fonts), served from our own site by `@fontsource-variable/manrope`, so nothing is requested from Google ([decision 0019](../decisions/0019-manrope-font.md)). Variable font, weights 200 to 800. Font smoothing is the browser default (`antialiased` was removed on 2026-10-23, the owner's choice after comparing), with `text-rendering: optimizeLegibility` and a universal letter-spacing of 0.02em. Code: `--font-sans` and the base layer in `src/index.css`.
 
 ## 🔠 Text styles
 Each class sets size, line height and weight together, so a component never needs its own `font-medium`. Letter-spacing is **0** everywhere (fractional spacing blurs letters on non-Retina screens); only the sidebar wordmark keeps its wide spacing.
