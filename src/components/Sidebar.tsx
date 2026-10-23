@@ -26,6 +26,16 @@ function Brand({ collapsed }: { collapsed: boolean }) {
   )
 }
 
+/** Phone top bar brand (Figma Mobile Top Bar): 32 px ring and the wordmark as 13 px text. */
+function MobileBrand() {
+  return (
+    <div className="flex items-center gap-2 px-1">
+      <img src={mark} alt="" width={32} height={32} className="shrink-0" />
+      <span className="text-[13px] leading-[22px] font-semibold tracking-[0.2em] whitespace-nowrap text-foreground">CIVIC PULSE</span>
+    </div>
+  )
+}
+
 function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: ComponentType<{ className?: string }>; label: string; active?: boolean; collapsed: boolean; onClick: () => void }) {
   return (
     <Button variant={active ? 'secondary' : 'ghost'} className={`gap-2 px-2 ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
@@ -104,8 +114,8 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
       </aside>
 
       {/* Phones: slim top bar with a menu button, and the menu slides in from the left. */}
-      <header className="fixed inset-x-0 top-0 z-20 flex h-[49px] items-center justify-between border-b bg-sidebar/90 px-3 backdrop-blur desk:hidden">
-        <Brand collapsed={false} />
+      <header className="fixed inset-x-0 top-0 z-20 flex h-[49px] items-center justify-between border-b bg-sidebar px-3 desk:hidden">
+        <MobileBrand />
         <Button size="icon" variant="ghost" aria-label="Open menu" onClick={() => setOpen(true)}>
           <Menu className="size-5" />
         </Button>
