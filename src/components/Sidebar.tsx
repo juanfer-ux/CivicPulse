@@ -38,9 +38,10 @@ function MobileBrand() {
   )
 }
 
-function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: ComponentType<{ className?: string }>; label: string; active?: boolean; collapsed: boolean; onClick: () => void }) {
+/** `flush` = no side padding when expanded (Figma: Sign out lines up with the user row above it). */
+function NavItem({ icon: Icon, label, active, collapsed, flush, onClick }: { icon: ComponentType<{ className?: string }>; label: string; active?: boolean; collapsed: boolean; flush?: boolean; onClick: () => void }) {
   return (
-    <Button variant={active ? 'secondary' : 'ghost'} className={`gap-2 px-2 ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
+    <Button variant={active ? 'secondary' : 'ghost'} className={`gap-2 ${flush && !collapsed ? 'px-0' : 'px-2'} ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
       <Icon className="size-5 shrink-0" />
       {!collapsed && label}
     </Button>
@@ -71,7 +72,7 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
             </div>
           </div>
         )}
-        <NavItem icon={LogOut} label="Sign out" collapsed={collapsed} onClick={signOut} />
+        <NavItem icon={LogOut} label="Sign out" flush collapsed={collapsed} onClick={signOut} />
       </div>
     </div>
   )
@@ -111,7 +112,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
           view={view}
           onView={onView}
           toggleItem={
-            <Button variant="ghost" className={`gap-2 px-2 ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'} onClick={toggle}>
+            <Button variant="ghost" className={`gap-2 ${flush && !collapsed ? 'px-0' : 'px-2'} ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'} onClick={toggle}>
               {collapsed ? <SidebarExpand className="size-5 shrink-0" /> : <SidebarCollapse className="size-5 shrink-0" />}
               {!collapsed && 'Collapse'}
             </Button>
