@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { NavArrowDown, NavArrowUp, Xmark } from 'iconoir-react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { MediaGallery } from '@/components/MediaGallery'
+import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,9 @@ import {
   type Incident,
   type Locality,
 } from '@/lib/incidents'
+import { useAuth } from '@/lib/auth'
+import { ROLE_LABELS } from '@/lib/users'
+import { shortName } from '@/lib/utils'
 
 const PERIODS = [
   { days: 7, label: 'Last 7 days' },
@@ -38,6 +42,7 @@ interface Props {
 }
 
 export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
+  const { profile } = useAuth()
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -98,9 +103,20 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
       />
 
       {/* Map header (desktop only): 70 px, across the whole width next to the sidebar, above the agent panel and the map. Test content. */}
-      <header data-slot="map-header" className="absolute inset-x-0 top-0 z-10 hidden h-(--map-header-h) items-center gap-3 border-b bg-sidebar px-6 desk:flex">
-        <h1 className="text-heading">Map</h1>
-        <span className="text-body text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
+      <header data-slot="map-header" className="absolute inset-x-0 top-0 z-10 hidden h-(--map-header-h) items-center justify-between border-b bg-sidebar px-6 desk:flex">
+        <div className="flex items-center gap-3">
+          <h1 className="text-heading">Map</h1>
+          <span className="text-body text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
+        </div>
+        {profile && (
+          <div className="flex items-center gap-3 text-body">
+            <Avatar name={profile.full_name || 'Signed in'} />
+            <div className="min-w-0">
+              <p className="truncate">{shortName(profile.full_name) || 'Signed in'}</p>
+              <p className="truncate text-meta text-muted-foreground">{profile.role ? ROLE_LABELS[profile.role] : ''}</p>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Mobile: bottom sheet over the map. Desktop (1440 px and wider): `contents`, so the two columns float over the map. */}
