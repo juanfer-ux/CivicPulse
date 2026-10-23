@@ -63,10 +63,10 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
       </nav>
       <div className={`mt-auto flex flex-col gap-4 ${collapsed ? 'items-center' : ''}`}>
         {!collapsed && profile && (
-          <div className="flex items-center gap-2 px-2 text-body">
-            <Avatar name={profile.full_name || 'Signed in'} size="sm" />
+          <div className="flex items-center gap-3 text-body">
+            <Avatar name={profile.full_name || 'Signed in'} />
             <div className="min-w-0">
-              <p className="truncate font-medium">{shortName(profile.full_name) || 'Signed in'}</p>
+              <p className="truncate">{shortName(profile.full_name) || 'Signed in'}</p>
               <p className="truncate text-meta text-muted-foreground">{profile.role ? ROLE_LABELS[profile.role] : ''}</p>
             </div>
           </div>
