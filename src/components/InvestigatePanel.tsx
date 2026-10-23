@@ -43,13 +43,13 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
 
   return (
     <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-8 max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
-      <CardHeader className="mx-auto flex w-full max-w-[550px] flex-row items-center justify-between">
+      <CardHeader className="mx-auto flex w-full max-w-[624px] flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <Sparks className="size-4" aria-hidden /> Investigate and Ask
         </CardTitle>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3">
-        <div className="mx-auto flex min-h-0 w-full max-w-[550px] flex-1 flex-col gap-3 overflow-y-auto pr-1 text-body">
+        <div className="mx-auto flex min-h-0 w-full max-w-[624px] flex-1 flex-col gap-3 overflow-y-auto pr-1 text-body">
           {turns.length === 0 && (
             <div className="flex flex-col gap-2">
               <p className="text-muted-foreground">Try one of these, or ask your own:</p>
@@ -70,7 +70,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
           ))}
           <div ref={end} />
         </div>
-        <form onSubmit={onSubmit} className="mx-auto flex w-full max-w-[550px] items-center gap-2">
+        <form onSubmit={onSubmit} className="mx-auto flex w-full max-w-[624px] items-center gap-2">
           <Input name="q" placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" />
           <Button type="submit" size="sm" variant="outline" disabled={busy}>
             Ask
