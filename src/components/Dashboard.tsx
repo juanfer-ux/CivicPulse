@@ -97,8 +97,8 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         onSelect={select}
       />
 
-      {/* Map header (desktop only): 80 px, across the whole width next to the sidebar, above the agent panel and the map. Test content. */}
-      <header data-slot="map-header" className="absolute inset-x-0 top-0 z-10 hidden h-20 items-center gap-3 border-b bg-sidebar px-6 desk:flex">
+      {/* Map header (desktop only): 72 px, across the whole width next to the sidebar, above the agent panel and the map. Test content. */}
+      <header data-slot="map-header" className="absolute inset-x-0 top-0 z-10 hidden h-18 items-center gap-3 border-b bg-sidebar px-6 desk:flex">
         <h1 className="text-heading">Map</h1>
         <span className="text-body text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
       </header>
@@ -124,7 +124,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         </div>
 
       <div
-        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 desk:top-24 desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
+        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 desk:top-22 desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
       >
         <Card className="bg-card/95">
           <CardHeader>
@@ -214,7 +214,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
       </div>
 
       <div
-        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-20 desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border-r desk:bg-ai desk:p-3`}
+        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-18 desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border-r desk:bg-ai desk:p-3`}
       >
         {children}
         {selected && (
