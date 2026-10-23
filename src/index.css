@@ -14,38 +14,38 @@
 
   /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is one universal 0.02em on every element (about 0.26 px at 13 px), small enough not to blur; Figma's fixed 0.2 and 0.3 px did blur letters on screens without a Retina display. Weights are ours: 550 headings and numbers, 450 actions and labels, 380 reading text (Manrope variable). */
   --text-display: 32px;
-  --text-display--font-weight: 550;
+  --text-display--font-weight: 400;
   --text-display--line-height: 32px;
   --text-stat: 24px;
-  --text-stat--font-weight: 550;
+  --text-stat--font-weight: 400;
   --text-stat--line-height: 32px;
   --text-heading: 20px;
-  --text-heading--font-weight: 550;
+  --text-heading--font-weight: 400;
   --text-heading--line-height: 28px;
   --text-title: 18px;
-  --text-title--font-weight: 550;
+  --text-title--font-weight: 400;
   --text-title--line-height: 28px;
   --text-subtitle: 16px;
-  --text-subtitle--font-weight: 450;
+  --text-subtitle--font-weight: 360;
   --text-subtitle--line-height: 24px;
   --text-label: var(--fs-label);
-  --text-label--font-weight: 450;
+  --text-label--font-weight: 360;
   --text-label--line-height: var(--lh-label);
   /* Button text (Figma: button and button-sm): same size as label, and one step down for small buttons. */
   --text-button: var(--fs-label);
-  --text-button--font-weight: 550;
+  --text-button--font-weight: 400;
   --text-button--line-height: var(--lh-label);
   --text-button-sm: var(--fs-body);
-  --text-button-sm--font-weight: 550;
+  --text-button-sm--font-weight: 400;
   --text-button-sm--line-height: var(--lh-label);
   --text-body: var(--fs-body);
-  --text-body--font-weight: 380;
+  --text-body--font-weight: 300;
   --text-body--line-height: var(--lh-body);
   --text-meta: var(--fs-meta);
-  --text-meta--font-weight: 380;
+  --text-meta--font-weight: 300;
   --text-meta--line-height: var(--lh-meta);
   --text-caption: var(--fs-caption);
-  --text-caption--font-weight: 450;
+  --text-caption--font-weight: 360;
   --text-caption--line-height: 16px;
 }
 
@@ -85,9 +85,9 @@
   --font-sans: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
   /* Manrope glows on dark backgrounds, so the weights sit a little below the usual 400 / 500 / 600 (it is a variable font). */
-  --font-weight-normal: 380;
-  --font-weight-medium: 450;
-  --font-weight-semibold: 550;
+  --font-weight-normal: 300;
+  --font-weight-medium: 360;
+  --font-weight-semibold: 400;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
   --radius-xs: 2px;
   --radius-sm: calc(var(--radius) - 4px);
