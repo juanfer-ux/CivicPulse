@@ -56,18 +56,18 @@ const SAMPLE: Answer = {
 /** Static copy of the docked agent panel with one conversation, so the look can be checked without signing in. */
 function ConversationDemo() {
   return (
-    <div className="flex h-[640px] w-[456px] max-w-full flex-col gap-8 border bg-ai p-3 text-body">
-      <div className="flex items-center gap-2 text-label">
-        <Sparks className="size-4" aria-hidden /> Investigate and Ask
-      </div>
-      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
-        <Question text="Which localities have the most parking obstruction incidents?" />
-        <AnswerView result={SAMPLE} onClear={() => {}} />
+    <div className="flex h-[640px] w-[456px] max-w-full flex-col gap-3 border border-card bg-ai p-6 text-body">
+      <div className="flex min-h-0 flex-1 flex-col gap-8">
+        <div className="flex items-center gap-2 text-label">
+          <Sparks className="size-4" aria-hidden /> Investigate and Ask
+        </div>
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+          <Question text="Which localities have the most parking obstruction incidents?" />
+          <AnswerView result={SAMPLE} onClear={() => {}} />
+        </div>
       </div>
       <div className="flex items-center gap-2">
-        <div className="gradient-border h-(--control-default) min-w-0 flex-1 rounded-sm border">
-          <Input placeholder="What would you like to investigate?" aria-label="Investigate and Ask" className="h-full border-0" />
-        </div>
+        <Input placeholder="What would you like to investigate?" aria-label="Investigate and Ask" />
         <Button size="sm" variant="outline">
           Ask
         </Button>

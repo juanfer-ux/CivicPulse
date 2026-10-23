@@ -71,9 +71,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
           <div ref={end} />
         </div>
         <form onSubmit={onSubmit} className="flex items-center gap-2">
-          <div className="gradient-border h-(--control-default) min-w-0 flex-1 rounded-sm border">
-            <Input name="q" placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" className="h-full border-0" />
-          </div>
+          <Input name="q" placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" />
           <Button type="submit" size="sm" variant="outline" disabled={busy}>
             Ask
           </Button>
