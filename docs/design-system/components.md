@@ -24,7 +24,7 @@ Textarea, Skeleton and Alert exist in Figma only (🟨 not in code).
 | **Form Field** | Label above a swappable control; error line in `incident` | inline in `UsersAdmin.tsx`, `AuthPage.tsx` |
 | **Status Badge** | Pending, Active, Off; "Invited" is a small text tag | `Badge` variants in `UsersAdmin.tsx` |
 | **Sidebar**, **Sidebar Item** | Desktop menu, 216 px expanded or 64.5 px collapsed, padding 16 / 12, 32 px between sections, 12 px between items, 16 px in the footer; order: logo, a divider line (0.5 px, `border` color), Collapse, Map, Users, then name and role and Sign out at the bottom; logo = 38 px ring mark + wordmark image (ring only when collapsed and on phones); one row = 20 px icon + label (icon only when collapsed) | `Sidebar.tsx` (`NavItem`) |
-| **Map Header** | Desktop header: 72 px, across the whole width next to the sidebar, above the agent panel and the map; title and incident count | `header` (`data-slot="map-header"`) in `Dashboard.tsx` |
+| **Map Header** | Desktop header: 70 px (`--map-header-h`), across the whole width next to the sidebar, above the agent panel and the map; title and incident count | `header` (`data-slot="map-header"`) in `Dashboard.tsx` |
 | **Mobile Top Bar** | 49 px solid bar: 32 px ring plus the "CIVIC PULSE" text wordmark (13 px), and the menu button | `header` in `Sidebar.tsx` |
 | **Logo** | 64 px ring mark + wordmark | `Logo.tsx` |
 | **Table Row** | Users table on desktop (header, row, selected; Show invited); columns flexible | `UsersAdmin.tsx` |
