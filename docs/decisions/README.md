@@ -23,6 +23,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0015](0015-thirteen-color-palette.md) | The palette is 13 colors | ✅ Accepted |
 | [0016](0016-auth-stays-simple-on-free-plan.md) | Authentication stays simple on the Free plan | ✅ Accepted |
 | [0017](0017-iconoir-icons.md) | Icons are Iconoir | ✅ Accepted |
+| [0018](0018-base-ui-select.md) | Select uses Base UI, not the browser list | ✅ Accepted |
 
 ## ✍️ Template
 ```

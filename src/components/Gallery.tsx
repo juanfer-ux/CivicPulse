@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Plus, Sparks } from 'iconoir-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
 import { AnswerView, Question } from '@/components/InvestigatePanel'
 import type { Answer } from '@/lib/agent'
 
@@ -76,6 +77,18 @@ function ConversationDemo({ width = 456 }: { width?: number }) {
   )
 }
 
+const ROLE_DEMO = [
+  { value: '', label: 'All roles' },
+  { value: 'super_admin', label: 'Super Admin' },
+  { value: 'zone_admin', label: 'Locality (Zone) Admin' },
+  { value: 'operator', label: 'Specialist Operator' },
+]
+
+function SelectDemo({ disabled }: { disabled?: boolean }) {
+  const [v, setV] = useState('')
+  return <Select aria-label="Role" value={v} onValueChange={setV} options={ROLE_DEMO} disabled={disabled} className="w-70" />
+}
+
 /** Component gallery: open `/#components`. Resize the window under 1,440 px to see the phone sizes. */
 export function Gallery() {
   return (
@@ -108,6 +121,13 @@ export function Gallery() {
         <div className="flex flex-wrap items-start gap-4">
           <ConversationDemo />
           <ConversationDemo width={800} />
+        </div>
+      </Section>
+
+      <Section title="Select · Base UI list (click to open)">
+        <div className="flex flex-wrap items-start gap-4">
+          <SelectDemo />
+          <SelectDemo disabled />
         </div>
       </Section>
 

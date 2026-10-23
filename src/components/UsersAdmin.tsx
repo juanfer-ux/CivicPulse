@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { selectClass } from '@/lib/ui'
+import { Select } from '@/components/ui/select'
 import { MultiSelect } from '@/components/MultiSelect'
 import { Input } from '@/components/ui/input'
 import { useAuth, type AppRole } from '@/lib/auth'
@@ -28,7 +28,7 @@ const STATUS_VARIANT: Record<UserStatus, 'default' | 'secondary' | 'outline'> = 
   active: 'secondary',
   off: 'outline',
 }
-const SELECT = selectClass
+const ROLE_OPTIONS = ROLES.map((r) => ({ value: r, label: ROLE_LABELS[r] }))
 
 const ASIDE = 'max-desk:fixed max-desk:inset-x-0 max-desk:bottom-0 max-desk:top-[49px] max-desk:z-20 desk:w-[420px] desk:shrink-0 desk:border-l bg-card'
 const localities = (n: number) => `${n} ${n === 1 ? 'locality' : 'localities'}`
@@ -99,14 +99,7 @@ export function UsersAdmin() {
 
           <div className="flex flex-wrap items-center gap-2">
             <Input className="max-w-xs" placeholder="Search name or email" value={search} onChange={(e) => setSearch(e.target.value)} />
-            <select className={`${SELECT} w-auto!`} value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} aria-label="Filter by role">
-              <option value="">All roles</option>
-              {ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {ROLE_LABELS[r]}
-                </option>
-              ))}
-            </select>
+            <Select className="w-auto!" aria-label="Filter by role" value={roleFilter} onValueChange={setRoleFilter} options={[{ value: '', label: 'All roles' }, ...ROLE_OPTIONS]} />
             <label className="flex items-center gap-2 text-body">
               <input type="checkbox" checked={pendingOnly} onChange={(e) => setPendingOnly(e.target.checked)} />
               Pending only
@@ -246,22 +239,16 @@ function UserPanel({
 
         <label className="flex flex-col gap-1 text-label">
           Role
-          <select
-            className={SELECT}
+          <Select
+            aria-label="Role"
             disabled={busy || isMe}
             value={user.role ?? ''}
-            onChange={(e) => {
-              const role = e.target.value as AppRole
+            onValueChange={(v) => {
+              const role = v as AppRole
               void save(() => updateProfile(user.id, { role }), { role }, `Role set to ${ROLE_LABELS[role]}.`)
             }}
-          >
-            {!user.role && <option value="">Pending: choose a role</option>}
-            {ROLES.map((r) => (
-              <option key={r} value={r}>
-                {ROLE_LABELS[r]}
-              </option>
-            ))}
-          </select>
+            options={user.role ? ROLE_OPTIONS : [{ value: '', label: 'Pending: choose a role', disabled: true }, ...ROLE_OPTIONS]}
+          />
         </label>
 
         <label className="flex items-center gap-2 text-body">
@@ -368,14 +355,7 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
         </label>
         <label className="flex flex-col gap-1 text-label">
           Role
-          <select className={SELECT} value={form.role} onChange={(e) => set({ role: e.target.value as AppRole | '' })}>
-            <option value="">Choose a role</option>
-            {ROLES.map((r) => (
-              <option key={r} value={r}>
-                {ROLE_LABELS[r]}
-              </option>
-            ))}
-          </select>
+          <Select aria-label="Role" value={form.role} onValueChange={(v) => set({ role: v as AppRole | '' })} options={[{ value: '', label: 'Choose a role' }, ...ROLE_OPTIONS]} />
         </label>
 
         {form.role === 'super_admin' && <p className="rounded-lg bg-muted/50 p-3 text-body">Super Admins see everything and manage users, so no zone is needed.</p>}
