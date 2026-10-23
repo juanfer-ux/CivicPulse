@@ -54,10 +54,10 @@ const SAMPLE: Answer = {
 }
 
 /** Static copy of the docked agent panel with one conversation, so the look can be checked without signing in. */
-function ConversationDemo() {
+function ConversationDemo({ width = 456 }: { width?: number }) {
   return (
-    <div className="flex h-[640px] w-[456px] max-w-full flex-col gap-3 border border-card bg-ai p-6 text-body">
-      <div className="flex min-h-0 flex-1 flex-col gap-8">
+    <div style={{ width }} className="flex h-[640px] max-w-full flex-col gap-3 border border-card bg-ai p-6 text-body">
+      <div className="mx-auto flex min-h-0 w-full max-w-[550px] flex-1 flex-col gap-8">
         <div className="flex items-center gap-2 text-label">
           <Sparks className="size-4" aria-hidden /> Investigate and Ask
         </div>
@@ -66,7 +66,7 @@ function ConversationDemo() {
           <AnswerView result={SAMPLE} onClear={() => {}} />
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="mx-auto flex w-full max-w-[550px] items-center gap-2">
         <Input placeholder="What would you like to investigate?" aria-label="Investigate and Ask" />
         <Button size="sm" variant="outline">
           Ask
@@ -104,8 +104,11 @@ export function Gallery() {
         ))}
       </Section>
 
-      <Section title="Agent panel · one conversation">
-        <ConversationDemo />
+      <Section title="Agent panel · one conversation (456 px and dragged to 800 px)">
+        <div className="flex flex-wrap items-start gap-4">
+          <ConversationDemo />
+          <ConversationDemo width={800} />
+        </div>
       </Section>
 
       <Section title="Button · icon and states">
