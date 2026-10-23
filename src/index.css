@@ -12,7 +12,7 @@
 @theme {
   --breakpoint-desk: 90rem; /* 1440 px */
 
-  /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is one universal 0.01em on every element (about 0.13 px at 13 px), small enough not to blur; Figma's fixed 0.2 and 0.3 px did blur letters on screens without a Retina display. Weights are ours: 550 headings and numbers, 450 actions and labels, 380 reading text (Manrope variable). */
+  /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is one universal 0.02em on every element (about 0.26 px at 13 px), small enough not to blur; Figma's fixed 0.2 and 0.3 px did blur letters on screens without a Retina display. Weights are ours: 550 headings and numbers, 450 actions and labels, 380 reading text (Manrope variable). */
   --text-display: 32px;
   --text-display--font-weight: 550;
   --text-display--line-height: 32px;
@@ -183,7 +183,7 @@ svg[stroke-width="1.5"] * { vector-effect: non-scaling-stroke; }
 
 @layer base {
   /* Letter-spacing in em on every element, not inherited from the root: an inherited em would turn into one fixed pixel value (0.16 px) for all sizes. */
-  * { @apply border-border outline-ring/50; letter-spacing: 0.01em; }
+  * { @apply border-border outline-ring/50; letter-spacing: 0.02em; }
   body { @apply bg-background text-foreground antialiased; }
   html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; -moz-osx-font-smoothing: grayscale; }
 }
