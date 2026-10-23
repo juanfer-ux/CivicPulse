@@ -25,6 +25,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0017](0017-iconoir-icons.md) | Icons are Iconoir | ✅ Accepted |
 | [0018](0018-base-ui-select.md) | Select uses Base UI, not the browser list | ✅ Accepted |
 | [0019](0019-manrope-font.md) | The product font is Manrope | ✅ Accepted |
+| [0020](0020-generic-color-names.md) | Color tokens are named by color, not by use | ✅ Accepted |
 
 ## ✍️ Template
 ```

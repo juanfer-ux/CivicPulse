@@ -28,23 +28,25 @@ Each class sets size, line height and weight together, so a component never need
 ## 🎨 Colors (dark theme): 13 in total
 Every other token name (`primary`, `muted`, `accent`, `border`…) is only an alias of one of these 13, because shadcn components expect those names ([decision 0015](../decisions/0015-thirteen-color-palette.md)). Add a color only if none of these can do the job.
 
-| # | Color | Token (aliases) | Used for |
-|---|---|---|---|
-| 1 | `#18181B` | `background` | Page; text on the main button |
-| 2 | `#1C1C1E` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar |
-| 3 | `#0F0F10` | `sidebar` (`inset`) | Map header, outline buttons, deepest surface (the sidebar itself now uses `card`) |
-| 4 | `#313135` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
-| 5 | `#404040` | `input` | Borders of inputs and dropdowns |
-| 6 | `#7A7A7A` | `closed` (`ring`) | Closed incidents, focus ring |
-| 7 | `#94949A` | `muted-foreground` | Supporting text, table headers, placeholders |
-| 8 | `#C2C2C7` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`, `destructive-foreground`) | Normal text, main button, "white" |
-| 9 | `#111113` | `ai` | Agent surfaces |
-| 10 | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
-| 11 | `#EA6C6E` | `destructive` | Fill of dangerous buttons and badges |
-| 12 | `#D0AC6B` | `warning` | Needs review |
-| 13 | `#E58C7D` | `incident` | Validated / in progress, invalid fields, **all error text** |
+| # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
+|---|---|---|---|---|
+| 1 | `neutral-950` | `#0F0F10` | `sidebar` (`inset`) | Map header, outline buttons, deepest surface; text on a light fill |
+| 2 | `neutral-900` | `#111113` | `ai` | Agent surfaces |
+| 3 | `neutral-850` | `#18181B` | `background` | Page |
+| 4 | `neutral-800` | `#1C1C1E` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar |
+| 5 | `neutral-700` | `#313135` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
+| 6 | `neutral-600` | `#404040` | `input` | Borders of inputs and dropdowns |
+| 7 | `neutral-500` | `#7A7A7A` | `closed` (`ring`) | Closed incidents, focus ring |
+| 8 | `neutral-400` | `#94949A` | `muted-foreground` | Supporting text, table headers, placeholders |
+| 9 | `neutral-300` | `#C2C2C7` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
+| 10 | `indigo-400` | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
+| 11 | `red-400` | `#EA6C6E` | `destructive` | Fill of dangerous buttons and badges |
+| 12 | `amber-400` | `#D0AC6B` | `warning` | Needs review |
+| 13 | `coral-400` | `#E58C7D` | `incident` | Validated / in progress, invalid fields, **all error text** |
 
-- Error text is always `text-incident` (contrast 8.7:1); `text-destructive` on dark is 5.6:1.
+Names say what a color is (family and lightness: lower number = darker for neutrals), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 13.
+
+- Error text is always `text-incident` (contrast 6.8:1); `text-destructive` on dark is 5.6:1.
 - Code that cannot use a CSS variable (map paint settings) reads the token with `token('--name')` from `src/lib/tokens.ts`. No color literals in `.ts` / `.tsx`.
 - Status dots: 🟧 `warning` needs review, 🩷 `incident` validated or in progress, ⬜ `closed`. See `GROUPS` in `src/lib/incidents.ts`.
 - **Gradient** `--ai-gradient` (Figma paint style `ai_gradient`): `ai-border`, `incident`, `warning`, top to bottom at 10 %, 64 %, 105 %. Built from three of the 13, so not a 14th color. Used on the border of the Agent Panel (`gradient-border` utility in `src/index.css`).
