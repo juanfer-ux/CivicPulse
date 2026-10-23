@@ -3,25 +3,25 @@
 > Typeface, text styles, colors, spacing and controls. Part of the [design system](README.md); components are in [components.md](components.md).
 
 ## 🔤 Typeface
-**Inter** (Google Fonts), served from our own site by `@fontsource-variable/inter`, so nothing is requested from Google ([decision 0014](../decisions/0014-inter-font.md)). Optical size is automatic. For sharp text the page uses `antialiased`, `text-rendering: optimizeLegibility` and no fractional letter-spacing. Code: `--font-sans` and the base layer in `src/index.css`.
+**Manrope** (Google Fonts), served from our own site by `@fontsource-variable/manrope`, so nothing is requested from Google ([decision 0019](../decisions/0019-manrope-font.md)). Variable font, weights 200 to 800. For sharp text the page uses `antialiased`, `text-rendering: optimizeLegibility` and no fractional letter-spacing. Code: `--font-sans` and the base layer in `src/index.css`.
 
 ## 🔠 Text styles
 Each class sets size, line height and weight together, so a component never needs its own `font-medium`. Letter-spacing is **0** everywhere (fractional spacing blurs letters on non-Retina screens); only the sidebar wordmark keeps its wide spacing.
 
 | Style | Desktop | Mobile | Weight | Use | Class |
 |---|---|---|---|---|---|
-| display | 32 / 32 | 32 / 32 | 600 | Big numbers | `text-display` |
-| stat | 24 / 32 | 24 / 32 | 600 | Counts in stat cards | `text-stat` |
-| heading | 20 / 28 | 20 / 28 | 600 | Page title | `text-heading` |
-| title | 18 / 28 | 18 / 28 | 600 | Panel and section titles | `text-title` |
-| subtitle | 16 / 24 | 16 / 24 | 500 | Card titles | `text-subtitle` |
-| label | 14 / 20 | **16 / 24** | 500 | Buttons, field names, menu items, tabs | `text-label` |
-| body | 13 / 22 | **16 / 24** | 400 | Paragraphs, inputs, table cells | `text-body` |
-| meta | 12 / 16 | **14 / 20** | 400 | Secondary info | `text-meta` |
-| caption | 11 / 16 | **12 / 16** | 500 | Small tags and badges | `text-caption` |
+| display | 32 / 32 | 32 / 32 | 550 | Big numbers | `text-display` |
+| stat | 24 / 32 | 24 / 32 | 550 | Counts in stat cards | `text-stat` |
+| heading | 20 / 28 | 20 / 28 | 550 | Page title | `text-heading` |
+| title | 18 / 28 | 18 / 28 | 550 | Panel and section titles | `text-title` |
+| subtitle | 16 / 24 | 16 / 24 | 450 | Card titles | `text-subtitle` |
+| label | 14 / 20 | **16 / 24** | 450 | Buttons, field names, menu items, tabs | `text-label` |
+| body | 13 / 22 | **16 / 24** | 380 | Paragraphs, inputs, table cells | `text-body` |
+| meta | 12 / 16 | **14 / 20** | 380 | Secondary info | `text-meta` |
+| caption | 11 / 16 | **12 / 16** | 450 | Small tags and badges | `text-caption` |
 
 - **Desktop = 1,440 px and wider; Mobile = anything narrower** (the `desk` breakpoint). The sizes come from Figma's Device collection and switch through CSS variables in `src/index.css` (`--fs-body`, `--lh-body`…); class names do not change.
-- **Weights:** 600 for headings and numbers; **500 for anything you act on or that labels something** (buttons, links, field names, menu items, badges, table headers, names in a table); 400 for reading text, typed text and placeholders.
+- **Weights** (Manrope is a variable font, and sits a little below the usual numbers because it glows on dark backgrounds): 550 for headings and numbers; **450 for anything you act on or that labels something** (buttons, links, field names, menu items, badges, table headers, names in a table); 380 for reading text, typed text and placeholders.
 - Figma also has `meta-medium` (12 / 16, 500) for table headers; the code uses `text-meta` plus `font-medium`.
 - ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes; without that, the class merger dropped `text-label` from colored buttons (test in `utils.test.ts`).
 

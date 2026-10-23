@@ -53,7 +53,7 @@ npm run build    # type-checks, then bundles
 
 ## ⚠️ 5. Known limits and decisions
 - 🗺️ **Basemap:** CARTO dark-matter (OpenStreetMap data), no key. Fine for a prototype; for production traffic use a keyed provider (for example MapTiler) by changing `STYLE` in `src/components/IncidentMap.tsx`, and keep the attribution.
-- 🔤 **Font:** Inter is served from our own site by an npm package; nothing to configure ([decision 0014](decisions/0014-inter-font.md)).
+- 🔤 **Font:** Manrope is served from our own site by an npm package; nothing to configure ([decision 0019](decisions/0019-manrope-font.md)).
 - 🤖 **Mock agent:** no LLM key to configure. A future LLM Edge Function will need its key as a Supabase secret, never in a `VITE_` variable ([ai-agent.md](ai-agent.md)).
 - 🛡️ **No Content-Security-Policy header yet:** MapLibre uses blob workers and external tiles, so it needs careful tuning first.
 - 🧪 **Data is synthetic**; photos and videos are placeholders.
