@@ -8,7 +8,7 @@ export function RoleBadge({ role, className }: { role: AppRole | null | undefine
     <span
       data-slot="role-badge"
       className={cn(
-        'inline-flex h-[18px] w-fit shrink-0 items-center justify-center rounded-xs border border-input bg-sidebar px-2 text-[9.5px]/[11.5px] font-medium whitespace-nowrap',
+        'inline-flex h-5 w-fit shrink-0 items-center justify-center rounded-xs border border-input bg-sidebar px-2 text-[10.5px]/[12.5px] font-medium whitespace-nowrap',
         role ? 'text-foreground' : 'text-muted-foreground',
         className
       )}
