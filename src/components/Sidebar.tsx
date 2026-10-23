@@ -2,9 +2,11 @@ import { useEffect, useState, type ComponentType } from 'react'
 import { Group, LogOut, Map as MapIcon, Menu, SidebarCollapse, SidebarExpand, Xmark } from 'iconoir-react'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
+import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth'
 import { ROLE_LABELS } from '@/lib/users'
+import { shortName } from '@/lib/utils'
 
 export type View = 'map' | 'users'
 
@@ -61,9 +63,12 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
       </nav>
       <div className={`mt-auto flex flex-col gap-4 ${collapsed ? 'items-center' : ''}`}>
         {!collapsed && profile && (
-          <div className="px-2 text-body">
-            <p className="truncate font-medium">{profile.full_name || 'Signed in'}</p>
-            <p className="truncate text-meta text-muted-foreground">{profile.role ? ROLE_LABELS[profile.role] : ''}</p>
+          <div className="flex items-center gap-2 px-2 text-body">
+            <Avatar name={profile.full_name || 'Signed in'} size="sm" />
+            <div className="min-w-0">
+              <p className="truncate font-medium">{shortName(profile.full_name) || 'Signed in'}</p>
+              <p className="truncate text-meta text-muted-foreground">{profile.role ? ROLE_LABELS[profile.role] : ''}</p>
+            </div>
           </div>
         )}
         <NavItem icon={LogOut} label="Sign out" collapsed={collapsed} onClick={signOut} />

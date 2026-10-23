@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Plus, Sparks } from 'iconoir-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Avatar } from '@/components/ui/avatar'
 import { Select } from '@/components/ui/select'
 import { AnswerView, Question } from '@/components/InvestigatePanel'
 import type { Answer } from '@/lib/agent'
@@ -121,6 +122,14 @@ export function Gallery() {
         <div className="flex flex-wrap items-start gap-4">
           <ConversationDemo />
           <ConversationDemo width={800} />
+        </div>
+      </Section>
+
+      <Section title="Avatar · sizes (initials until there is a photo)">
+        <div className="flex items-center gap-4">
+          <Measured><Avatar name="Juan Fernando Pérez Gómez" size="sm" /></Measured>
+          <Measured><Avatar name="Juan Fernando Pérez Gómez" /></Measured>
+          <Measured><Avatar name="Juan Fernando Pérez Gómez" size="lg" /></Measured>
         </div>
       </Section>
 
