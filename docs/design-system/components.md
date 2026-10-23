@@ -31,7 +31,7 @@ Textarea, Skeleton and Alert exist in Figma only (🟨 not in code).
 | **Side Panel** | 420 px (full screen on phones): person editor or invitation form | `UserPanel`, `InvitePanel` in `UsersAdmin.tsx` |
 | **Auth Card** | Centered card: logo, title, form (sign in; set up your account) | `AuthPage.tsx`, `SetPassword.tsx` |
 | **Filters Card**, **Summary Card**, **Sheet Tabs** | Map filters; count, legend, top localities; phone sheet tabs | `Dashboard.tsx` |
-| **Suggestion**, **Agent Panel** | Suggested question; the Investigate and Ask panel (docked on desktop: 543.5 px wide by default at 1,440 px; it is a share of the space next to the sidebar (39.5 %), so it **scales with the window**, and is **draggable on its right edge** (always kept between 360 and 800 px; remembered per browser, double-click resets), full height, square, 12 px padding, solid `ai` fill, flat border; the input has the `ai_gradient` border. Full width with a gradient ring on phones) | `InvestigatePanel.tsx` |
+| **Suggestion**, **Agent Panel** | Suggested question; the Investigate and Ask panel (docked on desktop: 543.5 px wide by default at 1,440 px; it is a share of the space next to the sidebar (39.5 %), so it **scales with the window**, and is **draggable on its right edge** (always kept between 424 and 800 px; remembered per browser, double-click resets), full height, square, 12 px padding, solid `ai` fill, flat border; the input has the `ai_gradient` border. Full width with a gradient ring on phones) | `InvestigatePanel.tsx` |
 
 Figma also keeps components from the earlier concept that no screen uses now (Stat Card, Incident Row, Nav Item rail, Panel Header, Message, Action Card, Map Marker, Incident Radius, Tab Bar, Drawer); prune when sure.
 
