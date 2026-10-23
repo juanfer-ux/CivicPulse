@@ -109,13 +109,10 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
           <span className="text-body text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
         </div>
         {profile && (
-          <div className="flex items-center gap-3 text-body">
-            <Avatar name={profile.full_name || 'Signed in'} />
-            <div className="min-w-0">
-              <p className="truncate">{shortName(profile.full_name) || 'Signed in'}</p>
-              <p className="truncate text-meta text-muted-foreground">{profile.role ? ROLE_LABELS[profile.role] : ''}</p>
-            </div>
-          </div>
+          <Avatar
+            name={profile.full_name || 'Signed in'}
+            title={`${shortName(profile.full_name) || 'Signed in'}${profile.role ? ` · ${ROLE_LABELS[profile.role]}` : ''}`}
+          />
         )}
       </header>
 
