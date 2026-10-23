@@ -139,12 +139,12 @@
   /* Names shadcn components expect, reusing the colors above. */
   --popover: var(--card);
   --primary: var(--foreground);
-  --primary-foreground: var(--background);
+  --primary-foreground: var(--sidebar); /* text on a light fill is the sidebar color */
   --secondary-foreground: var(--foreground);
   --muted: var(--secondary);
   --accent: var(--secondary);
   --accent-foreground: var(--foreground);
-  --destructive-foreground: var(--foreground);
+  --destructive-foreground: var(--sidebar);
   --border: var(--secondary);
   --ring: var(--closed);
   --inset: var(--sidebar);

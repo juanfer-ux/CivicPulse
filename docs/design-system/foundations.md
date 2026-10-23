@@ -6,7 +6,7 @@
 **Manrope** (Google Fonts), served from our own site by `@fontsource-variable/manrope`, so nothing is requested from Google ([decision 0019](../decisions/0019-manrope-font.md)). Variable font, weights 200 to 800. Font smoothing is the browser default (`antialiased` was removed on 2026-10-23, the owner's choice after comparing), with `text-rendering: optimizeLegibility` and a universal letter-spacing of 0.02em. Code: `--font-sans` and the base layer in `src/index.css`.
 
 ## 🔠 Text styles
-Each class sets size, line height and weight together, so a component never needs its own `font-medium`. Letter-spacing is **0** everywhere (fractional spacing blurs letters on non-Retina screens); only the sidebar wordmark keeps its wide spacing.
+Each class sets size, line height and weight together, so a component never needs its own `font-medium`. Letter-spacing is one universal **0.02em** on every element; only the sidebar wordmark and the small uppercase labels keep their own wider spacing. Text on a light fill (main button, default badge, dangerous button) uses the `sidebar` color.
 
 | Style | Desktop | Mobile | Weight | Use | Class |
 |---|---|---|---|---|---|
