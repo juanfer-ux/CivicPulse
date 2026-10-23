@@ -12,7 +12,7 @@
 @theme {
   --breakpoint-desk: 90rem; /* 1440 px */
 
-  /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is one universal 0.02em on every element (about 0.26 px at 13 px), small enough not to blur; Figma's fixed 0.2 and 0.3 px did blur letters on screens without a Retina display. Weights are ours: 550 headings and numbers, 450 actions and labels, 380 reading text (Manrope variable). */
+  /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is one universal 0.02em on every element (about 0.26 px at 13 px), small enough not to blur; Figma's fixed 0.2 and 0.3 px did blur letters on screens without a Retina display. Weights are ours (Manrope variable): 400 headings, numbers and button text, 360 labels and badges, 300 reading text. Label and button text have 0.022em. */
   --text-display: 32px;
   --text-display--font-weight: 400;
   --text-display--line-height: 32px;
@@ -31,6 +31,7 @@
   --text-label: var(--fs-label);
   --text-label--font-weight: 360;
   --text-label--line-height: var(--lh-label);
+  --text-label--letter-spacing: 0.022em;
   /* Button text (Figma: button and button-sm): same size as label, and one step down for small buttons. */
   --text-button: var(--fs-label);
   --text-button--font-weight: 400;
