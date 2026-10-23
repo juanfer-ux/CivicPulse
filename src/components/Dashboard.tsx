@@ -4,6 +4,7 @@ import { IncidentMap } from '@/components/IncidentMap'
 import { MediaGallery } from '@/components/MediaGallery'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { RoleBadge } from '@/components/ui/role-badge'
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,7 +19,6 @@ import {
   type Locality,
 } from '@/lib/incidents'
 import { useAuth } from '@/lib/auth'
-import { ROLE_LABELS } from '@/lib/users'
 import { shortName } from '@/lib/utils'
 
 const PERIODS = [
@@ -109,10 +109,10 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
           <span className="text-body text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
         </div>
         {profile && (
-          <Avatar
-            name={profile.full_name || 'Signed in'}
-            title={`${shortName(profile.full_name) || 'Signed in'}${profile.role ? ` · ${ROLE_LABELS[profile.role]}` : ''}`}
-          />
+          <div className="flex items-center gap-3">
+            <RoleBadge role={profile.role} />
+            <Avatar name={profile.full_name || 'Signed in'} title={shortName(profile.full_name) || 'Signed in'} />
+          </div>
         )}
       </header>
 

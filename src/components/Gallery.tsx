@@ -3,6 +3,7 @@ import { Plus, Sparks } from 'iconoir-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Avatar } from '@/components/ui/avatar'
+import { RoleBadge } from '@/components/ui/role-badge'
 import { Select } from '@/components/ui/select'
 import { AnswerView, Question } from '@/components/InvestigatePanel'
 import type { Answer } from '@/lib/agent'
@@ -130,6 +131,15 @@ export function Gallery() {
           <Measured><Avatar name="Juan Fernando Pérez Gómez" size="sm" /></Measured>
           <Measured><Avatar name="Juan Fernando Pérez Gómez" /></Measured>
           <Measured><Avatar name="Juan Fernando Pérez Gómez" size="lg" /></Measured>
+        </div>
+      </Section>
+
+      <Section title="Role Badge">
+        <div className="flex flex-wrap items-center gap-4">
+          <RoleBadge role="super_admin" />
+          <RoleBadge role="locality_admin" />
+          <RoleBadge role="specialist_operator" />
+          <RoleBadge role={null} />
         </div>
       </Section>
 
