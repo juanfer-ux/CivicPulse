@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Plus, Sparks } from 'iconoir-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { AnswerView } from '@/components/InvestigatePanel'
+import { AnswerView, Question } from '@/components/InvestigatePanel'
 import type { Answer } from '@/lib/agent'
 
 const VARIANTS = ['default', 'secondary', 'destructive', 'outline', 'ghost', 'link'] as const
@@ -56,12 +56,12 @@ const SAMPLE: Answer = {
 /** Static copy of the docked agent panel with one conversation, so the look can be checked without signing in. */
 function ConversationDemo() {
   return (
-    <div className="flex h-[640px] w-[456px] max-w-full flex-col gap-3 border bg-ai p-3 text-body">
+    <div className="flex h-[640px] w-[456px] max-w-full flex-col gap-8 border bg-ai p-3 text-body">
       <div className="flex items-center gap-2 text-label">
         <Sparks className="size-4" aria-hidden /> Investigate and Ask
       </div>
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
-        <p className="self-end rounded-lg bg-secondary px-3 py-2">Which localities have the most parking obstruction incidents?</p>
+      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+        <Question text="Which localities have the most parking obstruction incidents?" />
         <AnswerView result={SAMPLE} onClear={() => {}} />
       </div>
       <div className="flex items-center gap-2">

@@ -42,7 +42,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
   }
 
   return (
-    <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
+    <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-8 max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <Sparks className="size-4" aria-hidden /> Investigate and Ask
@@ -61,8 +61,8 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
             </div>
           )}
           {turns.map((t, i) => (
-            <div key={i} className="flex flex-col gap-2">
-              <p className="self-end rounded-lg bg-secondary px-3 py-2">{t.question}</p>
+            <div key={i} className="flex flex-col gap-4">
+              <Question text={t.question} />
               {!t.result && !t.error && <p className="text-muted-foreground">Querying…</p>}
               {t.error && <p className="text-incident">{t.error}</p>}
               {t.result && <AnswerView result={t.result} onClear={() => onHighlight([])} />}
@@ -83,17 +83,22 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
   )
 }
 
+/** The person's question (Figma Message, role user). */
+export function Question({ text }: { text: string }) {
+  return <p className="self-end rounded-lg bg-foreground/10 px-3 py-2">{text}</p>
+}
+
 /** Thumbs under an answer (Figma Message, role assistant). For now they only mark the choice on screen. */
 function Feedback() {
   const [vote, setVote] = useState<'up' | 'down' | null>(null)
   const pick = (v: 'up' | 'down') => setVote((cur) => (cur === v ? null : v))
   return (
-    <div className="flex gap-1">
-      <Button size="icon" variant="ghost" className="size-7" aria-label="Helpful" aria-pressed={vote === 'up'} onClick={() => pick('up')}>
-        <ThumbsUp className={`size-4 ${vote === 'up' ? 'text-foreground' : 'text-muted-foreground'}`} />
+    <div className="flex">
+      <Button size="icon" variant="ghost" className="size-5 max-desk:size-8" aria-label="Helpful" aria-pressed={vote === 'up'} onClick={() => pick('up')}>
+        <ThumbsUp className={`size-3 ${vote === 'up' ? 'text-foreground' : 'text-muted-foreground'}`} />
       </Button>
-      <Button size="icon" variant="ghost" className="size-7" aria-label="Not helpful" aria-pressed={vote === 'down'} onClick={() => pick('down')}>
-        <ThumbsDown className={`size-4 ${vote === 'down' ? 'text-foreground' : 'text-muted-foreground'}`} />
+      <Button size="icon" variant="ghost" className="size-5 max-desk:size-8" aria-label="Not helpful" aria-pressed={vote === 'down'} onClick={() => pick('down')}>
+        <ThumbsDown className={`size-3 ${vote === 'down' ? 'text-foreground' : 'text-muted-foreground'}`} />
       </Button>
     </div>
   )
@@ -102,8 +107,8 @@ function Feedback() {
 export function AnswerView({ result, onClear }: { result: Answer; onClear: () => void }) {
   const max = Math.max(1, ...result.bars.map((b) => b.value))
   return (
-    <div className="flex flex-col gap-2 rounded-lg border bg-card/60 p-3">
-      <p>{result.text}</p>
+    <div className="flex flex-col gap-3">
+      <p className="text-muted-foreground">{result.text}</p>
       {result.bars.length > 0 && (
         <ul className="flex flex-col gap-1">
           {result.bars.map((b) => (
