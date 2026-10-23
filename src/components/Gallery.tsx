@@ -6,6 +6,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { RoleBadge } from '@/components/ui/role-badge'
 import { Select } from '@/components/ui/select'
 import { AnswerView, Question } from '@/components/InvestigatePanel'
+import { SmoothingCompare } from '@/components/SmoothingCompare'
 import type { Answer } from '@/lib/agent'
 
 const VARIANTS = ['default', 'secondary', 'destructive', 'outline', 'ghost', 'link'] as const
@@ -101,6 +102,10 @@ export function Gallery() {
           Real components, not copies. Under 1,440 px wide you see the phone sizes.
         </p>
       </header>
+
+      <Section title="Text smoothing · off, on, on with a little more (temporary)">
+        <SmoothingCompare />
+      </Section>
 
       <Section title="Button · variants and sizes">
         {VARIANTS.map((variant) => (
