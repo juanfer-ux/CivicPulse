@@ -119,32 +119,47 @@
   --radius: 0.5rem;
   --map-header-h: 70px; /* Map header height (Figma Map Header); the panel, map and filters start below it */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
-  /* The whole palette is these 13 colors; every other token below points at one of them. */
-  /* Neutrals */
-  --background: #18181B;
-  --card: #1C1C1E;
-  --sidebar: #0F0F10;
-  --secondary: #313135;
-  --input: #404040;
-  --closed: #7A7A7A;
-  --muted-foreground: #94949A;
-  --foreground: #C2C2C7;
+  /* The whole palette is these 13 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
+  /* Neutrals, darkest to lightest */
+  --neutral-950: #0F0F10;
+  --neutral-900: #111113;
+  --neutral-850: #18181B;
+  --neutral-800: #1C1C1E;
+  --neutral-700: #313135;
+  --neutral-600: #404040;
+  --neutral-500: #7A7A7A;
+  --neutral-400: #94949A;
+  --neutral-300: #C2C2C7;
   /* Colored */
-  --ai: #111113;
-  --ai-border: #6D74E2;
-  --destructive: #EA6C6E; /* dangerous buttons and badges; text on it needs a dark color, see accessibility.md */
-  --warning: #D0AC6B;
-  --incident: #E58C7D; /* incidents, invalid fields and ALL error text */
+  --indigo-400: #6D74E2;
+  --red-400: #EA6C6E;
+  --amber-400: #D0AC6B;
+  --coral-400: #E58C7D;
+
+  /* Usage names the components use, each pointing at one of the 13 colors. */
+  --background: var(--neutral-850);
+  --card: var(--neutral-800);
+  --sidebar: var(--neutral-950);
+  --secondary: var(--neutral-700);
+  --input: var(--neutral-600);
+  --closed: var(--neutral-500);
+  --muted-foreground: var(--neutral-400);
+  --foreground: var(--neutral-300);
+  --ai: var(--neutral-900);
+  --ai-border: var(--indigo-400);
+  --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
+  --warning: var(--amber-400);
+  --incident: var(--coral-400); /* incidents, invalid fields and ALL error text */
 
   /* Names shadcn components expect, reusing the colors above. */
   --popover: var(--card);
   --primary: var(--foreground);
-  --primary-foreground: var(--background);
+  --primary-foreground: var(--sidebar); /* text on a light fill is the sidebar color */
   --secondary-foreground: var(--foreground);
   --muted: var(--secondary);
   --accent: var(--secondary);
   --accent-foreground: var(--foreground);
-  --destructive-foreground: var(--foreground);
+  --destructive-foreground: var(--sidebar);
   --border: var(--secondary);
   --ring: var(--closed);
   --inset: var(--sidebar);
