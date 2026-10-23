@@ -22,13 +22,13 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 
 | Pair | Ratio | Use |
 |---|---|---|
-| `foreground` `#DCDCDC` on `background` `#18181B` | 12.9 | Normal text |
+| `foreground` `#C2C2C7` on `background` `#18181B` | 10.0 | Normal text |
 | `foreground` on `card` `#1C1C1E` | 12.4 | Text in cards and inputs |
-| `muted-foreground` `#A5A5A5` on page / on card | 7.2 / 6.9 | Supporting text |
-| `incident` `#FFA08F` on card | 8.7 | **All error text** |
-| `background` on `primary` `#DCDCDC` | 12.9 | Text on the main button |
-| `foreground` `#DCDCDC` on `destructive` `#EA6C6E` | **2.2** ❌ | Dangerous buttons and badges: fails 4.5. Dark text (`background`) on it is 5.8. |
-| `warning` `#EDC57F` on page | 10.9 | Needs-review dots |
+| `muted-foreground` `#94949A` on page / on card | 5.9 / 5.6 | Supporting text |
+| `incident` `#E58C7D` on card | 6.8 | **All error text** |
+| `background` on `primary` `#C2C2C7` | 10.0 | Text on the main button |
+| `foreground` `#C2C2C7` on `destructive` `#EA6C6E` | **1.7** ❌ | Dangerous buttons and badges: fails 4.5. Dark text (`background`) on it is 5.8. |
+| `warning` `#D0AC6B` on page | 8.3 | Needs-review dots |
 | `closed` / `ring` `#7A7A7A` on page / on card | 4.1 / 4.0 | Closed dots, focus ring: **graphics only, never text** |
 | `destructive` `#EA6C6E` as text on card | 5.6 | OK as text, but error text stays `incident` |
 
