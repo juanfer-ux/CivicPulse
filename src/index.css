@@ -127,14 +127,14 @@
   --secondary: #313135;
   --input: #404040;
   --closed: #7A7A7A;
-  --muted-foreground: #A5A5A5;
-  --foreground: #DCDCDC;
+  --muted-foreground: #94949A;
+  --foreground: #C2C2C7;
   /* Colored */
   --ai: #111113;
   --ai-border: #6D74E2;
   --destructive: #EA6C6E; /* dangerous buttons and badges; text on it needs a dark color, see accessibility.md */
-  --warning: #EDC57F;
-  --incident: #FFA08F; /* incidents, invalid fields and ALL error text */
+  --warning: #D0AC6B;
+  --incident: #E58C7D; /* incidents, invalid fields and ALL error text */
 
   /* Names shadcn components expect, reusing the colors above. */
   --popover: var(--card);

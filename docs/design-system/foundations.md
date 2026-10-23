@@ -36,13 +36,13 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 4 | `#313135` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
 | 5 | `#404040` | `input` | Borders of inputs and dropdowns |
 | 6 | `#7A7A7A` | `closed` (`ring`) | Closed incidents, focus ring |
-| 7 | `#A5A5A5` | `muted-foreground` | Supporting text, table headers, placeholders |
-| 8 | `#DCDCDC` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`, `destructive-foreground`) | Normal text, main button, "white" |
+| 7 | `#94949A` | `muted-foreground` | Supporting text, table headers, placeholders |
+| 8 | `#C2C2C7` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`, `destructive-foreground`) | Normal text, main button, "white" |
 | 9 | `#111113` | `ai` | Agent surfaces |
 | 10 | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
 | 11 | `#EA6C6E` | `destructive` | Fill of dangerous buttons and badges |
-| 12 | `#EDC57F` | `warning` | Needs review |
-| 13 | `#FFA08F` | `incident` | Validated / in progress, invalid fields, **all error text** |
+| 12 | `#D0AC6B` | `warning` | Needs review |
+| 13 | `#E58C7D` | `incident` | Validated / in progress, invalid fields, **all error text** |
 
 - Error text is always `text-incident` (contrast 8.7:1); `text-destructive` on dark is 5.6:1.
 - Code that cannot use a CSS variable (map paint settings) reads the token with `token('--name')` from `src/lib/tokens.ts`. No color literals in `.ts` / `.tsx`.

@@ -6,7 +6,6 @@ import { Avatar } from '@/components/ui/avatar'
 import { RoleBadge } from '@/components/ui/role-badge'
 import { Select } from '@/components/ui/select'
 import { AnswerView, Question } from '@/components/InvestigatePanel'
-import { TextColorCompare } from '@/components/TextColorCompare'
 import type { Answer } from '@/lib/agent'
 
 const VARIANTS = ['default', 'secondary', 'destructive', 'outline', 'ghost', 'link'] as const
@@ -102,10 +101,6 @@ export function Gallery() {
           Real components, not copies. Under 1,440 px wide you see the phone sizes.
         </p>
       </header>
-
-      <Section title="Text colors · today and two softer sets, smoothing off (temporary)">
-        <TextColorCompare />
-      </Section>
 
       <Section title="Button · variants and sizes">
         {VARIANTS.map((variant) => (
