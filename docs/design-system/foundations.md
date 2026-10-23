@@ -10,20 +10,20 @@ Each class sets size, line height and weight together, so a component never need
 
 | Style | Desktop | Mobile | Weight | Use | Class |
 |---|---|---|---|---|---|
-| display | 32 / 32 | 32 / 32 | 500 | Big numbers | `text-display` |
-| stat | 24 / 32 | 24 / 32 | 500 | Counts in stat cards | `text-stat` |
-| heading | 20 / 28 | 20 / 28 | 500 | Page title | `text-heading` |
-| title | 18 / 28 | 18 / 28 | 500 | Panel and section titles | `text-title` |
-| subtitle | 16 / 24 | 16 / 24 | 410 | Card titles | `text-subtitle` |
-| label | 14 / 20 | **16 / 24** | 410 | Buttons, field names, menu items, tabs | `text-label` |
-| button | 14 / 20 | **16 / 24** | 500 | Text in Button (default, lg, icon-lg) | `text-button` |
-| button-sm | 13 / 20 | **16 / 24** | 500 | Text in small Button | `text-button-sm` |
-| body | 13 / 22 | **16 / 24** | 360 | Paragraphs, inputs, table cells | `text-body` |
-| meta | 12 / 16 | **14 / 20** | 360 | Secondary info | `text-meta` |
-| caption | 11 / 16 | **12 / 16** | 410 | Small tags and badges | `text-caption` |
+| display | 32 / 32 | 32 / 32 | 420 | Big numbers | `text-display` |
+| stat | 24 / 32 | 24 / 32 | 420 | Counts in stat cards | `text-stat` |
+| heading | 20 / 28 | 20 / 28 | 420 | Page title | `text-heading` |
+| title | 18 / 28 | 18 / 28 | 420 | Panel and section titles | `text-title` |
+| subtitle | 16 / 24 | 16 / 24 | 380 | Card titles | `text-subtitle` |
+| label | 14 / 20 | **16 / 24** | 380 | Buttons, field names, menu items, tabs | `text-label` |
+| button | 14 / 20 | **16 / 24** | 420 | Text in Button (default, lg, icon-lg) | `text-button` |
+| button-sm | 13 / 20 | **16 / 24** | 420 | Text in small Button | `text-button-sm` |
+| body | 13 / 22 | **16 / 24** | 320 | Paragraphs, inputs, table cells | `text-body` |
+| meta | 12 / 16 | **14 / 20** | 320 | Secondary info | `text-meta` |
+| caption | 11 / 16 | **12 / 16** | 380 | Small tags and badges | `text-caption` |
 
 - **Desktop = 1,440 px and wider; Mobile = anything narrower** (the `desk` breakpoint). The sizes come from Figma's Device collection and switch through CSS variables in `src/index.css` (`--fs-body`, `--lh-body`…); class names do not change.
-- **Weights** (Manrope is a variable font, and sits a little below the usual numbers because it glows on dark backgrounds): 500 for headings and numbers and button text; **410 for anything you act on or that labels something** (buttons, links, field names, menu items, badges, table headers, names in a table); 360 for reading text, typed text and placeholders. (Chosen by the owner, 20 / 40 / 50 below the earlier 380 / 450 / 550: a small step that mimics a touch of font smoothing, since smoothing itself has only two settings.)
+- **Weights** (Manrope is a variable font, so any number from 200 to 800 works; the owner chose these on 2026-10-23 by looking at the result): **Regular 320** for reading text, typed text, placeholders and secondary text; **Medium 380** for anything that labels something (field names, menu items, subtitles, badges, captions); **SemiBold 420** for headings, numbers, titles and button text.
 - Figma also has `meta-medium` (12 / 16, 500) for table headers; the code uses `text-meta` plus `font-medium`.
 - ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes; without that, the class merger dropped `text-label` from colored buttons (test in `utils.test.ts`).
 
