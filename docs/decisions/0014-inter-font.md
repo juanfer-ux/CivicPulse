@@ -1,5 +1,5 @@
 # 0014: Inter from Google Fonts, served from our own site
-**Status:** ✅ Accepted   **Date:** 2026-10-21   Replaces [0012](0012-dm-sans-self-hosted.md).
+**Status:** ⚪ Replaced by [0019](0019-manrope-font.md) (2026-10-23)   **Date:** 2026-10-21   Replaces [0012](0012-dm-sans-self-hosted.md).
 
 ## Context
 DM Sans was the first font after leaving Gilroy. The owner did not like it for a dashboard. Inter was tried live, the weights and text sharpness were checked with it, and the owner kept it.

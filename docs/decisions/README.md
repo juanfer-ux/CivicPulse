@@ -19,11 +19,12 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0011](0011-invite-users-by-edge-function.md) | Users are invited by an Edge Function; the admin key stays on the server | ✅ Accepted |
 | [0012](0012-dm-sans-self-hosted.md) | DM Sans from Google Fonts, served from our own site | ⚪ Replaced by 0014 |
 | [0013](0013-figma-is-the-source-of-truth.md) | Figma is the source of truth for the design | ✅ Accepted |
-| [0014](0014-inter-font.md) | Inter from Google Fonts, served from our own site | ✅ Accepted |
+| [0014](0014-inter-font.md) | Inter from Google Fonts, served from our own site | ⚪ Replaced by 0019 |
 | [0015](0015-thirteen-color-palette.md) | The palette is 13 colors | ✅ Accepted |
 | [0016](0016-auth-stays-simple-on-free-plan.md) | Authentication stays simple on the Free plan | ✅ Accepted |
 | [0017](0017-iconoir-icons.md) | Icons are Iconoir | ✅ Accepted |
 | [0018](0018-base-ui-select.md) | Select uses Base UI, not the browser list | ✅ Accepted |
+| [0019](0019-manrope-font.md) | The product font is Manrope | ✅ Accepted |
 
 ## ✍️ Template
 ```

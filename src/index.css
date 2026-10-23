@@ -5,8 +5,8 @@
 /* Civic Pulse is dark-only: <html class="dark"> is set in index.html. */
 @custom-variant dark (&:is(.dark *));
 
-/* Inter (Google Fonts, open licence) trial, served from our own site by the fontsource package. Variable font with the optical-size axis: the browser picks the cut for each size. */
-@import "@fontsource-variable/inter/opsz.css";
+/* Manrope (Google Fonts, open licence), served from our own site by the fontsource package. Variable font (weights 200 to 800). */
+@import "@fontsource-variable/manrope";
 
 /* The desktop layout (sidebar, floating panels) starts here; narrower windows get the mobile layout. */
 @theme {
@@ -75,7 +75,7 @@
 }
 
 @theme inline {
-  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --font-mono: 'Geist Mono', ui-monospace, monospace;
   --radius-xs: 2px;

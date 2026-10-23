@@ -38,6 +38,6 @@ Figma pages: Cover, Foundations, Components, Screens, Icons, Archive · earlier 
 |---|---|
 | 🟥 | **Code Connect** is not available: Figma allows it only on Organization or Enterprise plans. The "Code" columns above are the mapping until then. |
 | 🟨 | Table Row columns share the width equally in Figma; the code table lays columns out automatically. |
-| 🟥 | Figma's 14 text styles still use the font Gilroy, which Figma does not have; they should use Inter. Cover and a few old frames also still use Gilroy text. |
+| 🟥 | Cover and a few old frames still use Gilroy text, a font Figma does not have; they should use Manrope. |
 | 🟨 | Earlier-concept components remain in Figma (see components.md). |
 | ⬜ | Textarea in code (the agent composer is an Input today). |
