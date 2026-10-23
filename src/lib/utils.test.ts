@@ -5,6 +5,9 @@ describe('cn', () => {
   it('keeps a text style when a text color follows it', () => {
     expect(cn('text-label', 'text-primary-foreground')).toBe('text-label text-primary-foreground')
   })
+  it('lets the small button text replace the default button text', () => {
+    expect(cn('text-button', 'text-button-sm')).toBe('text-button-sm')
+  })
   it('still lets a later text style replace an earlier one', () => {
     expect(cn('text-body', 'text-label')).toBe('text-label')
   })
