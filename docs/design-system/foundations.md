@@ -27,8 +27,8 @@ Each class sets size, line height and weight together, so a component never need
 - Figma also has `meta-medium` (12 / 16, 500) for table headers; the code uses `text-meta` plus `font-medium`.
 - ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes; without that, the class merger dropped `text-label` from colored buttons (test in `utils.test.ts`).
 
-## 🎨 Colors (dark theme): 13 in total
-Every other token name (`primary`, `muted`, `accent`, `border`…) is only an alias of one of these 13, because shadcn components expect those names ([decision 0015](../decisions/0015-thirteen-color-palette.md)). Add a color only if none of these can do the job.
+## 🎨 Colors (dark theme): 14 in total
+Every other token name (`primary`, `muted`, `accent`, `border`…) is only an alias of one of these 14, because shadcn components expect those names ([decision 0015](../decisions/0015-thirteen-color-palette.md)). Add a color only if none of these can do the job.
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
 |---|---|---|---|---|
@@ -40,11 +40,12 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 6 | `neutral-600` | `#404040` | `input` | Borders of inputs and dropdowns |
 | 7 | `neutral-500` | `#7A7A7A` | `closed` (`ring`) | Closed incidents, focus ring |
 | 8 | `neutral-400` | `#94949A` | `muted-foreground` | Supporting text, table headers, placeholders |
-| 9 | `neutral-300` | `#C2C2C7` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
-| 10 | `indigo-400` | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
-| 11 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
-| 12 | `amber-400` | `#D0AC6B` | `warning` | Needs review |
-| 13 | `coral-400` | `#E58C7D` | `incident` | Validated / in progress, invalid fields, **all error text** |
+| 9 | `neutral-300` | `#ABABB0` | (none yet) | Between secondary and main text; not used by a component yet |
+| 10 | `neutral-200` | `#C2C2C7` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
+| 11 | `indigo-400` | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
+| 12 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
+| 13 | `amber-400` | `#D0AC6B` | `warning` | Needs review |
+| 14 | `coral-400` | `#E58C7D` | `incident` | Validated / in progress, invalid fields, **all error text** |
 
 Names say what a color is (family and lightness: lower number = darker for neutrals), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 13.
 
@@ -52,7 +53,7 @@ Names say what a color is (family and lightness: lower number = darker for neutr
 - Code that cannot use a CSS variable (map paint settings) reads the token with `token('--name')` from `src/lib/tokens.ts`. No color literals in `.ts` / `.tsx`.
 - Status dots: 🟧 `warning` needs review, 🩷 `incident` validated or in progress, ⬜ `closed`. See `GROUPS` in `src/lib/incidents.ts`.
 - **Gradient** `--ai-gradient` (Figma paint style `ai_gradient`): `ai-border`, `incident`, `warning`, top to bottom at 10 %, 64 %, 105 %. Built from three of the 13, so not a 14th color. Used on the border of the Agent Panel (`gradient-border` utility in `src/index.css`).
-- In Figma the **Colors** collection holds exactly these 13 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 13`). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
+- In Figma the **Colors** collection holds exactly these 14 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 13`). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
 
 ## 🔣 Icons
 Iconoir (`iconoir-react`, [decision 0017](../decisions/0017-iconoir-icons.md)): the line is always 1.5 px, at any icon size (`vector-effect: non-scaling-stroke` in `index.css`), so small icons stay crisp. Sidebar items 20 px (collapsed too), 16 px elsewhere. Colour follows the text (`currentColor`).
