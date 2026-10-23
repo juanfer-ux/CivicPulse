@@ -97,8 +97,8 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         onSelect={select}
       />
 
-      {/* Desktop only: an 80 px header over the map area (to the right of the agent panel). Test content. */}
-      <header className="absolute top-0 right-0 z-10 hidden h-20 items-center gap-3 border-b bg-sidebar px-6 desk:left-(--agent-w) desk:flex">
+      {/* Map header (desktop only): 80 px, across the whole width next to the sidebar, above the agent panel and the map. Test content. */}
+      <header data-slot="map-header" className="absolute inset-x-0 top-0 z-10 hidden h-20 items-center gap-3 border-b bg-sidebar px-6 desk:flex">
         <h1 className="text-heading">Map</h1>
         <span className="text-body text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
       </header>
@@ -214,7 +214,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
       </div>
 
       <div
-        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:inset-y-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border-r desk:bg-ai desk:p-3`}
+        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-20 desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border-r desk:bg-ai desk:p-3`}
       >
         {children}
         {selected && (
