@@ -16,6 +16,8 @@ Each class sets size, line height and weight together, so a component never need
 | title | 18 / 28 | 18 / 28 | 550 | Panel and section titles | `text-title` |
 | subtitle | 16 / 24 | 16 / 24 | 450 | Card titles | `text-subtitle` |
 | label | 14 / 20 | **16 / 24** | 450 | Buttons, field names, menu items, tabs | `text-label` |
+| button | 14 / 20 | **16 / 24** | 550 | Text in Button (default, lg, icon-lg) | `text-button` |
+| button-sm | 13 / 20 | **16 / 24** | 550 | Text in small Button | `text-button-sm` |
 | body | 13 / 22 | **16 / 24** | 380 | Paragraphs, inputs, table cells | `text-body` |
 | meta | 12 / 16 | **14 / 20** | 380 | Secondary info | `text-meta` |
 | caption | 11 / 16 | **12 / 16** | 450 | Small tags and badges | `text-caption` |

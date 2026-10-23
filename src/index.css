@@ -31,6 +31,13 @@
   --text-label: var(--fs-label);
   --text-label--font-weight: 450;
   --text-label--line-height: var(--lh-label);
+  /* Button text (Figma: button and button-sm): same size as label, and one step down for small buttons. */
+  --text-button: var(--fs-label);
+  --text-button--font-weight: 550;
+  --text-button--line-height: var(--lh-label);
+  --text-button-sm: var(--fs-body);
+  --text-button-sm--font-weight: 550;
+  --text-button-sm--line-height: var(--lh-label);
   --text-body: var(--fs-body);
   --text-body--font-weight: 380;
   --text-body--line-height: var(--lh-body);
