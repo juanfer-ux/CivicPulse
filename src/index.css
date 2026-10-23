@@ -135,8 +135,8 @@
   --neutral-700: #313135;
   --neutral-600: #404040;
   --neutral-500: #7A7A7A;
-  --neutral-400: #94949A;
-  --neutral-300: #ABABB0; /* between 400 and 200; not used by a component yet */
+  --neutral-400: #94949A; /* not used by a component right now */
+  --neutral-300: #ABABB0; /* secondary text */
   --neutral-200: #C2C2C7;
   /* Colored */
   --indigo-400: #6D74E2;
@@ -151,7 +151,7 @@
   --secondary: var(--neutral-700);
   --input: var(--neutral-600);
   --closed: var(--neutral-500);
-  --muted-foreground: var(--neutral-400);
+  --muted-foreground: var(--neutral-300);
   --foreground: var(--neutral-200);
   --ai: var(--neutral-900);
   --ai-border: var(--indigo-400);

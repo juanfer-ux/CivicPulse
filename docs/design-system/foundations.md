@@ -39,8 +39,8 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 5 | `neutral-700` | `#313135` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
 | 6 | `neutral-600` | `#404040` | `input` | Borders of inputs and dropdowns |
 | 7 | `neutral-500` | `#7A7A7A` | `closed` (`ring`) | Closed incidents, focus ring |
-| 8 | `neutral-400` | `#94949A` | `muted-foreground` | Supporting text, table headers, placeholders |
-| 9 | `neutral-300` | `#ABABB0` | (none yet) | Between secondary and main text; not used by a component yet |
+| 8 | `neutral-400` | `#94949A` | (none now) | Not used by a component right now (it was secondary text until 2026-10-23) |
+| 9 | `neutral-300` | `#ABABB0` | `muted-foreground` | Supporting text, table headers, placeholders |
 | 10 | `neutral-200` | `#C2C2C7` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
 | 11 | `indigo-400` | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
 | 12 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |

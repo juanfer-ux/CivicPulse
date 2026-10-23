@@ -24,7 +24,7 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 |---|---|---|
 | `foreground` `#C2C2C7` on `background` `#18181B` | 10.0 | Normal text |
 | `foreground` on `card` `#1C1C1E` | 12.4 | Text in cards and inputs |
-| `muted-foreground` `#94949A` on page / on card | 5.9 / 5.6 | Supporting text |
+| `muted-foreground` `#ABABB0` on page / on card | 7.7 / 7.4 | Supporting text |
 | `incident` `#E58C7D` on card | 6.8 | **All error text** |
 | `sidebar` on `primary` `#C2C2C7` | 10.8 | Text on the main button (rule: text on a light fill uses the `sidebar` color) |
 | `sidebar` on `destructive` `#EE8688` | 7.7 | Dangerous buttons and badges now use dark `sidebar` text (light text on it was 1.7 and failed 4.5) |
