@@ -35,9 +35,11 @@
   --text-button: var(--fs-label);
   --text-button--font-weight: 400;
   --text-button--line-height: var(--lh-label);
+  --text-button--letter-spacing: 0.024em;
   --text-button-sm: var(--fs-body);
   --text-button-sm--font-weight: 400;
   --text-button-sm--line-height: var(--lh-label);
+  --text-button-sm--letter-spacing: 0.022em;
   --text-body: var(--fs-body);
   --text-body--font-weight: 300;
   --text-body--line-height: var(--lh-body);
