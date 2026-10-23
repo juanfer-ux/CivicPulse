@@ -112,7 +112,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
           view={view}
           onView={onView}
           toggleItem={
-            <Button variant="ghost" className={`gap-2 ${flush && !collapsed ? 'px-0' : 'px-2'} ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'} onClick={toggle}>
+            <Button variant="ghost" className={`gap-2 px-2 ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'} onClick={toggle}>
               {collapsed ? <SidebarExpand className="size-5 shrink-0" /> : <SidebarCollapse className="size-5 shrink-0" />}
               {!collapsed && 'Collapse'}
             </Button>
