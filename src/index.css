@@ -113,6 +113,7 @@
 
 :root {
   --radius: 0.5rem;
+  --map-header-h: 70px; /* Map header height (Figma Map Header); the panel, map and filters start below it */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
   /* The whole palette is these 13 colors; every other token below points at one of them. */
   /* Neutrals */
