@@ -42,13 +42,13 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 8 | `neutral-400` | `#94949A` | `muted-foreground` | Supporting text, table headers, placeholders |
 | 9 | `neutral-300` | `#C2C2C7` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
 | 10 | `indigo-400` | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
-| 11 | `red-400` | `#EA6C6E` | `destructive` | Fill of dangerous buttons and badges |
+| 11 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
 | 12 | `amber-400` | `#D0AC6B` | `warning` | Needs review |
 | 13 | `coral-400` | `#E58C7D` | `incident` | Validated / in progress, invalid fields, **all error text** |
 
 Names say what a color is (family and lightness: lower number = darker for neutrals), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 13.
 
-- Error text is always `text-incident` (contrast 6.8:1); `text-destructive` on dark is 5.6:1.
+- Error text is always `text-incident` (contrast 6.8:1); `text-destructive` on dark is 6.8:1.
 - Code that cannot use a CSS variable (map paint settings) reads the token with `token('--name')` from `src/lib/tokens.ts`. No color literals in `.ts` / `.tsx`.
 - Status dots: 🟧 `warning` needs review, 🩷 `incident` validated or in progress, ⬜ `closed`. See `GROUPS` in `src/lib/incidents.ts`.
 - **Gradient** `--ai-gradient` (Figma paint style `ai_gradient`): `ai-border`, `incident`, `warning`, top to bottom at 10 %, 64 %, 105 %. Built from three of the 13, so not a 14th color. Used on the border of the Agent Panel (`gradient-border` utility in `src/index.css`).

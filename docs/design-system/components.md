@@ -11,7 +11,7 @@
 | **Badge** | default, secondary, destructive, outline · default (20 px, caption), lg (30 px, meta) | n/a | `badge.tsx` |
 | **Input** | control height, bg `card`, border `input`, radius sm, body text, px 12 | default, focus, filled, disabled, invalid | `input.tsx` |
 | **Card** | bg `card`, border, radius lg, padding 16, gap 12; subtitle title, body description | n/a | `card.tsx` |
-| **Separator** | horizontal, vertical | n/a | `separator.tsx` |
+| **Separator** | horizontal, vertical; a 0.5 px line (`--border-width`) in `neutral-700` (`border`) | n/a | `separator.tsx` |
 
 Textarea, Skeleton and Alert exist in Figma only (🟨 not in code).
 

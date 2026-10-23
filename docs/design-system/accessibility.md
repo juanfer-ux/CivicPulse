@@ -27,10 +27,10 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 | `muted-foreground` `#94949A` on page / on card | 5.9 / 5.6 | Supporting text |
 | `incident` `#E58C7D` on card | 6.8 | **All error text** |
 | `sidebar` on `primary` `#C2C2C7` | 10.8 | Text on the main button (rule: text on a light fill uses the `sidebar` color) |
-| `sidebar` on `destructive` `#EA6C6E` | 6.3 | Dangerous buttons and badges now use dark `sidebar` text (light text on it was 1.7 and failed 4.5) |
+| `sidebar` on `destructive` `#EE8688` | 7.7 | Dangerous buttons and badges now use dark `sidebar` text (light text on it was 1.7 and failed 4.5) |
 | `warning` `#D0AC6B` on page | 8.3 | Needs-review dots |
 | `closed` / `ring` `#7A7A7A` on page / on card | 4.1 / 4.0 | Closed dots, focus ring: **graphics only, never text** |
-| `destructive` `#EA6C6E` as text on card | 5.6 | OK as text, but error text stays `incident` |
+| `destructive` `#EE8688` as text on card | 6.8 | OK as text, but error text stays `incident` |
 
 ## 🟥 Not audited yet
 | Area | What is missing |
