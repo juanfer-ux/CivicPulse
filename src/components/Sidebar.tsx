@@ -19,7 +19,7 @@ const read = () => {
 
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-1'}`}>
+    <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-[7.13px]'}`}>
       <img src={mark} alt="" width={38} height={38} className="shrink-0" />
       {!collapsed && <img src={wordmark} alt="Civic Pulse" width={140} height={11} className="shrink-0" />}
     </div>
@@ -40,8 +40,9 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
   const { profile, can, signOut } = useAuth()
   return (
     <div className="flex h-full flex-col gap-8 px-3 py-4">
-      <div className={collapsed ? 'self-center' : ''}>
+      <div className={`flex flex-col gap-4 ${collapsed ? 'self-center' : ''}`}>
         <Brand collapsed={collapsed} />
+        <hr className="border-t" />
       </div>
       {toggleItem}
       <nav className={`flex flex-col gap-3 ${collapsed ? 'items-center' : ''}`}>
