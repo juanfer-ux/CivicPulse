@@ -19,7 +19,7 @@ const read = () => {
 
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-1'}`}>
+    <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-[7.13px]'}`}>
       <img src={mark} alt="" width={38} height={38} className="shrink-0" />
       {!collapsed && <img src={wordmark} alt="Civic Pulse" width={140} height={11} className="shrink-0" />}
     </div>
@@ -40,8 +40,9 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
   const { profile, can, signOut } = useAuth()
   return (
     <div className="flex h-full flex-col gap-8 px-3 py-4">
-      <div className={collapsed ? 'self-center' : ''}>
+      <div className={`flex flex-col gap-4 ${collapsed ? 'self-center' : ''}`}>
         <Brand collapsed={collapsed} />
+        <hr className="border-t" />
       </div>
       {toggleItem}
       <nav className={`flex flex-col gap-3 ${collapsed ? 'items-center' : ''}`}>
@@ -89,7 +90,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside className={`hidden shrink-0 border-r bg-sidebar transition-[width] desk:block ${collapsed ? 'w-[64.5px]' : 'w-54'}`}>
+      <aside className={`hidden shrink-0 border-r bg-card transition-[width] desk:block ${collapsed ? 'w-[64.5px]' : 'w-54'}`}>
         <Menu_
           collapsed={collapsed}
           view={view}
@@ -113,7 +114,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
       {open && (
         <div className="fixed inset-0 z-40 desk:hidden">
           <button aria-label="Close menu" className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
-          <aside className="relative h-full w-64 border-r bg-sidebar">
+          <aside className="relative h-full w-64 border-r bg-card">
             <Button size="icon" variant="ghost" className="absolute right-2 top-2" aria-label="Close menu" onClick={() => setOpen(false)}>
               <Xmark className="size-5" />
             </Button>

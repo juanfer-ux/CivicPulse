@@ -31,8 +31,8 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | # | Color | Token (aliases) | Used for |
 |---|---|---|---|
 | 1 | `#18181B` | `background` | Page; text on the main button |
-| 2 | `#1C1C1E` | `card` (`popover`) | Cards, inputs, panels, dropdowns |
-| 3 | `#0F0F10` | `sidebar` (`inset`) | Sidebar, outline buttons, deepest surface |
+| 2 | `#1C1C1E` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar |
+| 3 | `#0F0F10` | `sidebar` (`inset`) | Map header, outline buttons, deepest surface (the sidebar itself now uses `card`) |
 | 4 | `#313135` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
 | 5 | `#404040` | `input` | Borders of inputs and dropdowns |
 | 6 | `#7A7A7A` | `closed` (`ring`) | Closed incidents, focus ring |
