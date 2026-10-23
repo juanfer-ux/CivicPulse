@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Plus } from 'iconoir-react'
+import { Plus, Sparks } from 'iconoir-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { AnswerView } from '@/components/InvestigatePanel'
+import type { Answer } from '@/lib/agent'
 
 const VARIANTS = ['default', 'secondary', 'destructive', 'outline', 'ghost', 'link'] as const
 const SIZES = ['sm', 'default', 'lg'] as const
@@ -38,6 +41,41 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   )
 }
 
+const SAMPLE: Answer = {
+  text: 'Kennedy has the most parking obstruction incidents (77), followed by Chapinero (66) and Suba (60).',
+  bars: [
+    { label: 'Kennedy', value: 77 },
+    { label: 'Chapinero', value: 66 },
+    { label: 'Suba', value: 60 },
+  ],
+  evidence: [{ tool: 'ranking_by_locality', scope: 'All localities you can see', period: 'All time', incidentCount: 203, references: [] }],
+  limitations: ['Counts are of reported incidents, not confirmed violations.'],
+  highlightIds: [],
+}
+
+/** Static copy of the docked agent panel with one conversation, so the look can be checked without signing in. */
+function ConversationDemo() {
+  return (
+    <div className="flex h-[640px] w-[456px] max-w-full flex-col gap-3 border bg-ai p-3 text-body">
+      <div className="flex items-center gap-2 text-label">
+        <Sparks className="size-4" aria-hidden /> Investigate and Ask
+      </div>
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+        <p className="self-end rounded-lg bg-secondary px-3 py-2">Which localities have the most parking obstruction incidents?</p>
+        <AnswerView result={SAMPLE} onClear={() => {}} />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="gradient-border h-(--control-default) min-w-0 flex-1 rounded-sm border">
+          <Input placeholder="What would you like to investigate?" aria-label="Investigate and Ask" className="h-full border-0" />
+        </div>
+        <Button size="sm" variant="outline">
+          Ask
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 /** Component gallery: open `/#components`. Resize the window under 1,440 px to see the phone sizes. */
 export function Gallery() {
   return (
@@ -64,6 +102,10 @@ export function Gallery() {
             </div>
           </div>
         ))}
+      </Section>
+
+      <Section title="Agent panel · one conversation">
+        <ConversationDemo />
       </Section>
 
       <Section title="Button · icon and states">

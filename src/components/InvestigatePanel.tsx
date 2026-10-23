@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Sparks } from 'iconoir-react'
+import { Sparks, ThumbsDown, ThumbsUp } from 'iconoir-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -83,7 +83,23 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
   )
 }
 
-function AnswerView({ result, onClear }: { result: Answer; onClear: () => void }) {
+/** Thumbs under an answer (Figma Message, role assistant). For now they only mark the choice on screen. */
+function Feedback() {
+  const [vote, setVote] = useState<'up' | 'down' | null>(null)
+  const pick = (v: 'up' | 'down') => setVote((cur) => (cur === v ? null : v))
+  return (
+    <div className="flex gap-1">
+      <Button size="icon" variant="ghost" className="size-7" aria-label="Helpful" aria-pressed={vote === 'up'} onClick={() => pick('up')}>
+        <ThumbsUp className={`size-4 ${vote === 'up' ? 'text-foreground' : 'text-muted-foreground'}`} />
+      </Button>
+      <Button size="icon" variant="ghost" className="size-7" aria-label="Not helpful" aria-pressed={vote === 'down'} onClick={() => pick('down')}>
+        <ThumbsDown className={`size-4 ${vote === 'down' ? 'text-foreground' : 'text-muted-foreground'}`} />
+      </Button>
+    </div>
+  )
+}
+
+export function AnswerView({ result, onClear }: { result: Answer; onClear: () => void }) {
   const max = Math.max(1, ...result.bars.map((b) => b.value))
   return (
     <div className="flex flex-col gap-2 rounded-lg border bg-card/60 p-3">
@@ -130,6 +146,7 @@ function AnswerView({ result, onClear }: { result: Answer; onClear: () => void }
           Clear map highlight
         </Button>
       )}
+      <Feedback />
     </div>
   )
 }
