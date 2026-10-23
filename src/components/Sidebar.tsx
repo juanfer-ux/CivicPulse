@@ -38,9 +38,10 @@ function MobileBrand() {
   )
 }
 
-function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: ComponentType<{ className?: string }>; label: string; active?: boolean; collapsed: boolean; onClick: () => void }) {
+/** `flush` = no side padding when expanded (Figma: Sign out lines up with the user row above it). */
+function NavItem({ icon: Icon, label, active, collapsed, flush, onClick }: { icon: ComponentType<{ className?: string }>; label: string; active?: boolean; collapsed: boolean; flush?: boolean; onClick: () => void }) {
   return (
-    <Button variant={active ? 'secondary' : 'ghost'} className={`gap-2 px-2 ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
+    <Button variant={active ? 'secondary' : 'ghost'} className={`gap-2 ${flush && !collapsed ? 'px-0' : 'px-2'} ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
       <Icon className="size-5 shrink-0" />
       {!collapsed && label}
     </Button>
@@ -63,15 +64,15 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
       </nav>
       <div className={`mt-auto flex flex-col gap-4 ${collapsed ? 'items-center' : ''}`}>
         {!collapsed && profile && (
-          <div className="flex items-center gap-2 px-2 text-body">
-            <Avatar name={profile.full_name || 'Signed in'} size="sm" />
+          <div className="flex items-center gap-3 text-body desk:hidden">
+            <Avatar name={profile.full_name || 'Signed in'} />
             <div className="min-w-0">
-              <p className="truncate font-medium">{shortName(profile.full_name) || 'Signed in'}</p>
+              <p className="truncate">{shortName(profile.full_name) || 'Signed in'}</p>
               <p className="truncate text-meta text-muted-foreground">{profile.role ? ROLE_LABELS[profile.role] : ''}</p>
             </div>
           </div>
         )}
-        <NavItem icon={LogOut} label="Sign out" collapsed={collapsed} onClick={signOut} />
+        <NavItem icon={LogOut} label="Sign out" flush collapsed={collapsed} onClick={signOut} />
       </div>
     </div>
   )
