@@ -12,33 +12,33 @@
 @theme {
   --breakpoint-desk: 90rem; /* 1440 px */
 
-  /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is 0 on purpose: Figma's 0.2 and 0.3 px blur letters on screens without a Retina display. Weights are ours (Figma has all 400): 600 headings and numbers, 500 actions and labels, 400 reading text. */
+  /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is 0 on purpose: Figma's 0.2 and 0.3 px blur letters on screens without a Retina display. Weights are ours: 550 headings and numbers, 450 actions and labels, 380 reading text (Manrope variable). */
   --text-display: 32px;
-  --text-display--font-weight: 600;
+  --text-display--font-weight: 550;
   --text-display--line-height: 32px;
   --text-stat: 24px;
-  --text-stat--font-weight: 600;
+  --text-stat--font-weight: 550;
   --text-stat--line-height: 32px;
   --text-heading: 20px;
-  --text-heading--font-weight: 600;
+  --text-heading--font-weight: 550;
   --text-heading--line-height: 28px;
   --text-title: 18px;
-  --text-title--font-weight: 600;
+  --text-title--font-weight: 550;
   --text-title--line-height: 28px;
   --text-subtitle: 16px;
-  --text-subtitle--font-weight: 500;
+  --text-subtitle--font-weight: 450;
   --text-subtitle--line-height: 24px;
   --text-label: var(--fs-label);
-  --text-label--font-weight: 500;
+  --text-label--font-weight: 450;
   --text-label--line-height: var(--lh-label);
   --text-body: var(--fs-body);
-  --text-body--font-weight: 400;
+  --text-body--font-weight: 380;
   --text-body--line-height: var(--lh-body);
   --text-meta: var(--fs-meta);
-  --text-meta--font-weight: 400;
+  --text-meta--font-weight: 380;
   --text-meta--line-height: var(--lh-meta);
   --text-caption: var(--fs-caption);
-  --text-caption--font-weight: 500;
+  --text-caption--font-weight: 450;
   --text-caption--line-height: 16px;
 }
 
@@ -77,6 +77,10 @@
 @theme inline {
   --font-sans: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
+  /* Manrope glows on dark backgrounds, so the weights sit a little below the usual 400 / 500 / 600 (it is a variable font). */
+  --font-weight-normal: 380;
+  --font-weight-medium: 450;
+  --font-weight-semibold: 550;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
   --radius-xs: 2px;
   --radius-sm: calc(var(--radius) - 4px);
@@ -180,5 +184,5 @@ svg[stroke-width="1.5"] * { vector-effect: non-scaling-stroke; }
 @layer base {
   * { @apply border-border outline-ring/50; }
   body { @apply bg-background text-foreground antialiased; }
-  html { @apply font-sans; color-scheme: dark; text-rendering: optimizeLegibility; -moz-osx-font-smoothing: grayscale; }
+  html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; -moz-osx-font-smoothing: grayscale; }
 }
