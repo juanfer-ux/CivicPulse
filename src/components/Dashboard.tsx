@@ -3,7 +3,7 @@ import { NavArrowDown, NavArrowUp, Xmark } from 'iconoir-react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { MediaGallery } from '@/components/MediaGallery'
 import { Badge } from '@/components/ui/badge'
-import { selectClass } from '@/lib/ui'
+import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -131,42 +131,10 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
             <CardTitle>Filters</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
-            <select aria-label="Locality" className={selectClass} value={locality} onChange={(e) => setLocality(e.target.value)}>
-              <option value="">All localities</option>
-              {data?.localities.map((l) => (
-                <option key={l.code} value={l.code}>
-                  {l.name}
-                </option>
-              ))}
-            </select>
-            <select
-              aria-label="Category"
-              className={selectClass}
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="">All categories</option>
-              {data?.categories.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <select aria-label="Status" className={selectClass} value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option value="">All statuses</option>
-              {STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {label(s)}
-                </option>
-              ))}
-            </select>
-            <select aria-label="Period" className={selectClass} value={days} onChange={(e) => setDays(Number(e.target.value))}>
-              {PERIODS.map((p) => (
-                <option key={p.days} value={p.days}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
+            <Select aria-label="Locality" value={locality} onValueChange={setLocality} options={[{ value: '', label: 'All localities' }, ...(data?.localities.map((l) => ({ value: String(l.code), label: l.name })) ?? [])]} />
+            <Select aria-label="Category" value={category} onValueChange={setCategory} options={[{ value: '', label: 'All categories' }, ...(data?.categories.map((c) => ({ value: String(c.code), label: c.name })) ?? [])]} />
+            <Select aria-label="Status" value={status} onValueChange={setStatus} options={[{ value: '', label: 'All statuses' }, ...STATUSES.map((s) => ({ value: s, label: label(s) }))]} />
+            <Select aria-label="Period" value={String(days)} onValueChange={(v) => setDays(Number(v))} options={PERIODS.map((p) => ({ value: String(p.days), label: p.label }))} />
           </CardContent>
         </Card>
 
