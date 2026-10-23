@@ -8,7 +8,7 @@
 ## 📚 Files
 | File | What is in it |
 |---|---|
-| [foundations.md](foundations.md) | Typeface, text styles, the 13 colors, spacing, radius, control sizes, breakpoint |
+| [foundations.md](foundations.md) | Typeface, text styles, the 14 colors, spacing, radius, control sizes, breakpoint |
 | [components.md](components.md) | shadcn and app components (Figma name and code file), and the patterns |
 | [accessibility.md](accessibility.md) | Rules we follow, contrast numbers, and what is not audited yet |
 

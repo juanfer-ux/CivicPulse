@@ -126,7 +126,7 @@
   --radius: 0.5rem;
   --map-header-h: 70px; /* Map header height (Figma Map Header); the panel, map and filters start below it */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
-  /* The whole palette is these 13 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
+  /* The whole palette is these 14 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals, darkest to lightest */
   --neutral-950: #0F0F10;
   --neutral-900: #111113;
@@ -135,23 +135,24 @@
   --neutral-700: #313135;
   --neutral-600: #404040;
   --neutral-500: #7A7A7A;
-  --neutral-400: #94949A;
-  --neutral-300: #C2C2C7;
+  --neutral-400: #94949A; /* not used by a component right now */
+  --neutral-300: #ABABB0; /* secondary text */
+  --neutral-200: #C2C2C7;
   /* Colored */
   --indigo-400: #6D74E2;
   --red-400: #EE8688;
   --amber-400: #D0AC6B;
   --coral-400: #E58C7D;
 
-  /* Usage names the components use, each pointing at one of the 13 colors. */
+  /* Usage names the components use, each pointing at one of the 14 colors. */
   --background: var(--neutral-850);
   --card: var(--neutral-800);
   --sidebar: var(--neutral-950);
   --secondary: var(--neutral-700);
   --input: var(--neutral-600);
   --closed: var(--neutral-500);
-  --muted-foreground: var(--neutral-400);
-  --foreground: var(--neutral-300);
+  --muted-foreground: var(--neutral-300);
+  --foreground: var(--neutral-200);
   --ai: var(--neutral-900);
   --ai-border: var(--indigo-400);
   --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
