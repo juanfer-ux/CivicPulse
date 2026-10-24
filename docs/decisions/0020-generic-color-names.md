@@ -5,7 +5,7 @@
 The 13 colors were named after where they were used (`card`, `sidebar`, `closed`, `incident`…). The names kept drifting from the uses, and the owner wanted universal names.
 
 ## Decision
-The 13 colors are named by family and lightness in both Figma (Colors collection) and `src/index.css`: `neutral-950 … neutral-300` (darkest to lightest), `indigo-400`, `red-400`, `amber-400`, `coral-400`. The usage names (`background`, `card`, `sidebar`, `foreground`, `incident`…) stay in code as aliases pointing at them, so components, shadcn and the map code do not change. The mapping table is in [foundations.md](../design-system/foundations.md#-colors-dark-theme-13-in-total).
+The 13 colors are named by family and lightness in both Figma (Colors collection) and `src/index.css`: `neutral-900 … neutral-100` (darkest to lightest), `indigo-400`, `red-400`, `amber-400`, `coral-400`. The usage names (`background`, `card`, `sidebar`, `foreground`, `incident`…) stay in code as aliases pointing at them, so components, shadcn and the map code do not change. The mapping table is in [foundations.md](../design-system/foundations.md#-colors-dark-theme-13-in-total).
 
 ## Update (2026-10-23)
 The old `neutral-300` (`#C2C2C7`, `foreground`) became `neutral-200`, and a new `neutral-300` (`#ABABB0`) was added between it and `neutral-400`, so the palette is 14 colors. No component uses the new one yet.
@@ -13,3 +13,6 @@ The old `neutral-300` (`#C2C2C7`, `foreground`) became `neutral-200`, and a new 
 ## Consequences
 - ✅ A color can change its job without a rename; new work picks a color by lightness.
 - 🟨 Figma shows only the generic names; the usage names exist only in code and in the table.
+
+## Update (2026-10-24)
+Owner rule: neutrals are always `neutral-100` … `neutral-900` (no 950/850), and colors are always listed from the biggest number to the smallest. Renumbered: 950→900, 900→800, 850→700, 800→600, 700→500, 600→400, 500→300, 300→200, 200→100; the unused `#91919D` was dropped. Hex values are unchanged. Figma and `index.css` follow it; check the order on every color change.

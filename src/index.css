@@ -152,34 +152,33 @@
   --radius: 0.5rem;
   --map-header-h: 70px; /* Map header height (Figma Map Header); the panel, map and filters start below it */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
-  /* The whole palette is these 14 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
-  /* Neutrals, darkest to lightest */
-  --neutral-950: #0F0F10;
-  --neutral-900: #111113;
-  --neutral-850: #18181B;
-  --neutral-800: #1C1C1E;
-  --neutral-700: #313135;
-  --neutral-600: #404040;
-  --neutral-500: #7A7A7A;
-  --neutral-400: #94949A; /* not used by a component right now */
-  --neutral-300: #ABABB0; /* secondary text */
-  --neutral-200: #C2C2C7;
+  /* The whole palette is these 13 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
+  /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
+  --neutral-900: #0E0E10;
+  --neutral-800: #111113;
+  --neutral-700: #18181B;
+  --neutral-600: #1B1B1F;
+  --neutral-500: #303036;
+  --neutral-400: #3C3C44;
+  --neutral-300: #737381;
+  --neutral-200: #A9A9B2; /* secondary text */
+  --neutral-100: #C1C1C8;
   /* Colored */
   --indigo-400: #6D74E2;
   --red-400: #EE8688;
   --amber-400: #D0AC6B;
   --coral-400: #E58C7D;
 
-  /* Usage names the components use, each pointing at one of the 14 colors. */
-  --background: var(--neutral-850);
-  --card: var(--neutral-800);
-  --sidebar: var(--neutral-950);
-  --secondary: var(--neutral-700);
-  --input: var(--neutral-600);
-  --closed: var(--neutral-500);
-  --muted-foreground: var(--neutral-300);
-  --foreground: var(--neutral-200);
-  --ai: var(--neutral-900);
+  /* Usage names the components use, each pointing at one of the 13 colors. */
+  --background: var(--neutral-700);
+  --card: var(--neutral-600);
+  --sidebar: var(--neutral-900);
+  --secondary: var(--neutral-500);
+  --input: var(--neutral-400);
+  --closed: var(--neutral-300);
+  --muted-foreground: var(--neutral-200);
+  --foreground: var(--neutral-100);
+  --ai: var(--neutral-800);
   --ai-border: var(--indigo-400);
   --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
   --warning: var(--amber-400);
