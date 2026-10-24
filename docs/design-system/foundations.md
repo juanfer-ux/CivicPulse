@@ -37,16 +37,16 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
 |---|---|---|---|---|
-| 1 | `neutral-950` | `#0F0F10` | `sidebar` (`inset`) | Map header, outline buttons, deepest surface; text on a light fill |
+| 1 | `neutral-950` | `#0E0E10` | `sidebar` (`inset`) | Map header, outline buttons, deepest surface; text on a light fill |
 | 2 | `neutral-900` | `#111113` | `ai` | Agent surfaces |
 | 3 | `neutral-850` | `#18181B` | `background` | Page |
-| 4 | `neutral-800` | `#1C1C1E` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar |
-| 5 | `neutral-700` | `#313135` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
-| 6 | `neutral-600` | `#404040` | `input` | Borders of inputs and dropdowns |
-| 7 | `neutral-500` | `#7A7A7A` | `closed` (`ring`) | Closed incidents, focus ring |
-| 8 | `neutral-400` | `#94949A` | (none now) | Not used by a component right now (it was secondary text until 2026-10-23) |
-| 9 | `neutral-300` | `#ABABB0` | `muted-foreground` | Supporting text, table headers, placeholders |
-| 10 | `neutral-200` | `#C2C2C7` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
+| 4 | `neutral-800` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar |
+| 5 | `neutral-700` | `#303036` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
+| 6 | `neutral-600` | `#3C3C44` | `input` | Borders of inputs and dropdowns |
+| 7 | `neutral-500` | `#737381` | `closed` (`ring`) | Closed incidents, focus ring |
+| 8 | `neutral-400` | `#91919D` | (none now) | Not used by a component right now (it was secondary text until 2026-10-23) |
+| 9 | `neutral-300` | `#A9A9B2` | `muted-foreground` | Supporting text, table headers, placeholders |
+| 10 | `neutral-200` | `#C1C1C8` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
 | 11 | `indigo-400` | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
 | 12 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
 | 13 | `amber-400` | `#D0AC6B` | `warning` | Needs review |
@@ -54,7 +54,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 
 Names say what a color is (family and lightness: lower number = darker for neutrals), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 13.
 
-- Error text is always `text-incident` (contrast 6.8:1); `text-destructive` on dark is 6.8:1.
+- Error text is always `text-incident` (contrast 6.9:1); `text-destructive` on dark is 6.9:1.
 - Code that cannot use a CSS variable (map paint settings) reads the token with `token('--name')` from `src/lib/tokens.ts`. No color literals in `.ts` / `.tsx`.
 - Status dots: 🟧 `warning` needs review, 🩷 `incident` validated or in progress, ⬜ `closed`. See `GROUPS` in `src/lib/incidents.ts`.
 - **Gradient** `--ai-gradient` (Figma paint style `ai_gradient`): `ai-border`, `incident`, `warning`, top to bottom at 10 %, 64 %, 105 %. Built from three of the 13, so not a 14th color. Used on the border of the Agent Panel (`gradient-border` utility in `src/index.css`).
