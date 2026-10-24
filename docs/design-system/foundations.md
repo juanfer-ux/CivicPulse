@@ -37,10 +37,10 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
 |---|---|---|---|---|
-| 1 | `neutral-900` | `#0E0E10` | `sidebar` (`inset`) | Map header, outline buttons, deepest surface; text on a light fill |
-| 2 | `neutral-800` | `#111113` | `ai` | Agent surfaces |
+| 1 | `neutral-900` | `#0E0E10` | `sidebar` (`inset`) | Outline buttons, suggestions, role badge, mobile bars, deepest surface; text on a light fill |
+| 2 | `neutral-800` | `#111113` | `ai` | Agent surfaces, Side Panel |
 | 3 | `neutral-700` | `#18181B` | `background` | Page |
-| 4 | `neutral-600` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar |
+| 4 | `neutral-600` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar, Map header |
 | 5 | `neutral-500` | `#303036` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
 | 6 | `neutral-400` | `#3C3C44` | `input` | Borders of inputs and dropdowns |
 | 7 | `neutral-300` | `#737381` | `closed` (`ring`) | Closed incidents, focus ring |

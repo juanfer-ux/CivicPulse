@@ -30,7 +30,7 @@ const STATUS_VARIANT: Record<UserStatus, 'default' | 'secondary' | 'outline'> = 
 }
 const ROLE_OPTIONS = ROLES.map((r) => ({ value: r, label: ROLE_LABELS[r] }))
 
-const ASIDE = 'max-desk:fixed max-desk:inset-x-0 max-desk:bottom-0 max-desk:top-[49px] max-desk:z-20 desk:w-[420px] desk:shrink-0 desk:border-l bg-card'
+const ASIDE = 'max-desk:fixed max-desk:inset-x-0 max-desk:bottom-0 max-desk:top-[49px] max-desk:z-20 desk:w-[420px] desk:shrink-0 desk:border-l bg-ai'
 const localities = (n: number) => `${n} ${n === 1 ? 'locality' : 'localities'}`
 
 export function UsersAdmin() {
@@ -233,7 +233,7 @@ function UserPanel({
           </Button>
         </div>
 
-        <p className="rounded-lg bg-muted/50 p-3 text-body-sm">{summary}</p>
+        <p className="rounded-lg bg-secondary p-3 text-body-sm">{summary}</p>
         {user.role === 'specialist_operator' && <p className="text-body-sm">Specialty: {specialtyOf(user, data).join(', ') || 'none yet'}</p>}
         {isMe && <p className="text-meta text-muted-foreground">This is you: your own role and status are locked so you cannot lock yourself out.</p>}
 
