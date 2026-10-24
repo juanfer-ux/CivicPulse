@@ -48,7 +48,7 @@ export function AuthLayout({ children, mobileLogo }: { children: ReactNode; mobi
           <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
         </div>
       </section>
-      <div className="flex w-full flex-1 justify-center max-desk:flex-col max-desk:items-center max-desk:py-10 desk:min-w-[450px] desk:max-w-[640px] desk:self-stretch desk:rounded-xl desk:bg-background desk:px-4 desk:py-6">
+      <div className="flex w-full flex-1 justify-center max-desk:flex-col max-desk:items-center max-desk:py-10 desk:min-w-[450px] desk:max-w-[640px] desk:self-stretch desk:rounded-xl desk:bg-background/70 desk:px-4 desk:py-6">
         {mobileLogo && <Logo compact className="desk:hidden" />}
         <Card className="w-full max-w-[460px] justify-center gap-0 border-0 bg-transparent max-desk:flex-1">{children}</Card>
       </div>
