@@ -32,27 +32,26 @@ Each class sets size, line height and weight together, so a component never need
 - Figma also has `meta-medium` (12 / 16, 500) for table headers; the code uses `text-meta` plus `font-medium`.
 - ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes; without that, the class merger dropped `text-label` from colored buttons (test in `utils.test.ts`).
 
-## 🎨 Colors (dark theme): 14 in total
-Every other token name (`primary`, `muted`, `accent`, `border`…) is only an alias of one of these 14, because shadcn components expect those names ([decision 0015](../decisions/0015-thirteen-color-palette.md)). Add a color only if none of these can do the job.
+## 🎨 Colors (dark theme): 13 in total
+Every other token name (`primary`, `muted`, `accent`, `border`…) is only an alias of one of these 13, because shadcn components expect those names ([decision 0015](../decisions/0015-thirteen-color-palette.md)). Add a color only if none of these can do the job.
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
 |---|---|---|---|---|
-| 1 | `neutral-950` | `#0E0E10` | `sidebar` (`inset`) | Map header, outline buttons, deepest surface; text on a light fill |
-| 2 | `neutral-900` | `#111113` | `ai` | Agent surfaces |
-| 3 | `neutral-850` | `#18181B` | `background` | Page |
-| 4 | `neutral-800` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar |
-| 5 | `neutral-700` | `#303036` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
-| 6 | `neutral-600` | `#3C3C44` | `input` | Borders of inputs and dropdowns |
-| 7 | `neutral-500` | `#737381` | `closed` (`ring`) | Closed incidents, focus ring |
-| 8 | `neutral-400` | `#91919D` | (none now) | Not used by a component right now (it was secondary text until 2026-10-23) |
-| 9 | `neutral-300` | `#A9A9B2` | `muted-foreground` | Supporting text, table headers, placeholders |
-| 10 | `neutral-200` | `#C1C1C8` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
-| 11 | `indigo-400` | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
-| 12 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
-| 13 | `amber-400` | `#D0AC6B` | `warning` | Needs review |
-| 14 | `coral-400` | `#E58C7D` | `incident` | Validated / in progress, invalid fields, **all error text** |
+| 1 | `neutral-900` | `#0E0E10` | `sidebar` (`inset`) | Map header, outline buttons, deepest surface; text on a light fill |
+| 2 | `neutral-800` | `#111113` | `ai` | Agent surfaces |
+| 3 | `neutral-700` | `#18181B` | `background` | Page |
+| 4 | `neutral-600` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar |
+| 5 | `neutral-500` | `#303036` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
+| 6 | `neutral-400` | `#3C3C44` | `input` | Borders of inputs and dropdowns |
+| 7 | `neutral-300` | `#737381` | `closed` (`ring`) | Closed incidents, focus ring |
+| 8 | `neutral-200` | `#A9A9B2` | `muted-foreground` | Supporting text, table headers, placeholders |
+| 9 | `neutral-100` | `#C1C1C8` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
+| 10 | `indigo-400` | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
+| 11 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
+| 12 | `amber-400` | `#D0AC6B` | `warning` | Needs review |
+| 13 | `coral-400` | `#E58C7D` | `incident` | Validated / in progress, invalid fields, **all error text** |
 
-Names say what a color is (family and lightness: lower number = darker for neutrals), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 13.
+Names say what a color is (family and lightness: neutrals are always 100–900 and listed 900 first; higher number = darker), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 13.
 
 - Error text is always `text-incident` (contrast 6.9:1); `text-destructive` on dark is 6.9:1.
 - Code that cannot use a CSS variable (map paint settings) reads the token with `token('--name')` from `src/lib/tokens.ts`. No color literals in `.ts` / `.tsx`.
