@@ -6,8 +6,9 @@ import { Logo } from '@/components/Logo'
 import authImage from '@/assets/auth-image.png'
 import { supabase } from '@/lib/supabase'
 
-/** Placeholder value proposition shown next to the sign-in card on desktop. The picture is src/assets/auth-image.png: replace the file to change it. */
-const VALUE_PROP = "AI Multi-Agent civic intelligence system that helps city departments see what's happening on their streets, decide what matters most, and act on it."
+/** Value proposition next to the sign-in card on desktop (Figma Auth_Image container). The picture is src/assets/auth-image.png: replace the file to change it. */
+const HEADLINE = 'Street incidents,\nturned into decisions.'
+const SUBTITLE = 'AI agents connect scattered incidents into patterns and recommend an intervention, with the evidence behind it.'
 
 export function AuthPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
@@ -52,21 +53,23 @@ export function AuthPage() {
   }
 
   return (
-    <main className="flex min-h-svh items-center justify-center bg-[radial-gradient(ellipse_90%_90%_at_70%_30%,var(--neutral-500),var(--neutral-700))] p-4 desk:items-stretch desk:justify-start">
-      <section className="relative hidden min-w-[850px] flex-1 items-end overflow-hidden rounded-lg bg-sidebar p-12 desk:flex">
-        <img src={authImage} alt="" className="absolute inset-0 size-full object-cover object-left-top" />
-        <div className="absolute inset-0 bg-[linear-gradient(transparent,var(--neutral-900))]" />
-        <p className="relative max-w-[754px] text-[32px] leading-[42px] font-normal text-foreground">{VALUE_PROP}</p>
+    <main className="relative isolate flex min-h-svh items-center justify-center bg-background p-4 desk:gap-0 desk:p-6">
+      <img src={authImage} alt="" className="absolute inset-0 -z-10 hidden size-full object-cover object-center desk:block" />
+      <section className="hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-6 desk:flex">
+        <Logo compact />
+        <div className="flex max-w-[640px] flex-col gap-8">
+          <h1 className="text-[48px] leading-[52px] font-semibold tracking-[-0.014em] whitespace-pre-line text-foreground">{HEADLINE}</h1>
+          <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
+        </div>
       </section>
-      <div className="flex w-full items-center justify-center desk:min-w-[450px] desk:max-w-[800px] desk:flex-1 desk:px-16">
-        <Card className="w-full max-w-[360px] gap-16 border-0 bg-transparent">
-          <Logo compact className="px-(--card-spacing)" />
-          <CardContent>
-            {/* Figma Auth Card (sign in): blocks 64 px apart; header and fields 24 px apart, fields and actions 12 px inside. */}
+      <div className="flex w-full items-center justify-center desk:min-w-[450px] desk:max-w-[480px] desk:flex-1 desk:self-stretch desk:rounded-xl desk:bg-background desk:px-4 desk:py-6">
+        <Card className="w-full gap-0 border-0 bg-transparent">
+          <CardContent className="mx-auto w-full max-w-[392px]">
+            {/* Figma Auth Card (sign in): header + fields and actions 64 px apart; header and fields 24 px apart, fields and actions 12 px inside. */}
             <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-16">
               <div className="flex flex-col gap-6">
                 <CardHeader className="px-0">
-                  <CardTitle>{signup ? 'Create account' : 'Sign in'}</CardTitle>
+                  <CardTitle className="text-stat">{signup ? 'Create account' : 'Sign in'}</CardTitle>
                   <CardDescription>
                     {signup
                       ? 'New accounts have no access until a Super Admin assigns a role.'
