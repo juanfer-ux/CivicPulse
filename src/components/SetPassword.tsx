@@ -32,7 +32,7 @@ export function SetPassword({ onDone }: { onDone: () => void }) {
     <main className="grid min-h-svh place-items-center bg-background p-4">
       <Card className="w-full max-w-sm gap-10">
         <Logo className="px-(--card-spacing)" />
-        <CardHeader>
+        <CardHeader className="gap-2">
           <CardTitle>Set up your account</CardTitle>
           <CardDescription>Choose the password you will use to sign in.</CardDescription>
         </CardHeader>
