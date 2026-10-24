@@ -38,7 +38,7 @@
   --text-button--letter-spacing: 0.022em;
   --text-button-sm: var(--fs-body-sm);
   --text-button-sm--font-weight: 400;
-  --text-button-sm--line-height: var(--lh-button);
+  --text-button-sm--line-height: 24px;
   --text-button-sm--letter-spacing: 0.022em;
   --text-body-sm: var(--fs-body-sm);
   --text-body-sm--font-weight: 300;
@@ -90,14 +90,14 @@
 @media (min-width: 90rem) {
   :root {
     --fs-body-sm: 13.5px;
-    --lh-body-sm: 24px;
+    --lh-body-sm: 22px;
     --fs-body: 14px;
-    --lh-body: 24px;
+    --lh-body: 22px;
     --fs-label: 14px;
     --lh-label: 22px;
     --lh-button: 20px;
     --fs-meta: 13px;
-    --lh-meta: 18px;
+    --lh-meta: 21px;
     --fs-caption: 12.5px;
     --control-sm: 32px;
     --control-default: 36px;
