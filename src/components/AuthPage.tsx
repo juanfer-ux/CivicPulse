@@ -57,9 +57,9 @@ export function AuthPage() {
       <img src={authImage} alt="" className="absolute inset-0 -z-10 hidden size-full object-cover object-center desk:block" />
       <section className="hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-8 desk:flex">
         <Logo compact />
-        <div className="flex max-w-[680px] flex-col gap-8 py-2">
-          <h1 className="text-[64px] leading-[68px] font-semibold tracking-[-0.014em] text-muted-foreground">{HEADLINE}</h1>
-          <p className="text-title font-medium text-foreground">{SUBTITLE}</p>
+        <div className="flex max-w-[620px] flex-col gap-8 py-2">
+          <h1 className="text-[64px] leading-[68px] font-extralight tracking-[-0.014em] text-foreground">{HEADLINE}</h1>
+          <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
         </div>
       </section>
       <div className="flex w-full items-center justify-center desk:min-w-[450px] desk:max-w-[480px] desk:flex-1 desk:self-stretch desk:rounded-xl desk:bg-background desk:px-4 desk:py-6">
