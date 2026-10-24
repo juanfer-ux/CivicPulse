@@ -49,9 +49,9 @@ export function AuthPage() {
 
   return (
     <main className="grid min-h-svh place-items-center bg-background p-4">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm gap-10">
+        <Logo className="px-(--card-spacing)" />
         <CardHeader>
-          <Logo className="mb-9 ml-2" /> {/* Figma: 40px from logo row to title (4px header gap + 36px) */}
           <CardTitle>{signup ? 'Create account' : 'Sign in'}</CardTitle>
           <CardDescription>
             {signup
@@ -60,43 +60,48 @@ export function AuthPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-3">
-            {signup && <Input name="name" placeholder="Full name" aria-label="Full name" autoComplete="name" required />}
-            <Input name="email" type="email" placeholder="Email" aria-label="Email" autoComplete="email" required />
-            <Input
-              name="password"
-              type="password"
-              placeholder="Password (min. 8 characters)"
-              aria-label="Password"
-              autoComplete={signup ? 'new-password' : 'current-password'}
-              minLength={8}
-              required
-            />
-            {error && (
-              <p role="alert" className="text-body-sm text-incident">
-                {error}
-              </p>
-            )}
-            {notice && <p className="text-body-sm text-muted-foreground">{notice}</p>}
-            <Button type="submit" disabled={busy}>
-              {busy ? 'Please wait…' : signup ? 'Create account' : 'Sign in'}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => {
-                setMode(signup ? 'signin' : 'signup')
-                setError(null)
-                setNotice(null)
-              }}
-            >
-              {signup ? 'I already have an account' : 'Create an account'}
-            </Button>
-            {!signup && (
-              <Button type="button" variant="link" size="sm" disabled={busy} onClick={forgot}>
-                Forgot password?
+          {/* Figma Auth Card: logo, header, fields and actions are 40 px apart; fields and actions 12 px inside. */}
+          <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-10">
+            <div className="flex flex-col gap-3">
+              {signup && <Input name="name" placeholder="Full name" aria-label="Full name" autoComplete="name" required />}
+              <Input name="email" type="email" placeholder="Email" aria-label="Email" autoComplete="email" required />
+              <Input
+                name="password"
+                type="password"
+                placeholder="Password (min. 8 characters)"
+                aria-label="Password"
+                autoComplete={signup ? 'new-password' : 'current-password'}
+                minLength={8}
+                required
+              />
+              {error && (
+                <p role="alert" className="text-body-sm text-incident">
+                  {error}
+                </p>
+              )}
+              {notice && <p className="text-body-sm text-muted-foreground">{notice}</p>}
+            </div>
+            <div className="flex flex-col gap-3">
+              <Button type="submit" disabled={busy}>
+                {busy ? 'Please wait…' : signup ? 'Create account' : 'Sign in'}
               </Button>
-            )}
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setMode(signup ? 'signin' : 'signup')
+                  setError(null)
+                  setNotice(null)
+                }}
+              >
+                {signup ? 'I already have an account' : 'Create an account'}
+              </Button>
+              {!signup && (
+                <Button type="button" variant="link" size="sm" disabled={busy} onClick={forgot}>
+                  Forgot password?
+                </Button>
+              )}
+            </div>
           </form>
         </CardContent>
       </Card>
