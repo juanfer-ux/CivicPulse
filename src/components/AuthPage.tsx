@@ -64,7 +64,7 @@ export function AuthPage() {
       </section>
       <div className="flex w-full items-center justify-center desk:min-w-[450px] desk:max-w-[640px] desk:flex-1 desk:self-stretch desk:rounded-xl desk:bg-background desk:px-4 desk:py-6">
         <Card className="w-full gap-0 border-0 bg-transparent">
-          <CardContent className="mx-auto w-full max-w-[380px]">
+          <CardContent className="mx-auto w-full max-w-[460px]">
             {/* Figma Auth Card (sign in): header + fields and actions 64 px apart; header and fields 24 px apart, fields and actions 12 px inside. */}
             <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-16">
               <div className="flex flex-col gap-6">
