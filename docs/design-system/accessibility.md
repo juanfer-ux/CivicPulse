@@ -22,15 +22,15 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 
 | Pair | Ratio | Use |
 |---|---|---|
-| `foreground` `#C2C2C7` on `background` `#18181B` | 10.0 | Normal text |
-| `foreground` on `card` `#1C1C1E` | 12.4 | Text in cards and inputs |
-| `muted-foreground` `#ABABB0` on page / on card | 7.7 / 7.4 | Supporting text |
-| `incident` `#E58C7D` on card | 6.8 | **All error text** |
-| `sidebar` on `primary` `#C2C2C7` | 10.8 | Text on the main button (rule: text on a light fill uses the `sidebar` color) |
+| `foreground` `#C1C1C8` on `background` `#18181B` | 9.9 | Normal text |
+| `foreground` on `card` `#1B1B1F` | 9.6 | Text in cards and inputs |
+| `muted-foreground` `#A9A9B2` on page / on card | 7.6 / 7.4 | Supporting text |
+| `incident` `#E58C7D` on card | 6.9 | **All error text** |
+| `sidebar` on `primary` `#C1C1C8` | 10.8 | Text on the main button (rule: text on a light fill uses the `sidebar` color) |
 | `sidebar` on `destructive` `#EE8688` | 7.7 | Dangerous buttons and badges now use dark `sidebar` text (light text on it was 1.7 and failed 4.5) |
 | `warning` `#D0AC6B` on page | 8.3 | Needs-review dots |
-| `closed` / `ring` `#7A7A7A` on page / on card | 4.1 / 4.0 | Closed dots, focus ring: **graphics only, never text** |
-| `destructive` `#EE8688` as text on card | 6.8 | OK as text, but error text stays `incident` |
+| `closed` / `ring` `#737381` on page / on card | 3.8 / 3.7 | Closed dots, focus ring: **graphics only, never text** |
+| `destructive` `#EE8688` as text on card | 6.9 | OK as text, but error text stays `incident` |
 
 ## 🟥 Not audited yet
 | Area | What is missing |
