@@ -33,7 +33,7 @@ function MobileBrand() {
   return (
     <div className="flex items-center gap-2 px-1">
       <img src={mark} alt="" width={32} height={32} className="shrink-0" />
-      <span className="text-[13px] leading-[22px] font-semibold tracking-[0.2em] whitespace-nowrap text-foreground">CIVIC PULSE</span>
+      <span className="text-[13.5px] leading-[22px] tracking-[2.6px] whitespace-nowrap text-foreground">CIVIC PULSE</span>
     </div>
   )
 }

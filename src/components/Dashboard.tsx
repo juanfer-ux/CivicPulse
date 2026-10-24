@@ -106,7 +106,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
       <header data-slot="map-header" className="absolute inset-x-0 top-0 z-10 hidden h-(--map-header-h) items-center justify-between border-b bg-card px-6 desk:flex">
         <div className="flex items-center gap-3">
           <h1 className="text-heading">Map</h1>
-          <span className="text-body-sm text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
+          <span className="text-[13px] leading-[22px] text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
         </div>
         {profile && (
           <div className="flex items-center gap-3">
@@ -172,7 +172,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
                 </ul>
                 {topLocalities.length > 0 && (
                   <div>
-                    <p className="mb-1 text-meta font-medium uppercase tracking-wide text-muted-foreground">Top localities</p>
+                    <p className="mb-1 text-meta uppercase tracking-[0.05em] text-muted-foreground">Top localities</p>
                     <ol className="flex flex-col gap-1">
                       {topLocalities.map(([code, n]) => (
                         <li key={code} className="flex justify-between">
