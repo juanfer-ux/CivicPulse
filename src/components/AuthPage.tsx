@@ -59,11 +59,11 @@ export function AuthPage() {
         <p className="relative max-w-[754px] text-[32px] leading-[42px] font-normal text-foreground">{VALUE_PROP}</p>
       </section>
       <div className="flex w-full items-center justify-center desk:min-w-[450px] desk:max-w-[800px] desk:flex-1 desk:px-16">
-        <Card className="w-full max-w-[360px] gap-10 border-0 bg-transparent">
+        <Card className="w-full max-w-[360px] gap-16 border-0 bg-transparent">
           <Logo compact className="px-(--card-spacing)" />
           <CardContent>
-            {/* Figma Auth Card (sign in): blocks 40 px apart; header and fields 24 px apart, fields and actions 12 px inside. */}
-            <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-10">
+            {/* Figma Auth Card (sign in): blocks 64 px apart; header and fields 24 px apart, fields and actions 12 px inside. */}
+            <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-16">
               <div className="flex flex-col gap-6">
                 <CardHeader className="px-0">
                   <CardTitle>{signup ? 'Create account' : 'Sign in'}</CardTitle>
