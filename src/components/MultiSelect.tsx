@@ -73,7 +73,7 @@ export function MultiSelect<T extends string | number>({
           </div>
           <div className="overflow-y-auto p-1">
             {options.map((o) => (
-              <label key={String(o.value)} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-body hover:bg-muted">
+              <label key={String(o.value)} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-body-sm hover:bg-muted">
                 <input
                   type="checkbox"
                   checked={selected.includes(o.value)}

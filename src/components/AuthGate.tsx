@@ -16,7 +16,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (session === undefined || (session && profile === undefined)) {
     return (
       <Screen>
-        <p className="text-body text-muted-foreground">Loading…</p>
+        <p className="text-body-sm text-muted-foreground">Loading…</p>
       </Screen>
     )
   }

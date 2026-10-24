@@ -40,7 +40,7 @@ export function Select({
         <BaseSelect.Positioner sideOffset={4} alignItemWithTrigger={false} className="z-50 outline-none">
           <BaseSelect.Popup
             data-slot="select-content"
-            className="max-h-(--available-height) min-w-(--anchor-width) overflow-y-auto rounded-sm border border-secondary bg-popover p-1 text-body outline-none"
+            className="max-h-(--available-height) min-w-(--anchor-width) overflow-y-auto rounded-sm border border-secondary bg-popover p-1 text-body-sm outline-none"
           >
             {options.map((o) => (
               <BaseSelect.Item

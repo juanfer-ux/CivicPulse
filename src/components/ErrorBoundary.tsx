@@ -10,7 +10,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: E
     if (!this.state.error) return this.props.children
     return (
       <main className="grid min-h-svh place-items-center p-4">
-        <div className="max-w-md rounded-lg border bg-card p-4 text-body">
+        <div className="max-w-md rounded-lg border bg-card p-4 text-body-sm">
           <p className="mb-2 font-medium">Something went wrong</p>
           <p className="mb-3 text-muted-foreground">{this.state.error.message}</p>
           <button className="underline" onClick={() => location.reload()}>

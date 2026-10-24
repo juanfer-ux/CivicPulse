@@ -64,7 +64,7 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
       </nav>
       <div className={`mt-auto flex flex-col gap-4 ${collapsed ? 'items-center' : ''}`}>
         {!collapsed && profile && (
-          <div className="flex items-center gap-3 text-body desk:hidden">
+          <div className="flex items-center gap-3 text-body-sm desk:hidden">
             <Avatar name={profile.full_name || 'Signed in'} />
             <div className="min-w-0">
               <p className="truncate">{shortName(profile.full_name) || 'Signed in'}</p>
