@@ -54,7 +54,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
             <div className="flex flex-col gap-2">
               <p className="text-muted-foreground">Try one of these, or ask your own:</p>
               {SUGGESTIONS.map((s) => (
-                <Button key={s} variant="outline" className="h-auto justify-start whitespace-normal px-3 py-2 text-left text-button-sm text-muted-foreground" onClick={() => void ask(s)}>
+                <Button key={s} variant="outline" className="h-auto justify-start whitespace-normal px-3 py-2 text-left text-button-sm text-foreground" onClick={() => void ask(s)}>
                   {s}
                 </Button>
               ))}
