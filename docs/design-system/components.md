@@ -43,7 +43,7 @@ Figma also keeps components from the earlier concept that no screen uses now (St
 |---|---|
 | **Forms** | Field name (`text-label`) above the control; error line below in `incident`; one primary button at the bottom. |
 | **Saving** | Changes save immediately; a status line (`role="status"`) says what happened or why it failed, in plain words. |
-| **Tables** | Header `text-meta` muted, rows `text-body`, whole row clickable; on phones each row becomes a card. |
+| **Tables** | Header `text-meta` muted, rows `text-body-sm`, whole row clickable; on phones each row becomes a card. |
 | **Side panels** | One at a time; 420 px on desktop, full screen with a Close button on phones. |
 | **Menus** | Desktop: sidebar, remembered as expanded or collapsed per browser; **Users** only with `manage_users`. Phones: top bar with a menu button and a slide-out that closes on a choice, backdrop tap or Escape. |
 | **Users flow** | Table (cards on phones) plus a side panel for one person; **Create user** opens the invitation form in the same place. An invited person sees **Set up your account** until a password is set; sign-in has **Forgot password?**. |

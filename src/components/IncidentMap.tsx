@@ -120,7 +120,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
 function ListFallback({ incidents, selectedId, onSelect }: Pick<Props, 'incidents' | 'selectedId' | 'onSelect'>) {
   return (
     <div className="absolute inset-y-0 inset-x-0 overflow-y-auto px-4 pb-16 pt-16 desk:left-[calc(var(--agent-w)+0.5rem)] desk:right-80 desk:pt-[calc(var(--map-header-h)+1.5rem)] desk:pb-4">
-      <p className="mb-3 rounded-md border border-warning/50 p-3 text-body text-muted-foreground">
+      <p className="mb-3 rounded-md border border-warning/50 p-3 text-body-sm text-muted-foreground">
         The map needs WebGL2, which this browser has turned off. In Chrome: Settings → System → turn on “Use graphical
         acceleration when available”, then relaunch. Until then, here is the list of incidents (newest 100).
       </p>
@@ -130,7 +130,7 @@ function ListFallback({ incidents, selectedId, onSelect }: Pick<Props, 'incident
             <button
               onClick={() => onSelect(i.id)}
               aria-pressed={i.id === selectedId}
-              className={`flex w-full items-center gap-2 rounded-md border px-3 py-2 text-left text-body hover:bg-accent ${i.id === selectedId ? 'border-ring bg-accent' : 'bg-card/60'}`}
+              className={`flex w-full items-center gap-2 rounded-md border px-3 py-2 text-left text-body-sm hover:bg-accent ${i.id === selectedId ? 'border-ring bg-accent' : 'bg-card/60'}`}
             >
               <span className="size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[groupOf(i.status)].token})` }} aria-hidden />
               <span className="flex-1">

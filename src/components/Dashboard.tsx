@@ -106,7 +106,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
       <header data-slot="map-header" className="absolute inset-x-0 top-0 z-10 hidden h-(--map-header-h) items-center justify-between border-b bg-sidebar px-6 desk:flex">
         <div className="flex items-center gap-3">
           <h1 className="text-heading">Map</h1>
-          <span className="text-body text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
+          <span className="text-body-sm text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
         </div>
         {profile && (
           <div className="flex items-center gap-3">
@@ -157,7 +157,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
               {error ? 'Could not load incidents' : data ? `${filtered.length} incidents` : 'Loading…'}
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3 text-body">
+          <CardContent className="flex flex-col gap-3 text-body-sm">
             {error && <p className="text-incident">{error}</p>}
             {data && !error && (
               <>
@@ -211,7 +211,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
               <Xmark />
             </Button>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3 text-body">
+          <CardContent className="flex flex-col gap-3 text-body-sm">
             <div className="flex flex-wrap gap-1">
               <Badge variant="secondary">{label(selected.status)}</Badge>
               {selected.uncertainty_flags.map((f) => (

@@ -59,7 +59,7 @@ const SAMPLE: Answer = {
 /** Static copy of the docked agent panel with one conversation, so the look can be checked without signing in. */
 function ConversationDemo({ width = 456 }: { width?: number }) {
   return (
-    <div style={{ width }} className="flex h-[640px] max-w-full flex-col gap-3 border border-card bg-ai p-6 text-body">
+    <div style={{ width }} className="flex h-[640px] max-w-full flex-col gap-3 border border-card bg-ai p-6 text-body-sm">
       <div className="mx-auto flex min-h-0 w-full max-w-[664px] flex-1 flex-col gap-8">
         <div className="flex items-center gap-2 text-label">
           <Sparks className="size-4" aria-hidden /> Investigate and Ask
@@ -97,7 +97,7 @@ export function Gallery() {
     <div className="mx-auto flex min-h-svh max-w-5xl flex-col gap-8 p-4 desk:p-8">
       <header className="flex flex-col gap-1">
         <h1 className="text-heading">Component gallery</h1>
-        <p className="text-body text-muted-foreground">
+        <p className="text-body-sm text-muted-foreground">
           Real components, not copies. Under 1,440 px wide you see the phone sizes.
         </p>
       </header>

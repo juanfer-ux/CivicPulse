@@ -80,7 +80,7 @@ export function UsersAdmin() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h1 className="text-heading">Users</h1>
-              <p className="text-body text-muted-foreground">
+              <p className="text-body-sm text-muted-foreground">
                 {data ? `${data.users.length} ${data.users.length === 1 ? 'person' : 'people'}, ${pendingCount} waiting for a role` : 'Loading…'}
               </p>
             </div>
@@ -100,16 +100,16 @@ export function UsersAdmin() {
           <div className="flex flex-wrap items-center gap-2">
             <Input className="max-w-xs" placeholder="Search name or email" value={search} onChange={(e) => setSearch(e.target.value)} />
             <Select className="w-auto!" aria-label="Filter by role" value={roleFilter} onValueChange={setRoleFilter} options={[{ value: '', label: 'All roles' }, ...ROLE_OPTIONS]} />
-            <label className="flex items-center gap-2 text-body">
+            <label className="flex items-center gap-2 text-body-sm">
               <input type="checkbox" checked={pendingOnly} onChange={(e) => setPendingOnly(e.target.checked)} />
               Pending only
             </label>
           </div>
 
-          {error && <p className="text-body text-incident">Could not load users: {error}</p>}
+          {error && <p className="text-body-sm text-incident">Could not load users: {error}</p>}
 
           {data && (
-            <table className="w-full text-left text-body max-desk:block">
+            <table className="w-full text-left text-body-sm max-desk:block">
               <thead className="text-meta text-muted-foreground max-desk:hidden">
                 <tr className="border-b">
                   {['Name', 'Email', 'Role', 'Status', 'Localities', 'Categories'].map((h) => (
@@ -226,15 +226,15 @@ function UserPanel({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <h2 className="truncate text-title">{user.full_name || 'No name'}</h2>
-            <p className="truncate text-body text-muted-foreground">{user.email}</p>
+            <p className="truncate text-body-sm text-muted-foreground">{user.email}</p>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
             Close
           </Button>
         </div>
 
-        <p className="rounded-lg bg-muted/50 p-3 text-body">{summary}</p>
-        {user.role === 'specialist_operator' && <p className="text-body">Specialty: {specialtyOf(user, data).join(', ') || 'none yet'}</p>}
+        <p className="rounded-lg bg-muted/50 p-3 text-body-sm">{summary}</p>
+        {user.role === 'specialist_operator' && <p className="text-body-sm">Specialty: {specialtyOf(user, data).join(', ') || 'none yet'}</p>}
         {isMe && <p className="text-meta text-muted-foreground">This is you: your own role and status are locked so you cannot lock yourself out.</p>}
 
         <label className="flex flex-col gap-1 text-label">
@@ -251,7 +251,7 @@ function UserPanel({
           />
         </label>
 
-        <label className="flex items-center gap-2 text-body">
+        <label className="flex items-center gap-2 text-body-sm">
           <input
             type="checkbox"
             disabled={busy || isMe || !user.role}
@@ -265,7 +265,7 @@ function UserPanel({
         </label>
 
         {user.role !== 'super_admin' && (
-          <div className="flex flex-col gap-1 text-body">
+          <div className="flex flex-col gap-1 text-body-sm">
             Localities
             <MultiSelect
               noun="localities"
@@ -287,13 +287,13 @@ function UserPanel({
                   <span className="text-meta text-muted-foreground">{s.name}</span>
                   {cats.length ? (
                     cats.map((c) => (
-                      <label key={c.code} className="flex items-center gap-2 text-body">
+                      <label key={c.code} className="flex items-center gap-2 text-body-sm">
                         <input type="checkbox" checked={user.categories.includes(c.code)} onChange={(e) => toggleCategory(c.code, e.target.checked)} />
                         {c.name}
                       </label>
                     ))
                   ) : (
-                    <span className="text-body text-muted-foreground">No categories yet</span>
+                    <span className="text-body-sm text-muted-foreground">No categories yet</span>
                   )}
                 </div>
               )
@@ -301,7 +301,7 @@ function UserPanel({
           </fieldset>
         )}
 
-        <p role="status" className={`min-h-5 text-body ${msg?.ok === false ? 'text-incident' : 'text-muted-foreground'}`}>
+        <p role="status" className={`min-h-5 text-body-sm ${msg?.ok === false ? 'text-incident' : 'text-muted-foreground'}`}>
           {busy ? 'Saving…' : msg?.text}
         </p>
       </div>
@@ -338,7 +338,7 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
         <div className="flex items-start justify-between gap-2">
           <div>
             <h2 className="text-title">Create user</h2>
-            <p className="text-body text-muted-foreground">They get an email to set their own password.</p>
+            <p className="text-body-sm text-muted-foreground">They get an email to set their own password.</p>
           </div>
           <Button type="button" variant="ghost" size="sm" onClick={onClose}>
             Close
@@ -358,10 +358,10 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
           <Select aria-label="Role" value={form.role} onValueChange={(v) => set({ role: v as AppRole | '' })} options={[{ value: '', label: 'Choose a role' }, ...ROLE_OPTIONS]} />
         </label>
 
-        {form.role === 'super_admin' && <p className="rounded-lg bg-muted/50 p-3 text-body">Super Admins see everything and manage users, so no zone is needed.</p>}
+        {form.role === 'super_admin' && <p className="rounded-lg bg-muted/50 p-3 text-body-sm">Super Admins see everything and manage users, so no zone is needed.</p>}
 
         {(form.role === 'locality_admin' || form.role === 'specialist_operator') && (
-          <div className="flex flex-col gap-1 text-body">
+          <div className="flex flex-col gap-1 text-body-sm">
             Zone{form.role === 'locality_admin' ? ' to administer' : 's'}
             <MultiSelect
               noun="zones"
@@ -382,13 +382,13 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
                   <span className="text-meta text-muted-foreground">{sp.name}</span>
                   {cats.length ? (
                     cats.map((c) => (
-                      <label key={c.code} className="flex items-center gap-2 text-body">
+                      <label key={c.code} className="flex items-center gap-2 text-body-sm">
                         <input type="checkbox" checked={form.categories.includes(c.code)} onChange={(e) => toggleCategory(c.code, e.target.checked)} />
                         {c.name}
                       </label>
                     ))
                   ) : (
-                    <span className="text-body text-muted-foreground">No categories yet</span>
+                    <span className="text-body-sm text-muted-foreground">No categories yet</span>
                   )}
                 </div>
               )
@@ -397,7 +397,7 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
           </fieldset>
         )}
 
-        <p role="alert" className="min-h-5 text-body text-incident">
+        <p role="alert" className="min-h-5 text-body-sm text-incident">
           {error}
         </p>
         <Button type="submit" disabled={busy}>

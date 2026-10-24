@@ -36,14 +36,31 @@
   --text-button--font-weight: 400;
   --text-button--line-height: var(--lh-label);
   --text-button--letter-spacing: 0.022em;
-  --text-button-sm: var(--fs-body);
+  --text-button-sm: var(--fs-body-sm);
   --text-button-sm--font-weight: 400;
   --text-button-sm--line-height: var(--lh-label);
   --text-button-sm--letter-spacing: 0.022em;
+  --text-body-sm: var(--fs-body-sm);
+  --text-body-sm--font-weight: 300;
+  --text-body-sm--line-height: var(--lh-body-sm);
+  --text-body-sm--letter-spacing: 0.022em;
+  --text-body-sm-medium: var(--fs-body-sm);
+  --text-body-sm-medium--font-weight: 360;
+  --text-body-sm-medium--line-height: var(--lh-body-sm);
+  --text-body-sm-strong: var(--fs-body-sm);
+  --text-body-sm-strong--font-weight: 400;
+  --text-body-sm-strong--line-height: var(--lh-body-sm);
+  /* Default body is 14 px on desktop (Figma: body, body-medium, body-strong); body-sm is the 13 px one used so far. */
   --text-body: var(--fs-body);
   --text-body--font-weight: 300;
   --text-body--line-height: var(--lh-body);
   --text-body--letter-spacing: 0.022em;
+  --text-body-medium: var(--fs-body);
+  --text-body-medium--font-weight: 360;
+  --text-body-medium--line-height: var(--lh-body);
+  --text-body-strong: var(--fs-body);
+  --text-body-strong--font-weight: 400;
+  --text-body-strong--line-height: var(--lh-body);
   --text-meta: var(--fs-meta);
   --text-meta--font-weight: 300;
   --text-meta--line-height: var(--lh-meta);
@@ -54,6 +71,8 @@
 
 /* Sizes from Figma's Device collection: Mobile values by default (windows under 1,440 px), Desktop values from 1,440 px. */
 :root {
+  --fs-body-sm: 16px;
+  --lh-body-sm: 24px;
   --fs-body: 16px;
   --lh-body: 24px;
   --fs-label: 16px;
@@ -69,7 +88,9 @@
 }
 @media (min-width: 90rem) {
   :root {
-    --fs-body: 13px;
+    --fs-body-sm: 13px;
+    --lh-body-sm: 22px;
+    --fs-body: 14px;
     --lh-body: 22px;
     --fs-label: 14px;
     --lh-label: 20px;
