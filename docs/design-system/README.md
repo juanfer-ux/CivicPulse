@@ -40,5 +40,5 @@ Figma pages: Cover, Foundations, Components, Screens, Icons, Archive · earlier 
 | 🟨 | Table Row columns share the width equally in Figma; the code table lays columns out automatically. |
 | 🟥 | Cover and a few old frames still use Gilroy text, a font Figma does not have; they should use Manrope. |
 | 🟨 | Earlier-concept components remain in Figma (see components.md). |
-| 🟨 | The Sign in picture is a looping video in code; Figma still shows the still frame ([decision 0021](../decisions/0021-auth-picture-is-a-video.md)). |
+| 🟨 | The Sign in picture is a looping video in code; Figma still shows the old wave picture ([decision 0021](../decisions/0021-auth-picture-is-a-video.md)). |
 | ⬜ | Textarea in code (the agent composer is an Input today). |
