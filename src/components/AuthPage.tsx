@@ -53,11 +53,11 @@ export function AuthPage() {
   }
 
   return (
-    <main className="relative isolate flex min-h-svh items-center justify-center bg-background p-4 desk:gap-0 desk:p-6">
+    <main className="relative isolate flex min-h-svh items-center justify-center bg-background p-4 desk:gap-0 desk:p-10">
       <img src={authImage} alt="" className="absolute inset-0 -z-10 hidden size-full object-cover object-center desk:block" />
-      <section className="hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-8 desk:flex">
+      <section className="hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-0.5 desk:flex">
         <Logo compact />
-        <div className="flex max-w-[640px] flex-col gap-10 p-2">
+        <div className="flex max-w-[640px] flex-col gap-10 p-2.5">
           <h1 className="text-[64px] leading-[68px] font-extralight tracking-[-0.014em] text-foreground">{HEADLINE}</h1>
           <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
         </div>
