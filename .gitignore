@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local design drafts (videos, source pictures): large, kept out of the public repo
+images/
