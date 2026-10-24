@@ -1,12 +1,12 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { Pause, Play } from 'iconoir-react'
-import authImage from '@/assets/auth-image.png'
+import authImage from '@/assets/auth-aura-still.jpg'
 import authVideo from '@/assets/auth-aura.mp4'
 import { Logo } from '@/components/Logo'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
-/** Value proposition next to the card on desktop (Figma Auth_Image container). The picture is the still src/assets/auth-image.png (Figma's frame, the poster, the phone-free fallback) with the looping src/assets/auth-aura.mp4 on top: replace the files to change them (decision 0021). */
+/** Value proposition next to the card on desktop (Figma Auth_Image container). The picture is the looping src/assets/auth-aura.mp4 over its own first frame, src/assets/auth-aura-still.jpg (shown before it loads and for reduced motion): re-export the still when the video changes (decision 0021). */
 const HEADLINE = 'Street incidents, turned into decisions.'
 const SUBTITLE = 'AI agents connect scattered incidents into patterns and recommend an intervention, with the evidence behind it.'
 
