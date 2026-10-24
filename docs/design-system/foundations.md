@@ -17,7 +17,7 @@ Each class sets size, line height and weight together, so a component never need
 | subtitle | 16 / 24 | 16 / 24 | 360 | Card titles | `text-subtitle` |
 | label | 14 / 20 | **16 / 24** | 360 | Buttons, field names, menu items, tabs | `text-label` |
 | button | 14 / 20 (spacing 2.2%) | **16 / 24** | 400 | Text in Button (default, lg, icon-lg) | `text-button` |
-| button-sm | 13 / 20 (spacing 2.2%) | **16 / 24** | 400 | Text in small Button | `text-button-sm` |
+| button-sm | 13.5 / 20 (spacing 2.2%) | **16 / 24** | 400 | Text in small Button | `text-button-sm` |
 | body | 14 / 22 (spacing 2.2%) | **16 / 24** | 300 | Default paragraph text (new; not used by a screen yet) | `text-body` |
 | body-medium | 14 / 22 (spacing 2%) | **16 / 24** | 360 | Default body, medium | `text-body-medium` |
 | body-strong | 14 / 22 (spacing 2%) | **16 / 24** | 400 | Default body, strong | `text-body-strong` |
