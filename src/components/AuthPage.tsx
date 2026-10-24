@@ -106,17 +106,6 @@ export function AuthPage() {
                     Forgot password?
                   </Button>
                 )}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setMode(signup ? 'signin' : 'signup')
-                    setError(null)
-                    setNotice(null)
-                  }}
-                >
-                  {signup ? 'I already have an account' : 'Create an account'}
-                </Button>
               </div>
             </form>
           </CardContent>
