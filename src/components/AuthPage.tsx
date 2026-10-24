@@ -7,7 +7,7 @@ import authImage from '@/assets/auth-image.png'
 import { supabase } from '@/lib/supabase'
 
 /** Value proposition next to the sign-in card on desktop (Figma Auth_Image container). The picture is src/assets/auth-image.png: replace the file to change it. */
-const HEADLINE = 'Street incidents,\nturned into decisions.'
+const HEADLINE = 'Street incidents, turned into decisions.'
 const SUBTITLE = 'AI agents connect scattered incidents into patterns and recommend an intervention, with the evidence behind it.'
 
 export function AuthPage() {
@@ -55,10 +55,10 @@ export function AuthPage() {
   return (
     <main className="relative isolate flex min-h-svh items-center justify-center bg-background p-4 desk:gap-0 desk:p-6">
       <img src={authImage} alt="" className="absolute inset-0 -z-10 hidden size-full object-cover object-center desk:block" />
-      <section className="hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-6 desk:flex">
+      <section className="hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-8 desk:flex">
         <Logo compact />
-        <div className="flex max-w-[640px] flex-col gap-8">
-          <h1 className="text-[48px] leading-[52px] font-semibold tracking-[-0.014em] whitespace-pre-line text-foreground">{HEADLINE}</h1>
+        <div className="flex max-w-[620px] flex-col gap-8 py-2">
+          <h1 className="text-[64px] leading-[68px] font-extralight tracking-[-0.014em] text-foreground">{HEADLINE}</h1>
           <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
         </div>
       </section>

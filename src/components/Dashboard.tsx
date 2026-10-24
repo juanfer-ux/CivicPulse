@@ -103,7 +103,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
       />
 
       {/* Map header (desktop only): 70 px, across the whole width next to the sidebar, above the agent panel and the map. Test content. */}
-      <header data-slot="map-header" className="absolute inset-x-0 top-0 z-10 hidden h-(--map-header-h) items-center justify-between border-b bg-sidebar px-6 desk:flex">
+      <header data-slot="map-header" className="absolute inset-x-0 top-0 z-10 hidden h-(--map-header-h) items-center justify-between border-b bg-card px-6 desk:flex">
         <div className="flex items-center gap-3">
           <h1 className="text-heading">Map</h1>
           <span className="text-body-sm text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
