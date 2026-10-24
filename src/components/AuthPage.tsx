@@ -53,7 +53,7 @@ export function AuthPage() {
   }
 
   return (
-    <main className="relative isolate flex min-h-svh items-center justify-center bg-background p-4 desk:gap-0 desk:p-10">
+    <main className="relative isolate flex min-h-svh justify-center bg-background px-4 desk:gap-0 desk:p-10">
       <img src={authImage} alt="" className="absolute inset-0 -z-10 hidden size-full object-cover object-center desk:block" />
       <section className="hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-0.5 desk:flex">
         <Logo compact />
@@ -62,18 +62,32 @@ export function AuthPage() {
           <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
         </div>
       </section>
-      <div className="flex w-full items-center justify-center desk:min-w-[450px] desk:max-w-[640px] desk:flex-1 desk:self-stretch desk:rounded-xl desk:bg-background desk:px-4 desk:py-6">
-        <Card className="w-full gap-0 border-0 bg-transparent">
-          <CardContent className="mx-auto w-full max-w-[460px]">
-            {/* Figma Auth Card (sign in): header + fields and actions 64 px apart; header and fields 24 px apart, fields and actions 12 px inside. */}
-            <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-16">
+      <div className="flex w-full justify-center desk:min-w-[450px] desk:max-w-[640px] desk:flex-1 desk:self-stretch desk:rounded-xl desk:bg-background desk:px-4 desk:py-6">
+        <Card className="w-full max-w-[460px] justify-between gap-0 border-0 bg-transparent">
+          {/* Figma Auth Card (sign in): the account switch sits top right; the form block is centered; header and fields 24 px apart, fields and actions 40 px, buttons 12 px. */}
+          <CardContent className="flex justify-end">
+            <Button
+              type="button"
+              variant="ghost"
+              className="px-1"
+              onClick={() => {
+                setMode(signup ? 'signin' : 'signup')
+                setError(null)
+                setNotice(null)
+              }}
+            >
+              {signup ? 'I already have an account' : 'Create account'}
+            </Button>
+          </CardContent>
+          <CardContent className="flex flex-1 flex-col justify-center">
+            <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-10">
               <div className="flex flex-col gap-6">
                 <CardHeader className="gap-2 px-0">
                   <CardTitle className="text-stat">{signup ? 'Create account' : 'Sign in'}</CardTitle>
                   <CardDescription>
                     {signup
                       ? 'New accounts have no access until a Super Admin assigns a role.'
-                      : 'Civic Operations Agent.'}
+                      : 'Welcome to Civic Operations Agent.'}
                   </CardDescription>
                 </CardHeader>
                 <div className="flex flex-col gap-3">
@@ -99,17 +113,6 @@ export function AuthPage() {
               <div className="flex flex-col gap-3">
                 <Button type="submit" disabled={busy}>
                   {busy ? 'Please wait…' : signup ? 'Create account' : 'Sign in'}
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setMode(signup ? 'signin' : 'signup')
-                    setError(null)
-                    setNotice(null)
-                  }}
-                >
-                  {signup ? 'I already have an account' : 'Create an account'}
                 </Button>
                 {!signup && (
                   <Button type="button" variant="link" size="sm" disabled={busy} onClick={forgot}>
