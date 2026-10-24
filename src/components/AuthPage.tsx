@@ -62,24 +62,11 @@ export function AuthPage() {
           <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
         </div>
       </section>
-      <div className="flex w-full justify-center desk:min-w-[450px] desk:max-w-[640px] desk:flex-1 desk:self-stretch desk:rounded-xl desk:bg-background desk:px-4 desk:py-6">
-        <Card className="w-full max-w-[460px] justify-between gap-0 border-0 bg-transparent">
-          {/* Figma Auth Card (sign in): the account switch sits top right; the form block is centered; header and fields 24 px apart, fields and actions 40 px, buttons 12 px. */}
-          <CardContent className="flex justify-end">
-            <Button
-              type="button"
-              variant="ghost"
-              className="px-1"
-              onClick={() => {
-                setMode(signup ? 'signin' : 'signup')
-                setError(null)
-                setNotice(null)
-              }}
-            >
-              {signup ? 'I already have an account' : 'Create account'}
-            </Button>
-          </CardContent>
-          <CardContent className="flex flex-1 flex-col justify-center">
+      <div className="flex w-full flex-1 justify-center max-desk:flex-col max-desk:items-center max-desk:py-10 desk:min-w-[450px] desk:max-w-[640px] desk:self-stretch desk:rounded-xl desk:bg-background desk:px-4 desk:py-6">
+        <Logo compact className="desk:hidden" />
+        <Card className="w-full max-w-[460px] justify-center gap-0 border-0 bg-transparent max-desk:flex-1">
+          {/* Figma Auth Card (sign in): one centered block; header and fields 24 px apart, fields and actions 40 px, buttons 12 px. On phones the logo sits above the card. */}
+          <CardContent>
             <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-10">
               <div className="flex flex-col gap-6">
                 <CardHeader className="gap-2 px-0">
@@ -119,6 +106,17 @@ export function AuthPage() {
                     Forgot password?
                   </Button>
                 )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setMode(signup ? 'signin' : 'signup')
+                    setError(null)
+                    setNotice(null)
+                  }}
+                >
+                  {signup ? 'I already have an account' : 'Create an account'}
+                </Button>
               </div>
             </form>
           </CardContent>
