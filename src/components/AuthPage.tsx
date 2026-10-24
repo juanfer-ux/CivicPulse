@@ -52,7 +52,7 @@ export function AuthPage() {
   }
 
   return (
-    <main className="flex min-h-svh items-center justify-center bg-background p-4 desk:items-stretch desk:justify-start desk:gap-0 desk:bg-[radial-gradient(ellipse_90%_90%_at_70%_30%,var(--neutral-500),var(--neutral-700))]">
+    <main className="flex min-h-svh items-center justify-center bg-[radial-gradient(ellipse_90%_90%_at_70%_30%,var(--neutral-500),var(--neutral-700))] p-4 desk:items-stretch desk:justify-start">
       <section className="relative hidden min-w-[850px] flex-1 items-end overflow-hidden rounded-lg bg-sidebar p-12 desk:flex">
         <img src={authImage} alt="" className="absolute inset-0 size-full object-cover object-left-top" />
         <div className="absolute inset-0 bg-[linear-gradient(transparent,var(--neutral-900))]" />
