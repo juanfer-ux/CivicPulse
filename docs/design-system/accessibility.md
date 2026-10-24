@@ -40,7 +40,7 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 | **Focus ring contrast** | The ring is `ring` at 50 %, probably under 3 : 1 against the page; the border change helps. Needs measuring against WCAG 2.2 (3 : 1). |
 | **Side panels** | Focus does not move into a panel when it opens, and is not returned to the row or button on close. |
 | **Tables** | Check header cells are announced as headers (`scope`) and rows are operable by keyboard (the row click has no key handler today). |
-| **Motion** | The slide-out menu and sidebar width transitions ignore `prefers-reduced-motion`. |
+| **Motion** | The slide-out menu and sidebar width transitions ignore `prefers-reduced-motion`. The Sign in video does follow it (no autoplay) and has a pause button; it never flashes (pulses fade in and out over seconds). |
 | **Zoom and text size** | 200 % zoom and larger system text are untested (a zoomed desktop falls back to the mobile layout, which helps). |
 | **Automated and manual checks** | No axe or Lighthouse run, no screen-reader pass (VoiceOver) yet. |
 

@@ -26,6 +26,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0018](0018-base-ui-select.md) | Select uses Base UI, not the browser list | ✅ Accepted |
 | [0019](0019-manrope-font.md) | The product font is Manrope | ✅ Accepted |
 | [0020](0020-generic-color-names.md) | Color tokens are named by color, not by use | ✅ Accepted |
+| [0021](0021-auth-picture-is-a-video.md) | The Sign in picture is a looping video | ✅ Accepted |
 
 ## ✍️ Template
 ```
