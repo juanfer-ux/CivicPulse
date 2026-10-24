@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Sparks, ThumbsDown, ThumbsUp } from 'iconoir-react'
+import { ArrowUp, Sparks, ThumbsDown, ThumbsUp } from 'iconoir-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,7 @@ type Turn = { question: string; result?: Answer; error?: string }
 export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[]) => void }) {
   const [turns, setTurns] = useState<Turn[]>([])
   const [busy, setBusy] = useState(false)
+  const [text, setText] = useState('')
   const end = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -36,9 +37,8 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const input = e.currentTarget.elements.namedItem('q') as HTMLInputElement
-    void ask(input.value)
-    input.value = ''
+    void ask(text)
+    setText('')
   }
 
   return (
@@ -52,7 +52,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
         <div className="mx-auto flex min-h-0 w-full max-w-[664px] flex-1 flex-col gap-3 overflow-y-auto pr-1 text-body">
           {turns.length === 0 && (
             <div className="flex flex-col gap-2">
-              <p className="text-muted-foreground">Try one of these, or ask your own:</p>
+              <p className="text-meta text-muted-foreground">Try one of these, or ask your own:</p>
               {SUGGESTIONS.map((s) => (
                 <Button key={s} variant="outline" className="h-auto justify-start whitespace-normal px-3 py-2 text-left text-button-sm text-foreground" onClick={() => void ask(s)}>
                   {s}
@@ -71,9 +71,9 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
           <div ref={end} />
         </div>
         <form onSubmit={onSubmit} className="mx-auto flex w-full max-w-[664px] items-center gap-2">
-          <Input name="q" placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" />
-          <Button type="submit" variant="outline" disabled={busy}>
-            Ask
+          <Input name="q" value={text} onChange={(e) => setText(e.target.value)} placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" />
+          <Button type="submit" size="icon" aria-label="Ask" disabled={busy || !text.trim()}>
+            <ArrowUp aria-hidden />
           </Button>
         </form>
       </CardContent>

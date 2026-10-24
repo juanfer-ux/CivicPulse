@@ -43,6 +43,7 @@
   --text-body: var(--fs-body);
   --text-body--font-weight: 300;
   --text-body--line-height: var(--lh-body);
+  --text-body--letter-spacing: 0.022em;
   --text-meta: var(--fs-meta);
   --text-meta--font-weight: 300;
   --text-meta--line-height: var(--lh-meta);
