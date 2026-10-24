@@ -11,7 +11,8 @@ const HEADLINE = 'Street incidents, turned into decisions.'
 const SUBTITLE = 'AI agents connect scattered incidents into patterns and recommend an intervention, with the evidence behind it.'
 
 export function AuthPage() {
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+  // Sign-up is not offered for now (no button opens it); the setter comes back with the "Create an account" button.
+  const [mode] = useState<'signin' | 'signup'>('signin')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
