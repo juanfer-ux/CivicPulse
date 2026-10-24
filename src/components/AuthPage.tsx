@@ -62,7 +62,7 @@ export function AuthPage() {
           <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
         </div>
       </section>
-      <div className="flex w-full items-center justify-center desk:min-w-[450px] desk:max-w-[480px] desk:flex-1 desk:self-stretch desk:rounded-xl desk:bg-background desk:px-4 desk:py-6">
+      <div className="flex w-full items-center justify-center desk:min-w-[450px] desk:max-w-[640px] desk:flex-1 desk:self-stretch desk:rounded-xl desk:bg-background desk:px-4 desk:py-6">
         <Card className="w-full gap-0 border-0 bg-transparent">
           <CardContent className="mx-auto w-full max-w-[392px]">
             {/* Figma Auth Card (sign in): header + fields and actions 64 px apart; header and fields 24 px apart, fields and actions 12 px inside. */}
