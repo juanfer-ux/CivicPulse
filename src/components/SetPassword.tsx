@@ -30,27 +30,25 @@ export function SetPassword({ onDone }: { onDone: () => void }) {
 
   return (
     <main className="grid min-h-svh place-items-center bg-background p-4">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm gap-10">
+        <Logo className="px-(--card-spacing)" />
         <CardHeader>
-          <Logo className="mb-9 ml-2" />
           <CardTitle>Set up your account</CardTitle>
           <CardDescription>Choose the password you will use to sign in.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit} className="flex flex-col gap-3">
-            <Input value={String(session?.user.user_metadata?.full_name ?? '')} aria-label="Name" disabled readOnly />
-            <Input value={session?.user.email ?? ''} aria-label="Email" disabled readOnly />
-            <label className="flex flex-col gap-1 text-label">
-              Password
-              <Input name="password" type="password" autoComplete="new-password" required />
-            </label>
-            <label className="flex flex-col gap-1 text-label">
-              Repeat password
-              <Input name="confirm" type="password" autoComplete="new-password" required />
-            </label>
-            <p role="alert" className="min-h-5 text-body-sm text-incident">
-              {error}
-            </p>
+          <form onSubmit={onSubmit} className="flex flex-col gap-10">
+            <div className="flex flex-col gap-3">
+              <Input value={String(session?.user.user_metadata?.full_name ?? '')} aria-label="Name" disabled readOnly />
+              <Input value={session?.user.email ?? ''} aria-label="Email" disabled readOnly />
+              <Input name="password" type="password" placeholder="Password" aria-label="Password" autoComplete="new-password" required />
+              <Input name="confirm" type="password" placeholder="Repeat password" aria-label="Repeat password" autoComplete="new-password" required />
+              {error && (
+                <p role="alert" className="text-body-sm text-incident">
+                  {error}
+                </p>
+              )}
+            </div>
             <Button type="submit" disabled={busy}>
               {busy ? 'Saving…' : 'Save and continue'}
             </Button>
