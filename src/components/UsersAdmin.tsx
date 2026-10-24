@@ -129,7 +129,7 @@ export function UsersAdmin() {
                         setCreating(false)
                         setOpenId(u.id)
                       }}
-                      className={`cursor-pointer border-b hover:bg-muted/50 max-desk:grid max-desk:grid-cols-2 max-desk:gap-1 max-desk:rounded-lg max-desk:border max-desk:bg-card max-desk:p-3 ${openId === u.id ? 'bg-muted/50' : ''}`}
+                      className={`cursor-pointer border-b hover:bg-muted/50 max-desk:grid max-desk:grid-cols-2 max-desk:gap-1 max-desk:rounded-lg max-desk:border max-desk:bg-card max-desk:p-3 ${openId === u.id ? 'bg-muted' : ''}`}
                     >
                       <td className="px-3 py-2 font-medium max-desk:col-span-2 max-desk:p-0">{u.full_name || 'No name'}</td>
                       <td className="px-3 py-2 text-muted-foreground max-desk:col-span-2 max-desk:truncate max-desk:p-0">{u.email}</td>
