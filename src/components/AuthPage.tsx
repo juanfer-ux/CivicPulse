@@ -68,7 +68,7 @@ export function AuthPage() {
             {/* Figma Auth Card (sign in): header + fields and actions 64 px apart; header and fields 24 px apart, fields and actions 12 px inside. */}
             <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-16">
               <div className="flex flex-col gap-6">
-                <CardHeader className="px-0">
+                <CardHeader className="gap-2 px-0">
                   <CardTitle className="text-stat">{signup ? 'Create account' : 'Sign in'}</CardTitle>
                   <CardDescription>
                     {signup
