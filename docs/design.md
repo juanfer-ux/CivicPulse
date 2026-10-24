@@ -18,6 +18,8 @@
 | Layout | Sidebar on the left; a Map header (70 px, across the whole width next to the sidebar), and below it the agent panel docked next to the sidebar (543.5 px) and the map to its right with filters on the right (288 px) floating over it; the sidebar starts collapsed | Top bar with a menu button; map with a bottom sheet (Explore / Investigate) |
 | Sizes | Body 13, label 14, controls 36 | Body 16, label 16, controls 44 (touch) |
 
+On the sign-in screen the desktop version adds the image panel on the left; mobile is the card alone.
+
 The switch is at **1,440 px** (owner's decision): any narrower window, including a half-width laptop browser, gets the mobile layout. In code it is the `desk:` breakpoint in `src/index.css`.
 
 ## 🖼️ Figma ↔ code workflow
