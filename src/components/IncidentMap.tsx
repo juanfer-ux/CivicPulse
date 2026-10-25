@@ -50,7 +50,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'circle-color': ['get', 'color'],
           'circle-opacity': 0.85,
           'circle-stroke-width': 1,
-          'circle-stroke-color': token('--background'),
+          'circle-stroke-color': token('--map-dot-outline'),
         },
       })
       map.addLayer({
@@ -62,7 +62,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 6, 15, 12],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-stroke-width': 2,
-          'circle-stroke-color': token('--ai-border'),
+          'circle-stroke-color': token('--map-answer-ring'),
         },
       })
       map.addLayer({
@@ -74,7 +74,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 7, 15, 13],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-stroke-width': 2,
-          'circle-stroke-color': token('--foreground'),
+          'circle-stroke-color': token('--map-selected-ring'),
         },
       })
       map.on('click', 'incidents', (e) => onSelectRef.current(String(e.features?.[0]?.properties?.id ?? '') || null))

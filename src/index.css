@@ -184,6 +184,14 @@
   --warning: var(--amber-400);
   --incident: var(--coral-400); /* incidents, invalid fields and ALL error text */
 
+  /* Map colors (Figma Map collection, each an alias of a base color): the map reads these, not the UI names above, so it can be recolored without touching badges, errors or focus rings. */
+  --map-needs-review: var(--amber-400);
+  --map-validated: var(--coral-400);
+  --map-closed: var(--neutral-300);
+  --map-dot-outline: var(--neutral-700);
+  --map-answer-ring: var(--indigo-400);
+  --map-selected-ring: var(--neutral-100);
+
   /* Names shadcn components expect, reusing the colors above. */
   --popover: var(--card);
   --primary: var(--foreground);

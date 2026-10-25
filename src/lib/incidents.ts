@@ -64,9 +64,9 @@ export interface Category {
 
 /** Status groups and the color token each one uses (CSS variable name; the map resolves it with token() because MapLibre needs a literal color). */
 export const GROUPS = {
-  pending: { label: 'Needs review', token: '--warning' },
-  active: { label: 'Validated / in progress', token: '--incident' },
-  closed: { label: 'Closed', token: '--closed' },
+  pending: { label: 'Needs review', token: '--map-needs-review' },
+  active: { label: 'Validated / in progress', token: '--map-validated' },
+  closed: { label: 'Closed', token: '--map-closed' },
 } as const
 export type Group = keyof typeof GROUPS
 
