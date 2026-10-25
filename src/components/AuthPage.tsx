@@ -59,7 +59,7 @@ export function AuthPage() {
               <CardDescription>
                 {signup
                   ? 'New accounts have no access until a Super Admin assigns a role.'
-                  : 'Welcome to Civic Operations Agent.'}
+                  : 'Welcome to the Civic Ops. Agent Platform'}
               </CardDescription>
             </CardHeader>
             <div className="flex flex-col gap-3">
