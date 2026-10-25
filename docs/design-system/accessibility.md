@@ -40,7 +40,7 @@ Method: keyboard walk, computed styles and the real page in a browser, contrast 
 |---|---|
 | 1.4.3 Text over the moving video | Worst case over the whole loop: headline 7.9 : 1 (needs 3), subtitle 6.5 (needs 4.5), card description 7.2, Forgot password 10.0. The glow never gets close to a fail. |
 | 1.4.3 Other text | Button text 10.8, errors 6.9, placeholders 7.4 |
-| 2.4.7 Focus visible | On focus the field border becomes `ring` `#737381`: **3.7 : 1** against the field and 3.8 against the panel (1.4.11 needs 3). The 3 px halo alone is only about 1.9 : 1, so **keep the border change**. |
+| 2.4.7 Focus visible | On focus the field border becomes `foreground` `#C1C1C8` (it was `ring` `#737381` until the `input` token moved to the same color, see decision 0022): more than 9 : 1 against the field. The 3 px halo alone is only about 1.9 : 1, so **keep the border change**. |
 | 2.2.2, 2.3.1 Motion | Pause button (36 px, labelled, toggles); autoplay is off with reduced motion; nothing flashes (pulses fade over seconds); video and still are hidden from screen readers |
 | 1.3.5, 3.3.8 Inputs | `autocomplete` on email and password, paste allowed, no puzzle or memory test |
 | 1.4.10, 1.4.12 Reflow, text spacing | No horizontal scroll at 320 px; no clipping with line height 1.5, letter spacing 0.12 em, word spacing 0.16 em |
@@ -54,13 +54,15 @@ Method: keyboard walk, computed styles and the real page in a browser, contrast 
 | Errors were not tied to their fields | 3.3.1, 1.3.1 | `aria-invalid` and `aria-describedby` on the fields, `id` on the error |
 | "Sign in" / "Set up your account" were not headings, and the only heading was the tagline | 1.3.1, 2.4.6 | The card title is now the page's `h1` (`CardTitle asChild`); the tagline is a paragraph |
 | First Tab stop was the pause button, away from the form | 2.4.3 | The form comes first in the page order, the picture column (and its pause button) after it; the look is unchanged |
+| The placeholder was the only label and disappeared while typing | 3.3.2 | A visible label above every input; the placeholder is now only an example hint ([decision 0023](../decisions/0023-labels-above-inputs.md)) |
+| Field edges were almost invisible when not focused (border 1.6 : 1) | 1.4.11 | The `input` token now points at `neutral-300` `#737381` (3.8 : 1 on the panel) for every input, dropdown, outline button and role badge; focus border `foreground` ([decision 0022](../decisions/0022-input-border-neutral-300.md)) |
 
 **Open: needs a design decision (owner)**
 | Issue | WCAG | Evidence | Option |
 |---|---|---|---|
-| Field edges are almost invisible when not focused | 1.4.11 (AA) | Border `#3C3C44` is 1.6 : 1 against the panel; the fill is 1.03 : 1 | Border at `neutral-300` `#737381` (3.7 : 1) |
-| No visible labels: the placeholder is the only label and disappears while typing, together with "min. 8 characters" | 3.3.2 (A) | Names exist for assistive tech | A visible label above each field |
 | Thin body text: description at weight 300, 13.5 px | advisory | Passes contrast | Heavier weight or 14 px and up |
+
+See the weight options on localhost: `/#components` → "Description text · weight decision" (delete that section once decided).
 
 ## 🟥 Not audited yet
 | Area | What is missing |

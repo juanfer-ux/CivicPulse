@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Plus, Sparks } from 'iconoir-react'
 import { Button } from '@/components/ui/button'
+import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Avatar } from '@/components/ui/avatar'
 import { RoleBadge } from '@/components/ui/role-badge'
@@ -91,6 +92,36 @@ function SelectDemo({ disabled }: { disabled?: boolean }) {
   return <Select aria-label="Role" value={v} onValueChange={setV} options={ROLE_DEMO} disabled={disabled} className="w-70" />
 }
 
+/** The Map filters card and the Users search row with labels above (decision 0023), built from the real components; the real screens need a sign-in. */
+function FiltersDemo() {
+  const [v, setV] = useState('')
+  const options = [{ value: '', label: 'All' }, ...ROLE_DEMO]
+  return (
+    <div className="flex flex-wrap items-start gap-8">
+      <div className="flex w-72 flex-col gap-3 rounded-lg border bg-card p-4">
+        <div className="text-subtitle">Filters</div>
+        {['Locality', 'Category', 'Status', 'Period'].map((name) => (
+          <Field key={name} label={name}>
+            <Select aria-label={name} value={v} onValueChange={setV} options={options} />
+          </Field>
+        ))}
+      </div>
+      <div className="flex flex-wrap items-end gap-2">
+        <Field label="Search">
+          <Input className="max-w-xs" placeholder="Name or email" />
+        </Field>
+        <Field label="Role">
+          <Select className="w-auto!" aria-label="Filter by role" value={v} onValueChange={setV} options={options} />
+        </Field>
+        <label className="flex h-(--control-default) items-center gap-2 text-body-sm">
+          <input type="checkbox" />
+          Pending only
+        </label>
+      </div>
+    </div>
+  )
+}
+
 /** Component gallery: open `/#components`. Resize the window under 1,440 px to see the phone sizes. */
 export function Gallery() {
   return (
@@ -101,6 +132,23 @@ export function Gallery() {
           Real components, not copies. Under 1,440 px wide you see the phone sizes.
         </p>
       </header>
+
+      <Section title="Description text · weight decision (the Sign in line under the title)">
+        <div className="flex w-[460px] max-w-full flex-col gap-3 rounded-xl border bg-card p-4">
+          <div className="flex flex-col gap-1">
+            <span className="text-meta text-muted-foreground">Now: Regular (300), what the app uses</span>
+            <div className="text-body-sm text-muted-foreground">Welcome to the Civic Ops. Agent Platform</div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-meta text-muted-foreground">Proposed: Medium (360), sturdier strokes at 13.5 px</span>
+            <div className="text-body-sm-medium text-muted-foreground">Welcome to the Civic Ops. Agent Platform</div>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Filters and search · labels above (Map filters card, Users search row)">
+        <FiltersDemo />
+      </Section>
 
       <Section title="Button · variants and sizes">
         {VARIANTS.map((variant) => (

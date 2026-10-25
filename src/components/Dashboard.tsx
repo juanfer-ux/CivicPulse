@@ -5,6 +5,7 @@ import { MediaGallery } from '@/components/MediaGallery'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { RoleBadge } from '@/components/ui/role-badge'
+import { Field } from '@/components/ui/field'
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -143,11 +144,11 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
           <CardHeader>
             <CardTitle>Filters</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-2">
-            <Select aria-label="Locality" value={locality} onValueChange={setLocality} options={[{ value: '', label: 'All localities' }, ...(data?.localities.map((l) => ({ value: String(l.code), label: l.name })) ?? [])]} />
-            <Select aria-label="Category" value={category} onValueChange={setCategory} options={[{ value: '', label: 'All categories' }, ...(data?.categories.map((c) => ({ value: String(c.code), label: c.name })) ?? [])]} />
-            <Select aria-label="Status" value={status} onValueChange={setStatus} options={[{ value: '', label: 'All statuses' }, ...STATUSES.map((s) => ({ value: s, label: label(s) }))]} />
-            <Select aria-label="Period" value={String(days)} onValueChange={(v) => setDays(Number(v))} options={PERIODS.map((p) => ({ value: String(p.days), label: p.label }))} />
+          <CardContent className="flex flex-col gap-3">
+            <Field label="Locality"><Select aria-label="Locality" value={locality} onValueChange={setLocality} options={[{ value: '', label: 'All localities' }, ...(data?.localities.map((l) => ({ value: String(l.code), label: l.name })) ?? [])]} /></Field>
+            <Field label="Category"><Select aria-label="Category" value={category} onValueChange={setCategory} options={[{ value: '', label: 'All categories' }, ...(data?.categories.map((c) => ({ value: String(c.code), label: c.name })) ?? [])]} /></Field>
+            <Field label="Status"><Select aria-label="Status" value={status} onValueChange={setStatus} options={[{ value: '', label: 'All statuses' }, ...STATUSES.map((s) => ({ value: s, label: label(s) }))]} /></Field>
+            <Field label="Period"><Select aria-label="Period" value={String(days)} onValueChange={(v) => setDays(Number(v))} options={PERIODS.map((p) => ({ value: String(p.days), label: p.label }))} /></Field>
           </CardContent>
         </Card>
 
