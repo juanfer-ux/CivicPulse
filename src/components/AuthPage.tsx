@@ -50,16 +50,16 @@ export function AuthPage() {
 
   return (
     <AuthLayout mobileLogo>
-      {/* Figma Auth Card (sign in): one centered block; header and fields 24 px apart, fields and actions 40 px, buttons 12 px. */}
+      {/* Figma Auth Card (sign in): one centered block; header, fields and actions 40 px apart, buttons 12 px. */}
       <CardContent>
         <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-10">
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-10">
             <CardHeader className="gap-2 px-0">
               <CardTitle className="text-stat">{signup ? 'Create account' : 'Sign in'}</CardTitle>
               <CardDescription>
                 {signup
                   ? 'New accounts have no access until a Super Admin assigns a role.'
-                  : 'Welcome to Civic Operations Agent.'}
+                  : 'Welcome to the Civic Ops. Agent Platform'}
               </CardDescription>
             </CardHeader>
             <div className="flex flex-col gap-3">
