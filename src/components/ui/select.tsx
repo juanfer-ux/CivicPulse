@@ -29,7 +29,7 @@ export function Select({
         id={id}
         aria-label={ariaLabel}
         data-slot="select-trigger"
-        className={cn(controlClass, 'flex items-center justify-between gap-2 text-left data-popup-open:border-ring', className)}
+        className={cn(controlClass, 'flex items-center justify-between gap-2 text-left data-popup-open:border-foreground', className)}
       >
         <BaseSelect.Value className="truncate" />
         <BaseSelect.Icon className="shrink-0 text-muted-foreground">

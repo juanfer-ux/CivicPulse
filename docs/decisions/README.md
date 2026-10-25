@@ -27,6 +27,8 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0019](0019-manrope-font.md) | The product font is Manrope | ✅ Accepted |
 | [0020](0020-generic-color-names.md) | Color tokens are named by color, not by use | ✅ Accepted |
 | [0021](0021-auth-picture-is-a-video.md) | The Sign in picture is a looping video | ✅ Accepted |
+| [0022](0022-input-border-neutral-300.md) | Input borders use neutral-300 | ✅ Accepted |
+| [0023](0023-labels-above-inputs.md) | Every input has a visible label above it | ✅ Accepted |
 
 ## ✍️ Template
 ```

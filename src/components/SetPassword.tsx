@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { AuthLayout } from '@/components/AuthLayout'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
@@ -41,11 +42,19 @@ export function SetPassword({ onDone }: { onDone: () => void }) {
             </CardTitle>
             <CardDescription>Choose the password you will use to sign in.</CardDescription>
           </CardHeader>
-          <div className="flex flex-col gap-3">
-            <Input value={String(session?.user.user_metadata?.full_name ?? '')} aria-label="Name" disabled readOnly />
-            <Input value={session?.user.email ?? ''} aria-label="Email" disabled readOnly />
-            <Input name="password" type="password" placeholder="Password" aria-label="Password" autoComplete="new-password" required {...invalid} />
-            <Input name="confirm" type="password" placeholder="Repeat password" aria-label="Repeat password" autoComplete="new-password" required {...invalid} />
+          <div className="flex flex-col gap-4">
+            <Field label="Name">
+              <Input value={String(session?.user.user_metadata?.full_name ?? '')} disabled readOnly />
+            </Field>
+            <Field label="Email">
+              <Input value={session?.user.email ?? ''} disabled readOnly />
+            </Field>
+            <Field label="Password">
+              <Input name="password" type="password" placeholder="At least 8 characters" autoComplete="new-password" required {...invalid} />
+            </Field>
+            <Field label="Repeat password">
+              <Input name="confirm" type="password" placeholder="Type it again" autoComplete="new-password" required {...invalid} />
+            </Field>
             {error && (
               <p id="auth-error" role="alert" className="text-body-sm text-incident">
                 {error}

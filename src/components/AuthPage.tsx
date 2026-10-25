@@ -1,6 +1,7 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { AuthLayout } from '@/components/AuthLayout'
 import { supabase } from '@/lib/supabase'
@@ -68,19 +69,26 @@ export function AuthPage() {
                   : 'Welcome to the Civic Ops. Agent Platform'}
               </CardDescription>
             </CardHeader>
-            <div className="flex flex-col gap-3">
-              {signup && <Input name="name" placeholder="Full name" aria-label="Full name" autoComplete="name" required />}
-              <Input name="email" type="email" placeholder="Email" aria-label="Email" autoComplete="email" required {...invalid(!!error)} />
-              <Input
-                name="password"
-                type="password"
-                placeholder="Password (min. 8 characters)"
-                aria-label="Password"
-                autoComplete={signup ? 'new-password' : 'current-password'}
-                minLength={8}
-                required
-                {...invalid(!!error && error !== NEED_EMAIL)}
-              />
+            <div className="flex flex-col gap-4">
+              {signup && (
+                <Field label="Full name">
+                  <Input name="name" placeholder="Your full name" autoComplete="name" required />
+                </Field>
+              )}
+              <Field label="Email">
+                <Input name="email" type="email" placeholder="you@example.com" autoComplete="email" required {...invalid(!!error)} />
+              </Field>
+              <Field label="Password">
+                <Input
+                  name="password"
+                  type="password"
+                  placeholder="At least 8 characters"
+                  autoComplete={signup ? 'new-password' : 'current-password'}
+                  minLength={8}
+                  required
+                  {...invalid(!!error && error !== NEED_EMAIL)}
+                />
+              </Field>
               {error && (
                 <p id="auth-error" role="alert" className="text-body-sm text-incident">
                   {error}

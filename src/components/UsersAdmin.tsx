@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Field } from '@/components/ui/field'
 import { Select } from '@/components/ui/select'
 import { MultiSelect } from '@/components/MultiSelect'
 import { Input } from '@/components/ui/input'
@@ -97,10 +98,14 @@ export function UsersAdmin() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Input className="max-w-xs" placeholder="Search name or email" value={search} onChange={(e) => setSearch(e.target.value)} />
-            <Select className="w-auto!" aria-label="Filter by role" value={roleFilter} onValueChange={setRoleFilter} options={[{ value: '', label: 'All roles' }, ...ROLE_OPTIONS]} />
-            <label className="flex items-center gap-2 text-body-sm">
+          <div className="flex flex-wrap items-end gap-2">
+            <Field label="Search">
+              <Input className="max-w-xs" placeholder="Name or email" value={search} onChange={(e) => setSearch(e.target.value)} />
+            </Field>
+            <Field label="Role">
+              <Select className="w-auto!" aria-label="Filter by role" value={roleFilter} onValueChange={setRoleFilter} options={[{ value: '', label: 'All roles' }, ...ROLE_OPTIONS]} />
+            </Field>
+            <label className="flex h-(--control-default) items-center gap-2 text-body-sm">
               <input type="checkbox" checked={pendingOnly} onChange={(e) => setPendingOnly(e.target.checked)} />
               Pending only
             </label>
@@ -347,11 +352,11 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
 
         <label className="flex flex-col gap-1 text-label">
           Name
-          <Input value={form.full_name} onChange={(e) => set({ full_name: e.target.value })} autoComplete="off" />
+          <Input value={form.full_name} onChange={(e) => set({ full_name: e.target.value })} placeholder="Full name" autoComplete="off" />
         </label>
         <label className="flex flex-col gap-1 text-label">
           Email
-          <Input type="email" value={form.email} onChange={(e) => set({ email: e.target.value })} autoComplete="off" />
+          <Input type="email" value={form.email} onChange={(e) => set({ email: e.target.value })} placeholder="name@example.com" autoComplete="off" />
         </label>
         <label className="flex flex-col gap-1 text-label">
           Role
