@@ -13,6 +13,8 @@ export function SetPassword({ onDone }: { onDone: () => void }) {
   const { session } = useAuth()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Marks the password fields as invalid and points them at the error message (WCAG 3.3.1).
+  const invalid = error ? ({ 'aria-invalid': true, 'aria-describedby': 'auth-error' } as const) : {}
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -34,16 +36,18 @@ export function SetPassword({ onDone }: { onDone: () => void }) {
       <CardContent>
         <form onSubmit={onSubmit} className="flex flex-col gap-16">
           <CardHeader className="gap-2 px-0">
-            <CardTitle className="text-stat">Set up your account</CardTitle>
+            <CardTitle asChild className="text-stat">
+              <h1>Set up your account</h1>
+            </CardTitle>
             <CardDescription>Choose the password you will use to sign in.</CardDescription>
           </CardHeader>
           <div className="flex flex-col gap-3">
             <Input value={String(session?.user.user_metadata?.full_name ?? '')} aria-label="Name" disabled readOnly />
             <Input value={session?.user.email ?? ''} aria-label="Email" disabled readOnly />
-            <Input name="password" type="password" placeholder="Password" aria-label="Password" autoComplete="new-password" required />
-            <Input name="confirm" type="password" placeholder="Repeat password" aria-label="Repeat password" autoComplete="new-password" required />
+            <Input name="password" type="password" placeholder="Password" aria-label="Password" autoComplete="new-password" required {...invalid} />
+            <Input name="confirm" type="password" placeholder="Repeat password" aria-label="Repeat password" autoComplete="new-password" required {...invalid} />
             {error && (
-              <p role="alert" className="text-body-sm text-incident">
+              <p id="auth-error" role="alert" className="text-body-sm text-incident">
                 {error}
               </p>
             )}

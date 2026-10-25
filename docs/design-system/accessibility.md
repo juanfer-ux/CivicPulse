@@ -32,12 +32,41 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 | `closed` / `ring` `#737381` on page / on card | 3.8 / 3.7 | Closed dots, focus ring: **graphics only, never text** |
 | `destructive` `#EE8688` as text on card | 6.9 | OK as text, but error text stays `incident` |
 
+## 🔎 Sign in audit (desktop 1440 × 900, WCAG 2.2 AA, 2026-10-24)
+Method: keyboard walk, computed styles and the real page in a browser, contrast math on the real video frames behind the text (27 samples over the 9 s loop), text-spacing and 320 px reflow tests. **Not done:** screen reader (VoiceOver, NVDA), other browsers, an automated tool (axe).
+
+**Passes (measured)**
+| Check | Result |
+|---|---|
+| 1.4.3 Text over the moving video | Worst case over the whole loop: headline 7.9 : 1 (needs 3), subtitle 6.5 (needs 4.5), card description 7.2, Forgot password 10.0. The glow never gets close to a fail. |
+| 1.4.3 Other text | Button text 10.8, errors 6.9, placeholders 7.4 |
+| 2.4.7 Focus visible | On focus the field border becomes `ring` `#737381`: **3.7 : 1** against the field and 3.8 against the panel (1.4.11 needs 3). The 3 px halo alone is only about 1.9 : 1, so **keep the border change**. |
+| 2.2.2, 2.3.1 Motion | Pause button (36 px, labelled, toggles); autoplay is off with reduced motion; nothing flashes (pulses fade over seconds); video and still are hidden from screen readers |
+| 1.3.5, 3.3.8 Inputs | `autocomplete` on email and password, paste allowed, no puzzle or memory test |
+| 1.4.10, 1.4.12 Reflow, text spacing | No horizontal scroll at 320 px; no clipping with line height 1.5, letter spacing 0.12 em, word spacing 0.16 em |
+| 2.5.8, 2.5.3 | Targets 32–36 px (needs 24); accessible names equal the visible text |
+| 3.1.1, 1.1.1, 2.1.1 | `lang="en"`, logo alt text, everything reachable by keyboard, no traps |
+
+**Fixed in code (this audit)**
+| Issue | WCAG | Fix |
+|---|---|---|
+| The "check your email" notice was not announced | 4.1.3 | `role="status"` |
+| Errors were not tied to their fields | 3.3.1, 1.3.1 | `aria-invalid` and `aria-describedby` on the fields, `id` on the error |
+| "Sign in" / "Set up your account" were not headings, and the only heading was the tagline | 1.3.1, 2.4.6 | The card title is now the page's `h1` (`CardTitle asChild`); the tagline is a paragraph |
+| First Tab stop was the pause button, away from the form | 2.4.3 | The form comes first in the page order, the picture column (and its pause button) after it; the look is unchanged |
+
+**Open: needs a design decision (owner)**
+| Issue | WCAG | Evidence | Option |
+|---|---|---|---|
+| Field edges are almost invisible when not focused | 1.4.11 (AA) | Border `#3C3C44` is 1.6 : 1 against the panel; the fill is 1.03 : 1 | Border at `neutral-300` `#737381` (3.7 : 1) |
+| No visible labels: the placeholder is the only label and disappears while typing, together with "min. 8 characters" | 3.3.2 (A) | Names exist for assistive tech | A visible label above each field |
+| Thin body text: description at weight 300, 13.5 px | advisory | Passes contrast | Heavier weight or 14 px and up |
+
 ## 🟥 Not audited yet
 | Area | What is missing |
 |---|---|
 | **Map** | Incidents are color-only dots on a canvas: not reachable by keyboard and no text alternative beyond the counts. The list fallback only appears when WebGL is off. Needs a decision (always offer a list view?). |
 | **Zone dropdown** | The open list uses `role="listbox"` but holds checkboxes (not options); focus is not returned to the button on close and arrow keys do nothing. Should follow a checkbox-group or dialog pattern. |
-| **Focus ring contrast** | The ring is `ring` at 50 %, probably under 3 : 1 against the page; the border change helps. Needs measuring against WCAG 2.2 (3 : 1). |
 | **Side panels** | Focus does not move into a panel when it opens, and is not returned to the row or button on close. |
 | **Tables** | Check header cells are announced as headers (`scope`) and rows are operable by keyboard (the row click has no key handler today). |
 | **Motion** | The slide-out menu and sidebar width transitions ignore `prefers-reduced-motion`. The Sign in video does follow it (no autoplay) and has a pause button; it never flashes (pulses fade in and out over seconds). |
