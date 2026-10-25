@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { SectionHeader } from '@/components/SectionHeader'
+import { RoleBadge } from '@/components/ui/role-badge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
@@ -89,7 +90,7 @@ export function UsersAdmin() {
               Create user
             </Button>
           </SectionHeader>
-          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 desk:bg-ai desk:px-6 desk:py-10">
+          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 desk:gap-10 desk:bg-ai desk:px-6 desk:py-10">
           <div className="flex items-center justify-between gap-2 desk:hidden">
             <div>
               <h1 className="text-heading">Users</h1>
@@ -116,11 +117,11 @@ export function UsersAdmin() {
           {error && <p className="text-body-sm text-incident">Could not load users: {error}</p>}
 
           {data && (
-            <table className="w-full text-left text-body-sm max-desk:block">
+            <table className="w-full text-left text-body-sm max-desk:block desk:max-w-[900px] desk:table-fixed">
               <thead className="text-meta text-muted-foreground max-desk:hidden">
                 <tr className="border-b">
-                  {['Name', 'Email', 'Role', 'Status', 'Localities', 'Categories'].map((h) => (
-                    <th key={h} className="px-3 py-2 font-medium">
+                  {['Name', 'Email', 'Role', 'Status', 'Categories'].map((h) => (
+                    <th key={h} className="px-3 py-2 text-meta font-medium">
                       {h}
                     </th>
                   ))}
@@ -138,24 +139,24 @@ export function UsersAdmin() {
                       }}
                       className={`cursor-pointer border-b hover:bg-muted/50 max-desk:grid max-desk:grid-cols-2 max-desk:gap-1 max-desk:rounded-lg max-desk:border max-desk:bg-card max-desk:p-3 ${openId === u.id ? 'bg-muted' : ''}`}
                     >
-                      <td className="px-3 py-2 font-medium max-desk:col-span-2 max-desk:p-0">{u.full_name || 'No name'}</td>
-                      <td className="px-3 py-2 text-muted-foreground max-desk:col-span-2 max-desk:truncate max-desk:p-0">{u.email}</td>
-                      <td className="px-3 py-2 max-desk:p-0">
-                        {u.role ? ROLE_LABELS[u.role] : '—'}
+                      <td className="truncate px-3 py-5 font-medium max-desk:col-span-2 max-desk:p-0">{u.full_name || 'No name'}</td>
+                      <td className="truncate px-3 py-5 text-muted-foreground max-desk:col-span-2 max-desk:p-0">{u.email}</td>
+                      <td className="px-3 py-5 max-desk:p-0">
+                        <RoleBadge role={u.role} />
                         {u.role === 'specialist_operator' && <span className="block text-meta text-muted-foreground">{specialtyOf(u, data).join(', ') || 'No specialty yet'}</span>}
                       </td>
-                      <td className="px-3 py-2 max-desk:p-0">
+                      <td className="px-3 py-5 max-desk:p-0">
                         <Badge variant={STATUS_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
                         {u.invitation_pending && <span className="ml-2 text-meta text-muted-foreground">Invited</span>}
                       </td>
-                      <td className="px-3 py-2 text-muted-foreground max-desk:p-0">{u.role === 'super_admin' ? 'All' : localities(u.localities.length)}</td>
-                      <td className="px-3 py-2 text-muted-foreground max-desk:p-0">{u.role === 'super_admin' ? 'All' : u.categories.length ? u.categories.map(categoryName(data)).join(', ') : '—'}</td>
+                      <td className="px-3 py-5 text-muted-foreground max-desk:p-0 desk:hidden">{u.role === 'super_admin' ? 'All' : localities(u.localities.length)}</td>
+                      <td className="truncate px-3 py-5 text-muted-foreground max-desk:p-0">{u.role === 'super_admin' ? 'All' : u.categories.length ? u.categories.map(categoryName(data)).join(', ') : '—'}</td>
                     </tr>
                   )
                 })}
                 {!rows.length && (
                   <tr>
-                    <td colSpan={6} className="px-3 py-6 text-center text-muted-foreground">
+                    <td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">
                       No one matches.
                     </td>
                   </tr>
