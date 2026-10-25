@@ -193,11 +193,11 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
       </div>
 
       <div
-        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border desk:border-card desk:bg-sidebar desk:p-6`}
+        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border desk:border-y-0 desk:border-card desk:bg-sidebar desk:p-0`}
       >
         {children}
         {selected && (
-        <Card className="max-h-[45%] shrink-0 overflow-auto bg-card/95">
+        <Card className="max-h-[45%] shrink-0 overflow-auto bg-card/95 desk:mx-6 desk:mb-6">
           <CardHeader className="flex flex-row items-start justify-between gap-2">
             <div>
               <CardTitle>{selected.title}</CardTitle>
