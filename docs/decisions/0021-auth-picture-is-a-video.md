@@ -10,6 +10,5 @@ The still is the video's own first frame (`src/assets/auth-aura-still.jpg`, abou
 ## Consequences
 - ✅ Motion without flashing; the page works the same with the video off.
 - 🟨 Figma still shows the old wave picture; the video and its first-frame still are code-only until the owner wants them there.
-- 🟨 The street lines come from OpenStreetMap: keep "© OpenStreetMap contributors" visible somewhere (the pause button's neighbor is too small, so it goes in the page footer or About when we have one).
 - 🟨 Phones play the same 2880 px video (1.7 MB). Not tested on a real iPhone yet: if it stutters on older models, render a smaller phone version.
 - 🟨 The generator script is not in the repo. To change the video, re-render it and replace the file.

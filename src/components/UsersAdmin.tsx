@@ -32,7 +32,7 @@ const STATUS_VARIANT: Record<UserStatus, 'default' | 'secondary' | 'outline'> = 
 }
 const ROLE_OPTIONS = ROLES.map((r) => ({ value: r, label: ROLE_LABELS[r] }))
 
-const ASIDE = 'max-desk:fixed max-desk:inset-x-0 max-desk:bottom-0 max-desk:top-[49px] max-desk:z-20 desk:w-[420px] desk:shrink-0 desk:border-l bg-ai'
+const ASIDE = 'max-desk:fixed max-desk:inset-x-0 max-desk:bottom-0 max-desk:top-[49px] max-desk:z-20 desk:w-[420px] desk:shrink-0 desk:border-l bg-sidebar'
 const localities = (n: number) => `${n} ${n === 1 ? 'locality' : 'localities'}`
 
 export function UsersAdmin() {
