@@ -38,6 +38,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
     const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: 11, attributionControl: { compact: true } })
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     map.on('load', () => {
+      // The credit starts closed (just the ⓘ) and opens on tap; MapLibre opens it by default and only closes it on the first drag.
+      map.getContainer().querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
       map.addSource('incidents', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer({
         id: 'incidents',
