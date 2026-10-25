@@ -101,7 +101,7 @@ export function UsersAdmin() {
             </Button>
           </div>
 
-          <div className="flex flex-wrap items-end gap-2">
+          <div className="flex w-full flex-wrap items-end gap-2 desk:mx-auto desk:max-w-[1200px]">
             <Field label="Search">
               <Input className="max-w-xs" placeholder="Name or email" value={search} onChange={(e) => setSearch(e.target.value)} />
             </Field>
@@ -117,7 +117,7 @@ export function UsersAdmin() {
           {error && <p className="text-body-sm text-incident">Could not load users: {error}</p>}
 
           {data && (
-            <table className="w-full text-left text-body-sm max-desk:block desk:max-w-[900px] desk:table-fixed">
+            <table className="w-full text-left text-body-sm max-desk:block desk:mx-auto desk:max-w-[1200px] desk:table-fixed">
               <thead className="text-meta text-muted-foreground max-desk:hidden">
                 <tr className="border-b">
                   {['Name', 'Email', 'Role', 'Status', 'Categories'].map((h) => (
