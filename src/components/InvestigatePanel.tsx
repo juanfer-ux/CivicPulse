@@ -42,13 +42,16 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
   }
 
   return (
-    <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-8 max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
-      <CardHeader className="mx-auto flex w-full max-w-[664px] flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2 text-label">
-          <Sparks className="size-4" aria-hidden /> Investigate and Ask
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-3">
+    <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-0 max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
+      {/* On desktop the title row is as tall as the section header, so one line runs across the screen. */}
+      <div className="flex items-center desk:h-(--section-header-h) desk:shrink-0 desk:border-b desk:px-6">
+        <CardHeader className="mx-auto flex w-full max-w-[664px] flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-label">
+            <Sparks className="size-4" aria-hidden /> Investigate and Ask
+          </CardTitle>
+        </CardHeader>
+      </div>
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:p-6">
         <div className="mx-auto flex min-h-0 w-full max-w-[664px] flex-1 flex-col gap-3 overflow-y-auto pr-1 text-body-sm">
           {turns.length === 0 && (
             <div className="flex flex-col gap-2">
