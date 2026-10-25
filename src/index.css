@@ -150,7 +150,7 @@
 
 :root {
   --radius: 0.5rem;
-  --map-header-h: 70px; /* Map header height (Figma Map Header); the panel, map and filters start below it */
+  --section-header-h: 70px; /* Section header height (Figma Section Header, the Map and Users headers); the map and filters start below it */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
   /* The whole palette is these 13 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */

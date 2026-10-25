@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
+import { SectionHeader } from '@/components/SectionHeader'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
@@ -31,7 +32,7 @@ const STATUS_VARIANT: Record<UserStatus, 'default' | 'secondary' | 'outline'> = 
 }
 const ROLE_OPTIONS = ROLES.map((r) => ({ value: r, label: ROLE_LABELS[r] }))
 
-const ASIDE = 'max-desk:fixed max-desk:inset-x-0 max-desk:bottom-0 max-desk:top-[49px] max-desk:z-20 desk:w-[420px] desk:shrink-0 desk:border-l bg-ai'
+const ASIDE = 'max-desk:fixed max-desk:inset-x-0 max-desk:bottom-0 max-desk:top-[49px] max-desk:z-20 desk:w-[420px] desk:shrink-0 desk:border-l bg-sidebar'
 const localities = (n: number) => `${n} ${n === 1 ? 'locality' : 'localities'}`
 
 export function UsersAdmin() {
@@ -73,29 +74,30 @@ export function UsersAdmin() {
 
   const open = data?.users.find((u) => u.id === openId)
   const pendingCount = data?.users.filter((u) => statusOf(u) === 'pending').length ?? 0
+  const countText = data ? `${data.users.length} ${data.users.length === 1 ? 'person' : 'people'}, ${pendingCount} waiting for a role` : 'Loading…'
+  const startCreate = () => {
+    setOpenId(null)
+    setCreating(true)
+  }
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-background max-desk:pt-[49px]">
       <div className="flex h-full">
-        <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-4 desk:p-6">
-          <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-1 flex-col">
+          <SectionHeader title="Users" count={countText}>
+            <Button size="sm" onClick={startCreate}>
+              Create user
+            </Button>
+          </SectionHeader>
+          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 desk:bg-ai desk:px-6 desk:py-10">
+          <div className="flex items-center justify-between gap-2 desk:hidden">
             <div>
               <h1 className="text-heading">Users</h1>
-              <p className="text-body-sm text-muted-foreground">
-                {data ? `${data.users.length} ${data.users.length === 1 ? 'person' : 'people'}, ${pendingCount} waiting for a role` : 'Loading…'}
-              </p>
+              <p className="text-body-sm text-muted-foreground">{countText}</p>
             </div>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                onClick={() => {
-                  setOpenId(null)
-                  setCreating(true)
-                }}
-              >
-                Create user
-              </Button>
-            </div>
+            <Button size="sm" onClick={startCreate}>
+              Create user
+            </Button>
           </div>
 
           <div className="flex flex-wrap items-end gap-2">
@@ -161,6 +163,7 @@ export function UsersAdmin() {
               </tbody>
             </table>
           )}
+          </div>
         </div>
 
         {creating && data && <InvitePanel data={data} onClose={() => setCreating(false)} onInvited={invited} />}
@@ -227,7 +230,7 @@ function UserPanel({
 
   return (
     <aside className={ASIDE}>
-      <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
+      <div className="flex h-full flex-col gap-4 overflow-y-auto p-6">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <h2 className="truncate text-title">{user.full_name || 'No name'}</h2>
@@ -339,7 +342,7 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
 
   return (
     <aside className={ASIDE}>
-      <form onSubmit={submit} className="flex h-full flex-col gap-4 overflow-y-auto p-4">
+      <form onSubmit={submit} className="flex h-full flex-col gap-4 overflow-y-auto p-6">
         <div className="flex items-start justify-between gap-2">
           <div>
             <h2 className="text-title">Create user</h2>

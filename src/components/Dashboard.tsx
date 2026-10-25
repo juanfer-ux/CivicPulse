@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { NavArrowDown, NavArrowUp, Xmark } from 'iconoir-react'
 import { IncidentMap } from '@/components/IncidentMap'
+import { SectionHeader } from '@/components/SectionHeader'
 import { MediaGallery } from '@/components/MediaGallery'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -103,19 +104,15 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         onSelect={select}
       />
 
-      {/* Map header (desktop only): 70 px, across the whole width next to the sidebar, above the agent panel and the map. Test content. */}
-      <header data-slot="map-header" className="absolute inset-x-0 top-0 z-10 hidden h-(--map-header-h) items-center justify-between border-b bg-card px-6 desk:flex">
-        <div className="flex items-center gap-3">
-          <h1 className="text-heading">Map</h1>
-          <span className="text-[13px] leading-[22px] text-muted-foreground">{data ? `${filtered.length} incidents` : ''}</span>
-        </div>
+      {/* Section header (desktop only): 70 px, over the map to the right of the agent panel. */}
+      <SectionHeader title="Map" count={data ? `${filtered.length} incidents` : undefined} className="absolute top-0 right-0 left-(--agent-w) z-10">
         {profile && (
-          <div className="flex items-center gap-3">
+          <>
             <RoleBadge role={profile.role} />
             <Avatar name={profile.full_name || 'Signed in'} title={shortName(profile.full_name) || 'Signed in'} />
-          </div>
+          </>
         )}
-      </header>
+      </SectionHeader>
 
       {/* Mobile: bottom sheet over the map. Desktop (1440 px and wider): `contents`, so the two columns float over the map. */}
       <div
@@ -138,7 +135,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         </div>
 
       <div
-        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 desk:top-[calc(var(--map-header-h)+1rem)] desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
+        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 desk:top-[calc(var(--section-header-h)+1rem)] desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
       >
         <Card className="bg-card/95">
           <CardHeader>
@@ -196,7 +193,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
       </div>
 
       <div
-        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-(--map-header-h) desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border desk:border-card desk:bg-ai desk:p-6`}
+        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border desk:border-card desk:bg-sidebar desk:p-6`}
       >
         {children}
         {selected && (
