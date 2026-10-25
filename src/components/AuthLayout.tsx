@@ -45,18 +45,19 @@ export function AuthLayout({ children, mobileLogo }: { children: ReactNode; mobi
         className="absolute inset-0 -z-10 size-full object-cover object-top"
       />
       {mobileLogo && <Logo compact className="desk:hidden" />}
-      {pauseButton('top-1 right-1 desk:hidden')}
-      <section className="relative hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-0.5 desk:flex">
-        {pauseButton('right-0.5 bottom-0.5')}
-        <Logo compact />
-        <div className="flex max-w-[640px] flex-col gap-10 px-2.5 py-6">
-          <h1 className="text-[64px] leading-[68px] font-extralight tracking-[-0.014em] text-foreground">{HEADLINE}</h1>
-          <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
-        </div>
-      </section>
-      <div className={cn('flex w-full max-w-[640px] justify-center rounded-xl py-6 desk:min-w-[450px] desk:flex-1 desk:self-stretch desk:bg-background/25 desk:px-4 desk:backdrop-blur-[6px]', mobileLogo && 'max-desk:flex-1')}>
+      {/* The form comes first in the page order (keyboard and screen readers reach it first); `order` puts the picture column back on the left on desktop. */}
+      <div className={cn('flex w-full max-w-[640px] justify-center rounded-xl py-6 desk:order-2 desk:min-w-[450px] desk:flex-1 desk:self-stretch desk:bg-background/25 desk:px-4 desk:backdrop-blur-[6px]', mobileLogo && 'max-desk:flex-1')}>
         <Card className="w-full max-w-[460px] justify-center gap-0 border-0 bg-transparent">{children}</Card>
       </div>
+      <section className="relative hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-0.5 desk:order-1 desk:flex">
+        <Logo compact />
+        <div className="flex max-w-[640px] flex-col gap-10 px-2.5 py-6">
+          <p className="text-[64px] leading-[68px] font-extralight tracking-[-0.014em] text-foreground">{HEADLINE}</p>
+          <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
+        </div>
+        {pauseButton('right-0.5 bottom-0.5')}
+      </section>
+      {pauseButton('top-1 right-1 desk:hidden')}
     </main>
   )
 }

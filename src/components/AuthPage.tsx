@@ -5,6 +5,10 @@ import { Input } from '@/components/ui/input'
 import { AuthLayout } from '@/components/AuthLayout'
 import { supabase } from '@/lib/supabase'
 
+const NEED_EMAIL = 'Enter your email above first.'
+/** Marks a field as invalid and points it at the error message (WCAG 3.3.1). */
+const invalid = (on: boolean) => (on ? { 'aria-invalid': true, 'aria-describedby': 'auth-error' } as const : {})
+
 export function AuthPage() {
   // Sign-up is not offered for now (no button opens it); the setter comes back with the "Create an account" button.
   const [mode] = useState<'signin' | 'signup'>('signin')
@@ -17,7 +21,7 @@ export function AuthPage() {
   /** Emails a link to choose a new password (also how an invited person gets back in if the invitation link was already used). */
   async function forgot() {
     const email = String(new FormData(formRef.current!).get('email')).trim()
-    if (!email) return setError('Enter your email above first.')
+    if (!email) return setError(NEED_EMAIL)
     setBusy(true)
     setError(null)
     setNotice(null)
@@ -55,7 +59,9 @@ export function AuthPage() {
         <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-10">
           <div className="flex flex-col gap-10">
             <CardHeader className="gap-2 px-0">
-              <CardTitle className="text-stat">{signup ? 'Create account' : 'Sign in'}</CardTitle>
+              <CardTitle asChild className="text-stat">
+                <h1>{signup ? 'Create account' : 'Sign in'}</h1>
+              </CardTitle>
               <CardDescription>
                 {signup
                   ? 'New accounts have no access until a Super Admin assigns a role.'
@@ -64,7 +70,7 @@ export function AuthPage() {
             </CardHeader>
             <div className="flex flex-col gap-3">
               {signup && <Input name="name" placeholder="Full name" aria-label="Full name" autoComplete="name" required />}
-              <Input name="email" type="email" placeholder="Email" aria-label="Email" autoComplete="email" required />
+              <Input name="email" type="email" placeholder="Email" aria-label="Email" autoComplete="email" required {...invalid(!!error)} />
               <Input
                 name="password"
                 type="password"
@@ -73,13 +79,18 @@ export function AuthPage() {
                 autoComplete={signup ? 'new-password' : 'current-password'}
                 minLength={8}
                 required
+                {...invalid(!!error && error !== NEED_EMAIL)}
               />
               {error && (
-                <p role="alert" className="text-body-sm text-incident">
+                <p id="auth-error" role="alert" className="text-body-sm text-incident">
                   {error}
                 </p>
               )}
-              {notice && <p className="text-body-sm text-muted-foreground">{notice}</p>}
+              {notice && (
+                <p role="status" className="text-body-sm text-muted-foreground">
+                  {notice}
+                </p>
+              )}
             </div>
           </div>
           <div className="flex flex-col gap-3">
