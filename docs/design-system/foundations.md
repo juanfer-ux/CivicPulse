@@ -42,7 +42,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 3 | `neutral-700` | `#18181B` | `background` | Page |
 | 4 | `neutral-600` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar, section header |
 | 5 | `neutral-500` | `#303036` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
-| 6 | `neutral-400` | `#3C3C44` | none (used directly as `--neutral-400`) | Border of the section header's count pill; suggestion borders in Figma. Until 2026-10-24 it was `input` (borders of inputs and dropdowns), see [decision 0022](../decisions/0022-input-border-neutral-300.md) |
+| 6 | `neutral-400` | `#3C3C44` | none (used directly as `--neutral-400`) | Divider before the count in the section header; suggestion borders in Figma. Until 2026-10-24 it was `input` (borders of inputs and dropdowns), see [decision 0022](../decisions/0022-input-border-neutral-300.md) |
 | 7 | `neutral-300` | `#737381` | `closed` (`ring`), `input` | Closed incidents, focus ring, **borders of inputs and dropdowns** (since 2026-10-24) |
 | 8 | `neutral-200` | `#A9A9B2` | `muted-foreground` | Supporting text, table headers, placeholders |
 | 9 | `neutral-100` | `#C1C1C8` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
