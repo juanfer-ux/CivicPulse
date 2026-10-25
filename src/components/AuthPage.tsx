@@ -54,7 +54,7 @@ export function AuthPage() {
   }
 
   return (
-    <AuthLayout mobileLogo>
+    <AuthLayout mobileLogo footer="© 2026 Secretaría Distrital de Movilidad. Todos los derechos reservados.">
       {/* Figma Auth Card (sign in): one centered block; header, fields and actions 40 px apart, buttons 12 px. */}
       <CardContent>
         <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-10">

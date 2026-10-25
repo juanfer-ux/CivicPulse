@@ -28,12 +28,12 @@ function Brand({ collapsed }: { collapsed: boolean }) {
   )
 }
 
-/** Phone top bar brand (Figma Mobile Top Bar): 32 px ring and the wordmark as 13 px text. */
+/** Phone top bar brand (Figma Mobile Top Bar): 32 px ring and the 118.5 x 9 wordmark, centered. */
 function MobileBrand() {
   return (
-    <div className="flex items-center gap-2 px-1">
+    <div className="flex items-center gap-2">
       <img src={mark} alt="" width={32} height={32} className="shrink-0" />
-      <span className="text-[13.5px] leading-[22px] tracking-[2.6px] whitespace-nowrap text-foreground">CIVIC PULSE</span>
+      <img src={wordmark} alt="Civic Pulse" width={118.5} height={9} className="shrink-0" />
     </div>
   )
 }
@@ -122,10 +122,11 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
 
       {/* Phones: slim top bar with a menu button, and the menu slides in from the left. */}
       <header className="fixed inset-x-0 top-0 z-20 flex h-[49px] items-center justify-between border-b bg-sidebar px-3 desk:hidden">
-        <MobileBrand />
         <Button size="icon" variant="ghost" aria-label="Open menu" onClick={() => setOpen(true)}>
           <Menu className="size-5" />
         </Button>
+        <MobileBrand />
+        <span className="size-(--control-icon)" aria-hidden /> {/* Figma keeps an invisible second button so the logo stays centered. */}
       </header>
       {open && (
         <div className="fixed inset-0 z-40 desk:hidden">

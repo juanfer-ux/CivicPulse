@@ -68,7 +68,7 @@ export function AgentResizer({ frac, onChange }: { frac: number; onChange: (frac
       onKeyDown={key}
       onDoubleClick={() => onChange(AGENT_DEFAULT)}
       style={{ left: 'var(--agent-w)' }}
-      className="group absolute top-(--map-header-h) bottom-0 z-30 hidden w-3 -translate-x-1/2 cursor-col-resize touch-none select-none outline-none desk:block"
+      className="group absolute top-0 bottom-0 z-30 hidden w-3 -translate-x-1/2 cursor-col-resize touch-none select-none outline-none desk:block"
     >
       {/* The visible line: thin at rest, ai-border blue on hover, drag or keyboard focus. */}
       <div className={`mx-auto h-full w-0.5 transition-colors group-hover:bg-ai-border group-focus-visible:bg-ai-border ${dragging ? 'bg-ai-border' : 'bg-transparent'}`} />

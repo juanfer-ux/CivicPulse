@@ -15,7 +15,7 @@
 
 | | Desktop (1,440 px and wider) | Mobile (under 1,440 px) |
 |---|---|---|
-| Layout | Sidebar on the left; a Map header (70 px, across the whole width next to the sidebar), and below it the agent panel docked next to the sidebar (543.5 px) and the map to its right with filters on the right (288 px) floating over it; the sidebar starts collapsed | Top bar with a menu button; map with a bottom sheet (Explore / Investigate) |
+| Layout | Sidebar on the left; the agent panel docked next to the sidebar at full height (543.5 px), and the map to its right with the section header (70 px) on top and filters on the right (288 px) floating over it; the sidebar starts collapsed | Top bar with a menu button; map with a bottom sheet (Explore / Investigate) |
 | Sizes | Body 13, label 14, controls 36 | Body 16, label 16, controls 44 (touch) |
 
 On the sign-in screen the desktop version adds the picture, logo and headline on the left; mobile is the card alone.
