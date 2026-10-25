@@ -29,7 +29,7 @@ export function AuthLayout({ children, mobileLogo }: { children: ReactNode; mobi
   )
 
   return (
-    <main className="relative isolate flex min-h-svh flex-col items-center justify-center gap-4 bg-background p-4 desk:flex-row desk:gap-0 desk:p-10">
+    <main className={cn('relative isolate flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-4 desk:flex-row desk:gap-0 desk:p-10', mobileLogo ? 'py-10' : 'py-4')}>
       <img src={authImage} alt="" className="absolute inset-0 -z-20 size-full object-cover object-top" />
       <video
         ref={video}
@@ -54,7 +54,7 @@ export function AuthLayout({ children, mobileLogo }: { children: ReactNode; mobi
           <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
         </div>
       </section>
-      <div className="flex w-full max-w-[640px] justify-center rounded-xl bg-background/55 py-6 backdrop-blur-[6px] desk:min-w-[450px] desk:flex-1 desk:self-stretch desk:px-4">
+      <div className={cn('flex w-full max-w-[640px] justify-center rounded-xl py-6 desk:min-w-[450px] desk:flex-1 desk:self-stretch desk:bg-background/25 desk:px-4 desk:backdrop-blur-[6px]', mobileLogo && 'max-desk:flex-1')}>
         <Card className="w-full max-w-[460px] justify-center gap-0 border-0 bg-transparent">{children}</Card>
       </div>
     </main>
