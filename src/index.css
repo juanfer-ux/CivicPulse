@@ -191,7 +191,7 @@
   --map-dot-outline: var(--neutral-700);
   --map-answer-ring: var(--indigo-400);
   --map-selected-ring: var(--neutral-100);
-  --map-land: var(--neutral-600);
+  --map-land: var(--neutral-700);
 
   /* Names shadcn components expect, reusing the colors above. */
   --popover: var(--card);
