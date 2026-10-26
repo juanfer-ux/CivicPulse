@@ -11,6 +11,9 @@ const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 // Vite bundles the worker (with its shared chunk) so it also loads in production builds.
 maplibregl.setWorkerUrl(workerUrl)
 
+/** Zoom where small dots turn into icon badges. */
+const BADGE_ZOOM = 12
+
 const BOGOTA: [number, number] = [-74.09, 4.65]
 
 // MapLibre needs WebGL2. Without it (GPU acceleration off, some VMs) we show a list instead of crashing.
@@ -55,24 +58,24 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         id: 'incidents',
         type: 'circle',
         source: 'incidents',
-        maxzoom: 15,
+        maxzoom: BADGE_ZOOM,
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 3, 15, 8],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 2, BADGE_ZOOM, 5],
           'circle-color': ['get', 'color'],
           'circle-opacity': 0.85,
           'circle-stroke-width': 1,
           'circle-stroke-color': token('--map-dot-outline'),
         },
       })
-      // From street level (zoom 15) the dots become big badges with the category's icon, like Waze.
+      // From zoom 12 (owner's choice, 2026-10-26) the dots become big badges with the category's icon, like Waze.
       map.addLayer({
         id: 'incident-badges',
         type: 'symbol',
         source: 'incidents',
-        minzoom: 15,
+        minzoom: BADGE_ZOOM,
         layout: {
           'icon-image': ['concat', 'badge-', ['get', 'icon'], '-', ['get', 'group']],
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 15, 0.5, 18, 0.8],
+          'icon-size': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, 0.4, 15, 0.6, 18, 0.8],
           'icon-allow-overlap': true,
         },
       })
@@ -82,7 +85,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'hl'], true],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 6, 15, 12, 15.01, 21, 18, 31],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 5, BADGE_ZOOM, 9, BADGE_ZOOM + 0.01, 17, 15, 22, 18, 31],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-stroke-width': 2,
           'circle-stroke-color': token('--map-answer-ring'),
@@ -94,7 +97,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'id'], ''],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 7, 15, 13, 15.01, 23, 18, 33],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 6, BADGE_ZOOM, 10, BADGE_ZOOM + 0.01, 19, 15, 24, 18, 33],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-stroke-width': 2,
           'circle-stroke-color': token('--map-selected-ring'),
