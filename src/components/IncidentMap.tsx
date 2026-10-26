@@ -12,7 +12,7 @@ const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 maplibregl.setWorkerUrl(workerUrl)
 
 /** Zoom where small dots turn into icon badges. */
-const BADGE_ZOOM = 12
+const BADGE_ZOOM = 14
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
 
@@ -60,14 +60,14 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         maxzoom: BADGE_ZOOM,
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 2, BADGE_ZOOM, 5],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 1.5, 11, 2, 12, 3, BADGE_ZOOM, 3],
           'circle-color': ['get', 'color'],
           'circle-opacity': 0.85,
           'circle-stroke-width': 1,
           'circle-stroke-color': token('--map-dot-outline'),
         },
       })
-      // From zoom 12 (owner's choice, 2026-10-26) the dots become big badges with the category's icon, like Waze.
+      // From zoom 14 (owner's choice, 2026-10-26) the dots become big badges with the category's icon, like Waze.
       map.addLayer({
         id: 'incident-badges',
         type: 'symbol',
@@ -86,7 +86,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'hl'], true],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 5, BADGE_ZOOM, 9, BADGE_ZOOM + 0.01, 17, 15, 22, 18, 31],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 4, 11, 6, 12, 7, BADGE_ZOOM, 7, BADGE_ZOOM + 0.01, 17, 15, 22, 18, 31],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
           'circle-stroke-width': 2,
@@ -99,7 +99,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'id'], ''],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 6, BADGE_ZOOM, 10, BADGE_ZOOM + 0.01, 19, 15, 24, 18, 33],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 5, 11, 7, 12, 8, BADGE_ZOOM, 8, BADGE_ZOOM + 0.01, 19, 15, 24, 18, 33],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
           'circle-stroke-width': 2,
