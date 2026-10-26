@@ -55,16 +55,20 @@ export function Dashboard({ highlightIds, onClearHighlight, tab, onTab, children
 
   const localityName = useMemo(() => new Map(data?.localities.map((l) => [l.code, l.name])), [data])
 
+  // While an answer is shown, everything below (map, header count, summary card, status counts) is limited to the answer's incidents.
+  const answerIds = useMemo(() => (highlightIds.length ? new Set(highlightIds) : null), [highlightIds])
+
   // Everything except the status chips: the status counts show what each chip would add.
   const beforeStatus = useMemo(
     () =>
       (data?.incidents ?? []).filter(
         (i) =>
+          (!answerIds || answerIds.has(i.id)) &&
           (!filters.locality || i.locality_code === Number(filters.locality)) &&
           (!filters.categories.length || filters.categories.includes(i.category)) &&
           (!filters.days || new Date(i.occurred_at).getTime() >= now - filters.days * DAY),
       ),
-    [data, filters.locality, filters.categories, filters.days, now],
+    [data, answerIds, filters.locality, filters.categories, filters.days, now],
   )
   const filtered = useMemo(
     () => (filters.statuses.length ? beforeStatus.filter((i) => filters.statuses.includes(groupOf(i.status))) : beforeStatus),
