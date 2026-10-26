@@ -31,6 +31,8 @@ stateDiagram-v2
 | `intervention_proposed` / `approved` / `rejected` | A recommendation about it was proposed, approved or rejected |
 | `resolved` | Closed |
 
+**What people see (map dots and counts):** four statuses, grouped from the states above. **Pending** = `received`; **Reviewing** = `under_review`; **Approved** = `validated`, `intervention_proposed`, `intervention_approved`, `resolved`; **Rejected** = `rejected`, `duplicate`, `intervention_rejected`. The database keeps all nine; only labels and colors are grouped (`groupOf` in `src/lib/incidents.ts`, test in `incidents.test.ts`). "Community validation" is not a status: finding patterns is the agent's job ([ai-agent.md](ai-agent.md)).
+
 > 🔶 These are the **intended** transitions. The database lists the values but does **not** enforce the order yet.
 
 ## 💡 Recommendation status

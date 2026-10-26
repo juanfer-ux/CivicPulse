@@ -29,6 +29,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0021](0021-auth-picture-is-a-video.md) | The Sign in picture is a looping video | ✅ Accepted |
 | [0022](0022-input-border-neutral-300.md) | Input borders use neutral-300 | ✅ Accepted |
 | [0023](0023-labels-above-inputs.md) | Every input has a visible label above it | ✅ Accepted |
+| [0024](0024-sixteen-colors-map-statuses.md) | The palette is 16 colors; the map shows four statuses | ✅ Accepted |
 
 ## ✍️ Template
 ```

@@ -74,7 +74,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
   )
 
   const byGroup = useMemo(() => {
-    const counts = { pending: 0, active: 0, closed: 0 }
+    const counts = { pending: 0, reviewing: 0, approved: 0, rejected: 0 }
     for (const i of filtered) counts[groupOf(i.status)]++
     return counts
   }, [filtered])

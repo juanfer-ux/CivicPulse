@@ -28,8 +28,11 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 | `incident` `#E58C7D` on card | 6.9 | **All error text** |
 | `sidebar` on `primary` `#C1C1C8` | 10.8 | Text on the main button (rule: text on a light fill uses the `sidebar` color) |
 | `sidebar` on `destructive` `#EE8688` | 7.7 | Dangerous buttons and badges now use dark `sidebar` text (light text on it was 1.7 and failed 4.5) |
-| `warning` `#D0AC6B` on page | 8.3 | Needs-review dots |
-| `closed` / `ring` `#737381` on page / on card | 3.8 / 3.7 | Closed dots, focus ring: **graphics only, never text** |
+| `yellow-400` `#FFEE6C` on page / on card | 14.9 / 14.5 | Pending dots |
+| `orange-400` `#FF9F50` on page / on card | 8.7 / 8.4 | Reviewing dots |
+| `blue-400` `#487CFF` on page / on card | 4.7 / 4.6 | Approved dots (graphics only) |
+| `red-400` `#EE8688` on page / on card | 7.1 / 6.9 | Rejected dots |
+| `closed` / `ring` `#737381` on page / on card | 3.8 / 3.7 | Focus ring: **graphics only, never text** |
 | `destructive` `#EE8688` as text on card | 6.9 | OK as text, but error text stays `incident` |
 
 ## 🔎 Sign in audit (desktop 1440 × 900, WCAG 2.2 AA, 2026-10-24)
