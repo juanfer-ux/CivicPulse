@@ -1,12 +1,12 @@
 import { createElement } from 'react'
 import { Car, Trash } from '@phosphor-icons/react'
 import { GROUPS, type Group } from '@/lib/incidents'
-import { token } from '@/lib/tokens'
+import { KEEP, mix, token } from '@/lib/tokens'
 
 /** Street-level markers (Waze style): a big colored circle with the category's icon inside. One image per category and status. */
 const ICONS = { parking: Car, illegal_dumping: Trash }
 export const iconCategory = (category: string) => (category in ICONS ? category : 'parking')
-export const badgeId = (category: string, group: string) => `badge-${iconCategory(category)}-${group}`
+export const badgeId = (category: string, group: string, dim = false) => `badge-${iconCategory(category)}${dim ? '-dim' : ''}-${group}`
 
 /** The badge is a pin: a 64 px circle with a point below it, so the tip marks the exact spot (the layer anchors the image at its bottom). */
 const SIZE = 64
@@ -45,9 +45,14 @@ export async function addBadges(map: { addImage: (id: string, data: ImageData) =
   const outline = token('--map-dot-outline')
   await Promise.all(
     Object.entries(ICONS).flatMap(([category, Icon]) =>
-      (Object.keys(GROUPS) as Group[]).map(async (group) => {
+      (Object.keys(GROUPS) as Group[]).flatMap((group) => {
         const ink = token(group === 'approved' ? '--neutral-100' : '--neutral-900')
-        map.addImage(badgeId(category, group), await badge(Icon, token(GROUPS[group].token), ink, outline, tail))
+        const fill = token(GROUPS[group].token)
+        const land = token('--map-land')
+        // The same pin toned down toward the land color: it keeps its hue, so the status is still readable.
+        return [false, true].map(async (dim) =>
+          map.addImage(badgeId(category, group, dim), await badge(Icon, dim ? mix(fill, land, KEEP) : fill, dim ? mix(ink, land, KEEP) : ink, outline, tail)),
+        )
       }),
     ),
   )

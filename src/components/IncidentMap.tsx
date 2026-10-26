@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
-import { token } from '@/lib/tokens'
+import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { PIN_RISE, addBadges, iconCategory } from '@/lib/markerIcons'
@@ -86,10 +86,10 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'hl'], true],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 6, BADGE_ZOOM, 10, BADGE_ZOOM + 0.01, 18, 15, 23, 18, 32],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 5, BADGE_ZOOM, 9, BADGE_ZOOM + 0.01, 17, 15, 22, 18, 31],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
-          'circle-stroke-width': 4,
+          'circle-stroke-width': 2,
           'circle-stroke-color': token('--map-answer-ring'),
         },
       })
@@ -99,14 +99,18 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'id'], ''],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 7, BADGE_ZOOM, 11, BADGE_ZOOM + 0.01, 20, 15, 25, 18, 34],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 6, BADGE_ZOOM, 10, BADGE_ZOOM + 0.01, 19, 15, 24, 18, 33],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
-          'circle-stroke-width': 4,
+          'circle-stroke-width': 2,
           'circle-stroke-color': token('--map-selected-ring'),
         },
       })
-      map.on('click', ['incidents', 'incident-badges'], (e) => onSelectRef.current(String(e.features?.[0]?.properties?.id ?? '') || null))
+      // A click on an incident selects it; a click anywhere else on the map clears the selection.
+      map.on('click', (e) => {
+        const hit = map.queryRenderedFeatures(e.point, { layers: ['incidents', 'incident-badges'] })[0]
+        onSelectRef.current(hit ? String(hit.properties.id) : null)
+      })
       for (const layer of ['incidents', 'incident-badges']) {
         map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'))
         map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''))
@@ -114,7 +118,10 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       setReady(true)
     })
     mapRef.current = map
+    const clear = (e: KeyboardEvent) => e.key === 'Escape' && onSelectRef.current(null)
+    window.addEventListener('keydown', clear)
     return () => {
+      window.removeEventListener('keydown', clear)
       setReady(false)
       map.remove()
     }
@@ -129,7 +136,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       features: incidents.map((i) => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
-        properties: { id: i.id, color: token(GROUPS[groupOf(i.status)].token), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id) },
+        properties: { id: i.id, color: token(GROUPS[groupOf(i.status)].token), dim: mix(token(GROUPS[groupOf(i.status)].token), token('--map-land'), KEEP), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id) },
       })),
     })
   }, [ready, incidents, highlightIds])
@@ -139,6 +146,18 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
     if (!ready || !map) return
     map.setFilter('incident-selected', ['==', ['get', 'id'], selectedId ?? ''])
   }, [ready, selectedId])
+
+  // Focus: while an incident is selected (or the agent's answer is shown) every other dot or pin is toned down toward the land color (same hue, so its status stays readable), and the focused ones draw on top.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    const focus = selectedId ? ['==', ['get', 'id'], selectedId] : highlightIds.length ? ['get', 'hl'] : null
+    const own = ['get', 'color']
+    const ownBadge = ['concat', 'badge-', ['get', 'icon'], '-', ['get', 'group']]
+    map.setPaintProperty('incidents', 'circle-color', (focus ? ['case', focus, own, ['get', 'dim']] : own) as never)
+    map.setLayoutProperty('incident-badges', 'icon-image', (focus ? ['case', focus, ownBadge, ['concat', 'badge-', ['get', 'icon'], '-dim-', ['get', 'group']]] : ownBadge) as never)
+    map.setLayoutProperty('incident-badges', 'symbol-sort-key', (focus ? ['case', focus, 1, 0] : 0) as never)
+  }, [ready, selectedId, highlightIds])
 
   if (!WEBGL2) return <ListFallback incidents={incidents} selectedId={selectedId} onSelect={onSelect} />
 
