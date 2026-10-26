@@ -174,6 +174,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
           'circle-stroke-width': 2,
           'circle-stroke-color': token('--map-answer-ring'),
+          'circle-stroke-opacity': 0.6, // rings in a crowd overlap: see-through, so the overlaps stay readable
         },
       })
       map.addLayer({
