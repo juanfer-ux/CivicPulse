@@ -115,10 +115,10 @@ export function Dashboard({ highlightIds, onClearHighlight, tab, onTab, children
 
       {/* Conversation mode banner (24 px): while an answer is on the map, filters narrow it; the button ends the mode. */}
       {chatMode && (
-        <div className="fixed inset-x-0 top-[53px] z-10 flex h-6 items-center justify-center gap-2 bg-(--ai-banner) text-meta text-(--neutral-900) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
+        <div className="fixed inset-x-0 top-[53px] z-10 flex h-6 items-center justify-center gap-2 bg-(--ai-banner) text-meta text-(--neutral-100) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
           <span>While showing the agent's answer, the filters will narrow it down.</span>
-          <Button size="sm" variant="ghost" className="h-6 px-2 text-meta text-inherit hover:bg-black/10 hover:text-inherit" onClick={onClearHighlight}>
-            Clear conversation results
+          <Button size="sm" variant="ghost" className="h-6" onClick={onClearHighlight}>
+            Clear agent results
           </Button>
         </div>
       )}

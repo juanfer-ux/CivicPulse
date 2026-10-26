@@ -183,7 +183,7 @@
   --foreground: var(--neutral-100);
   --ai: var(--neutral-800);
   --ai-border: var(--indigo-400);
-  --ai-banner: #A5AAF2; /* outside the 16 (owner, 2026-10-26): a brighter indigo-400 for the conversation banner, with neutral-900 text. Not in Figma yet */
+  --ai-banner: #3F44A0; /* outside the 16 (owner, 2026-10-26): a much darker indigo-400, the conversation banner and the answer rings on the map, with neutral-100 text. Not in Figma yet */
   --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
   --warning: var(--amber-400);
   --incident: var(--coral-400); /* incidents, invalid fields and ALL error text */
@@ -194,7 +194,7 @@
   --map-approved: var(--blue-400);
   --map-rejected: var(--red-400);
   --map-dot-outline: var(--neutral-700);
-  --map-answer-ring: var(--indigo-400);
+  --map-answer-ring: var(--ai-banner);
   --map-selected-ring: var(--neutral-100);
   --map-roads: #363644; /* map only, outside the 16 (owner, 2026-10-26): minor and secondary streets; CARTO's is #414758. Figma map/roads */
   --map-buildings: #3F4550; /* map only, outside the 16 (owner, 2026-10-26): building tops, they fade in from zoom 13 to 16. CARTO's is #393939. Figma map/buildings */
