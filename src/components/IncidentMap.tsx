@@ -58,6 +58,12 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       for (const id of ['background', 'landcover', 'landuse', 'park_national_park', 'park_nature_reserve']) {
         if (map.getLayer(id)) map.setPaintProperty(id, id === 'background' ? 'background-color' : 'fill-color', token('--map-land'))
       }
+      // Streets use our own colors (--map-roads, --map-main-roads) instead of CARTO's: find the style's road lines by their original color.
+      const roads: Record<string, string> = { 'rgba(65, 71, 88, 1)': token('--map-roads'), 'rgba(83, 86, 102, 1)': token('--map-main-roads') }
+      for (const l of map.getStyle().layers) {
+        const c = l.type === 'line' ? map.getPaintProperty(l.id, 'line-color') : null
+        if (typeof c === 'string' && roads[c]) map.setPaintProperty(l.id, 'line-color', roads[c])
+      }
       // The credit starts closed (just the ⓘ) and opens on tap; MapLibre opens it by default and only closes it on the first drag.
       map.getContainer().querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
       map.addSource('incidents', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })

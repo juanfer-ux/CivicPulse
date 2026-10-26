@@ -195,6 +195,8 @@
   --map-dot-outline: var(--neutral-700);
   --map-answer-ring: var(--indigo-400);
   --map-selected-ring: var(--neutral-100);
+  --map-roads: #343946; /* map only, outside the 16 (owner, 2026-10-26): minor and secondary streets; CARTO's is #414758. Figma map/roads */
+  --map-main-roads: #454754; /* map only: primary roads; CARTO's is #535666. Figma map/main-roads */
   --map-land: #1A1A20; /* map only, the one color outside the 16 (owner, 2026-10-26): CARTO's land is #0E0E0E; Figma map/land */
 
   /* Names shadcn components expect, reusing the colors above. */
