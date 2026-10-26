@@ -140,6 +140,18 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
     map.setFilter('incident-selected', ['==', ['get', 'id'], selectedId ?? ''])
   }, [ready, selectedId])
 
+  // Focus: while an incident is selected (or the agent's answer is shown) every other dot or pin fades to 45%, and the focused ones draw on top.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    const focus = selectedId ? ['==', ['get', 'id'], selectedId] : highlightIds.length ? ['get', 'hl'] : null
+    const fade = (full: number) => (focus ? ['case', focus, full, full * 0.45] : full)
+    map.setPaintProperty('incidents', 'circle-opacity', fade(0.85) as never)
+    map.setPaintProperty('incidents', 'circle-stroke-opacity', fade(1) as never)
+    map.setPaintProperty('incident-badges', 'icon-opacity', fade(1) as never)
+    map.setLayoutProperty('incident-badges', 'symbol-sort-key', (focus ? ['case', focus, 1, 0] : 0) as never)
+  }, [ready, selectedId, highlightIds])
+
   if (!WEBGL2) return <ListFallback incidents={incidents} selectedId={selectedId} onSelect={onSelect} />
 
   // Wrapper positions the map: maplibre's unlayered CSS overrides Tailwind's `absolute` on the map element itself.
