@@ -45,7 +45,7 @@ export function InvestigatePanel({ onHighlight, highlightIds }: { onHighlight: (
     <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-0 max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
       {/* On desktop the title row is as tall as the section header, so one line runs across the screen. */}
       <div className="flex items-center desk:h-(--section-header-h) desk:shrink-0 desk:border-b desk:px-6">
-        <CardHeader className="mx-auto flex w-full max-w-[664px] flex-row items-center justify-between">
+        <CardHeader className="flex w-full flex-row items-center justify-between max-desk:mx-auto max-desk:max-w-[664px]">
           <CardTitle className="flex items-center gap-2 text-label">
             <Sparkle className="size-4" aria-hidden /> Investigate and Ask
           </CardTitle>
