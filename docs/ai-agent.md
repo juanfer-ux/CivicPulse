@@ -4,7 +4,7 @@
 > 🔐 What each role may see: [roles-and-permissions.md](roles-and-permissions.md). Tables: [data-model.md](data-model.md).
 
 ## 🎯 What it is
-A question box. An operator asks about the incidents they are allowed to see; the agent answers with numbers, a small chart, the evidence behind them, and its limitations, and rings the relevant incidents on the map. **The agent recommends. The human decides.**
+A question box. An operator asks about the incidents they are allowed to see; the agent answers with numbers, a small chart, the evidence behind them, and its limitations, and rings the relevant incidents on the map and hides the others while the answer is shown. **The agent recommends. The human decides.**
 
 ## ⚙️ How it works today (mock mode)
 ```mermaid
