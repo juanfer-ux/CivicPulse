@@ -39,7 +39,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
 
   useEffect(() => {
     if (!WEBGL2) return
-    const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: 11, attributionControl: { compact: true } })
+    const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: 12, attributionControl: { compact: true } })
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     map.on('load', async () => {
       await addBadges(map)
