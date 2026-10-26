@@ -27,10 +27,11 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0019](0019-manrope-font.md) | The product font is Manrope | ✅ Accepted |
 | [0020](0020-generic-color-names.md) | Color tokens are named by color, not by use | ✅ Accepted |
 | [0021](0021-auth-picture-is-a-video.md) | The Sign in picture is a looping video | ✅ Accepted |
-| [0022](0022-input-border-neutral-300.md) | Input borders use neutral-300 | ✅ Accepted |
+| [0022](0022-input-border-neutral-300.md) | Input borders use neutral-300 | Superseded by 0026 |
 | [0023](0023-labels-above-inputs.md) | Every input has a visible label above it | ✅ Accepted |
 | [0024](0024-sixteen-colors-map-statuses.md) | The palette is 16 colors; the map shows four statuses | ✅ Accepted |
 | [0025](0025-phosphor-icons.md) | Icons are Phosphor (regular, fill for map badges) | ✅ Accepted |
+| [0026](0026-control-border-neutral-400.md) | Control borders use neutral-400 again (below 3:1, owner's choice) | ✅ Accepted |
 
 ## ✍️ Template
 ```

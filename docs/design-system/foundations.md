@@ -42,8 +42,8 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 3 | `neutral-700` | `#18181B` | `background` | Page, sidebar (Figma 2026-10-26) |
 | 4 | `neutral-600` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns |
 | 5 | `neutral-500` | `#303036` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
-| 6 | `neutral-400` | `#3C3C44` | none (used directly as `--neutral-400`) | Divider before the count in the section header; suggestion borders in Figma. Until 2026-10-24 it was `input` (borders of inputs and dropdowns), see [decision 0022](../decisions/0022-input-border-neutral-300.md) |
-| 7 | `neutral-300` | `#737381` | `closed` (`ring`) | Focus ring. Until 2026-10-26 it was also `input` (borders of inputs and dropdowns): see [Borders](#borders) |
+| 6 | `neutral-400` | `#3C3C44` | `input` | `input` (borders of every control: inputs, dropdowns, chips, suggestions, outline buttons; since 2026-10-26, [decision 0026](../decisions/0026-control-border-neutral-400.md)); divider before the count in the section header |
+| 7 | `neutral-300` | `#737381` | `closed` (`ring`) | Focus ring, border of an active or pressed chip. Until 2026-10-26 it was also `input` (see [Borders](#borders)) |
 | 8 | `neutral-200` | `#A9A9B2` | `muted-foreground` | Supporting text, table headers, placeholders |
 | 9 | `neutral-100` | `#C1C1C8` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
 | 10 | `indigo-400` | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
@@ -70,14 +70,14 @@ Every border and divider in one place. Width is always `--border-width` (0.5 px)
 | Border | Color | Contrast | Used for |
 |---|---|---|---|
 | Default and dividers | `border` = `neutral-500` | decorative | Cards, tables, section header line, agent panel right line, map zoom buttons |
-| **Controls** | `input` = **`#666672`** (new 2026-10-26, outside the 16) | 3.03:1 on `neutral-600` (input fill), 3.1:1 on `neutral-800` | Inputs, dropdowns, filter chips, suggestions, outline buttons. The darkest grey that still passes; `neutral-400` would only reach 1.6:1 to 1.7:1 and `neutral-300` (the previous value) reaches 3.7:1 to 4.0:1 |
+| **Controls** | `input` = `neutral-400` (owner's choice 2026-10-26, one border for every control) | 1.6:1 on `neutral-600` (input fill), 1.7:1 on `neutral-800` | Inputs, dropdowns, filter chips, suggestions, outline buttons. ⚠️ Below the 3:1 that WCAG 1.4.11 asks for text inputs (the darkest palette step that passes is `neutral-300`, 3.7:1 to 4.0:1; a custom `#666672` also passes at 3.03:1). Accepted by the owner for look and consistency. Chips, suggestions and buttons are identified by their text, so they are not affected |
 | Focus ring | `ring` = `neutral-300` | 4.0:1 on `neutral-800` | Keyboard focus (3 px ring, not a border) |
 | Section header divider | `neutral-400` | decorative | Line before the count |
 | Agent accent | `ai-border` = `indigo-400` | | Gradient ring around the agent input (`ai_gradient`) |
 | Answer rings and banner | `--ai-banner` (`#34388A`, ring at 60 % opacity) | | Incidents ringed on the map for an agent answer |
 | Map outlines | `--map-road-outlines`, `--map-road-outlines-minor`, `--map-building-outlines`, `--map-boundary*`, `--map-bogota-border` (off) | | See Map colors below |
 
-⚠️ Figma's Suggestion component still uses `neutral-400` for its border, which fails the 3:1 rule; code uses `input`. Update Figma to `input`. The Filter Chip border in Figma (`secondary`) also needs to become `input`.
+Figma follows this: Suggestion, Filter Chip, Input and the other controls all use `neutral-400`.
 
 ## 🔣 Icons
 Phosphor (`@phosphor-icons/react`, [decision 0025](../decisions/0025-phosphor-icons.md)): the **regular** weight everywhere, 1em by default, sized with `size-*` (sidebar items 20 px, 16 px elsewhere). The **fill** weight only on the map badges (car for parking, trash can for illegal dumping). Colour follows the text (`currentColor`). Phosphor icons are filled shapes, so no stroke tricks are needed. Mapping from the old Iconoir names: Group→UsersThree, LogOut→SignOut, Map→MapTrifold, MediaImage→Image, Menu→List, NavArrow→Caret, Sparks→Sparkle, Xmark→X, SidebarCollapse/Expand→SidebarSimple (mirrored when collapsed).

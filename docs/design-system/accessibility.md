@@ -59,6 +59,7 @@ Method: keyboard walk, computed styles and the real page in a browser, contrast 
 | First Tab stop was the pause button, away from the form | 2.4.3 | The form comes first in the page order, the picture column (and its pause button) after it; the look is unchanged |
 | The placeholder was the only label and disappeared while typing | 3.3.2 | A visible label above every input; the placeholder is now only an example hint ([decision 0023](../decisions/0023-labels-above-inputs.md)) |
 | Field edges were almost invisible when not focused (border 1.6 : 1) | 1.4.11 | The `input` token now points at `neutral-300` `#737381` (3.8 : 1 on the panel) for every input, dropdown, outline button and role badge; focus border `foreground` ([decision 0022](../decisions/0022-input-border-neutral-300.md)) |
+| 🟨 Field edges are below 3 : 1 again (1.6 : 1) | 1.4.11 | Reverted on 2026-10-26: the owner chose `neutral-400` for every control border, because `neutral-300` looked too bright ([decision 0026](../decisions/0026-control-border-neutral-400.md)). Known gap; the focus border stays `foreground` |
 
 **Open: needs a design decision (owner)**
 | Issue | WCAG | Evidence | Option |
