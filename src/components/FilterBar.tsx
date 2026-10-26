@@ -56,6 +56,21 @@ export function FilterBar({
   const group = 'flex shrink-0 items-center gap-2'
   return (
     <div role="group" aria-label="Filters" className={className}>
+      {/* Statuses first: they are the operator's triage, so they must never scroll out of sight. One segmented block (shared borders), the counts double as the legend of the map dots. */}
+      <div className="flex shrink-0 items-center">
+        {(Object.keys(GROUPS) as Group[]).map((g) => (
+          <Chip
+            key={g}
+            pressed={filters.statuses.includes(g)}
+            count={counts[g]}
+            icon={<span className="size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />}
+            className="relative -ml-px rounded-none first:ml-0 first:rounded-l-sm last:rounded-r-sm aria-pressed:z-10"
+            onClick={() => set({ statuses: toggle(filters.statuses, g) })}
+          >
+            {GROUPS[g].label}
+          </Chip>
+        ))}
+      </div>
       <div className={group}>
         <Select
           chip
@@ -88,19 +103,6 @@ export function FilterBar({
           onValueChange={(v) => set({ days: Number(v) })}
           options={PERIODS.map((p) => ({ value: String(p.days), label: p.label }))}
         />
-      </div>
-      <div className={group}>
-        {(Object.keys(GROUPS) as Group[]).map((g) => (
-          <Chip
-            key={g}
-            pressed={filters.statuses.includes(g)}
-            count={counts[g]}
-            icon={<span className="size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />}
-            onClick={() => set({ statuses: toggle(filters.statuses, g) })}
-          >
-            {GROUPS[g].label}
-          </Chip>
-        ))}
       </div>
       {isFiltered(filters) && (
         <div className={group}>
