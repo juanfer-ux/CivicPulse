@@ -58,7 +58,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         if (l.type === 'symbol' && JSON.stringify(l.layout?.['text-field']).includes('name:en')) map.setLayoutProperty(l.id, 'text-field', ['coalesce', ['get', 'name:es'], ['get', 'name']])
       }
       // Land, parks and background (Figma map/land). LAND_ON is false for now (owner, 2026-10-26): the land layers are hidden, as if invisible, and the page color shows through. Set it to true to paint them with --map-land.
-      for (const id of ['background', 'landcover', 'landuse', 'park_national_park', 'park_nature_reserve']) {
+      for (const id of ['background', 'landcover', 'landuse', 'landuse_residential', 'park_national_park', 'park_nature_reserve']) {
         if (!map.getLayer(id)) continue
         if (LAND_ON) map.setPaintProperty(id, id === 'background' ? 'background-color' : 'fill-color', token('--map-land'))
         else map.setLayoutProperty(id, 'visibility', 'none')
