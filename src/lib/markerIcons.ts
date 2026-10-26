@@ -11,7 +11,7 @@ export const badgeId = (category: string, group: string) => `badge-${iconCategor
 /** The badge is a pin: a 64 px circle with a point below it, so the tip marks the exact spot (the layer anchors the image at its bottom). */
 const SIZE = 64
 /** Length of the pin's point, in image px (displayed at 0.4 to 0.8 of this, depending on zoom). */
-export const TAIL = 16
+export const TAIL = 8
 export const PIN_CENTER = SIZE / 2 // circle center, in image px from the top (the circle is at the top)
 export const PIN_RISE = SIZE - 2 - PIN_CENTER + TAIL // image px from the tip up to the circle center
 
