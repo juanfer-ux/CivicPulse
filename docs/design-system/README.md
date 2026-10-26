@@ -39,6 +39,8 @@ Which Components page holds which component (since 2026-10-26; moving a componen
 | Components · Map & agent | Map Marker, Incident Radius, Filters Card, Agent Panel, Suggestion, Message, Action Card |
 | Components · Auth & brand | Auth Card, Logo |
 
+Rules (also in `CLAUDE.md` and the owner's Obsidian note *Design System Rules - Figma Pages and Layout*): frames on each page sit in **one horizontal row** (left to right, 100 px apart, same y), and every Components page has the background **`#3D3D43`**, including pages created later.
+
 ---
 
 ---
