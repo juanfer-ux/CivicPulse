@@ -8,17 +8,21 @@ export const ICONS = { parking: Car, illegal_dumping: Trash }
 export const iconCategory = (category: string) => (category in ICONS ? category : 'parking')
 export const badgeId = (category: string, group: string, dim = false) => `badge-${iconCategory(category)}${dim ? '-dim' : ''}-${group}`
 
-/** The badge is a pin: a 64 px circle with a point below it, so the tip marks the exact spot (the layer anchors the image at its bottom). */
+/** The badge is a pin: a circle with a point below it, so the tip marks the exact spot (the layer anchors the image at its bottom). 64 px wide including the outline. */
 const SIZE = 64
+/** Outline outside the circle, 7.5 % of its diameter (Figma Map Pin: 2.4 px outside a 32 px pin, 2026-10-26). */
+const OUTLINE = 4.2
 /** Length of the pin's point, in image px (displayed at 0.4 to 0.8 of this, depending on zoom). */
 export const TAIL = 8
 export const PIN_CENTER = SIZE / 2 // circle center, in image px from the top (the circle is at the top)
-export const PIN_RISE = SIZE - 2 - PIN_CENTER + TAIL // image px from the tip up to the circle center
+export const PIN_RISE = SIZE + TAIL - PIN_CENTER // image px from the bottom of the image (the exact spot) up to the circle center
+
+const ICON = 28 // half the circle's diameter, like Figma (16 px icon in a 32 px pin)
 
 async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string, tail = TAIL) {
   const height = SIZE + tail
   const { renderToStaticMarkup } = await import('react-dom/server')
-  const svg = renderToStaticMarkup(createElement(Icon, { color: ink, width: 34, height: 34, weight: 'fill' }))
+  const svg = renderToStaticMarkup(createElement(Icon, { color: ink, width: ICON, height: ICON, weight: 'fill' }))
   const img = new Image()
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
   await img.decode()
@@ -26,17 +30,19 @@ async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink
   c.width = SIZE
   c.height = height
   const g = c.getContext('2d')!
-  const r = SIZE / 2 - 2
+  const r = SIZE / 2 - OUTLINE // the circle; the outline sits outside it, so the whole pin fits in SIZE
   g.beginPath()
   g.arc(SIZE / 2, PIN_CENTER, r, Math.atan2(0.75 * r, -0.67 * r), Math.PI * 2 + Math.atan2(0.75 * r, 0.67 * r))
-  g.lineTo(SIZE / 2, SIZE - 2 + tail)
+  g.lineTo(SIZE / 2, height - OUTLINE)
   g.closePath()
-  g.fillStyle = fill
-  g.fill()
-  g.lineWidth = 2
+  // Outside outline: stroke twice as wide, then paint the fill over its inner half.
+  g.lineJoin = 'round'
+  g.lineWidth = OUTLINE * 2
   g.strokeStyle = outline
   g.stroke()
-  g.drawImage(img, (SIZE - 34) / 2, PIN_CENTER - 17, 34, 34)
+  g.fillStyle = fill
+  g.fill()
+  g.drawImage(img, (SIZE - ICON) / 2, PIN_CENTER - ICON / 2, ICON, ICON)
   return g.getImageData(0, 0, SIZE, height)
 }
 
