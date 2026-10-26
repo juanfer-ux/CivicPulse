@@ -1,10 +1,9 @@
 import { createElement } from 'react'
-import { Car } from 'iconoir-react'
-import { Trash } from 'iconoir-react/solid'
+import { Car, Trash } from 'iconoir-react'
 import { GROUPS, type Group } from '@/lib/incidents'
 import { token } from '@/lib/tokens'
 
-/** Iconoir icons as they come (no hand-made variants): Trash has an official solid version, Car has none (the solid set has 288 icons, no vehicles), so it is the regular outline. Street-level markers (Waze style): a big colored circle with the category's icon inside. One image per category and status. */
+/** Street-level markers (Waze style): a big colored circle with the category's icon inside. One image per category and status. */
 const ICONS = { parking: Car, illegal_dumping: Trash }
 export const iconCategory = (category: string) => (category in ICONS ? category : 'parking')
 export const badgeId = (category: string, group: string) => `badge-${iconCategory(category)}-${group}`
