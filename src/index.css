@@ -152,7 +152,7 @@
   --radius: 0.5rem;
   --section-header-h: 70px; /* Section header height (Figma Section Header, the Map and Users headers); the map and filters start below it */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
-  /* The whole palette is these 13 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
+  /* The whole palette is these 16 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
   --neutral-900: #0E0E10;
   --neutral-800: #111113;
@@ -168,8 +168,11 @@
   --red-400: #EE8688;
   --amber-400: #D0AC6B;
   --coral-400: #E58C7D;
+  --orange-400: #FF9F50;
+  --blue-400: #487CFF;
+  --yellow-400: #FFEE6C;
 
-  /* Usage names the components use, each pointing at one of the 13 colors. */
+  /* Usage names the components use, each pointing at one of the 16 colors. */
   --background: var(--neutral-700);
   --card: var(--neutral-600);
   --sidebar: var(--neutral-900);
@@ -185,9 +188,10 @@
   --incident: var(--coral-400); /* incidents, invalid fields and ALL error text */
 
   /* Map colors (Figma Map collection, each an alias of a base color): the map reads these, not the UI names above, so it can be recolored without touching badges, errors or focus rings. */
-  --map-needs-review: var(--amber-400);
-  --map-validated: var(--coral-400);
-  --map-closed: var(--neutral-300);
+  --map-pending: var(--yellow-400);
+  --map-reviewing: var(--orange-400);
+  --map-approved: var(--blue-400);
+  --map-rejected: var(--red-400);
   --map-dot-outline: var(--neutral-700);
   --map-answer-ring: var(--indigo-400);
   --map-selected-ring: var(--neutral-100);
@@ -205,7 +209,7 @@
   --border: var(--secondary);
   --ring: var(--closed);
   --inset: var(--sidebar);
-  /* Not a new color: built from three of the 13. Same stops as the Figma style ai_gradient (top to bottom). */
+  /* Not a new color: built from three of the 16. Same stops as the Figma style ai_gradient (top to bottom). */
   --ai-gradient: linear-gradient(180deg, var(--ai-border) 10%, var(--incident) 64%, var(--warning) 105%);
 }
 

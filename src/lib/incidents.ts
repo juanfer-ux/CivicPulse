@@ -64,18 +64,19 @@ export interface Category {
 
 /** Status groups and the color token each one uses (CSS variable name; the map resolves it with token() because MapLibre needs a literal color). */
 export const GROUPS = {
-  pending: { label: 'Needs review', token: '--map-needs-review' },
-  active: { label: 'Validated / in progress', token: '--map-validated' },
-  closed: { label: 'Closed', token: '--map-closed' },
+  pending: { label: 'Pending', token: '--map-pending' },
+  reviewing: { label: 'Reviewing', token: '--map-reviewing' },
+  approved: { label: 'Approved', token: '--map-approved' },
+  rejected: { label: 'Rejected', token: '--map-rejected' },
 } as const
 export type Group = keyof typeof GROUPS
 
+/** The four statuses people see (map dots, counts); the nine database states stay as they are. */
 export function groupOf(status: IncidentStatus): Group {
-  if (status === 'received' || status === 'under_review') return 'pending'
-  if (status === 'validated' || status === 'intervention_proposed' || status === 'intervention_approved') {
-    return 'active'
-  }
-  return 'closed'
+  if (status === 'received') return 'pending'
+  if (status === 'under_review') return 'reviewing'
+  if (status === 'rejected' || status === 'duplicate' || status === 'intervention_rejected') return 'rejected'
+  return 'approved'
 }
 
 export const label = (value: string) => {

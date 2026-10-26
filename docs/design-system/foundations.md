@@ -32,8 +32,8 @@ Each class sets size, line height and weight together, so a component never need
 - Figma also has `meta-medium` (12 / 16, 500) for table headers; the code uses `text-meta` plus `font-medium`.
 - ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes; without that, the class merger dropped `text-label` from colored buttons (test in `utils.test.ts`).
 
-## 🎨 Colors (dark theme): 13 in total
-Every other token name (`primary`, `muted`, `accent`, `border`…) is only an alias of one of these 13, because shadcn components expect those names ([decision 0015](../decisions/0015-thirteen-color-palette.md)). Add a color only if none of these can do the job.
+## 🎨 Colors (dark theme): 16 in total
+Every other token name (`primary`, `muted`, `accent`, `border`…) is only an alias of one of these 16, because shadcn components expect those names ([decision 0015](../decisions/0015-thirteen-color-palette.md)). Add a color only if none of these can do the job.
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
 |---|---|---|---|---|
@@ -43,21 +43,24 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 4 | `neutral-600` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar, section header |
 | 5 | `neutral-500` | `#303036` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
 | 6 | `neutral-400` | `#3C3C44` | none (used directly as `--neutral-400`) | Divider before the count in the section header; suggestion borders in Figma. Until 2026-10-24 it was `input` (borders of inputs and dropdowns), see [decision 0022](../decisions/0022-input-border-neutral-300.md) |
-| 7 | `neutral-300` | `#737381` | `closed` (`ring`), `input` | Closed incidents, focus ring, **borders of inputs and dropdowns** (since 2026-10-24) |
+| 7 | `neutral-300` | `#737381` | `closed` (`ring`), `input` | Focus ring, **borders of inputs and dropdowns** (since 2026-10-24) |
 | 8 | `neutral-200` | `#A9A9B2` | `muted-foreground` | Supporting text, table headers, placeholders |
 | 9 | `neutral-100` | `#C1C1C8` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
 | 10 | `indigo-400` | `#6D74E2` | `ai-border` | Agent accents, map highlight rings |
 | 11 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
-| 12 | `amber-400` | `#D0AC6B` | `warning` | Needs review |
-| 13 | `coral-400` | `#E58C7D` | `incident` | Validated / in progress, invalid fields, **all error text** |
+| 12 | `amber-400` | `#D0AC6B` | `warning` | Warning border (map list fallback), end of the AI gradient |
+| 13 | `coral-400` | `#E58C7D` | `incident` | Invalid fields, **all error text** |
+| 14 | `orange-400` | `#FF9F50` | none (map only, `--map-reviewing`) | Reviewing dots (added 2026-10-26, [decision 0024](../decisions/0024-sixteen-colors-map-statuses.md)) |
+| 15 | `blue-400` | `#487CFF` | none (map only, `--map-approved`) | Approved dots (same decision) |
+| 16 | `yellow-400` | `#FFEE6C` | none (map only, `--map-pending`) | Pending dots (same decision) |
 
-Names say what a color is (family and lightness: neutrals are always 100–900 and listed 900 first; higher number = darker), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 13.
+Names say what a color is (family and lightness: neutrals are always 100–900 and listed 900 first; higher number = darker), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 16.
 
 - Error text is always `text-incident` (contrast 6.9:1); `text-destructive` on dark is 6.9:1.
 - Code that cannot use a CSS variable (map paint settings) reads the token with `token('--name')` from `src/lib/tokens.ts`. No color literals in `.ts` / `.tsx`.
-- **Map colors** (Figma `Map` collection, 2026-10-25): the map reads its own tokens, each an alias of a base color: `--map-needs-review` (amber-400), `--map-validated` (coral-400), `--map-closed` (neutral-300), `--map-dot-outline` (neutral-700), `--map-answer-ring` (indigo-400), `--map-selected-ring` (neutral-100), `--map-land` (neutral-700: land, parks and map background, overriding CARTO's #0E0E0E). Recolor the map by re-pointing these; the UI (warning badges, error text, focus rings) is untouched. Dots: 🟧 needs review, 🩷 validated or in progress, ⬜ closed (`GROUPS` in `src/lib/incidents.ts`). The other basemap (CARTO Dark Matter) colors are listed in the Figma sheet `Map colors` but are not tokens.
-- **Gradient** `--ai-gradient` (Figma paint style `ai_gradient`): `ai-border`, `incident`, `warning`, top to bottom at 10 %, 64 %, 105 %. Built from three of the 13, so not a 14th color. Used on the border of the Agent Panel (`gradient-border` utility in `src/index.css`).
-- In Figma the **Colors** collection holds exactly these 13 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 13`). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
+- **Map colors** (Figma `Map` collection, 2026-10-25): the map reads its own tokens, each an alias of a base color: the four statuses `--map-pending` (yellow-400), `--map-reviewing` (orange-400), `--map-approved` (blue-400), `--map-rejected` (red-400), `--map-dot-outline` (neutral-700), `--map-answer-ring` (indigo-400), `--map-selected-ring` (neutral-100), `--map-land` (neutral-700: land, parks and map background, overriding CARTO's #0E0E0E). Recolor the map by re-pointing these; the UI (warning badges, error text, focus rings) is untouched. Dots show four statuses: 🟨 Pending, 🟧 Reviewing, 🟦 Approved, 🟥 Rejected (`GROUPS` and `groupOf` in `src/lib/incidents.ts`; the nine database states are grouped as listed in [incident-lifecycle.md](../incident-lifecycle.md#-incident-status-9-values)). The other basemap (CARTO Dark Matter) colors are listed in the Figma sheet `Map colors` but are not tokens.
+- **Gradient** `--ai-gradient` (Figma paint style `ai_gradient`): `ai-border`, `incident`, `warning`, top to bottom at 10 %, 64 %, 105 %. Built from three of the 16, so not a new color. Used on the border of the Agent Panel (`gradient-border` utility in `src/index.css`).
+- In Figma the **Colors** collection holds exactly these 16 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 16`). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
 
 ## 🔣 Icons
 Iconoir (`iconoir-react`, [decision 0017](../decisions/0017-iconoir-icons.md)): the line is always 1.5 px, at any icon size (`vector-effect: non-scaling-stroke` in `index.css`), so small icons stay crisp. Sidebar items 20 px (collapsed too), 16 px elsewhere. Colour follows the text (`currentColor`).
