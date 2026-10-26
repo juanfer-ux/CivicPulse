@@ -45,9 +45,10 @@ export async function addBadges(map: { addImage: (id: string, data: ImageData) =
   const outline = token('--map-dot-outline')
   await Promise.all(
     Object.entries(ICONS).flatMap(([category, Icon]) =>
-      (Object.keys(GROUPS) as Group[]).map(async (group) => {
+      [...(Object.keys(GROUPS) as Group[]), 'dimmed' as const].map(async (group) => {
         const ink = token(group === 'approved' ? '--neutral-100' : '--neutral-900')
-        map.addImage(badgeId(category, group), await badge(Icon, token(GROUPS[group].token), ink, outline, tail))
+        const fill = token(group === 'dimmed' ? '--map-dimmed' : GROUPS[group].token)
+        map.addImage(badgeId(category, group), await badge(Icon, fill, ink, outline, tail))
       }),
     ),
   )

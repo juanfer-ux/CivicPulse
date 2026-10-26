@@ -140,15 +140,15 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
     map.setFilter('incident-selected', ['==', ['get', 'id'], selectedId ?? ''])
   }, [ready, selectedId])
 
-  // Focus: while an incident is selected (or the agent's answer is shown) every other dot or pin fades to 45%, and the focused ones draw on top.
+  // Focus: while an incident is selected (or the agent's answer is shown) every other dot or pin turns gray (--map-dimmed), and the focused ones draw on top.
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
     const focus = selectedId ? ['==', ['get', 'id'], selectedId] : highlightIds.length ? ['get', 'hl'] : null
-    const fade = (full: number) => (focus ? ['case', focus, full, full * 0.45] : full)
-    map.setPaintProperty('incidents', 'circle-opacity', fade(0.85) as never)
-    map.setPaintProperty('incidents', 'circle-stroke-opacity', fade(1) as never)
-    map.setPaintProperty('incident-badges', 'icon-opacity', fade(1) as never)
+    const own = ['get', 'color']
+    const ownBadge = ['concat', 'badge-', ['get', 'icon'], '-', ['get', 'group']]
+    map.setPaintProperty('incidents', 'circle-color', (focus ? ['case', focus, own, token('--map-dimmed')] : own) as never)
+    map.setLayoutProperty('incident-badges', 'icon-image', (focus ? ['case', focus, ownBadge, ['concat', 'badge-', ['get', 'icon'], '-dimmed']] : ownBadge) as never)
     map.setLayoutProperty('incident-badges', 'symbol-sort-key', (focus ? ['case', focus, 1, 0] : 0) as never)
   }, [ready, selectedId, highlightIds])
 
