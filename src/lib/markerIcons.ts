@@ -10,12 +10,19 @@ export const badgeId = (category: string, group: string) => `badge-${iconCategor
 
 const SIZE = 64
 
-async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string) {
+/** The icon as an image. Drawn twice per badge: a solid silhouette in `ink`, then the thin outline in the badge color on top, so details (windshield, lid) stay readable. */
+async function glyph(Icon: (typeof ICONS)[keyof typeof ICONS], ink: string, strokeWidth: number, fill?: string) {
   const { renderToStaticMarkup } = await import('react-dom/server')
-  const svg = renderToStaticMarkup(createElement(Icon, { color: ink, width: 34, height: 34, strokeWidth: 1.8 }))
+  const svg = renderToStaticMarkup(createElement(Icon, { color: ink, width: 34, height: 34, strokeWidth, fill }))
   const img = new Image()
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
   await img.decode()
+  return img
+}
+
+async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string) {
+  const solid = await glyph(Icon, ink, 1.8, ink)
+  const lines = await glyph(Icon, fill, 1)
   const c = document.createElement('canvas')
   c.width = c.height = SIZE
   const g = c.getContext('2d')!
@@ -26,7 +33,9 @@ async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink
   g.lineWidth = 2
   g.strokeStyle = outline
   g.stroke()
-  g.drawImage(img, (SIZE - 34) / 2, (SIZE - 34) / 2, 34, 34)
+  const at = (SIZE - 34) / 2
+  g.drawImage(solid, at, at, 34, 34)
+  g.drawImage(lines, at, at, 34, 34)
   return g.getImageData(0, 0, SIZE, SIZE)
 }
 
