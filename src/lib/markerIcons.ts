@@ -17,6 +17,9 @@ export const TAIL = 8
 export const PIN_CENTER = SIZE / 2 // circle center, in image px from the top (the circle is at the top)
 export const PIN_RISE = SIZE + TAIL - PIN_CENTER // image px from the bottom of the image (the exact spot) up to the circle center
 
+/** Softness of the outline only, in image px. Uses canvas filter, so a browser without it just keeps a sharp outline. */
+const OUTLINE_BLUR = 1
+
 const ICON = 28 // half the circle's diameter, like Figma (16 px icon in a 32 px pin)
 
 async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string, tail = TAIL) {
@@ -39,7 +42,9 @@ async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink
   g.lineJoin = 'round'
   g.lineWidth = OUTLINE * 2
   g.strokeStyle = outline
+  g.filter = `blur(${OUTLINE_BLUR}px)`
   g.stroke()
+  g.filter = 'none'
   g.fillStyle = fill
   g.fill()
   g.drawImage(img, (SIZE - ICON) / 2, PIN_CENTER - ICON / 2, ICON, ICON)

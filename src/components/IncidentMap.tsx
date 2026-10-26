@@ -16,6 +16,10 @@ const BADGE_ZOOM = 14
 
 /** Paint the land with --map-land (true) or leave it invisible (false). */
 const LAND_ON = false
+// Very subtle softness on the roads and their outlines, in pixels (owner, 2026-10-26). 0 = sharp.
+const ROAD_BLUR = 0.6
+/** Same for the building outlines, in pixels. */
+const BUILDING_BLUR = 2
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
 /** The map always opens here (owner's choice, 2026-10-26). */
@@ -67,7 +71,10 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       const roads: Record<string, string> = { 'rgba(65, 71, 88, 1)': token('--map-roads'), 'rgba(83, 86, 102, 1)': token('--map-main-roads') }
       for (const l of map.getStyle().layers) {
         const c = l.type === 'line' ? map.getPaintProperty(l.id, 'line-color') : null
-        if (typeof c === 'string' && roads[c]) map.setPaintProperty(l.id, 'line-color', roads[c])
+        if (typeof c === 'string' && roads[c]) {
+          map.setPaintProperty(l.id, 'line-color', roads[c])
+          map.setPaintProperty(l.id, 'line-blur', ROAD_BLUR)
+        }
       }
       // Outlines and thin lines (Figma Map colors sheet): CARTO's colors replaced by our tokens, group by group. Sizes stay CARTO's.
       const lines: Record<string, string> = {
@@ -89,12 +96,29 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           // Road outlines are the "case" layers: CARTO's #232323 ones are the major roads, the rest (#1a1a1a) tunnels, minor roads and bridges.
           const name = lines[l.id] ?? (l.id.includes('case') ? (old.includes('#232323') ? '--map-road-outlines' : '--map-road-outlines-minor') : null)
           if (name) map.setPaintProperty(l.id, 'line-color', token(name))
+          if (l.id.includes('case')) map.setPaintProperty(l.id, 'line-blur', ROAD_BLUR)
         }
         if (l.type === 'symbol' && map.getPaintProperty(l.id, 'text-halo-width')) map.setPaintProperty(l.id, 'text-halo-color', token('--map-label-halo'))
       }
       if (map.getLayer('building-top')) {
         map.setPaintProperty('building-top', 'fill-color', token('--map-buildings'))
-        map.setPaintProperty('building-top', 'fill-outline-color', token('--map-building-outlines'))
+        // Fills can't blur, so the 1 px outline becomes a soft line layer on the same source, with the same fade-in and offset.
+        map.setPaintProperty('building-top', 'fill-outline-color', 'transparent')
+        const top = map.getLayer('building-top') as unknown as { source: string; sourceLayer: string }
+        map.addLayer({
+          id: 'building-outline',
+          type: 'line',
+          source: top.source,
+          'source-layer': top.sourceLayer,
+          minzoom: 13,
+          paint: {
+            'line-color': token('--map-building-outlines'),
+            'line-width': 1,
+            'line-blur': BUILDING_BLUR,
+            'line-opacity': map.getPaintProperty('building-top', 'fill-opacity'),
+            'line-translate': map.getPaintProperty('building-top', 'fill-translate'),
+          },
+        })
       }
       // The credit starts closed (just the ⓘ) and opens on tap; MapLibre opens it by default and only closes it on the first drag.
       map.getContainer().querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
