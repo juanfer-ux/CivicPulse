@@ -1,4 +1,4 @@
-import { Car, Clock, DotsThree, Flag, MapPin, SquaresFour, Trash, TrafficSignal, Wheelchair } from '@phosphor-icons/react'
+import { Car, Clock, DotsThree, Flag, MapPin, SquaresFour, Trash, TrafficSignal, Wheelchair, X } from '@phosphor-icons/react'
 import type { ComponentType } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { ChipMultiSelect } from '@/components/ui/chip-multi-select'
@@ -50,11 +50,10 @@ export function FilterBar({
   className?: string
 }) {
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
-  // Chips are 8 px apart inside a group and the groups 32 px apart, so the filters and "Clear filters" read as separate blocks.
-  const group = 'flex shrink-0 items-center gap-2'
   return (
     <div role="group" aria-label="Filters" className={className}>
-      <div className={group}>
+      {/* The filters share one 8 px gap and scroll sideways when they do not fit; "Clear filters" stays put at the far right. */}
+      <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-1 [scrollbar-width:none]">
         <ChipMultiSelect
           aria-label="Status"
           icon={<Flag aria-hidden />}
@@ -101,11 +100,9 @@ export function FilterBar({
           options={PERIODS.map((p) => ({ value: String(p.days), label: p.label }))}
         />
       </div>
-      {isFiltered(filters) && (
-        <div className={group}>
-          <Chip onClick={() => onChange(NO_FILTERS)}>Clear filters</Chip>
-        </div>
-      )}
+      <Chip icon={<X aria-hidden />} title="Clear filters" disabled={!isFiltered(filters)} onClick={() => onChange(NO_FILTERS)}>
+        <span className="max-desk:sr-only">Clear filters</span>
+      </Chip>
     </div>
   )
 }
