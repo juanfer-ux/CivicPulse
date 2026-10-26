@@ -87,6 +87,20 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'icon-allow-overlap': true,
         },
       })
+      // Rule (owner, 2026-10-26): the selected incident always shows its pin with the category icon, at any zoom. From zoom 14 every incident is already a pin, so this layer only draws below it.
+      map.addLayer({
+        id: 'incident-selected-pin',
+        type: 'symbol',
+        source: 'incidents',
+        maxzoom: BADGE_ZOOM,
+        filter: ['==', ['get', 'id'], ''],
+        layout: {
+          'icon-image': ['concat', 'badge-', ['get', 'icon'], '-', ['get', 'group']],
+          'icon-size': 0.4,
+          'icon-anchor': 'bottom',
+          'icon-allow-overlap': true,
+        },
+      })
       map.addLayer({
         id: 'incident-highlight',
         type: 'circle',
@@ -106,19 +120,20 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'id'], ''],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 11.99, 8, 12, 10, BADGE_ZOOM, 10, BADGE_ZOOM + 0.01, 19, 15, 24, 18, 33],
+          // The selected incident is always a pin (see 'incident-selected-pin'), so its ring always wraps the pin's circle, at any zoom.
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, 19, 15, 24, 18, 33],
           'circle-color': 'rgba(0,0,0,0)',
-          'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
+          'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
           'circle-stroke-width': 2,
           'circle-stroke-color': token('--map-selected-ring'),
         },
       })
       // A click on an incident selects it; a click anywhere else on the map clears the selection.
       map.on('click', (e) => {
-        const hit = map.queryRenderedFeatures(e.point, { layers: ['incidents', 'incident-badges'] })[0]
+        const hit = map.queryRenderedFeatures(e.point, { layers: ['incident-selected-pin', 'incidents', 'incident-badges'] })[0]
         onSelectRef.current(hit ? String(hit.properties.id) : null)
       })
-      for (const layer of ['incidents', 'incident-badges']) {
+      for (const layer of ['incident-selected-pin', 'incidents', 'incident-badges']) {
         map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'))
         map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''))
       }
@@ -152,6 +167,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
     const map = mapRef.current
     if (!ready || !map) return
     map.setFilter('incident-selected', ['==', ['get', 'id'], selectedId ?? ''])
+    map.setFilter('incident-selected-pin', ['==', ['get', 'id'], selectedId ?? ''])
   }, [ready, selectedId])
 
   // Focus: while an incident is selected (or the agent's answer is shown) every other dot or pin is toned down toward the land color (same hue, so its status stays readable), and the focused ones draw on top.
