@@ -86,10 +86,10 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'hl'], true],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 5, BADGE_ZOOM, 9, BADGE_ZOOM + 0.01, 17, 15, 22, 18, 31],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 6, BADGE_ZOOM, 10, BADGE_ZOOM + 0.01, 18, 15, 23, 18, 32],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 4,
           'circle-stroke-color': token('--map-answer-ring'),
         },
       })
@@ -99,10 +99,10 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'id'], ''],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 6, BADGE_ZOOM, 10, BADGE_ZOOM + 0.01, 19, 15, 24, 18, 33],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 7, BADGE_ZOOM, 11, BADGE_ZOOM + 0.01, 20, 15, 25, 18, 34],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 4,
           'circle-stroke-color': token('--map-selected-ring'),
         },
       })
