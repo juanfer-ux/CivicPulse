@@ -16,6 +16,8 @@ const BADGE_ZOOM = 14
 
 /** Paint the land with --map-land (true) or leave it invisible (false). */
 const LAND_ON = false
+/** The Bogotá outline (public/bogota-boundary.geojson, 19 KB). OFF for now (owner, 2026-10-26): nothing is loaded or drawn. Set to true to bring it back. */
+const BOGOTA_OUTLINE_ON = false
 // Very subtle softness on the roads and their outlines, in pixels (owner, 2026-10-26). 0 = sharp.
 const ROAD_BLUR = 0.6
 /** Same for the building outlines, in pixels. */
@@ -122,6 +124,11 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       }
       // The credit starts closed (just the ⓘ) and opens on tap; MapLibre opens it by default and only closes it on the first drag.
       map.getContainer().querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
+      // The city's outline: one line from OpenStreetMap (public/bogota-boundary.geojson), under the incidents.
+      if (BOGOTA_OUTLINE_ON) {
+        map.addSource('bogota', { type: 'geojson', data: new URL('/bogota-boundary.geojson', location.href).href })
+        map.addLayer({ id: 'bogota-border', type: 'line', source: 'bogota', paint: { 'line-color': token('--map-bogota-border'), 'line-width': 1.5, 'line-blur': ROAD_BLUR } })
+      }
       map.addSource('incidents', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer({
         id: 'incidents',
