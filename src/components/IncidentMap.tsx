@@ -18,6 +18,8 @@ const BADGE_ZOOM = 14
 const LAND_ON = false
 // Very subtle softness on the roads and their outlines, in pixels (owner, 2026-10-26). 0 = sharp.
 const ROAD_BLUR = 0.6
+/** Same for the building outlines, in pixels. */
+const BUILDING_BLUR = 2
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
 /** The map always opens here (owner's choice, 2026-10-26). */
@@ -100,7 +102,23 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       }
       if (map.getLayer('building-top')) {
         map.setPaintProperty('building-top', 'fill-color', token('--map-buildings'))
-        map.setPaintProperty('building-top', 'fill-outline-color', token('--map-building-outlines'))
+        // Fills can't blur, so the 1 px outline becomes a soft line layer on the same source, with the same fade-in and offset.
+        map.setPaintProperty('building-top', 'fill-outline-color', 'transparent')
+        const top = map.getLayer('building-top') as unknown as { source: string; sourceLayer: string }
+        map.addLayer({
+          id: 'building-outline',
+          type: 'line',
+          source: top.source,
+          'source-layer': top.sourceLayer,
+          minzoom: 13,
+          paint: {
+            'line-color': token('--map-building-outlines'),
+            'line-width': 1,
+            'line-blur': BUILDING_BLUR,
+            'line-opacity': map.getPaintProperty('building-top', 'fill-opacity'),
+            'line-translate': map.getPaintProperty('building-top', 'fill-translate'),
+          },
+        })
       }
       // The credit starts closed (just the ⓘ) and opens on tap; MapLibre opens it by default and only closes it on the first drag.
       map.getContainer().querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
