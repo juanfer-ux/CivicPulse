@@ -209,7 +209,7 @@
   --map-road-outlines: #363644; /* map only, outside the 16 (owner, 2026-10-26): the thin outline under roads; CARTO's is #232323. Figma map/road-outlines */
   --map-main-roads: #2B2B36; /* map only: primary roads; CARTO's is #535666. Figma map/main-roads */
   --map-boundary: #32323E; /* map only, outside the 16 (owner, 2026-10-26): state borders; CARTO's is #676772. Figma map/boundary */
-  --map-bogota-border: var(--neutral-100); /* map only (owner, 2026-10-26): the outline of the city of Bogotá, from OpenStreetMap. Not in Figma yet */
+  --map-bogota-border: var(--neutral-400); /* map only (owner, 2026-10-26): the outline of the city of Bogotá, from OpenStreetMap. Not in Figma yet */
   --map-background-gradient: radial-gradient(ellipse 71% 104% at 35% 21%, var(--neutral-700), var(--neutral-900)); /* subtle radial gradient behind the map, as in Figma (owner, 2026-10-26): neutral-700 near the top left, fading to neutral-900 at the edges, laid out over the whole screen (the map shows the part under it; Figma paint style map_background). Figma's gradient is slightly tilted; CSS cannot tilt it. */
   --map-background: var(--neutral-800); /* What shows behind the map while the land is off, i.e. the map screen background (owner, 2026-10-26). Figma map/background */
   --map-land: var(--neutral-700); /* The land is OFF for now (owner, 2026-10-26): its layers are hidden and the page color shows through, so this is only what dimmed pins blend toward. To use a land color, set LAND_ON in IncidentMap.tsx and this value (the one picked in Figma was #19191F). */
