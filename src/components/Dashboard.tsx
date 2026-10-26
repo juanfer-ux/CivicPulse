@@ -115,11 +115,11 @@ export function Dashboard({ highlightIds, onClearHighlight, tab, onTab, children
 
       {/* Conversation mode banner (32 px, Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. */}
       {chatMode && (
-        <div className="fixed inset-x-0 top-[53px] z-10 flex h-8 items-center justify-center gap-2 bg-(--ai-banner) px-6 text-meta text-(--neutral-100) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
+        <div className="fixed inset-x-0 top-[53px] z-10 flex h-8 items-center justify-center gap-2 bg-(--ai-banner) px-4 text-meta text-(--neutral-100) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
           <Button size="sm" variant="ghost" className="invisible h-6 max-desk:hidden" aria-hidden tabIndex={-1}>
             Clear agent results
           </Button>
-          <span>While showing the agent's answer, the filters will narrow it down.</span>
+          <span className="flex-1 text-center">While showing the agent's answer, the filters will narrow it down.</span>
           <Button size="sm" variant="ghost" className="h-6" onClick={onClearHighlight}>
             Clear agent results
           </Button>
