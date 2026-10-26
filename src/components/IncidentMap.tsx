@@ -64,12 +64,33 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         const c = l.type === 'line' ? map.getPaintProperty(l.id, 'line-color') : null
         if (typeof c === 'string' && roads[c]) map.setPaintProperty(l.id, 'line-color', roads[c])
       }
-      // The thin outline under roads (CARTO's #232323) also uses our color.
-      for (const l of map.getStyle().layers) {
-        if (l.type === 'line' && JSON.stringify(map.getPaintProperty(l.id, 'line-color')).includes('#232323')) map.setPaintProperty(l.id, 'line-color', token('--map-road-outlines'))
+      // Outlines and thin lines (Figma Map colors sheet): CARTO's colors replaced by our tokens, group by group. Sizes stay CARTO's.
+      const lines: Record<string, string> = {
+        boundary_state: '--map-boundary',
+        boundary_county: '--map-boundary-county',
+        boundary_country_outline: '--map-boundary-country',
+        tunnel_path: '--map-paths',
+        road_path: '--map-paths',
+        road_path_areas: '--map-paths',
+        bridge_path: '--map-paths',
+        rail: '--map-rail',
+        tunnel_rail: '--map-rail',
+        'aeroway-runway': '--map-airport',
+        'aeroway-taxiway': '--map-airport',
       }
-      if (map.getLayer('building-top')) map.setPaintProperty('building-top', 'fill-color', token('--map-buildings'))
-      if (map.getLayer('boundary_state')) map.setPaintProperty('boundary_state', 'line-color', token('--map-boundary'))
+      for (const l of map.getStyle().layers) {
+        if (l.type === 'line') {
+          const old = JSON.stringify(map.getPaintProperty(l.id, 'line-color'))
+          // Road outlines are the "case" layers: CARTO's #232323 ones are the major roads, the rest (#1a1a1a) tunnels, minor roads and bridges.
+          const name = lines[l.id] ?? (l.id.includes('case') ? (old.includes('#232323') ? '--map-road-outlines' : '--map-road-outlines-minor') : null)
+          if (name) map.setPaintProperty(l.id, 'line-color', token(name))
+        }
+        if (l.type === 'symbol' && map.getPaintProperty(l.id, 'text-halo-width')) map.setPaintProperty(l.id, 'text-halo-color', token('--map-label-halo'))
+      }
+      if (map.getLayer('building-top')) {
+        map.setPaintProperty('building-top', 'fill-color', token('--map-buildings'))
+        map.setPaintProperty('building-top', 'fill-outline-color', token('--map-building-outlines'))
+      }
       // The credit starts closed (just the ⓘ) and opens on tap; MapLibre opens it by default and only closes it on the first drag.
       map.getContainer().querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
       map.addSource('incidents', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })

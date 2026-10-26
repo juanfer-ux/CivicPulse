@@ -197,6 +197,14 @@
   --map-selected-ring: var(--neutral-100);
   --map-roads: #363644; /* map only, outside the 16 (owner, 2026-10-26): minor and secondary streets; CARTO's is #414758. Figma map/roads */
   --map-buildings: #3F4550; /* map only, outside the 16 (owner, 2026-10-26): building tops, they fade in from zoom 13 to 16. CARTO's is #393939. Figma map/buildings */
+  --map-road-outlines-minor: #1A1A1A; /* map only (owner, 2026-10-26): outline under tunnels, minor roads and bridges; CARTO's own. Figma map/road-outlines-minor */
+  --map-building-outlines: #0E0E0E; /* map only: 1 px outline of each building; CARTO's own. Figma map/building-outlines */
+  --map-label-halo: #222222; /* map only: 1 px outline around place and street names; CARTO uses #222, #111 and #181818, now one color. Figma map/label-halo */
+  --map-paths: #262626; /* map only: pedestrian paths and service lanes; CARTO's own. Figma map/paths */
+  --map-boundary-county: #222222; /* map only: county line; CARTO's own. Figma map/boundary-county */
+  --map-boundary-country: #2C353C; /* map only: country border glow; CARTO's own. Figma map/boundary-country */
+  --map-rail: #1A1A1A; /* map only: railways; CARTO's own. Figma map/rail */
+  --map-airport: #111111; /* map only: runways and taxiways; CARTO's own. Figma map/airport */
   --map-road-outlines: #363644; /* map only, outside the 16 (owner, 2026-10-26): the thin outline under roads; CARTO's is #232323. Figma map/road-outlines */
   --map-main-roads: #2B2B36; /* map only: primary roads; CARTO's is #535666. Figma map/main-roads */
   --map-boundary: #32323E; /* map only, outside the 16 (owner, 2026-10-26): state borders; CARTO's is #676772. Figma map/boundary */
