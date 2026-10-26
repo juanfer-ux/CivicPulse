@@ -3,6 +3,7 @@ import * as maplibregl from 'maplibre-gl'
 import { token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
+import { addBadges, iconCategory } from '@/lib/markerIcons'
 import { GROUPS, groupOf, label, typeOf, type Incident } from '@/lib/incidents'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.
@@ -37,7 +38,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
     if (!WEBGL2) return
     const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: 11, attributionControl: { compact: true } })
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
-    map.on('load', () => {
+    map.on('load', async () => {
+      await addBadges(map)
       // Place and street names stay in Spanish (the local names): the CARTO style asks for English first.
       for (const l of map.getStyle().layers) {
         if (l.type === 'symbol' && JSON.stringify(l.layout?.['text-field']).includes('name:en')) map.setLayoutProperty(l.id, 'text-field', ['coalesce', ['get', 'name:es'], ['get', 'name']])
@@ -53,6 +55,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         id: 'incidents',
         type: 'circle',
         source: 'incidents',
+        maxzoom: 15,
         paint: {
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 3, 15, 8],
           'circle-color': ['get', 'color'],
@@ -61,13 +64,25 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'circle-stroke-color': token('--map-dot-outline'),
         },
       })
+      // From street level (zoom 15) the dots become big badges with the category's icon, like Waze.
+      map.addLayer({
+        id: 'incident-badges',
+        type: 'symbol',
+        source: 'incidents',
+        minzoom: 15,
+        layout: {
+          'icon-image': ['concat', 'badge-', ['get', 'icon'], '-', ['get', 'group']],
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 15, 0.5, 18, 0.8],
+          'icon-allow-overlap': true,
+        },
+      })
       map.addLayer({
         id: 'incident-highlight',
         type: 'circle',
         source: 'incidents',
         filter: ['==', ['get', 'hl'], true],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 6, 15, 12],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 6, 15, 12, 15.01, 21, 18, 31],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-stroke-width': 2,
           'circle-stroke-color': token('--map-answer-ring'),
@@ -79,15 +94,17 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'id'], ''],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 7, 15, 13],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 7, 15, 13, 15.01, 23, 18, 33],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-stroke-width': 2,
           'circle-stroke-color': token('--map-selected-ring'),
         },
       })
-      map.on('click', 'incidents', (e) => onSelectRef.current(String(e.features?.[0]?.properties?.id ?? '') || null))
-      map.on('mouseenter', 'incidents', () => (map.getCanvas().style.cursor = 'pointer'))
-      map.on('mouseleave', 'incidents', () => (map.getCanvas().style.cursor = ''))
+      map.on('click', ['incidents', 'incident-badges'], (e) => onSelectRef.current(String(e.features?.[0]?.properties?.id ?? '') || null))
+      for (const layer of ['incidents', 'incident-badges']) {
+        map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'))
+        map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''))
+      }
       setReady(true)
     })
     mapRef.current = map
@@ -106,7 +123,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       features: incidents.map((i) => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
-        properties: { id: i.id, color: token(GROUPS[groupOf(i.status)].token), hl: highlight.has(i.id) },
+        properties: { id: i.id, color: token(GROUPS[groupOf(i.status)].token), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id) },
       })),
     })
   }, [ready, incidents, highlightIds])
