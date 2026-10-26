@@ -51,7 +51,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 12 | `amber-400` | `#D0AC6B` | `warning` | Warning border (map list fallback), end of the AI gradient |
 | 13 | `coral-400` | `#E58C7D` | `incident` | Invalid fields, **all error text** |
 | 14 | `orange-400` | `#FF9F50` | none (map only, `--map-reviewing`) | Reviewing dots (added 2026-10-26, [decision 0024](../decisions/0024-sixteen-colors-map-statuses.md)) |
-| 15 | `blue-400` | `#487CFF` | none (map only, `--map-approved`) | Approved dots (same decision) |
+| 15 | `blue-400` | `#495C8B` | none (map only, `--map-approved`) | Approved dots (same decision) |
 | 16 | `yellow-400` | `#FFEE6C` | none (map only, `--map-pending`) | Pending dots (same decision) |
 
 Names say what a color is (family and lightness: neutrals are always 100–900 and listed 900 first; higher number = darker), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 16.
