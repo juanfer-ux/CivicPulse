@@ -47,6 +47,11 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
     fetchDashboardData().then(setData, (e: Error) => setError(e.message))
   }, [])
 
+  // The conversation takes over the map: when an answer rings incidents, filters are cleared so nothing it points at is hidden.
+  useEffect(() => {
+    if (highlightIds.length) setFilters(NO_FILTERS) // eslint-disable-line react-hooks/set-state-in-effect
+  }, [highlightIds])
+
   const localityName = useMemo(() => new Map(data?.localities.map((l) => [l.code, l.name])), [data])
 
   // Everything except the status chips: the status counts show what each chip would add.
