@@ -183,6 +183,7 @@
   --foreground: var(--neutral-100);
   --ai: var(--neutral-800);
   --ai-border: var(--indigo-400);
+  --ai-banner: #A5AAF2; /* outside the 16 (owner, 2026-10-26): a brighter indigo-400 for the conversation banner, with neutral-900 text. Not in Figma yet */
   --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
   --warning: var(--amber-400);
   --incident: var(--coral-400); /* incidents, invalid fields and ALL error text */
