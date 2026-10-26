@@ -43,7 +43,7 @@ export default function App() {
       <main className="relative min-w-0 flex-1" style={{ '--agent-w': agentWidthCss(agentWidth) } as CSSProperties}>
         {/* Kept mounted while the Users page is open, so the map and the agent's answer are still there on return. */}
         <div className={showUsers ? 'hidden' : 'contents'}>
-          <Dashboard highlightIds={highlightIds} tab={tab} onTab={setTab}>
+          <Dashboard highlightIds={highlightIds} onClearHighlight={() => setHighlightIds([])} tab={tab} onTab={setTab}>
             {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
               <InvestigatePanel onHighlight={setHighlightIds} />

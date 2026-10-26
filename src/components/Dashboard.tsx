@@ -28,13 +28,14 @@ export type Tab = 'explore' | 'ask'
 
 interface Props {
   highlightIds: string[]
+  onClearHighlight: () => void
   /** Active panel on mobile (on desktop everything is visible). */
   tab: Tab
   onTab: (tab: Tab) => void
   children?: ReactNode
 }
 
-export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
+export function Dashboard({ highlightIds, onClearHighlight, tab, onTab, children }: Props) {
   const { profile } = useAuth()
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -82,6 +83,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
     return [...counts].sort((a, b) => b[1] - a[1]).slice(0, 5)
   }, [filtered])
 
+  const chatMode = highlightIds.length > 0 // an answer is on the map: the banner shows and everything below it moves down 24 px
   const selected = filtered.find((i) => i.id === selectedId) ?? null
   const select = (id: string | null) => {
     setSelectedId(id)
@@ -111,6 +113,16 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         )}
       </SectionHeader>
 
+      {/* Conversation mode banner (24 px): while an answer is on the map, filters narrow it; the button ends the mode. */}
+      {chatMode && (
+        <div className="fixed inset-x-0 top-[53px] z-10 flex h-6 items-center justify-center gap-2 border-b bg-ai text-meta text-muted-foreground desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
+          <span>Showing the agent's answer. Filters narrow it down.</span>
+          <Button size="sm" variant="ghost" className="h-6 px-2 text-meta" onClick={onClearHighlight}>
+            Clear conversation results
+          </Button>
+        </div>
+      )}
+
       {/* Filter chips (Figma: Filter Bar): one row over the map, scrolling sideways when it does not fit; hidden while an incident is open. */}
       {!selected && data && (
         <FilterBar
@@ -119,7 +131,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
           localities={data.localities}
           categories={data.categories}
           counts={byGroup}
-          className="fixed inset-x-3 top-[53px] z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto desk:top-[calc(var(--section-header-h)+0.75rem)] desk:right-4 desk:left-[calc(var(--agent-w)+1rem)]"
+          className={`fixed inset-x-3 ${chatMode ? 'top-[77px]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+1.5rem+0.75rem)]' : 'desk:top-[calc(var(--section-header-h)+0.75rem)]'} desk:right-4 desk:left-[calc(var(--agent-w)+1rem)]`}
         />
       )}
 
@@ -144,7 +156,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         </div>
 
       <div
-        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 desk:top-[calc(var(--section-header-h)+1rem+2.25rem+0.75rem)] desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
+        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+1.5rem+1rem+2.25rem+0.75rem)]' : 'desk:top-[calc(var(--section-header-h)+1rem+2.25rem+0.75rem)]'} desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
       >
         <Card className="bg-card/95">
           <CardHeader>
