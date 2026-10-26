@@ -54,7 +54,7 @@ export async function addBadges(map: { addImage: (id: string, data: ImageData) =
       (Object.keys(GROUPS) as Group[]).flatMap((group) => {
         const ink = token(group === 'approved' ? '--neutral-100' : '--neutral-900')
         const fill = token(GROUPS[group].token)
-        const land = token('--map-land')
+        const land = token('--map-background')
         // The same pin toned down toward the land color: it keeps its hue, so the status is still readable.
         return [false, true].map(async (dim) =>
           map.addImage(badgeId(category, group, dim), await badge(Icon, dim ? mix(fill, land, KEEP) : fill, dim ? mix(ink, land, KEEP) : ink, outline, tail)),

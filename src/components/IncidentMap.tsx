@@ -196,7 +196,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       features: incidents.map((i) => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
-        properties: { id: i.id, color: token(GROUPS[groupOf(i.status)].token), dim: mix(token(GROUPS[groupOf(i.status)].token), token('--map-land'), KEEP), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id) },
+        properties: { id: i.id, color: token(GROUPS[groupOf(i.status)].token), dim: mix(token(GROUPS[groupOf(i.status)].token), token('--map-background'), KEEP), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id) },
       })),
     })
   }, [ready, incidents, highlightIds])
@@ -224,7 +224,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
 
   // Wrapper positions the map: maplibre's unlayered CSS overrides Tailwind's `absolute` on the map element itself.
   return (
-    <div className="absolute inset-x-0 top-0 bottom-14 desk:top-(--section-header-h) desk:bottom-0 desk:left-(--agent-w)">
+    <div className="absolute inset-x-0 top-0 bottom-14 bg-(--map-background) desk:top-(--section-header-h) desk:bottom-0 desk:left-(--agent-w)">
       <div ref={container} className="size-full" />
     </div>
   )
