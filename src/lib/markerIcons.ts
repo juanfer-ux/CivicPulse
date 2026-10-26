@@ -4,7 +4,7 @@ import { GROUPS, type Group } from '@/lib/incidents'
 import { KEEP, mix, token } from '@/lib/tokens'
 
 /** Street-level markers (Waze style): a big colored circle with the category's icon inside. One image per category and status. */
-const ICONS = { parking: Car, illegal_dumping: Trash }
+export const ICONS = { parking: Car, illegal_dumping: Trash }
 export const iconCategory = (category: string) => (category in ICONS ? category : 'parking')
 export const badgeId = (category: string, group: string, dim = false) => `badge-${iconCategory(category)}${dim ? '-dim' : ''}-${group}`
 
