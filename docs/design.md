@@ -8,7 +8,7 @@
 - **Logo:** ring mark plus wordmark (`src/assets/logo-*.svg`, `src/components/Logo.tsx`).
 - **Font:** Manrope, served from our own site ([decision 0019](decisions/0019-manrope-font.md)).
 - **Theme:** dark only ([decision 0005](decisions/0005-dark-only-figma-tokens.md)).
-- **Incident markers:** small colored circles up to zoom 15; from street level (zoom 15 and closer) they become big badges (32 px growing to 51 px) with the category's icon inside, like Waze: a car for parking, a trash can for illegal dumping (Iconoir). Same four status colors; the icons are filled (solid silhouettes with their detail lines cut out), dark, light on Approved. Rings for the agent's answer and the selected incident grow with them. Built in `src/lib/markerIcons.ts`; a new category needs one icon there.
+- **Incident markers:** small colored circles up to zoom 15; from street level (zoom 15 and closer) they become big badges (32 px growing to 51 px) with the category's icon inside, like Waze: a car for parking, a trash can for illegal dumping (Iconoir). Same four status colors; the icons are Iconoir as published (Trash solid, Car regular: Iconoir has no solid car), dark, light on Approved. Rings for the agent's answer and the selected incident grow with them. Built in `src/lib/markerIcons.ts`; a new category needs one icon there.
 - **Basemap:** dark CARTO (OpenStreetMap data). Place and street names are shown in Spanish (the local names, not the English ones CARTO asks for first; owner, 2026-10-25). The credit is required by their licenses, so it stays on the map as a small dark ⓘ that opens on tap (compact MapLibre control, styled in `src/index.css`). Never remove it.
 
 ## 📱 Mobile rule

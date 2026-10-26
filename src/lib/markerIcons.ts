@@ -1,28 +1,22 @@
 import { createElement } from 'react'
-import { Car, Trash } from 'iconoir-react'
+import { Car } from 'iconoir-react'
+import { Trash } from 'iconoir-react/solid'
 import { GROUPS, type Group } from '@/lib/incidents'
 import { token } from '@/lib/tokens'
 
-/** Street-level markers (Waze style): a big colored circle with the category's icon inside. One image per category and status. */
+/** Iconoir icons as they come (no hand-made variants): Trash has an official solid version, Car has none (the solid set has 288 icons, no vehicles), so it is the regular outline. Street-level markers (Waze style): a big colored circle with the category's icon inside. One image per category and status. */
 const ICONS = { parking: Car, illegal_dumping: Trash }
 export const iconCategory = (category: string) => (category in ICONS ? category : 'parking')
 export const badgeId = (category: string, group: string) => `badge-${iconCategory(category)}-${group}`
 
 const SIZE = 64
 
-/** The icon as an image. Drawn twice per badge: a solid silhouette in `ink`, then the thin outline in the badge color on top, so details (windshield, lid) stay readable. */
-async function glyph(Icon: (typeof ICONS)[keyof typeof ICONS], ink: string, strokeWidth: number, fill?: string) {
+async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string) {
   const { renderToStaticMarkup } = await import('react-dom/server')
-  const svg = renderToStaticMarkup(createElement(Icon, { color: ink, width: 34, height: 34, strokeWidth, fill }))
+  const svg = renderToStaticMarkup(createElement(Icon, { color: ink, width: 34, height: 34 }))
   const img = new Image()
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
   await img.decode()
-  return img
-}
-
-async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string) {
-  const solid = await glyph(Icon, ink, 1.8, ink)
-  const lines = await glyph(Icon, fill, 1)
   const c = document.createElement('canvas')
   c.width = c.height = SIZE
   const g = c.getContext('2d')!
@@ -33,9 +27,7 @@ async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink
   g.lineWidth = 2
   g.strokeStyle = outline
   g.stroke()
-  const at = (SIZE - 34) / 2
-  g.drawImage(solid, at, at, 34, 34)
-  g.drawImage(lines, at, at, 34, 34)
+  g.drawImage(img, (SIZE - 34) / 2, (SIZE - 34) / 2, 34, 34)
   return g.getImageData(0, 0, SIZE, SIZE)
 }
 
