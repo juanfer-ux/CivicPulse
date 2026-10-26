@@ -240,11 +240,15 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
     map.setFilter('incident-selected-pin', ['==', ['get', 'id'], selectedId ?? ''])
   }, [ready, selectedId])
 
-  // Focus: while an incident is selected (or the agent's answer is shown) every other dot or pin is toned down toward the land color (same hue, so its status stays readable), and the focused ones draw on top.
+  // While the agent's answer is shown (owner, 2026-10-26) the incidents that are not part of it are hidden, not toned down.
+  // While an incident is selected every other dot or pin is toned down toward the land color (same hue, so its status stays readable), and the focused one draws on top.
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
-    const focus = selectedId ? ['==', ['get', 'id'], selectedId] : highlightIds.length ? ['get', 'hl'] : null
+    const answer = highlightIds.length ? ['get', 'hl'] : null
+    map.setFilter('incidents', answer as never)
+    map.setFilter('incident-badges', answer as never)
+    const focus = selectedId ? ['==', ['get', 'id'], selectedId] : null
     const own = ['get', 'color']
     const ownBadge = ['concat', 'badge-', ['get', 'icon'], '-', ['get', 'group']]
     map.setPaintProperty('incidents', 'circle-color', (focus ? ['case', focus, own, ['get', 'dim']] : own) as never)

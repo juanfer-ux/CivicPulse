@@ -1,5 +1,5 @@
 # 0022: Input borders use neutral-300
-**Status:** ✅ Accepted   **Date:** 2026-10-24   Refines [0020](0020-generic-color-names.md).
+**Status:** 🔁 Superseded by [0026](0026-control-border-neutral-400.md)   **Date:** 2026-10-24   Refines [0020](0020-generic-color-names.md).
 
 ## Context
 The accessibility audit of Sign in ([accessibility.md](../design-system/accessibility.md)) found the field border `#3C3C44` (`neutral-400`) only 1.6 : 1 against the panel; WCAG 1.4.11 asks for 3 : 1 on the edge of a control.

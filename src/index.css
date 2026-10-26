@@ -177,7 +177,7 @@
   --card: var(--neutral-600);
   --sidebar: var(--neutral-900);
   --secondary: var(--neutral-500);
-  --input: #666672; /* outside the 16 (owner, 2026-10-26): borders of inputs, dropdowns and suggestions. The darkest grey that keeps 3:1 on the input fill (3.03:1 on neutral-600, 3.1:1 on neutral-800), a step under neutral-300. Not in Figma yet */
+  --input: var(--neutral-400); /* owner's choice (2026-10-26): one border for every control. Reaches only ~1.6:1 on the input fill, below WCAG 1.4.11's 3:1 for text inputs; accepted by the owner */
   --closed: var(--neutral-300);
   --muted-foreground: var(--neutral-200);
   --foreground: var(--neutral-100);
