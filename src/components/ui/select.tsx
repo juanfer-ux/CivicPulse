@@ -1,5 +1,5 @@
 import { Select as BaseSelect } from '@base-ui/react/select'
-import { Check, NavArrowDown } from 'iconoir-react'
+import { CaretDown, Check } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { controlClass } from '@/lib/ui'
 
@@ -33,7 +33,7 @@ export function Select({
       >
         <BaseSelect.Value className="truncate" />
         <BaseSelect.Icon className="shrink-0 text-muted-foreground">
-          <NavArrowDown className="size-4" aria-hidden />
+          <CaretDown className="size-4" aria-hidden />
         </BaseSelect.Icon>
       </BaseSelect.Trigger>
       <BaseSelect.Portal>

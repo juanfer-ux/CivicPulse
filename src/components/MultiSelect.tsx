@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { NavArrowDown } from 'iconoir-react'
+import { CaretDown } from '@phosphor-icons/react'
 import { controlClass } from '@/lib/ui'
 import { Button } from '@/components/ui/button'
 
@@ -54,7 +54,7 @@ export function MultiSelect<T extends string | number>({
         className={`${controlClass} flex items-center justify-between gap-2 text-left`}
       >
         <span className="truncate">{summary}</span>
-        <NavArrowDown aria-hidden className="size-4 shrink-0 text-muted-foreground" />
+        <CaretDown aria-hidden className="size-4 shrink-0 text-muted-foreground" />
       </button>
       {open && (
         <div role="listbox" aria-multiselectable className="absolute inset-x-0 top-full z-30 mt-1 flex max-h-72 flex-col overflow-hidden rounded-sm border bg-popover shadow-lg">

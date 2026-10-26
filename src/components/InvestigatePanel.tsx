@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { ArrowUp, Sparks, ThumbsDown, ThumbsUp } from 'iconoir-react'
+import { ArrowUp, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -47,7 +47,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
       <div className="flex items-center desk:h-(--section-header-h) desk:shrink-0 desk:border-b desk:px-6">
         <CardHeader className="mx-auto flex w-full max-w-[664px] flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-label">
-            <Sparks className="size-4" aria-hidden /> Investigate and Ask
+            <Sparkle className="size-4" aria-hidden /> Investigate and Ask
           </CardTitle>
         </CardHeader>
       </div>

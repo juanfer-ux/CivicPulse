@@ -22,7 +22,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0014](0014-inter-font.md) | Inter from Google Fonts, served from our own site | ⚪ Replaced by 0019 |
 | [0015](0015-thirteen-color-palette.md) | The palette is 13 colors | ✅ Accepted |
 | [0016](0016-auth-stays-simple-on-free-plan.md) | Authentication stays simple on the Free plan | ✅ Accepted |
-| [0017](0017-iconoir-icons.md) | Icons are Iconoir | ✅ Accepted |
+| [0017](0017-iconoir-icons.md) | Icons are Iconoir | Replaced by 0025 |
 | [0018](0018-base-ui-select.md) | Select uses Base UI, not the browser list | ✅ Accepted |
 | [0019](0019-manrope-font.md) | The product font is Manrope | ✅ Accepted |
 | [0020](0020-generic-color-names.md) | Color tokens are named by color, not by use | ✅ Accepted |
@@ -30,6 +30,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0022](0022-input-border-neutral-300.md) | Input borders use neutral-300 | ✅ Accepted |
 | [0023](0023-labels-above-inputs.md) | Every input has a visible label above it | ✅ Accepted |
 | [0024](0024-sixteen-colors-map-statuses.md) | The palette is 16 colors; the map shows four statuses | ✅ Accepted |
+| [0025](0025-phosphor-icons.md) | Icons are Phosphor (regular, fill for map badges) | ✅ Accepted |
 
 ## ✍️ Template
 ```

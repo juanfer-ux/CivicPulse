@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Pause, Play } from 'iconoir-react'
+import { Pause, Play } from '@phosphor-icons/react'
 import authImage from '@/assets/auth-aura-still.jpg'
 import authVideo from '@/assets/auth-aura.mp4'
 import { Logo } from '@/components/Logo'

@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { Car, Trash } from 'iconoir-react'
+import { Car, Trash } from '@phosphor-icons/react'
 import { GROUPS, type Group } from '@/lib/incidents'
 import { token } from '@/lib/tokens'
 
@@ -12,7 +12,7 @@ const SIZE = 64
 
 async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string) {
   const { renderToStaticMarkup } = await import('react-dom/server')
-  const svg = renderToStaticMarkup(createElement(Icon, { color: ink, width: 34, height: 34 }))
+  const svg = renderToStaticMarkup(createElement(Icon, { color: ink, width: 34, height: 34, weight: 'fill' }))
   const img = new Image()
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
   await img.decode()

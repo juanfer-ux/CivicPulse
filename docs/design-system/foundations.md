@@ -63,7 +63,7 @@ Names say what a color is (family and lightness: neutrals are always 100–900 a
 - In Figma the **Colors** collection holds exactly these 16 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 16`). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
 
 ## 🔣 Icons
-Iconoir (`iconoir-react`, [decision 0017](../decisions/0017-iconoir-icons.md)): the line is always 1.5 px, at any icon size (`vector-effect: non-scaling-stroke` in `index.css`), so small icons stay crisp. Sidebar items 20 px (collapsed too), 16 px elsewhere. Colour follows the text (`currentColor`).
+Phosphor (`@phosphor-icons/react`, [decision 0025](../decisions/0025-phosphor-icons.md)): the **regular** weight everywhere, 1em by default, sized with `size-*` (sidebar items 20 px, 16 px elsewhere). The **fill** weight only on the map badges (car for parking, trash can for illegal dumping). Colour follows the text (`currentColor`). Phosphor icons are filled shapes, so no stroke tricks are needed. Mapping from the old Iconoir names: Group→UsersThree, LogOut→SignOut, Map→MapTrifold, MediaImage→Image, Menu→List, NavArrow→Caret, Sparks→Sparkle, Xmark→X, SidebarCollapse/Expand→SidebarSimple (mirrored when collapsed).
 
 ## 📏 Spacing, radius, controls
 | | Value |
