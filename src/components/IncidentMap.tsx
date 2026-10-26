@@ -68,6 +68,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       for (const l of map.getStyle().layers) {
         if (l.type === 'line' && JSON.stringify(map.getPaintProperty(l.id, 'line-color')).includes('#232323')) map.setPaintProperty(l.id, 'line-color', token('--map-road-outlines'))
       }
+      if (map.getLayer('building-top')) map.setPaintProperty('building-top', 'fill-color', token('--map-buildings'))
       if (map.getLayer('boundary_state')) map.setPaintProperty('boundary_state', 'line-color', token('--map-boundary'))
       // The credit starts closed (just the ⓘ) and opens on tap; MapLibre opens it by default and only closes it on the first drag.
       map.getContainer().querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
