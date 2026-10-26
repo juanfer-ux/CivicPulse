@@ -183,7 +183,8 @@
   --foreground: var(--neutral-100);
   --ai: var(--neutral-800);
   --ai-border: var(--indigo-400);
-  --ai-banner: #34388A; /* outside the 16 (owner, 2026-10-26): a much darker indigo-400, the conversation banner and the answer rings on the map, with neutral-100 text. Not in Figma yet */
+  --answer-banner-h: 38px; /* conversation banner height (Figma Answer Banner, owner 2026-10-26); the filters and the stats card move down by this much while it shows */
+  --ai-banner: #272A68; /* outside the 16 (owner, 2026-10-26): a much darker indigo-400, the conversation banner and the answer rings on the map, with neutral-100 text. Not in Figma yet */
   --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
   --warning: var(--amber-400);
   --incident: var(--coral-400); /* incidents, invalid fields and ALL error text */

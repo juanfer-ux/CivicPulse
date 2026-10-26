@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { CaretDown, CaretUp, X } from '@phosphor-icons/react'
+import { CaretDown, CaretUp, Car, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { SectionHeader } from '@/components/SectionHeader'
 import { MediaGallery } from '@/components/MediaGallery'
@@ -83,7 +83,7 @@ export function Dashboard({ highlightIds, onClearHighlight, tab, onTab, children
     return [...counts].sort((a, b) => b[1] - a[1]).slice(0, 5)
   }, [filtered])
 
-  const chatMode = highlightIds.length > 0 // an answer is on the map: the banner shows and everything below it moves down 32 px
+  const chatMode = highlightIds.length > 0 // an answer is on the map: the banner shows and everything below it moves down by --answer-banner-h
   const selected = filtered.find((i) => i.id === selectedId) ?? null
   const select = (id: string | null) => {
     setSelectedId(id)
@@ -113,14 +113,12 @@ export function Dashboard({ highlightIds, onClearHighlight, tab, onTab, children
         )}
       </SectionHeader>
 
-      {/* Conversation mode banner (32 px, Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. */}
+      {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. */}
       {chatMode && (
-        <div className="fixed inset-x-0 top-[53px] z-10 flex h-8 items-center justify-center gap-2 bg-(--ai-banner) px-4 text-meta text-(--neutral-100) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
-          <Button size="sm" variant="ghost" className="invisible h-6 max-desk:hidden" aria-hidden tabIndex={-1}>
-            Clear agent results
-          </Button>
-          <span className="flex-1 text-center">While showing the agent's answer, the filters will narrow it down.</span>
-          <Button size="sm" variant="ghost" className="h-6" onClick={onClearHighlight}>
+        <div className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-2 bg-(--ai-banner) px-5 text-meta text-(--neutral-100) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
+          <Car className="size-4 shrink-0" aria-hidden />
+          <span className="flex-1">While showing the agent's answer, the filters will narrow it down.</span>
+          <Button size="sm" variant="outline" className="h-6" onClick={onClearHighlight}>
             Clear agent results
           </Button>
         </div>
@@ -134,7 +132,7 @@ export function Dashboard({ highlightIds, onClearHighlight, tab, onTab, children
           localities={data.localities}
           categories={data.categories}
           counts={byGroup}
-          className={`fixed inset-x-3 ${chatMode ? 'top-[85px]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+2rem+0.75rem)]' : 'desk:top-[calc(var(--section-header-h)+0.75rem)]'} desk:right-4 desk:left-[calc(var(--agent-w)+1rem)]`}
+          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+0.75rem)]' : 'desk:top-[calc(var(--section-header-h)+0.75rem)]'} desk:right-4 desk:left-[calc(var(--agent-w)+1rem)]`}
         />
       )}
 
@@ -159,7 +157,7 @@ export function Dashboard({ highlightIds, onClearHighlight, tab, onTab, children
         </div>
 
       <div
-        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+2rem+1rem+2.25rem+0.75rem)]' : 'desk:top-[calc(var(--section-header-h)+1rem+2.25rem+0.75rem)]'} desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
+        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1rem+2.25rem+0.75rem)]' : 'desk:top-[calc(var(--section-header-h)+1rem+2.25rem+0.75rem)]'} desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
       >
         <Card className="bg-card/95">
           <CardHeader>
