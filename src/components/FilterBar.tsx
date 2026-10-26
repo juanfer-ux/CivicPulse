@@ -42,53 +42,57 @@ export function FilterBar({
   className?: string
 }) {
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
-  const divider = <span className="h-5 w-px shrink-0 bg-secondary" aria-hidden />
+  // Chips are 8 px apart inside a group and the groups 16 px apart (double), so the three kinds of filter read as three blocks.
+  const group = 'flex shrink-0 items-center gap-2'
   return (
     <div role="group" aria-label="Filters" className={className}>
-      <Select
-        chip
-        aria-label="Locality"
-        icon={<MapPin aria-hidden />}
-        active={!!filters.locality}
-        value={filters.locality}
-        onValueChange={(locality) => set({ locality })}
-        options={[{ value: '', label: 'All localities' }, ...localities.map((l) => ({ value: String(l.code), label: l.name }))]}
-      />
-      <Select
-        chip
-        aria-label="Period"
-        icon={<Clock aria-hidden />}
-        active={!!filters.days}
-        value={String(filters.days)}
-        onValueChange={(v) => set({ days: Number(v) })}
-        options={PERIODS.map((p) => ({ value: String(p.days), label: p.label }))}
-      />
-      {divider}
-      {categories.map((c) => {
-        const Icon = ICONS[iconCategory(c.code) as keyof typeof ICONS]
-        return (
-          <Chip key={c.code} pressed={filters.categories.includes(c.code)} icon={<Icon aria-hidden />} onClick={() => set({ categories: toggle(filters.categories, c.code) })}>
-            {c.name}
+      <div className={group}>
+        <Select
+          chip
+          aria-label="Locality"
+          icon={<MapPin aria-hidden />}
+          active={!!filters.locality}
+          value={filters.locality}
+          onValueChange={(locality) => set({ locality })}
+          options={[{ value: '', label: 'All localities' }, ...localities.map((l) => ({ value: String(l.code), label: l.name }))]}
+        />
+        <Select
+          chip
+          aria-label="Period"
+          icon={<Clock aria-hidden />}
+          active={!!filters.days}
+          value={String(filters.days)}
+          onValueChange={(v) => set({ days: Number(v) })}
+          options={PERIODS.map((p) => ({ value: String(p.days), label: p.label }))}
+        />
+      </div>
+      <div className={group}>
+        {categories.map((c) => {
+          const Icon = ICONS[iconCategory(c.code) as keyof typeof ICONS]
+          return (
+            <Chip key={c.code} pressed={filters.categories.includes(c.code)} icon={<Icon aria-hidden />} onClick={() => set({ categories: toggle(filters.categories, c.code) })}>
+              {c.name}
+            </Chip>
+          )
+        })}
+      </div>
+      <div className={group}>
+        {(Object.keys(GROUPS) as Group[]).map((g) => (
+          <Chip
+            key={g}
+            pressed={filters.statuses.includes(g)}
+            count={counts[g]}
+            icon={<span className="size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />}
+            onClick={() => set({ statuses: toggle(filters.statuses, g) })}
+          >
+            {GROUPS[g].label}
           </Chip>
-        )
-      })}
-      {divider}
-      {(Object.keys(GROUPS) as Group[]).map((g) => (
-        <Chip
-          key={g}
-          pressed={filters.statuses.includes(g)}
-          count={counts[g]}
-          icon={<span className="size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />}
-          onClick={() => set({ statuses: toggle(filters.statuses, g) })}
-        >
-          {GROUPS[g].label}
-        </Chip>
-      ))}
+        ))}
+      </div>
       {isFiltered(filters) && (
-        <>
-          {divider}
+        <div className={group}>
           <Chip onClick={() => onChange(NO_FILTERS)}>Clear filters</Chip>
-        </>
+        </div>
       )}
     </div>
   )
