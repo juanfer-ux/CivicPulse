@@ -60,7 +60,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         maxzoom: BADGE_ZOOM,
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 1.5, 11, 2, 12, 3, BADGE_ZOOM, 3],
+          'circle-radius': ['step', ['zoom'], 2, 12, 3], // 4 px across below zoom 12, 6 px from 12 (until the pins)
           'circle-color': ['get', 'color'],
           'circle-opacity': 0.85,
           'circle-stroke-width': 1,
@@ -86,7 +86,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'hl'], true],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 4, 11, 6, 12, 7, BADGE_ZOOM, 7, BADGE_ZOOM + 0.01, 17, 15, 22, 18, 31],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 11.99, 6, 12, 7, BADGE_ZOOM, 7, BADGE_ZOOM + 0.01, 17, 15, 22, 18, 31],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
           'circle-stroke-width': 2,
@@ -99,7 +99,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         source: 'incidents',
         filter: ['==', ['get', 'id'], ''],
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 5, 11, 7, 12, 8, BADGE_ZOOM, 8, BADGE_ZOOM + 0.01, 19, 15, 24, 18, 33],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 11.99, 7, 12, 8, BADGE_ZOOM, 8, BADGE_ZOOM + 0.01, 19, 15, 24, 18, 33],
           'circle-color': 'rgba(0,0,0,0)',
           'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
           'circle-stroke-width': 2,
