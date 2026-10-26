@@ -10,11 +10,13 @@ export const badgeId = (category: string, group: string) => `badge-${iconCategor
 
 /** The badge is a pin: a 64 px circle with a point below it, so the tip marks the exact spot (the layer anchors the image at its bottom). */
 const SIZE = 64
-const HEIGHT = 80
+/** Length of the pin's point, in image px (displayed at 0.4 to 0.8 of this, depending on zoom). */
+export const TAIL = 16
 export const PIN_CENTER = SIZE / 2 // circle center, in image px from the top (the circle is at the top)
-export const PIN_RISE = HEIGHT - 2 - PIN_CENTER // image px from the tip up to the circle center
+export const PIN_RISE = SIZE - 2 - PIN_CENTER + TAIL // image px from the tip up to the circle center
 
-async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string) {
+async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string, tail = TAIL) {
+  const height = SIZE + tail
   const { renderToStaticMarkup } = await import('react-dom/server')
   const svg = renderToStaticMarkup(createElement(Icon, { color: ink, width: 34, height: 34, weight: 'fill' }))
   const img = new Image()
@@ -22,12 +24,12 @@ async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink
   await img.decode()
   const c = document.createElement('canvas')
   c.width = SIZE
-  c.height = HEIGHT
+  c.height = height
   const g = c.getContext('2d')!
   const r = SIZE / 2 - 2
   g.beginPath()
   g.arc(SIZE / 2, PIN_CENTER, r, Math.atan2(0.75 * r, -0.67 * r), Math.PI * 2 + Math.atan2(0.75 * r, 0.67 * r))
-  g.lineTo(SIZE / 2, HEIGHT - 2)
+  g.lineTo(SIZE / 2, SIZE - 2 + tail)
   g.closePath()
   g.fillStyle = fill
   g.fill()
@@ -35,17 +37,17 @@ async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink
   g.strokeStyle = outline
   g.stroke()
   g.drawImage(img, (SIZE - 34) / 2, PIN_CENTER - 17, 34, 34)
-  return g.getImageData(0, 0, SIZE, HEIGHT)
+  return g.getImageData(0, 0, SIZE, height)
 }
 
 /** Adds every badge to the map. Icon ink is dark, except on Approved (a mid blue) where it is light. */
-export async function addBadges(map: { addImage: (id: string, data: ImageData) => void }) {
+export async function addBadges(map: { addImage: (id: string, data: ImageData) => void }, tail = TAIL) {
   const outline = token('--map-dot-outline')
   await Promise.all(
     Object.entries(ICONS).flatMap(([category, Icon]) =>
       (Object.keys(GROUPS) as Group[]).map(async (group) => {
         const ink = token(group === 'approved' ? '--neutral-100' : '--neutral-900')
-        map.addImage(badgeId(category, group), await badge(Icon, token(GROUPS[group].token), ink, outline))
+        map.addImage(badgeId(category, group), await badge(Icon, token(GROUPS[group].token), ink, outline, tail))
       }),
     ),
   )
