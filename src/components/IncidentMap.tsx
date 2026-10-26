@@ -14,6 +14,9 @@ maplibregl.setWorkerUrl(workerUrl)
 /** Zoom where small dots turn into icon badges. */
 const BADGE_ZOOM = 14
 
+/** Paint the land with --map-land (true) or leave it invisible (false). */
+const LAND_ON = false
+
 const BOGOTA: [number, number] = [-74.09, 4.65]
 /** The map always opens here (owner's choice, 2026-10-26). */
 const START_ZOOM = 12
@@ -54,9 +57,44 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       for (const l of map.getStyle().layers) {
         if (l.type === 'symbol' && JSON.stringify(l.layout?.['text-field']).includes('name:en')) map.setLayoutProperty(l.id, 'text-field', ['coalesce', ['get', 'name:es'], ['get', 'name']])
       }
-      // Land, parks and background use the --map-land token (Figma map/land) instead of CARTO's #0E0E0E.
-      for (const id of ['background', 'landcover', 'landuse', 'park_national_park', 'park_nature_reserve']) {
-        if (map.getLayer(id)) map.setPaintProperty(id, id === 'background' ? 'background-color' : 'fill-color', token('--map-land'))
+      // Land, parks and background (Figma map/land). LAND_ON is false for now (owner, 2026-10-26): the land layers are hidden, as if invisible, and the page color shows through. Set it to true to paint them with --map-land.
+      for (const id of ['background', 'landcover', 'landuse', 'landuse_residential', 'park_national_park', 'park_nature_reserve']) {
+        if (!map.getLayer(id)) continue
+        if (LAND_ON) map.setPaintProperty(id, id === 'background' ? 'background-color' : 'fill-color', token('--map-land'))
+        else map.setLayoutProperty(id, 'visibility', 'none')
+      }
+      // Streets use our own colors (--map-roads, --map-main-roads) instead of CARTO's: find the style's road lines by their original color.
+      const roads: Record<string, string> = { 'rgba(65, 71, 88, 1)': token('--map-roads'), 'rgba(83, 86, 102, 1)': token('--map-main-roads') }
+      for (const l of map.getStyle().layers) {
+        const c = l.type === 'line' ? map.getPaintProperty(l.id, 'line-color') : null
+        if (typeof c === 'string' && roads[c]) map.setPaintProperty(l.id, 'line-color', roads[c])
+      }
+      // Outlines and thin lines (Figma Map colors sheet): CARTO's colors replaced by our tokens, group by group. Sizes stay CARTO's.
+      const lines: Record<string, string> = {
+        boundary_state: '--map-boundary',
+        boundary_county: '--map-boundary-county',
+        boundary_country_outline: '--map-boundary-country',
+        tunnel_path: '--map-paths',
+        road_path: '--map-paths',
+        road_path_areas: '--map-paths',
+        bridge_path: '--map-paths',
+        rail: '--map-rail',
+        tunnel_rail: '--map-rail',
+        'aeroway-runway': '--map-airport',
+        'aeroway-taxiway': '--map-airport',
+      }
+      for (const l of map.getStyle().layers) {
+        if (l.type === 'line') {
+          const old = JSON.stringify(map.getPaintProperty(l.id, 'line-color'))
+          // Road outlines are the "case" layers: CARTO's #232323 ones are the major roads, the rest (#1a1a1a) tunnels, minor roads and bridges.
+          const name = lines[l.id] ?? (l.id.includes('case') ? (old.includes('#232323') ? '--map-road-outlines' : '--map-road-outlines-minor') : null)
+          if (name) map.setPaintProperty(l.id, 'line-color', token(name))
+        }
+        if (l.type === 'symbol' && map.getPaintProperty(l.id, 'text-halo-width')) map.setPaintProperty(l.id, 'text-halo-color', token('--map-label-halo'))
+      }
+      if (map.getLayer('building-top')) {
+        map.setPaintProperty('building-top', 'fill-color', token('--map-buildings'))
+        map.setPaintProperty('building-top', 'fill-outline-color', token('--map-building-outlines'))
       }
       // The credit starts closed (just the ⓘ) and opens on tap; MapLibre opens it by default and only closes it on the first drag.
       map.getContainer().querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
@@ -158,7 +196,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       features: incidents.map((i) => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
-        properties: { id: i.id, color: token(GROUPS[groupOf(i.status)].token), dim: mix(token(GROUPS[groupOf(i.status)].token), token('--map-land'), KEEP), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id) },
+        properties: { id: i.id, color: token(GROUPS[groupOf(i.status)].token), dim: mix(token(GROUPS[groupOf(i.status)].token), token('--map-background'), KEEP), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id) },
       })),
     })
   }, [ready, incidents, highlightIds])
@@ -186,7 +224,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
 
   // Wrapper positions the map: maplibre's unlayered CSS overrides Tailwind's `absolute` on the map element itself.
   return (
-    <div className="absolute inset-x-0 top-0 bottom-14 desk:top-(--section-header-h) desk:bottom-0 desk:left-(--agent-w)">
+    <div className="absolute inset-x-0 top-0 bottom-14 bg-(--map-background) desk:top-(--section-header-h) desk:bottom-0 desk:left-(--agent-w)">
       <div ref={container} className="size-full" />
     </div>
   )
