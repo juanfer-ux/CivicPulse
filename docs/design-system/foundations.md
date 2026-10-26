@@ -38,9 +38,9 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
 |---|---|---|---|---|
 | 1 | `neutral-900` | `#0E0E10` | `sidebar` (`inset`) | Outline buttons, suggestions, role badge, agent panel, mobile bars, deepest surface; text on a light fill |
-| 2 | `neutral-800` | `#111113` | `ai` | Agent surfaces, Side Panel |
-| 3 | `neutral-700` | `#18181B` | `background` | Page |
-| 4 | `neutral-600` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns, sidebar, section header |
+| 2 | `neutral-800` | `#111113` | `ai` | Agent surfaces, Side Panel, section header (Figma 2026-10-26) |
+| 3 | `neutral-700` | `#18181B` | `background` | Page, sidebar (Figma 2026-10-26) |
+| 4 | `neutral-600` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns |
 | 5 | `neutral-500` | `#303036` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
 | 6 | `neutral-400` | `#3C3C44` | none (used directly as `--neutral-400`) | Divider before the count in the section header; suggestion borders in Figma. Until 2026-10-24 it was `input` (borders of inputs and dropdowns), see [decision 0022](../decisions/0022-input-border-neutral-300.md) |
 | 7 | `neutral-300` | `#737381` | `closed` (`ring`), `input` | Focus ring, **borders of inputs and dropdowns** (since 2026-10-24) |
