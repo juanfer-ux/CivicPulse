@@ -14,6 +14,9 @@ maplibregl.setWorkerUrl(workerUrl)
 /** Zoom where small dots turn into icon badges. */
 const BADGE_ZOOM = 14
 
+/** Paint the land with --map-land (true) or leave it invisible (false). */
+const LAND_ON = false
+
 const BOGOTA: [number, number] = [-74.09, 4.65]
 /** The map always opens here (owner's choice, 2026-10-26). */
 const START_ZOOM = 12
@@ -54,9 +57,11 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       for (const l of map.getStyle().layers) {
         if (l.type === 'symbol' && JSON.stringify(l.layout?.['text-field']).includes('name:en')) map.setLayoutProperty(l.id, 'text-field', ['coalesce', ['get', 'name:es'], ['get', 'name']])
       }
-      // Land, parks and background use the --map-land token (Figma map/land) instead of CARTO's #0E0E0E.
+      // Land, parks and background (Figma map/land). LAND_ON is false for now (owner, 2026-10-26): the land layers are hidden, as if invisible, and the page color shows through. Set it to true to paint them with --map-land.
       for (const id of ['background', 'landcover', 'landuse', 'park_national_park', 'park_nature_reserve']) {
-        if (map.getLayer(id)) map.setPaintProperty(id, id === 'background' ? 'background-color' : 'fill-color', token('--map-land'))
+        if (!map.getLayer(id)) continue
+        if (LAND_ON) map.setPaintProperty(id, id === 'background' ? 'background-color' : 'fill-color', token('--map-land'))
+        else map.setLayoutProperty(id, 'visibility', 'none')
       }
       // Streets use our own colors (--map-roads, --map-main-roads) instead of CARTO's: find the style's road lines by their original color.
       const roads: Record<string, string> = { 'rgba(65, 71, 88, 1)': token('--map-roads'), 'rgba(83, 86, 102, 1)': token('--map-main-roads') }
