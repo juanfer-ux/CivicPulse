@@ -42,7 +42,7 @@ export function FilterBar({
   className?: string
 }) {
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
-  // Chips are 8 px apart inside a group and the groups 16 px apart (double), so the three kinds of filter read as three blocks.
+  // Chips are 8 px apart inside a group and the groups 32 px apart, so the three kinds of filter read as three blocks.
   const group = 'flex shrink-0 items-center gap-2'
   return (
     <div role="group" aria-label="Filters" className={className}>

@@ -114,7 +114,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
           localities={data.localities}
           categories={data.categories}
           counts={byGroup}
-          className="fixed inset-x-3 top-[53px] z-10 flex items-center gap-4 overflow-x-auto py-1 [scrollbar-width:none] desk:absolute desk:inset-x-auto desk:top-[calc(var(--section-header-h)+0.75rem)] desk:right-4 desk:left-[calc(var(--agent-w)+1rem)]"
+          className="fixed inset-x-3 top-[53px] z-10 flex items-center gap-8 overflow-x-auto py-1 [scrollbar-width:none] desk:absolute desk:inset-x-auto desk:top-[calc(var(--section-header-h)+0.75rem)] desk:right-4 desk:left-[calc(var(--agent-w)+1rem)]"
         />
       )}
 
