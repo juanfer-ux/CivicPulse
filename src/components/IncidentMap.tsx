@@ -42,6 +42,10 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       for (const l of map.getStyle().layers) {
         if (l.type === 'symbol' && JSON.stringify(l.layout?.['text-field']).includes('name:en')) map.setLayoutProperty(l.id, 'text-field', ['coalesce', ['get', 'name:es'], ['get', 'name']])
       }
+      // Land, parks and background use the --map-land token (Figma map/land) instead of CARTO's #0E0E0E.
+      for (const id of ['background', 'landcover', 'landuse', 'park_national_park', 'park_nature_reserve']) {
+        if (map.getLayer(id)) map.setPaintProperty(id, id === 'background' ? 'background-color' : 'fill-color', token('--map-land'))
+      }
       // The credit starts closed (just the ⓘ) and opens on tap; MapLibre opens it by default and only closes it on the first drag.
       map.getContainer().querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
       map.addSource('incidents', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
