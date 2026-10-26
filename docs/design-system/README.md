@@ -27,7 +27,17 @@ Split `components.md` by group (forms, navigation, data display, overlays) once 
 ## 🖼️ Screens and the Figma file
 Ten screens on the Figma **Screens** page, built only from the components in [components.md](components.md): Sign in, Set up your account, Map, Users (person panel open), Create user (form open), each at desktop **1440×900** and mobile **390×844** (Device **Mobile** mode).
 
-Figma pages: Cover, Foundations, Components, Screens, Icons, Archive · earlier concept, Code to Figma (flat captures). Variable collections: Colors (13), Radius, Spacing, Typography, Device (Desktop, Mobile).
+Figma pages: Cover, Foundations, five **Components** pages (below), Screens, Icons, Archive · earlier concept, Code to Figma (flat captures). Variable collections: Colors (16), Radius, Spacing, Typography, Device (Desktop, Mobile), Map.
+
+Which Components page holds which component (since 2026-10-26; moving a component between pages keeps its instances):
+
+| Page | Components |
+|---|---|
+| Components · Actions & inputs | Button, Input, Textarea, Select, Select Menu, Checkbox, Multi-select, Form Field |
+| Components · Data display | Badge, Status Badge, Role Badge, Avatar, Card, Stat Card, Summary Card, Table Row, User Card, Incident Row, Incident Card (with Media Tile, Video Player, Detail Row), Alert, Skeleton, Separator |
+| Components · Navigation & layout | Sidebar, Sidebar Item, Nav Item, Tab Bar, Sheet Tabs, Mobile Top Bar, Section Header, Panel Header, Side Panel, Drawer |
+| Components · Map & agent | Map Marker, Incident Radius, Filters Card, Agent Panel, Suggestion, Message, Action Card |
+| Components · Auth & brand | Auth Card, Logo |
 
 ---
 
