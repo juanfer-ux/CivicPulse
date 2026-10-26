@@ -195,7 +195,7 @@
   --map-dot-outline: var(--neutral-700);
   --map-answer-ring: var(--indigo-400);
   --map-selected-ring: var(--neutral-100);
-  --map-land: var(--neutral-700);
+  --map-land: #1A1A20; /* map only, the one color outside the 16 (owner, 2026-10-26): CARTO's land is #0E0E0E; Figma map/land */
 
   /* Names shadcn components expect, reusing the colors above. */
   --popover: var(--card);
