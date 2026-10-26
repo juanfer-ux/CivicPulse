@@ -197,7 +197,8 @@
   --map-selected-ring: var(--neutral-100);
   --map-roads: #343946; /* map only, outside the 16 (owner, 2026-10-26): minor and secondary streets; CARTO's is #414758. Figma map/roads */
   --map-main-roads: #454754; /* map only: primary roads; CARTO's is #535666. Figma map/main-roads */
-  --map-land: #1A1A20; /* map only, the one color outside the 16 (owner, 2026-10-26): CARTO's land is #0E0E0E; Figma map/land */
+  --map-boundary: #4D4D56; /* map only, outside the 16 (owner, 2026-10-26): state borders; CARTO's is #676772. Figma map/boundary */
+  --map-land: #25252D; /* map only, outside the 16 (owner, 2026-10-26): land, parks and the map background; CARTO's is #0E0E0E. Figma map/land */
 
   /* Names shadcn components expect, reusing the colors above. */
   --popover: var(--card);
