@@ -3,7 +3,7 @@ import * as maplibregl from 'maplibre-gl'
 import { token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import { addBadges, iconCategory } from '@/lib/markerIcons'
+import { PIN_RISE, addBadges, iconCategory } from '@/lib/markerIcons'
 import { GROUPS, groupOf, label, typeOf, type Incident } from '@/lib/incidents'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.
@@ -76,6 +76,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         layout: {
           'icon-image': ['concat', 'badge-', ['get', 'icon'], '-', ['get', 'group']],
           'icon-size': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, 0.4, 15, 0.6, 18, 0.8],
+          'icon-anchor': 'bottom',
           'icon-allow-overlap': true,
         },
       })
@@ -87,6 +88,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         paint: {
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 5, BADGE_ZOOM, 9, BADGE_ZOOM + 0.01, 17, 15, 22, 18, 31],
           'circle-color': 'rgba(0,0,0,0)',
+          'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
           'circle-stroke-width': 2,
           'circle-stroke-color': token('--map-answer-ring'),
         },
@@ -99,6 +101,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         paint: {
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 6, BADGE_ZOOM, 10, BADGE_ZOOM + 0.01, 19, 15, 24, 18, 33],
           'circle-color': 'rgba(0,0,0,0)',
+          'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
           'circle-stroke-width': 2,
           'circle-stroke-color': token('--map-selected-ring'),
         },

@@ -8,7 +8,11 @@ const ICONS = { parking: Car, illegal_dumping: Trash }
 export const iconCategory = (category: string) => (category in ICONS ? category : 'parking')
 export const badgeId = (category: string, group: string) => `badge-${iconCategory(category)}-${group}`
 
+/** The badge is a pin: a 64 px circle with a point below it, so the tip marks the exact spot (the layer anchors the image at its bottom). */
 const SIZE = 64
+const HEIGHT = 80
+export const PIN_CENTER = SIZE / 2 // circle center, in image px from the top (the circle is at the top)
+export const PIN_RISE = HEIGHT - 2 - PIN_CENTER // image px from the tip up to the circle center
 
 async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string) {
   const { renderToStaticMarkup } = await import('react-dom/server')
@@ -17,17 +21,21 @@ async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
   await img.decode()
   const c = document.createElement('canvas')
-  c.width = c.height = SIZE
+  c.width = SIZE
+  c.height = HEIGHT
   const g = c.getContext('2d')!
+  const r = SIZE / 2 - 2
   g.beginPath()
-  g.arc(SIZE / 2, SIZE / 2, SIZE / 2 - 2, 0, Math.PI * 2)
+  g.arc(SIZE / 2, PIN_CENTER, r, Math.atan2(0.75 * r, -0.67 * r), Math.PI * 2 + Math.atan2(0.75 * r, 0.67 * r))
+  g.lineTo(SIZE / 2, HEIGHT - 2)
+  g.closePath()
   g.fillStyle = fill
   g.fill()
   g.lineWidth = 2
   g.strokeStyle = outline
   g.stroke()
-  g.drawImage(img, (SIZE - 34) / 2, (SIZE - 34) / 2, 34, 34)
-  return g.getImageData(0, 0, SIZE, SIZE)
+  g.drawImage(img, (SIZE - 34) / 2, PIN_CENTER - 17, 34, 34)
+  return g.getImageData(0, 0, SIZE, HEIGHT)
 }
 
 /** Adds every badge to the map. Icon ink is dark, except on Approved (a mid blue) where it is light. */
