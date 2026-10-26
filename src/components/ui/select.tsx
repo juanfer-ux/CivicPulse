@@ -1,7 +1,9 @@
 import { Select as BaseSelect } from '@base-ui/react/select'
+import type { ReactNode } from 'react'
 import { CaretDown, Check } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { controlClass } from '@/lib/ui'
+import { chipClass } from '@/components/ui/chip'
 
 export type SelectOption = { value: string; label: string; disabled?: boolean }
 
@@ -13,6 +15,9 @@ export function Select({
   className,
   disabled,
   id,
+  chip,
+  icon,
+  active,
   'aria-label': ariaLabel,
 }: {
   value: string
@@ -21,6 +26,10 @@ export function Select({
   className?: string
   disabled?: boolean
   id?: string
+  /** Filter Chip look instead of a form field; `icon` on the left, `active` when a value other than the default is chosen. */
+  chip?: boolean
+  icon?: ReactNode
+  active?: boolean
   'aria-label'?: string
 }) {
   return (
@@ -29,8 +38,10 @@ export function Select({
         id={id}
         aria-label={ariaLabel}
         data-slot="select-trigger"
-        className={cn(controlClass, 'flex items-center justify-between gap-2 text-left data-popup-open:border-foreground', className)}
+        data-active={chip && active ? '' : undefined}
+        className={cn(chip ? chipClass : [controlClass, 'flex items-center justify-between gap-2 text-left data-popup-open:border-foreground'], className)}
       >
+        {chip && icon}
         <BaseSelect.Value className="truncate" />
         <BaseSelect.Icon className="shrink-0 text-muted-foreground">
           <CaretDown className="size-4" aria-hidden />

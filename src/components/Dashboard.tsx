@@ -6,13 +6,10 @@ import { MediaGallery } from '@/components/MediaGallery'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { RoleBadge } from '@/components/ui/role-badge'
-import { Field } from '@/components/ui/field'
-import { Select } from '@/components/ui/select'
+import { FilterBar, NO_FILTERS, type Filters } from '@/components/FilterBar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  GROUPS,
-  STATUSES,
   fetchDashboardData,
   groupOf,
   label,
@@ -23,12 +20,6 @@ import {
 import { useAuth } from '@/lib/auth'
 import { shortName } from '@/lib/utils'
 
-const PERIODS = [
-  { days: 7, label: 'Last 7 days' },
-  { days: 30, label: 'Last 30 days' },
-  { days: 90, label: 'Last 90 days' },
-  { days: 0, label: 'All time' },
-]
 const DAY = 86_400_000
 
 type Data = { incidents: Incident[]; localities: Locality[]; categories: Category[] }
@@ -48,10 +39,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
-  const [locality, setLocality] = useState('')
-  const [status, setStatus] = useState('')
-  const [category, setCategory] = useState('')
-  const [days, setDays] = useState(0)
+  const [filters, setFilters] = useState<Filters>(NO_FILTERS)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState(false) // mobile bottom sheet only
 
@@ -61,23 +49,27 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
 
   const localityName = useMemo(() => new Map(data?.localities.map((l) => [l.code, l.name])), [data])
 
-  const filtered = useMemo(
+  // Everything except the status chips: the status counts show what each chip would add.
+  const beforeStatus = useMemo(
     () =>
       (data?.incidents ?? []).filter(
         (i) =>
-          (!locality || i.locality_code === Number(locality)) &&
-          (!category || i.category === category) &&
-          (!status || i.status === status) &&
-          (!days || new Date(i.occurred_at).getTime() >= now - days * DAY),
+          (!filters.locality || i.locality_code === Number(filters.locality)) &&
+          (!filters.categories.length || filters.categories.includes(i.category)) &&
+          (!filters.days || new Date(i.occurred_at).getTime() >= now - filters.days * DAY),
       ),
-    [data, locality, category, status, days, now],
+    [data, filters.locality, filters.categories, filters.days, now],
+  )
+  const filtered = useMemo(
+    () => (filters.statuses.length ? beforeStatus.filter((i) => filters.statuses.includes(groupOf(i.status))) : beforeStatus),
+    [beforeStatus, filters.statuses],
   )
 
   const byGroup = useMemo(() => {
     const counts = { pending: 0, reviewing: 0, approved: 0, rejected: 0 }
-    for (const i of filtered) counts[groupOf(i.status)]++
+    for (const i of beforeStatus) counts[groupOf(i.status)]++
     return counts
-  }, [filtered])
+  }, [beforeStatus])
 
   const topLocalities = useMemo(() => {
     const counts = new Map<number, number>()
@@ -114,6 +106,18 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         )}
       </SectionHeader>
 
+      {/* Filter chips (Figma: Filter Bar): one row over the map, scrolling sideways when it does not fit; hidden while an incident is open. */}
+      {!selected && data && (
+        <FilterBar
+          filters={filters}
+          onChange={setFilters}
+          localities={data.localities}
+          categories={data.categories}
+          counts={byGroup}
+          className="fixed inset-x-3 top-[53px] z-10 flex items-center gap-2 overflow-x-auto py-1 [scrollbar-width:none] desk:absolute desk:inset-x-auto desk:top-[calc(var(--section-header-h)+0.75rem)] desk:right-4 desk:left-[calc(var(--agent-w)+1rem)]"
+        />
+      )}
+
       {/* Mobile: bottom sheet over the map. Desktop (1440 px and wider): `contents`, so the two columns float over the map. */}
       <div
         className={`fixed inset-x-0 bottom-0 z-10 flex flex-col gap-2 rounded-t-2xl border-t bg-sidebar/95 p-2 backdrop-blur desk:contents ${collapsed ? 'max-desk:[&>:not(:first-child)]:hidden' : 'h-[62svh]'}`}
@@ -135,20 +139,8 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
         </div>
 
       <div
-        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 desk:top-[calc(var(--section-header-h)+1rem)] desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
+        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 desk:top-[calc(var(--section-header-h)+1rem+2.25rem+0.75rem)] desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
       >
-        <Card className="bg-card/95">
-          <CardHeader>
-            <CardTitle>Filters</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <Field label="Locality"><Select aria-label="Locality" value={locality} onValueChange={setLocality} options={[{ value: '', label: 'All localities' }, ...(data?.localities.map((l) => ({ value: String(l.code), label: l.name })) ?? [])]} /></Field>
-            <Field label="Category"><Select aria-label="Category" value={category} onValueChange={setCategory} options={[{ value: '', label: 'All categories' }, ...(data?.categories.map((c) => ({ value: String(c.code), label: c.name })) ?? [])]} /></Field>
-            <Field label="Status"><Select aria-label="Status" value={status} onValueChange={setStatus} options={[{ value: '', label: 'All statuses' }, ...STATUSES.map((s) => ({ value: s, label: label(s) }))]} /></Field>
-            <Field label="Period"><Select aria-label="Period" value={String(days)} onValueChange={(v) => setDays(Number(v))} options={PERIODS.map((p) => ({ value: String(p.days), label: p.label }))} /></Field>
-          </CardContent>
-        </Card>
-
         <Card className="bg-card/95">
           <CardHeader>
             <CardTitle>
@@ -159,22 +151,13 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
             {error && <p className="text-incident">{error}</p>}
             {data && !error && (
               <>
-                <ul className="flex flex-col gap-1">
-                  {(Object.keys(GROUPS) as (keyof typeof GROUPS)[]).map((g) => (
-                    <li key={g} className="flex items-center gap-2">
-                      <span className="size-2.5 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />
-                      <span className="flex-1 text-muted-foreground">{GROUPS[g].label}</span>
-                      <span>{byGroup[g]}</span>
-                    </li>
-                  ))}
-                </ul>
                 {topLocalities.length > 0 && (
                   <div>
                     <p className="mb-1 text-meta uppercase tracking-[0.05em] text-muted-foreground">Top localities</p>
                     <ol className="flex flex-col gap-1">
                       {topLocalities.map(([code, n]) => (
                         <li key={code} className="flex justify-between">
-                          <button className="text-left hover:underline" onClick={() => setLocality(String(code))}>
+                          <button className="text-left hover:underline" onClick={() => setFilters({ ...filters, locality: String(code) })}>
                             {localityName.get(code)}
                           </button>
                           <span>{n}</span>
