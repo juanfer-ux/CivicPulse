@@ -1,4 +1,4 @@
-import { Car, Clock, DotsThree, MapPin, SquaresFour, Trash, TrafficSignal, Wheelchair } from '@phosphor-icons/react'
+import { Car, Clock, DotsThree, Flag, MapPin, SquaresFour, Trash, TrafficSignal, Wheelchair } from '@phosphor-icons/react'
 import type { ComponentType } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { ChipMultiSelect } from '@/components/ui/chip-multi-select'
@@ -30,8 +30,6 @@ const PLANNED: Category[] = [
   { code: 'other', name: 'Others' },
 ]
 
-const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v])
-
 /**
  * The map filters as one row of chips (Figma: Filter Bar). Locality and Period open a menu; categories and
  * statuses are toggles you can combine; the status chips carry their counts (computed with every other filter applied).
@@ -52,26 +50,25 @@ export function FilterBar({
   className?: string
 }) {
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
-  // Chips are 8 px apart inside a group and the groups 32 px apart, so the three kinds of filter read as three blocks.
+  // Chips are 8 px apart inside a group and the groups 32 px apart, so the filters and "Clear filters" read as separate blocks.
   const group = 'flex shrink-0 items-center gap-2'
   return (
     <div role="group" aria-label="Filters" className={className}>
-      {/* Statuses first: they are the operator's triage, so they must never scroll out of sight. One segmented block (shared borders), the counts double as the legend of the map dots. */}
-      <div className="flex shrink-0 items-center">
-        {(Object.keys(GROUPS) as Group[]).map((g) => (
-          <Chip
-            key={g}
-            pressed={filters.statuses.includes(g)}
-            count={counts[g]}
-            icon={<span className="size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />}
-            className="relative -ml-px rounded-none first:ml-0 first:rounded-l-sm last:rounded-r-sm aria-pressed:z-10"
-            onClick={() => set({ statuses: toggle(filters.statuses, g) })}
-          >
-            {GROUPS[g].label}
-          </Chip>
-        ))}
-      </div>
       <div className={group}>
+        <ChipMultiSelect
+          aria-label="Status"
+          icon={<Flag aria-hidden />}
+          all="All statuses"
+          noun="statuses"
+          value={filters.statuses}
+          onValueChange={(statuses) => set({ statuses: statuses as Group[] })}
+          options={(Object.keys(GROUPS) as Group[]).map((g) => ({
+            value: g,
+            label: GROUPS[g].label,
+            icon: <span className="block size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />,
+            hint: String(counts[g]),
+          }))}
+        />
         <Select
           chip
           aria-label="Locality"
