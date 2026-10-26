@@ -15,6 +15,8 @@ maplibregl.setWorkerUrl(workerUrl)
 const BADGE_ZOOM = 14
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
+/** The map always opens here (owner's choice, 2026-10-26). */
+const START_ZOOM = 12
 
 // MapLibre needs WebGL2. Without it (GPU acceleration off, some VMs) we show a list instead of crashing.
 const WEBGL2 = !!document.createElement('canvas').getContext('webgl2')
@@ -39,9 +41,14 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
 
   useEffect(() => {
     if (!WEBGL2) return
-    const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: 12, attributionControl: { compact: true } })
+    const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: START_ZOOM, attributionControl: { compact: true } })
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
+    // On first entry the container can still be settling its size when the map is created, so once the style has loaded we re-measure it and set the start view again, unless the person has already moved the map.
+    let moved = false
+    map.on('movestart', (e) => e.originalEvent && (moved = true))
     map.on('load', async () => {
+      map.resize()
+      if (!moved) map.jumpTo({ center: BOGOTA, zoom: START_ZOOM })
       await addBadges(map)
       // Place and street names stay in Spanish (the local names): the CARTO style asks for English first.
       for (const l of map.getStyle().layers) {
