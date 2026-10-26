@@ -115,9 +115,9 @@ export function Dashboard({ highlightIds, onClearHighlight, tab, onTab, children
 
       {/* Conversation mode banner (24 px): while an answer is on the map, filters narrow it; the button ends the mode. */}
       {chatMode && (
-        <div className="fixed inset-x-0 top-[53px] z-10 flex h-6 items-center justify-center gap-2 border-b bg-ai text-meta text-muted-foreground desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
-          <span>Showing the agent's answer. Filters narrow it down.</span>
-          <Button size="sm" variant="ghost" className="h-6 px-2 text-meta" onClick={onClearHighlight}>
+        <div className="fixed inset-x-0 top-[53px] z-10 flex h-6 items-center justify-center gap-2 bg-ai-border text-meta text-(--neutral-100) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
+          <span>While showing the agent's answer, the filters will narrow it down.</span>
+          <Button size="sm" variant="ghost" className="h-6 px-2 text-meta text-inherit hover:bg-white/15 hover:text-inherit" onClick={onClearHighlight}>
             Clear conversation results
           </Button>
         </div>
