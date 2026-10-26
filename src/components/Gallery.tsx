@@ -67,7 +67,7 @@ function ConversationDemo({ width = 456 }: { width?: number }) {
         </div>
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
           <Question text="Which localities have the most parking obstruction incidents?" />
-          <AnswerView result={SAMPLE} onClear={() => {}} />
+          <AnswerView result={SAMPLE} shown onToggle={() => {}} />
         </div>
       </div>
       <div className="mx-auto flex w-full max-w-[664px] items-center gap-2">

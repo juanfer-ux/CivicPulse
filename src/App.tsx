@@ -46,7 +46,7 @@ export default function App() {
           <Dashboard highlightIds={highlightIds} onClearHighlight={() => setHighlightIds([])} tab={tab} onTab={setTab}>
             {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
-              <InvestigatePanel onHighlight={setHighlightIds} />
+              <InvestigatePanel onHighlight={setHighlightIds} highlightIds={highlightIds} />
             </div>
           </Dashboard>
         </div>

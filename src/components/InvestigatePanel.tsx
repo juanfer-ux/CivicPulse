@@ -8,7 +8,7 @@ import { fetchLocalities } from '@/lib/incidents'
 
 type Turn = { question: string; result?: Answer; error?: string }
 
-export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[]) => void }) {
+export function InvestigatePanel({ onHighlight, highlightIds }: { onHighlight: (ids: string[]) => void; highlightIds: string[] }) {
   const [turns, setTurns] = useState<Turn[]>([])
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
@@ -68,7 +68,7 @@ export function InvestigatePanel({ onHighlight }: { onHighlight: (ids: string[])
               <Question text={t.question} />
               {!t.result && !t.error && <p className="text-muted-foreground">Querying…</p>}
               {t.error && <p className="text-incident">{t.error}</p>}
-              {t.result && <AnswerView result={t.result} onClear={() => onHighlight([])} />}
+              {t.result && <AnswerView result={t.result} shown={t.result.highlightIds === highlightIds} onToggle={(on) => onHighlight(on ? t.result!.highlightIds : [])} />}
             </div>
           ))}
           <div ref={end} />
@@ -105,7 +105,8 @@ function Feedback() {
   )
 }
 
-export function AnswerView({ result, onClear }: { result: Answer; onClear: () => void }) {
+/** `shown`: this answer is the one ringed on the map. The button clears it, or brings it back after clearing (or from an older answer). */
+export function AnswerView({ result, shown, onToggle }: { result: Answer; shown: boolean; onToggle: (on: boolean) => void }) {
   const max = Math.max(1, ...result.bars.map((b) => b.value))
   return (
     <div className="flex flex-col gap-3">
@@ -148,8 +149,8 @@ export function AnswerView({ result, onClear }: { result: Answer; onClear: () =>
         ))}
       </ul>
       {result.highlightIds.length > 0 && (
-        <Button size="sm" variant="ghost" className="self-start" onClick={onClear}>
-          Clear map highlight
+        <Button size="sm" variant="ghost" className="self-start" onClick={() => onToggle(!shown)}>
+          {shown ? 'Clear map highlight' : 'Show on map'}
         </Button>
       )}
       <Feedback />
