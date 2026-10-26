@@ -1,8 +1,9 @@
-import { Clock, MapPin } from '@phosphor-icons/react'
+import { Car, Clock, DotsThree, MapPin, SquaresFour, Trash, TrafficSignal, Wheelchair } from '@phosphor-icons/react'
+import type { ComponentType } from 'react'
 import { Chip } from '@/components/ui/chip'
+import { ChipMultiSelect } from '@/components/ui/chip-multi-select'
 import { Select } from '@/components/ui/select'
 import { GROUPS, type Category, type Group, type Locality } from '@/lib/incidents'
-import { ICONS, iconCategory } from '@/lib/markerIcons'
 
 export const PERIODS = [
   { days: 7, label: 'Last 7 days' },
@@ -19,6 +20,15 @@ export interface Filters {
 }
 export const NO_FILTERS: Filters = { locality: '', categories: [], statuses: [], days: 0 }
 export const isFiltered = (f: Filters) => !!(f.locality || f.categories.length || f.statuses.length || f.days)
+
+/** One icon per category (map pins use the first two). */
+const CATEGORY_ICON: Record<string, ComponentType> = { parking: Car, illegal_dumping: Trash, damaged_infrastructure: TrafficSignal, accessibility: Wheelchair, other: DotsThree }
+/** Categories from the brief that have no data yet: shown in the menu, switched off, so the dropdown can be designed with a realistic list. Remove an entry once the category exists in the database. */
+const PLANNED: Category[] = [
+  { code: 'damaged_infrastructure', name: 'Damaged infrastructure' },
+  { code: 'accessibility', name: 'Accessibility' },
+  { code: 'other', name: 'Others' },
+]
 
 const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v])
 
@@ -56,6 +66,19 @@ export function FilterBar({
           onValueChange={(locality) => set({ locality })}
           options={[{ value: '', label: 'All localities' }, ...localities.map((l) => ({ value: String(l.code), label: l.name }))]}
         />
+        <ChipMultiSelect
+          aria-label="Category"
+          icon={<SquaresFour aria-hidden />}
+          all="All categories"
+          noun="categories"
+          value={filters.categories}
+          onValueChange={(categories) => set({ categories })}
+          options={[...categories, ...PLANNED.filter((p) => !categories.some((c) => c.code === p.code))].map((c) => {
+            const Icon = CATEGORY_ICON[c.code] ?? SquaresFour
+            const planned = !categories.some((x) => x.code === c.code)
+            return { value: c.code, label: c.name, icon: <Icon aria-hidden />, disabled: planned, hint: planned ? 'Soon' : undefined }
+          })}
+        />
         <Select
           chip
           aria-label="Period"
@@ -65,16 +88,6 @@ export function FilterBar({
           onValueChange={(v) => set({ days: Number(v) })}
           options={PERIODS.map((p) => ({ value: String(p.days), label: p.label }))}
         />
-      </div>
-      <div className={group}>
-        {categories.map((c) => {
-          const Icon = ICONS[iconCategory(c.code) as keyof typeof ICONS]
-          return (
-            <Chip key={c.code} pressed={filters.categories.includes(c.code)} icon={<Icon aria-hidden />} onClick={() => set({ categories: toggle(filters.categories, c.code) })}>
-              {c.name}
-            </Chip>
-          )
-        })}
       </div>
       <div className={group}>
         {(Object.keys(GROUPS) as Group[]).map((g) => (
