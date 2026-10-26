@@ -141,10 +141,7 @@ export function UsersAdmin() {
                     >
                       <td className="truncate px-3 py-5 font-medium max-desk:col-span-2 max-desk:p-0">{u.full_name || 'No name'}</td>
                       <td className="truncate px-3 py-5 text-muted-foreground max-desk:col-span-2 max-desk:p-0">{u.email}</td>
-                      <td className="px-3 py-5 max-desk:p-0">
-                        <RoleBadge role={u.role} />
-                        {u.role === 'specialist_operator' && <span className="block text-meta text-muted-foreground">{specialtyOf(u, data).join(', ') || 'No specialty yet'}</span>}
-                      </td>
+                      <td className="px-3 py-5 max-desk:p-0"><RoleBadge role={u.role} /></td>
                       <td className="px-3 py-5 max-desk:p-0">
                         <Badge variant={STATUS_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
                         {u.invitation_pending && <span className="ml-2 text-meta text-muted-foreground">Invited</span>}
