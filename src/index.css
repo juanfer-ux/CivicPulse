@@ -239,9 +239,6 @@
 .maplibregl-map .maplibregl-ctrl.maplibregl-ctrl-attrib a { color: var(--muted-foreground); }
 .maplibregl-map .maplibregl-ctrl.maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button { filter: invert(1); opacity: 0.6; }
 
-/* Iconoir icons are drawn on a 24 px grid with a 1.5 px line. When one is shown at 20 or 16 px the browser scales the line to 1.25 or 1 px and it looks soft and uneven. Non-scaling keeps the line at exactly 1.5 px at every size. */
-svg[stroke-width="1.5"] * { vector-effect: non-scaling-stroke; }
-
 @layer base {
   /* Letter-spacing in em on every element, not inherited from the root: an inherited em would turn into one fixed pixel value (0.16 px) for all sizes. */
   * { @apply border-border outline-ring/50; letter-spacing: 0.02em; }

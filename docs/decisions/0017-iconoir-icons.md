@@ -1,5 +1,5 @@
 # 0017: Icons are Iconoir
-**Status:** ✅ Accepted   **Date:** 2026-10-22
+**Status:** Replaced by [0025](0025-phosphor-icons.md)   **Date:** 2026-10-22
 
 ## Context
 Lucide, the shadcn default, looked too generic. We compared Phosphor (duotone), Iconoir and Hugeicons on the sidebar and the owner chose Iconoir.

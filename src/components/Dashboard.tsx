@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { NavArrowDown, NavArrowUp, Xmark } from 'iconoir-react'
+import { CaretDown, CaretUp, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { SectionHeader } from '@/components/SectionHeader'
 import { MediaGallery } from '@/components/MediaGallery'
@@ -130,7 +130,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
             </Button>
           ))}
           <Button size="icon" variant="ghost" aria-label={collapsed ? 'Expand panel' : 'Collapse panel'} onClick={() => setCollapsed((c) => !c)}>
-            {collapsed ? <NavArrowUp /> : <NavArrowDown />}
+            {collapsed ? <CaretUp /> : <CaretDown />}
           </Button>
         </div>
 
@@ -206,7 +206,7 @@ export function Dashboard({ highlightIds, tab, onTab, children }: Props) {
               </p>
             </div>
             <Button size="icon" variant="ghost" aria-label="Close" onClick={() => setSelectedId(null)}>
-              <Xmark />
+              <X />
             </Button>
           </CardHeader>
           <CardContent className="flex flex-col gap-3 text-body-sm">

@@ -3,7 +3,7 @@
 Civic Operations Agent prototype for synthetic parking incidents in Bogotá. All incident data is synthetic.
 
 ## Stack
-React 19, TypeScript (strict), Vite, Tailwind v4, shadcn/ui (Radix, Nova preset), Iconoir icons. Planned: Supabase (auth, Postgres, RLS), MapLibre, an Edge Function agent.
+React 19, TypeScript (strict), Vite, Tailwind v4, shadcn/ui (Radix, Nova preset), Phosphor icons. Planned: Supabase (auth, Postgres, RLS), MapLibre, an Edge Function agent.
 
 ## Setup
 ```bash

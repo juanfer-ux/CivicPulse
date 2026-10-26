@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Plus, Sparks } from 'iconoir-react'
+import { Plus, Sparkle } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -63,7 +63,7 @@ function ConversationDemo({ width = 456 }: { width?: number }) {
     <div style={{ width }} className="flex h-[640px] max-w-full flex-col gap-3 border border-card bg-ai p-6 text-body-sm">
       <div className="mx-auto flex min-h-0 w-full max-w-[664px] flex-1 flex-col gap-8">
         <div className="flex items-center gap-2 text-label">
-          <Sparks className="size-4" aria-hidden /> Investigate and Ask
+          <Sparkle className="size-4" aria-hidden /> Investigate and Ask
         </div>
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
           <Question text="Which localities have the most parking obstruction incidents?" />

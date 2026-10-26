@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType } from 'react'
-import { Group, LogOut, Map as MapIcon, Menu, SidebarCollapse, SidebarExpand, Xmark } from 'iconoir-react'
+import { List, MapTrifold, SidebarSimple, SignOut, UsersThree, X } from '@phosphor-icons/react'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Avatar } from '@/components/ui/avatar'
@@ -59,8 +59,8 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
       </div>
       {toggleItem}
       <nav className={`flex flex-col gap-3 ${collapsed ? 'items-center' : ''}`}>
-        <NavItem icon={MapIcon} label="Map" active={view === 'map'} collapsed={collapsed} onClick={() => onView('map')} />
-        {can('manage_users') && <NavItem icon={Group} label="Users" active={view === 'users'} collapsed={collapsed} onClick={() => onView('users')} />}
+        <NavItem icon={MapTrifold} label="Map" active={view === 'map'} collapsed={collapsed} onClick={() => onView('map')} />
+        {can('manage_users') && <NavItem icon={UsersThree} label="Users" active={view === 'users'} collapsed={collapsed} onClick={() => onView('users')} />}
       </nav>
       <div className={`mt-auto flex flex-col gap-4 ${collapsed ? 'items-center' : ''}`}>
         {!collapsed && profile && (
@@ -72,7 +72,7 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
             </div>
           </div>
         )}
-        <NavItem icon={LogOut} label="Sign out" flush collapsed={collapsed} onClick={signOut} />
+        <NavItem icon={SignOut} label="Sign out" flush collapsed={collapsed} onClick={signOut} />
       </div>
     </div>
   )
@@ -113,7 +113,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
           onView={onView}
           toggleItem={
             <Button variant="ghost" className={`gap-2 px-2 ${collapsed ? 'w-10 justify-center' : 'justify-start'}`} aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'} onClick={toggle}>
-              {collapsed ? <SidebarExpand className="size-5 shrink-0" /> : <SidebarCollapse className="size-5 shrink-0" />}
+              {collapsed ? <SidebarSimple className="size-5 shrink-0 -scale-x-100" /> : <SidebarSimple className="size-5 shrink-0" />}
               {!collapsed && 'Collapse'}
             </Button>
           }
@@ -123,7 +123,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
       {/* Phones: slim top bar with a menu button, and the menu slides in from the left. */}
       <header className="fixed inset-x-0 top-0 z-20 flex h-[49px] items-center justify-between border-b bg-sidebar px-3 desk:hidden">
         <Button size="icon" variant="ghost" aria-label="Open menu" onClick={() => setOpen(true)}>
-          <Menu className="size-5" />
+          <List className="size-5" />
         </Button>
         <MobileBrand />
         <span className="size-(--control-icon)" aria-hidden /> {/* Figma keeps an invisible second button so the logo stays centered. */}
@@ -133,7 +133,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
           <button aria-label="Close menu" className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
           <aside className="relative h-full w-64 border-r bg-card">
             <Button size="icon" variant="ghost" className="absolute right-2 top-2" aria-label="Close menu" onClick={() => setOpen(false)}>
-              <Xmark className="size-5" />
+              <X className="size-5" />
             </Button>
             <Menu_ collapsed={false} view={view} onView={go} />
           </aside>
