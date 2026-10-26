@@ -8,4 +8,4 @@ export const mix = (a: string, b: string, t: number) => {
 }
 
 /** How much of its own color a toned-down (not selected) incident keeps. */
-export const KEEP = 0.55
+export const KEEP = 0.4
