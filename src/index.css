@@ -196,6 +196,7 @@
   --map-answer-ring: var(--indigo-400);
   --map-selected-ring: var(--neutral-100);
   --map-roads: #363644; /* map only, outside the 16 (owner, 2026-10-26): minor and secondary streets; CARTO's is #414758. Figma map/roads */
+  --map-road-outlines: #363644; /* map only, outside the 16 (owner, 2026-10-26): the thin outline under roads; CARTO's is #232323. Figma map/road-outlines */
   --map-main-roads: #2B2B36; /* map only: primary roads; CARTO's is #535666. Figma map/main-roads */
   --map-boundary: #32323E; /* map only, outside the 16 (owner, 2026-10-26): state borders; CARTO's is #676772. Figma map/boundary */
   --map-land: #19191F; /* map only, outside the 16 (owner, 2026-10-26): land, parks and the map background; CARTO's is #0E0E0E. Figma map/land */
