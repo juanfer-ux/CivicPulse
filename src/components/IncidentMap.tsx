@@ -224,7 +224,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
 
   // Wrapper positions the map: maplibre's unlayered CSS overrides Tailwind's `absolute` on the map element itself.
   return (
-    <div className="absolute inset-x-0 top-0 bottom-14 bg-(image:--map-background-gradient) desk:top-(--section-header-h) desk:bottom-0 desk:left-(--agent-w)">
+    <div className="absolute inset-x-0 top-0 bottom-14 bg-(image:--map-background-gradient) bg-fixed desk:top-(--section-header-h) desk:bottom-0 desk:left-(--agent-w)">
       <div ref={container} className="size-full" />
     </div>
   )
