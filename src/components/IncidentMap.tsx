@@ -236,7 +236,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
           source: 'answer-areas',
           layout: {
             'text-field': ['get', 'name'],
-            'text-font': (underLabels && (map.getLayoutProperty(underLabels, 'text-font') as string[])) || ['Montserrat Regular'],
+            'text-font': ['Montserrat Medium', 'Open Sans Regular', 'Noto Sans Regular'], // upright, like the basemap's own place names (the first label layer is italic: waterways)
             'text-size': 13,
             'text-allow-overlap': false,
           },
