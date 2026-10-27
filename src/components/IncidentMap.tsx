@@ -26,7 +26,7 @@ const ROAD_BLUR = 0.6
 const METERS_TO_PX_Z0 = 1 / (78271.517 * Math.cos((4.65 * Math.PI) / 180))
 /** Same for the building outlines, in pixels. */
 const BUILDING_BLUR = 2
-/** Opacity of the locality fill for an answer about localities (owner, 2026-10-27: 10 %). Above 0 the fill tints the map, so the buildings are hidden to keep each locality one shade. */
+/** Opacity of the locality fill for an answer about localities (owner, 2026-10-27: 10 %). */
 const LOCALITY_FILL = 0.1
 /** How strong the answer radius fill gets at its edge (Figma: 5.9 % on the Fill layer). */
 const ANSWER_FILL_ALPHA = 0.06
@@ -313,8 +313,6 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
     const map = mapRef.current
     if (!ready || !map) return
     const source = map.getSource('answer-areas') as maplibregl.GeoJSONSource
-    // Buildings are drawn above the locality fill and would tint it grey in dense parts, so each locality would not read as one shade: hide them while localities are shown.
-    for (const id of ['building', 'building-top', 'building-outline']) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', areas.length && LOCALITY_FILL > 0 ? 'none' : 'visible')
     if (!areas.length) {
       source.setData({ type: 'FeatureCollection', features: [] })
       return
