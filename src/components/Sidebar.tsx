@@ -41,7 +41,7 @@ function MobileBrand() {
 /** `flush` = no side padding when expanded (Figma: Sign out lines up with the user row above it). */
 function NavItem({ icon: Icon, label, active, collapsed, flush, onClick }: { icon: ComponentType<IconProps>; label: string; active?: boolean; collapsed: boolean; flush?: boolean; onClick: () => void }) {
   return (
-    <Button variant={collapsed && active ? 'secondary' : 'ghost'} className={`h-11 ${collapsed ? 'w-10 gap-2 px-2 justify-center' : `gap-4 justify-start hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${flush ? 'px-0' : 'px-3'}`}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
+    <Button variant="ghost" className={`h-11 hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'w-10 gap-2 px-2 justify-center' : `gap-4 justify-start ${flush ? 'px-0' : 'px-3'}`}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
       <Icon className="size-5 shrink-0" weight={active ? 'fill' : 'regular'} />
       {!collapsed && label}
     </Button>
