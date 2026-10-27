@@ -139,7 +139,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'circle-radius': ['step', ['zoom'], 3, 12, 5], // 6 px across below zoom 12, 10 px from 12 (until the pins)
           'circle-color': ['get', 'color'],
           'circle-opacity': 0.85,
-          'circle-stroke-width': 1,
+          'circle-stroke-width': 2,
           'circle-stroke-color': token('--map-dot-outline'),
         },
       })
