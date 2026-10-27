@@ -26,6 +26,8 @@ const ROAD_BLUR = 0.6
 const METERS_TO_PX_Z0 = 1 / (78271.517 * Math.cos((4.65 * Math.PI) / 180))
 /** Same for the building outlines, in pixels. */
 const BUILDING_BLUR = 2
+/** Opacity of the locality fill for an answer about localities (owner, 2026-10-27: 0, outline only). Above 0 the fill tints the map, so the buildings are hidden to keep each locality one shade. */
+const LOCALITY_FILL = 0
 /** How strong the answer radius fill gets at its edge (Figma: 5.9 % on the Fill layer). */
 const ANSWER_FILL_ALPHA = 0.06
 
@@ -210,7 +212,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
         },
         underLabels,
       )
-      // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (the same 25 % for every locality, so they all read as one shade), with their names in neutral-100. No circles then.
+      // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same for every locality; 0 for now, outline only), with their names in neutral-100. No circles then.
       // The locality fill sits above the roads and under the names (owner, 2026-10-27), so it tints everything under it evenly and each locality reads as one shade; the outline is drawn on top of everything.
       map.addSource('answer-areas', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer(
@@ -218,7 +220,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
           id: 'answer-areas-fill',
           type: 'fill',
           source: 'answer-areas',
-          paint: { 'fill-color': token('--map-locality-fill'), 'fill-opacity': 0.25 },
+          paint: { 'fill-color': token('--map-locality-fill'), 'fill-opacity': LOCALITY_FILL },
         },
         underLabels,
       )
@@ -312,7 +314,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
     if (!ready || !map) return
     const source = map.getSource('answer-areas') as maplibregl.GeoJSONSource
     // Buildings are drawn above the locality fill and would tint it grey in dense parts, so each locality would not read as one shade: hide them while localities are shown.
-    for (const id of ['building', 'building-top', 'building-outline']) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', areas.length ? 'none' : 'visible')
+    for (const id of ['building', 'building-top', 'building-outline']) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', areas.length && LOCALITY_FILL > 0 ? 'none' : 'visible')
     if (!areas.length) {
       source.setData({ type: 'FeatureCollection', features: [] })
       return
