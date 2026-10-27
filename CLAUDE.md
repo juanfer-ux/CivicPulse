@@ -45,8 +45,8 @@ Rules:
 - Coding follows the **ponytail** rule (the `ponytail` plugin, level `full`, is on in every session). Climb the ladder and stop at the first rung that holds: does it need to exist, is it already in this codebase, standard library, native platform feature, an installed dependency, one line, and only then the minimum new code. No new dependency for what a few lines can do, no abstraction with one user, no speculative extras. Non-trivial logic leaves one small runnable check. Never lazy about input validation, security, data-loss handling, accessibility or anything explicitly asked for. Say "stop ponytail" to turn it off.
 
 ## Figma component pages (this project)
-- Components live on the five `Components · …` pages (index in [docs/design-system/README.md](docs/design-system/README.md)); frames are laid out in one horizontal row.
-- **Every `Components · …` page has the background `#3D3D43`**, existing and any new one. When creating a components page, set it right away.
+- Components live on the five family pages (Actions & inputs, Data display, Navigation & layout, Map & agent, Auth & brand), grouped under the separator page `——— Components ———` (index in [docs/design-system/README.md](docs/design-system/README.md)); frames are laid out in one horizontal row.
+- **Every component family page has the background `#3D3D43`** (the pages between the `——— Components ———` separator and Screens), existing and any new one. When creating a components page, set it right away.
 
 ## Color rules (every project)
 - Neutrals are always `neutral-100` … `neutral-900`, 900 = darkest. Never 950, 850 or other in-between steps.
