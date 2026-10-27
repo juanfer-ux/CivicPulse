@@ -41,7 +41,7 @@ function MobileBrand() {
 /** `flush` = no side padding when expanded (Figma: Sign out lines up with the user row above it). */
 function NavItem({ icon: Icon, label, active, collapsed, flush, onClick }: { icon: ComponentType<{ className?: string }>; label: string; active?: boolean; collapsed: boolean; flush?: boolean; onClick: () => void }) {
   return (
-    <Button variant="ghost" className={`${active ? 'bg-sidebar hover:bg-sidebar' : ''} ${collapsed ? 'w-10 gap-2 px-2 justify-center' : `h-11 gap-4 justify-start ${flush ? 'px-0' : 'px-3'}`}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
+    <Button variant={collapsed && active ? 'secondary' : 'ghost'} className={`h-11 ${collapsed ? 'w-10 gap-2 px-2 justify-center' : `gap-4 justify-start hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${flush ? 'px-0' : 'px-3'}`}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
       <Icon className="size-5 shrink-0" />
       {!collapsed && label}
     </Button>
@@ -112,7 +112,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
           view={view}
           onView={onView}
           toggleItem={
-            <Button variant="ghost" className={collapsed ? 'w-10 gap-2 px-2 justify-center' : 'h-11 gap-4 px-3 justify-start'} aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'} onClick={toggle}>
+            <Button variant="ghost" className={collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-11 gap-4 px-3 justify-start hover:bg-sidebar'} aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'} onClick={toggle}>
               {collapsed ? <SidebarSimple className="size-5 shrink-0 -scale-x-100" /> : <SidebarSimple className="size-5 shrink-0" />}
               {!collapsed && 'Collapse'}
             </Button>
