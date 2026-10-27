@@ -4,7 +4,7 @@
 > 🔐 What each role may see: [roles-and-permissions.md](roles-and-permissions.md). Tables: [data-model.md](data-model.md).
 
 ## 🎯 What it is
-A question box. An operator asks about the incidents they are allowed to see; the agent answers with numbers, a small chart, the evidence behind them, and its limitations, and draws one incident radius per group of the relevant incidents on the map (groups: incidents within 1.2 km of each other; the circle covers the whole group, in meters, so its size follows the group) and, while the answer is shown, hides the others and limits the header count, the summary card and the status counts to the answer's incidents. **The agent recommends. The human decides.**
+A question box. An operator asks about the incidents they are allowed to see; the agent answers with numbers, a small chart, the evidence behind them, and its limitations, and draws one indigo incident radius per wide group (radius 400 m or more) of the relevant incidents on the map (groups: incidents within 1.2 km of each other; the circle covers the whole group, in meters, so its size follows the group; tight hotspots, like repeated reports or the area for tomorrow, show only their pins) and moves the map to show the whole answer and, while the answer is shown, hides the others and limits the header count, the summary card and the status counts to the answer's incidents. **The agent recommends. The human decides.**
 
 ## ⚙️ How it works today (mock mode)
 ```mermaid

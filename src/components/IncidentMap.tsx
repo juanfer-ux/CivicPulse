@@ -182,9 +182,9 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           paint: {
             // meters to pixels: a pixel is 78271.5 m x cos(lat) / 2^zoom wide (512 px tiles); zoom may only drive a top-level interpolate
             'circle-radius': ['interpolate', ['exponential', 2], ['zoom'], 0, ['*', ['get', 'r'], METERS_TO_PX_Z0], 22, ['*', ['get', 'r'], METERS_TO_PX_Z0 * 2 ** 22]],
-            'circle-color': token('--map-incident-radius'),
+            'circle-color': token('--map-answer-radius'),
             'circle-opacity': 0.18,
-            'circle-stroke-color': token('--map-incident-radius'),
+            'circle-stroke-color': token('--map-answer-radius'),
             'circle-stroke-width': 1,
           },
         },
@@ -238,6 +238,20 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       })),
     })
   }, [ready, incidents, highlightIds])
+
+  // When an answer arrives the map moves to show all of it (owner, 2026-10-27), clear of the banner, the filters and the summary card.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map || !highlightIds.length) return
+    const highlight = new Set(highlightIds)
+    const pts = incidents.filter((i) => highlight.has(i.id))
+    if (!pts.length) return
+    const bounds = new maplibregl.LngLatBounds([pts[0].lng, pts[0].lat], [pts[0].lng, pts[0].lat])
+    for (const i of pts) bounds.extend([i.lng, i.lat])
+    const wide = map.getContainer().clientWidth > 700
+    map.fitBounds(bounds, { padding: { top: wide ? 120 : 100, bottom: wide ? 40 : 60, left: 40, right: wide ? 320 : 40 }, maxZoom: 15, duration: 700 })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the answer changes, not when filters change the list
+  }, [ready, highlightIds])
 
   // One radius per group of incidents behind the agent's answer.
   useEffect(() => {
