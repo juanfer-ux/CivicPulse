@@ -21,6 +21,10 @@ export interface Evidence {
   incidentCount: number
   references: string[]
 }
+export interface Area {
+  code: number
+  value: number
+}
 export interface Answer {
   text: string
   bars: Bar[]
@@ -29,6 +33,8 @@ export interface Answer {
   highlightIds: string[]
   /** Which chart draws `bars`: a ranking (horizontal bars), the day in 4-hour blocks (area) or two periods (two columns). Without it, the plain bar list. */
   chart?: 'ranking' | 'time' | 'period'
+  /** Localities to outline and shade on the map (code, and a value that sets the shade). An answer about localities shows these instead of circles. */
+  areas?: Area[]
   /** Set when the answer is a recommendation a human can send for review. */
   proposal?: Draft
 }
@@ -51,6 +57,7 @@ const TZ = 'America/Bogota'
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const SYNTHETIC = 'All records are synthetic.'
 const CIRCLES = 'Circles on the map show where the incidents are, not an area of risk.'
+const AREAS = 'Localities on the map are outlined and tinted because they are in the answer: the tint is the same for all and is not a risk level.'
 const MIN_REPEATS = 3
 const CANDIDATE_DAYS = 90
 const COUNTING = 'Counts exclude reports marked duplicate or rejected.'
@@ -223,16 +230,18 @@ async function ranking(days: number | null, category: string | null): Promise<An
     .slice(tied.length, tied.length + 2)
     .map((r) => `${r.locality_name} (${r.incident_count})`)
     .join(', ')
-  const topIds = rows.slice(0, 3).flatMap((r) => r.incident_ids)
+  const shown = rows.slice(0, 10)
+  const topIds = shown.flatMap((r) => r.incident_ids)
 
   return {
     text: `${lead}, across ${rows.length} localities, ${period}.${next ? ` Next: ${next}.` : ''}`,
-    bars: rows.slice(0, 10).map((r) => ({ label: r.locality_name, value: r.incident_count })),
+    bars: shown.map((r) => ({ label: r.locality_name, value: r.incident_count })),
     chart: 'ranking',
+    areas: shown.map((r) => ({ code: r.locality_code, value: r.incident_count })),
     evidence: [
       {
         tool: 'tool_incidents_by_locality',
-        scope: `top 3 localities of ${rows.length}`,
+        scope: `top ${shown.length} localities of ${rows.length}`,
         period,
         incidentCount: topIds.length,
         references: await references(topIds),
@@ -242,7 +251,7 @@ async function ranking(days: number | null, category: string | null): Promise<An
       COUNTING,
       'Only localities in your authorized scope are included.',
       'Raw counts are not adjusted for population, area or reporting rates: they show where reports concentrate, not where the problem is worst.',
-      CIRCLES,
+      AREAS,
       SYNTHETIC,
     ],
     highlightIds: topIds,
@@ -296,10 +305,11 @@ async function timeOfDay(locality: Locality | null, days: number | null, categor
       ...(total < 30 ? [`Small sample (${total} incidents): treat the distribution as indicative only.`] : []),
       'Times are when the incident occurred (Bogotá time), in 4-hour intervals.',
       COUNTING,
-      CIRCLES,
+      locality ? AREAS : CIRCLES,
       SYNTHETIC,
     ],
     highlightIds: ids,
+    areas: locality ? [{ code: locality.code, value: 1 }] : undefined,
   }
 }
 
@@ -361,10 +371,11 @@ async function compare(locality: Locality | null, days: number, category: string
         : []),
       'This compares counts only. It does not explain why the numbers differ.',
       COUNTING,
-      CIRCLES,
+      locality ? AREAS : CIRCLES,
       SYNTHETIC,
     ],
     highlightIds: ids,
+    areas: locality ? [{ code: locality.code, value: 1 }] : undefined,
   }
 }
 

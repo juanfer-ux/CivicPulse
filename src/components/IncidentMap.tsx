@@ -5,6 +5,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { PIN_RISE, addBadges, iconCategory } from '@/lib/markerIcons'
 import { circleBounds, radiusGroups } from '@/lib/radius'
+import type { Area } from '@/lib/agent'
 import { GROUPS, groupOf, label, typeOf, type Incident } from '@/lib/incidents'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.
@@ -25,6 +26,8 @@ const ROAD_BLUR = 0.6
 const METERS_TO_PX_Z0 = 1 / (78271.517 * Math.cos((4.65 * Math.PI) / 180))
 /** Same for the building outlines, in pixels. */
 const BUILDING_BLUR = 2
+/** Opacity of the locality fill for an answer about localities (owner, 2026-10-27: 4 %). */
+const LOCALITY_FILL = 0.04
 /** How strong the answer radius fill gets at its edge (Figma: 5.9 % on the Fill layer). */
 const ANSWER_FILL_ALPHA = 0.06
 
@@ -40,10 +43,12 @@ interface Props {
   selectedId: string | null
   /** Incidents backing the agent's latest answer, ringed in the AI colour. */
   highlightIds: string[]
+  /** Localities to outline and shade (an answer about localities); they replace the circles. */
+  areas: Area[]
   onSelect: (id: string | null) => void
 }
 
-export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSelect }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
@@ -207,6 +212,37 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         },
         underLabels,
       )
+      // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same 4 % for every locality), with their names in neutral-100. No circles then.
+      // The locality fill sits above the roads and under the names (owner, 2026-10-27), so it tints everything under it evenly and each locality reads as one shade; the outline is drawn on top of everything.
+      map.addSource('answer-areas', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      map.addLayer(
+        {
+          id: 'answer-areas-fill',
+          type: 'fill',
+          source: 'answer-areas',
+          paint: { 'fill-color': token('--map-locality-fill'), 'fill-opacity': LOCALITY_FILL },
+        },
+        underLabels,
+      )
+      map.addLayer(
+        { id: 'answer-areas-line', type: 'line', source: 'answer-areas', paint: { 'line-color': token('--map-locality-line'), 'line-width': 1.4 } },
+        'incidents', // the outline is on top of the whole basemap (owner, 2026-10-27), so roads and water do not cut it; only the names and the incidents are above it
+      )
+      map.addLayer(
+        {
+          id: 'answer-areas-name',
+          type: 'symbol',
+          source: 'answer-areas',
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-font': ['Montserrat Medium', 'Open Sans Regular', 'Noto Sans Regular'], // upright, like the basemap's own place names (the first label layer is italic: waterways)
+            'text-size': 13,
+            'text-allow-overlap': false,
+          },
+          paint: { 'text-color': token('--neutral-100'), 'text-halo-color': token('--neutral-900'), 'text-halo-width': 1.5 },
+        },
+        'incidents',
+      )
       map.addLayer({
         id: 'incident-selected',
         type: 'circle',
@@ -259,7 +295,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
   // When an answer arrives the map moves to show all of it (owner, 2026-10-27), clear of the banner, the filters and the summary card.
   useEffect(() => {
     const map = mapRef.current
-    if (!ready || !map || !highlightIds.length) return
+    if (!ready || !map || !highlightIds.length || areas.length) return
     const highlight = new Set(highlightIds)
     const pts = incidents.filter((i) => highlight.has(i.id))
     if (!pts.length) return
@@ -271,17 +307,50 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the answer changes, not when filters change the list
   }, [ready, highlightIds])
 
+  // The localities of an answer: load the boundaries once, draw the listed ones (shade by count) and move the map to show them all.
+  const localities = useRef<{ features: { properties: { code: number; name: string }; geometry: { coordinates: unknown } }[] } | null>(null)
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    const source = map.getSource('answer-areas') as maplibregl.GeoJSONSource
+    if (!areas.length) {
+      source.setData({ type: 'FeatureCollection', features: [] })
+      return
+    }
+    let stale = false
+    ;(async () => {
+      localities.current ??= await fetch('/bogota-localities.geojson').then((r) => r.json())
+      if (stale || !localities.current) return
+      const wanted = new Set(areas.map((a) => a.code))
+      const features = localities.current.features.filter((f) => wanted.has(f.properties.code))
+      source.setData({ type: 'FeatureCollection', features } as never)
+      const bounds = new maplibregl.LngLatBounds()
+      const extend = (c: unknown): void => {
+        if (Array.isArray(c) && typeof c[0] === 'number') bounds.extend(c as [number, number])
+        else (c as unknown[]).forEach(extend)
+      }
+      for (const f of features) extend(f.geometry.coordinates)
+      if (!bounds.isEmpty()) {
+        const wide = map.getContainer().clientWidth > 700
+        map.fitBounds(bounds, { padding: { top: wide ? 120 : 100, bottom: wide ? 40 : 60, left: 40, right: wide ? 320 : 40 }, maxZoom: 13, duration: 700 })
+      }
+    })()
+    return () => {
+      stale = true
+    }
+  }, [ready, areas])
+
   // One radius per group of incidents behind the agent's answer.
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
     const highlight = new Set(highlightIds)
-    const circles = highlightIds.length ? radiusGroups(incidents.filter((i) => highlight.has(i.id))) : []
+    const circles = highlightIds.length && !areas.length ? radiusGroups(incidents.filter((i) => highlight.has(i.id))) : []
     ;(map.getSource('answer-radius') as maplibregl.GeoJSONSource).setData({
       type: 'FeatureCollection',
       features: circles.map((c) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [c.lng, c.lat] }, properties: { r: c.radius } })),
     })
-  }, [ready, incidents, highlightIds])
+  }, [ready, incidents, highlightIds, areas])
 
   useEffect(() => {
     const map = mapRef.current
