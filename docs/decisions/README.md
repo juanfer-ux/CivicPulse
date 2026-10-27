@@ -32,6 +32,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0024](0024-sixteen-colors-map-statuses.md) | The palette is 16 colors; the map shows four statuses | ✅ Accepted |
 | [0025](0025-phosphor-icons.md) | Icons are Phosphor (regular, fill for map badges) | ✅ Accepted |
 | [0026](0026-control-border-neutral-400.md) | Control borders use neutral-400 again (below 3:1, owner's choice) | ✅ Accepted |
+| [0027](0027-indigo-700-in-the-palette.md) | indigo-700 joins the palette (17 colors) | ✅ Accepted |
 
 ## ✍️ Template
 ```
