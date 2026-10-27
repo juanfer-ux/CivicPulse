@@ -106,7 +106,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside className={`hidden shrink-0 border-r bg-background transition-[width] desk:block ${collapsed ? 'w-[64.5px]' : 'w-54'}`}>
+      <aside className={`hidden shrink-0 border-r bg-card transition-[width] desk:block ${collapsed ? 'w-[64.5px]' : 'w-54'}`}>
         <Menu_
           collapsed={collapsed}
           view={view}
