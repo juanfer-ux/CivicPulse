@@ -31,6 +31,8 @@ The switch is at **1,440 px** (owner's decision): any narrower window, including
 3. Check at **1,440** and **390** by **measuring** (heights, radius, text size), not only by eye.
 
 ## 🖼️ Component gallery
+Chart options for the agent's answers (the current bars next to shadcn Chart, a BarList and a metric tile, on the same data): open `/#charts` (no sign-in; loaded only when opened).
+
 Open `/#components` (no sign-in) to see real components on their own, with their measured height and text style. Resize under 1,440 px for the phone sizes. Code: `src/components/Gallery.tsx`. It only has the Button so far; add a component by adding a section there.
 
 ## 🟥 Gaps

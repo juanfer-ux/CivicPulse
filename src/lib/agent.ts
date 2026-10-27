@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import type { Locality } from '@/lib/incidents'
 import type { Draft } from '@/lib/recommendations'
+import { timeBlockLabel } from '@/lib/utils'
 
 /**
  * Civic Operations Agent, MOCK MODE.
@@ -26,6 +27,8 @@ export interface Answer {
   evidence: Evidence[]
   limitations: string[]
   highlightIds: string[]
+  /** Which chart draws `bars`: a ranking (horizontal bars), the day in 4-hour blocks (area) or two periods (two columns). Without it, the plain bar list. */
+  chart?: 'ranking' | 'time' | 'period'
   /** Set when the answer is a recommendation a human can send for review. */
   proposal?: Draft
 }
@@ -225,6 +228,7 @@ async function ranking(days: number | null, category: string | null): Promise<An
   return {
     text: `${lead}, across ${rows.length} localities, ${period}.${next ? ` Next: ${next}.` : ''}`,
     bars: rows.slice(0, 10).map((r) => ({ label: r.locality_name, value: r.incident_count })),
+    chart: 'ranking',
     evidence: [
       {
         tool: 'tool_incidents_by_locality',
@@ -260,7 +264,7 @@ async function timeOfDay(locality: Locality | null, days: number | null, categor
   const total = rows.reduce((s, r) => s + r.incident_count, 0)
   const period = `${date(rows[0].first_at)} to ${date(rows[0].last_at)}`
   const blocks = Array.from({ length: 6 }, (_, b) => ({
-    label: `${String(b * 4).padStart(2, '0')}:00–${String(b * 4 + 4).padStart(2, '0')}:00`,
+    label: timeBlockLabel(b),
     value: rows.filter((r) => Math.floor(r.hour / 4) === b).reduce((s, r) => s + r.incident_count, 0),
   }))
   const peak = blocks.reduce((a, b) => (b.value > a.value ? b : a))
@@ -278,6 +282,7 @@ async function timeOfDay(locality: Locality | null, days: number | null, categor
       `${peakTied.length > 1 ? `The most frequent intervals are ${peakTied.map((b) => b.label).join(' and ')}` : `The most frequent interval is ${peak.label}`} ` +
       `with ${peak.value} incidents (${pct(peak.value, total)}%). The busiest weekday is ${busiest.label} (${busiest.value}).`,
     bars: blocks,
+    chart: 'time',
     evidence: [
       {
         tool: 'tool_time_distribution',
@@ -336,6 +341,7 @@ async function compare(locality: Locality | null, days: number, category: string
       { label: `Previous ${days} days`, value: prev.incident_count },
       { label: `Last ${days} days`, value: cur.incident_count },
     ],
+    chart: 'period',
     evidence: [
       {
         tool: 'tool_period_comparison',

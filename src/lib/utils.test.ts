@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { cn, initials, shortName } from '@/lib/utils'
+import { cn, initials, shortName, timeBlockLabel } from '@/lib/utils'
 
 describe('cn', () => {
   it('keeps a text style when a text color follows it', () => {
@@ -25,5 +25,11 @@ describe('shortName and initials', () => {
   it('makes initials', () => {
     expect(initials('juan Fernando Pérez Gómez')).toBe('JP')
     expect(initials('')).toBe('')
+  })
+})
+
+describe('timeBlockLabel', () => {
+  it('writes the six 4-hour blocks with AM and PM', () => {
+    expect([0, 1, 2, 3, 4, 5].map(timeBlockLabel)).toEqual(['12–4 AM', '4–8 AM', '8 AM–12 PM', '12–4 PM', '4–8 PM', '8 PM–12 AM'])
   })
 })

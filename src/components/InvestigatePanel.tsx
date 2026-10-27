@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ArrowUp, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { SUGGESTIONS, answer, type Answer } from '@/lib/agent'
 import { fetchLocalities } from '@/lib/incidents'
+
+// The charts (Recharts) load with the first answer, not with the app; the plain bars show meanwhile.
+const AnswerChart = lazy(() => import('@/components/AnswerCharts'))
 
 type Turn = { question: string; result?: Answer; error?: string }
 
@@ -106,24 +109,37 @@ function Feedback() {
 }
 
 /** `shown`: this answer is the one ringed on the map. The button clears it, or brings it back after clearing (or from an older answer). */
+
+/** The answer's small bar list: a label, a bar sized by value, and the number. */
+export function Bars({ bars }: { bars: Answer['bars'] }) {
+  const max = Math.max(1, ...bars.map((b) => b.value))
+  return (
+    <ul className="flex flex-col gap-1">
+      {bars.map((b) => (
+        <li key={b.label} className="grid grid-cols-[7.5rem_1fr_2rem] items-center gap-2 text-meta">
+          <span className="truncate text-muted-foreground">{b.label}</span>
+          <span className="h-2 rounded-full bg-muted">
+            <span className="block h-2 rounded-full bg-ai-border" style={{ width: `${(b.value / max) * 100}%` }} />
+          </span>
+          <span className="text-right">{b.value}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 export function AnswerView({ result, shown, onToggle }: { result: Answer; shown: boolean; onToggle: (on: boolean) => void }) {
-  const max = Math.max(1, ...result.bars.map((b) => b.value))
   return (
     <div className="flex flex-col gap-3">
       <p className="text-muted-foreground">{result.text}</p>
-      {result.bars.length > 0 && (
-        <ul className="flex flex-col gap-1">
-          {result.bars.map((b) => (
-            <li key={b.label} className="grid grid-cols-[7.5rem_1fr_2rem] items-center gap-2 text-meta">
-              <span className="truncate text-muted-foreground">{b.label}</span>
-              <span className="h-2 rounded-full bg-muted">
-                <span className="block h-2 rounded-full bg-ai-border" style={{ width: `${(b.value / max) * 100}%` }} />
-              </span>
-              <span className="text-right">{b.value}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      {result.bars.length > 0 &&
+        (result.chart ? (
+          <Suspense fallback={<Bars bars={result.bars} />}>
+            <AnswerChart kind={result.chart} bars={result.bars} />
+          </Suspense>
+        ) : (
+          <Bars bars={result.bars} />
+        ))}
       {result.evidence.map((e) => (
         <details key={e.tool + e.scope} className="text-meta text-muted-foreground">
           <summary className="cursor-pointer">Evidence: {e.incidentCount} incidents</summary>
