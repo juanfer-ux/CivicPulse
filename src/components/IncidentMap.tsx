@@ -156,16 +156,15 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'icon-allow-overlap': true,
         },
       })
-      // Rule (owner, 2026-10-26): the selected incident always shows its pin with the category icon, at any zoom. From zoom 14 every incident is already a pin, so this layer only draws below it.
+      // Rule (owner, 2026-10-26): the selected incident always shows its pin with the category icon, at any zoom, and it is always the top level. It has its own layer above the badges at every zoom, because symbol-sort-key only orders pins inside one map tile, so a neighbouring pin from another tile could still cover the selected one.
       map.addLayer({
         id: 'incident-selected-pin',
         type: 'symbol',
         source: 'incidents',
-        maxzoom: BADGE_ZOOM,
         filter: ['==', ['get', 'id'], ''],
         layout: {
           'icon-image': ['concat', 'badge-', ['get', 'icon'], '-', ['get', 'group']],
-          'icon-size': 0.4,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, 0.4, 15, 0.6, 18, 0.8],
           'icon-anchor': 'bottom',
           'icon-allow-overlap': true,
         },
