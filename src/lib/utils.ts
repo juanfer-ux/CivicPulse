@@ -28,3 +28,11 @@ export function initials(full: string | null | undefined): string {
     .map((p) => p[0]?.toUpperCase() ?? '')
     .join('')
 }
+
+/** A 4-hour block of the day with AM/PM, so it reads without 24-hour habits: 0 is "12–4 AM", 5 is "8 PM–12 AM". */
+export function timeBlockLabel(b: number) {
+  const at = (h: number) => ({ n: h % 12 === 0 ? 12 : h % 12, m: h % 24 < 12 ? 'AM' : 'PM' })
+  const s = at(b * 4)
+  const e = at(b * 4 + 4)
+  return s.m === e.m ? `${s.n}–${e.n} ${e.m}` : `${s.n} ${s.m}–${e.n} ${e.m}`
+}

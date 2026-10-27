@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ArrowUp, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { SUGGESTIONS, answer, type Answer } from '@/lib/agent'
 import { fetchLocalities } from '@/lib/incidents'
+
+// The charts (Recharts) load with the first answer, not with the app; the plain bars show meanwhile.
+const AnswerChart = lazy(() => import('@/components/AnswerCharts'))
 
 type Turn = { question: string; result?: Answer; error?: string }
 
@@ -129,7 +132,14 @@ export function AnswerView({ result, shown, onToggle }: { result: Answer; shown:
   return (
     <div className="flex flex-col gap-3">
       <p className="text-muted-foreground">{result.text}</p>
-      {result.bars.length > 0 && <Bars bars={result.bars} />}
+      {result.bars.length > 0 &&
+        (result.chart ? (
+          <Suspense fallback={<Bars bars={result.bars} />}>
+            <AnswerChart kind={result.chart} bars={result.bars} />
+          </Suspense>
+        ) : (
+          <Bars bars={result.bars} />
+        ))}
       {result.evidence.map((e) => (
         <details key={e.tool + e.scope} className="text-meta text-muted-foreground">
           <summary className="cursor-pointer">Evidence: {e.incidentCount} incidents</summary>

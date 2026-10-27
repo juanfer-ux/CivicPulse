@@ -14,12 +14,12 @@ const RANKING = [
   { label: 'Fontibón', value: 29 },
 ]
 const TIME = [
-  { label: '00–04', value: 3 },
-  { label: '04–08', value: 2 },
-  { label: '08–12', value: 2 },
-  { label: '12–16', value: 9 },
-  { label: '16–20', value: 11 },
-  { label: '20–24', value: 1 },
+  { label: '12–4 AM', value: 3 },
+  { label: '4–8 AM', value: 2 },
+  { label: '8 AM–12 PM', value: 2 },
+  { label: '12–4 PM', value: 9 },
+  { label: '4–8 PM', value: 11 },
+  { label: '8 PM–12 AM', value: 1 },
 ]
 const PERIOD = [
   { label: 'Previous 30 days', value: 20 },

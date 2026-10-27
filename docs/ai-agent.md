@@ -35,7 +35,7 @@ Say "illegal dumping" or "parking" in the question to limit it to that category.
 Unsupported questions get an honest "I cannot answer that yet". The agent does not guess.
 
 ## 📦 What every answer contains
-`text` · `bars` (small chart) · `evidence` (tool, scope, period, incident count, example references) · `limitations` (always) · `highlightIds` (incidents behind the answer, shown inside incident radii on the map) · optional `proposal` (a recommendation draft, investigation E only).
+`text` · `bars` (small chart; `chart` says how it is drawn: a horizontal bar chart for rankings, an area chart over the day for time of day with AM/PM blocks, two columns for a period comparison, plain bars otherwise. shadcn Chart on Recharts, loaded with the first answer; chart options are compared at `/#charts`) · `evidence` (tool, scope, period, incident count, example references) · `limitations` (always) · `highlightIds` (incidents behind the answer, shown inside incident radii on the map) · optional `proposal` (a recommendation draft, investigation E only).
 
 ## 🛡️ Rules (never break these)
 1. 🔢 Never invent a statistic. Numbers, comparisons, percentages and counts are **calculated by SQL or deterministic code**, not by a language model.
