@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType } from 'react'
-import { List, MapTrifold, SidebarSimple, SignOut, UsersThree, X } from '@phosphor-icons/react'
+import { List, MapTrifold, SidebarSimple, SignOut, UsersThree, X, type IconProps } from '@phosphor-icons/react'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Avatar } from '@/components/ui/avatar'
@@ -39,10 +39,10 @@ function MobileBrand() {
 }
 
 /** `flush` = no side padding when expanded (Figma: Sign out lines up with the user row above it). */
-function NavItem({ icon: Icon, label, active, collapsed, flush, onClick }: { icon: ComponentType<{ className?: string }>; label: string; active?: boolean; collapsed: boolean; flush?: boolean; onClick: () => void }) {
+function NavItem({ icon: Icon, label, active, collapsed, flush, onClick }: { icon: ComponentType<IconProps>; label: string; active?: boolean; collapsed: boolean; flush?: boolean; onClick: () => void }) {
   return (
     <Button variant={collapsed && active ? 'secondary' : 'ghost'} className={`h-11 ${collapsed ? 'w-10 gap-2 px-2 justify-center' : `gap-4 justify-start hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${flush ? 'px-0' : 'px-3'}`}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
-      <Icon className="size-5 shrink-0" />
+      <Icon className="size-5 shrink-0" weight={active ? 'fill' : 'regular'} />
       {!collapsed && label}
     </Button>
   )
