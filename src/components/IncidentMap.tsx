@@ -314,6 +314,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
     const map = mapRef.current
     if (!ready || !map) return
     const source = map.getSource('answer-areas') as maplibregl.GeoJSONSource
+    // Buildings are drawn above the locality fill and would tint it grey in dense parts, so each locality would not read as one shade: hide them while localities are shown.
+    for (const id of ['building', 'building-top', 'building-outline']) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', areas.length ? 'none' : 'visible')
     if (!areas.length) {
       source.setData({ type: 'FeatureCollection', features: [] })
       return
