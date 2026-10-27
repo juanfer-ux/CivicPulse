@@ -123,8 +123,8 @@ export function Dashboard({ highlightIds, areas, onClearHighlight, tab, onTab, c
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. */}
       {chatMode && (
-        <div className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--neutral-200) px-5 text-meta text-(--neutral-800) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
-          <Car className="size-6 shrink-0" aria-hidden />
+        <div className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--neutral-400) px-5 text-meta text-(--neutral-100) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
+          <Car className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
           <span className="flex-1">While showing the agent's answer, the filters will narrow it down.</span>
           <Button size="sm" variant="outline" className="h-6" onClick={onClearHighlight}>
             Clear agent results
