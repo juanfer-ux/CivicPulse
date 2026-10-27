@@ -4,6 +4,7 @@ import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { PIN_RISE, addBadges, iconCategory } from '@/lib/markerIcons'
+import { labelPoint } from '@/lib/polygons'
 import { circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
 import { GROUPS, groupOf, label, typeOf, type Incident } from '@/lib/incidents'
@@ -215,6 +216,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
       // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same 4 % for every locality), with their names in neutral-100. No circles then.
       // The locality fill sits above the roads and under the names (owner, 2026-10-27), so it tints everything under it evenly and each locality reads as one shade; the outline is drawn on top of everything.
       map.addSource('answer-areas', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      // One point per locality for its name: a polygon source repeats the name in every map tile it crosses.
+      map.addSource('answer-area-names', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer(
         {
           id: 'answer-areas-fill',
@@ -232,7 +235,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
         {
           id: 'answer-areas-name',
           type: 'symbol',
-          source: 'answer-areas',
+          source: 'answer-area-names',
           layout: {
             'text-field': ['get', 'name'],
             'text-font': ['Montserrat Medium', 'Open Sans Regular', 'Noto Sans Regular'], // upright, like the basemap's own place names (the first label layer is italic: waterways)
@@ -308,13 +311,17 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
   }, [ready, highlightIds])
 
   // The localities of an answer: load the boundaries once, draw the listed ones (shade by count) and move the map to show them all.
-  const localities = useRef<{ features: { properties: { code: number; name: string }; geometry: { coordinates: unknown } }[] } | null>(null)
+  const localities = useRef<{ features: { properties: { code: number; name: string }; geometry: { type: string; coordinates: unknown } }[] } | null>(null)
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
     const source = map.getSource('answer-areas') as maplibregl.GeoJSONSource
+    const names = map.getSource('answer-area-names') as maplibregl.GeoJSONSource
+    // The basemap writes "Localidad X" for the same localities: hide it while ours are shown, so each name appears once.
+    if (map.getLayer('place_suburbs')) map.setLayoutProperty('place_suburbs', 'visibility', areas.length ? 'none' : 'visible')
     if (!areas.length) {
       source.setData({ type: 'FeatureCollection', features: [] })
+      names.setData({ type: 'FeatureCollection', features: [] })
       return
     }
     let stale = false
@@ -324,6 +331,10 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
       const wanted = new Set(areas.map((a) => a.code))
       const features = localities.current.features.filter((f) => wanted.has(f.properties.code))
       source.setData({ type: 'FeatureCollection', features } as never)
+      names.setData({
+        type: 'FeatureCollection',
+        features: features.map((f) => ({ type: 'Feature', properties: { name: f.properties.name }, geometry: { type: 'Point', coordinates: labelPoint(f.geometry.type, f.geometry.coordinates) } })),
+      })
       const bounds = new maplibregl.LngLatBounds()
       const extend = (c: unknown): void => {
         if (Array.isArray(c) && typeof c[0] === 'number') bounds.extend(c as [number, number])
