@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { CaretDown, CaretUp, Car, X } from '@phosphor-icons/react'
+import { CaretDown, CaretUp, Robot, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { SectionHeader } from '@/components/SectionHeader'
 import { MediaGallery } from '@/components/MediaGallery'
@@ -124,7 +124,7 @@ export function Dashboard({ highlightIds, areas, onClearHighlight, tab, onTab, c
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. */}
       {chatMode && (
         <div className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-800) px-5 text-meta text-(--indigo-200) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
-          <Car className="size-5 shrink-0 text-(--indigo-300)" aria-hidden />
+          <Robot className="size-5 shrink-0 text-(--indigo-300)" aria-hidden />
           <span className="flex-1">While showing the agent's answer, the filters will narrow it down.</span>
           <Button size="sm" variant="outline" className="h-6" onClick={onClearHighlight}>
             Clear agent results
