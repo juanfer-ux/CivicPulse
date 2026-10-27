@@ -211,10 +211,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
         underLabels,
       )
       // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and shaded with the radius fill color, stronger for a higher count, with their names in neutral-100. No circles then.
-      // The locality fill sits just above the land (owner, 2026-10-27), under the water, roads, buildings and names, so none of those are hidden; the outline is drawn on top of everything.
-      const layers = map.getStyle().layers
-      const LAND = ['background', 'landcover', 'landuse', 'landuse_residential', 'park_national_park', 'park_nature_reserve']
-      const aboveLand = layers[Math.max(...LAND.map((id) => layers.findIndex((l) => l.id === id))) + 1]?.id ?? underLabels
+      // The locality fill sits above the roads and under the names (owner, 2026-10-27), so it tints everything under it evenly and each locality reads as one shade; the outline is drawn on top of everything.
       map.addSource('answer-areas', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer(
         {
@@ -223,7 +220,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
           source: 'answer-areas',
           paint: { 'fill-color': token('--map-locality-fill'), 'fill-opacity': ['interpolate', ['linear'], ['get', 'v'], 0, 0.07, 1, 0.25] },
         },
-        aboveLand,
+        underLabels,
       )
       map.addLayer(
         { id: 'answer-areas-line', type: 'line', source: 'answer-areas', paint: { 'line-color': token('--map-locality-line'), 'line-width': 1.5 } },
