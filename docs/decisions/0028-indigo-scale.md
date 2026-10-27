@@ -12,3 +12,6 @@ The agent's indigo had only two steps, `indigo-400` and `indigo-700`, and two lo
 ## Consequences
 - ✅ One named scale for every agent purple.
 - 🟨 Figma cannot reorder variables from the API, so the new steps sit after `yellow-400` in the Colors list, not next to the other indigos.
+
+## Update 2026-10-28
+The owner linked the map to existing indigos: `--map-answer-radius` is `indigo-400` (was the loose `#545EFF`) and `--map-locality-line` is `indigo-700` (was `indigo-600`). `indigo-600` is kept in the scale but not used on screen.
