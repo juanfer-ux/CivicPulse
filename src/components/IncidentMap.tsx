@@ -89,6 +89,9 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
           map.setPaintProperty(l.id, 'line-blur', ROAD_BLUR)
         }
       }
+      // Rivers and lakes (Figma map/water, map/waterway).
+      map.setPaintProperty('water', 'fill-color', token('--map-water'))
+      map.setPaintProperty('waterway', 'line-color', token('--map-waterway'))
       // Outlines and thin lines (Figma Map colors sheet): CARTO's colors replaced by our tokens, group by group. Sizes stay CARTO's.
       const lines: Record<string, string> = {
         boundary_state: '--map-boundary',
