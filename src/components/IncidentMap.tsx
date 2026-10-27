@@ -210,7 +210,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
         },
         underLabels,
       )
-      // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and shaded with the radius fill color, stronger for a higher count, with their names in neutral-100. No circles then.
+      // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (the same 25 % for every locality, so they all read as one shade), with their names in neutral-100. No circles then.
       // The locality fill sits above the roads and under the names (owner, 2026-10-27), so it tints everything under it evenly and each locality reads as one shade; the outline is drawn on top of everything.
       map.addSource('answer-areas', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer(
@@ -218,7 +218,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
           id: 'answer-areas-fill',
           type: 'fill',
           source: 'answer-areas',
-          paint: { 'fill-color': token('--map-locality-fill'), 'fill-opacity': ['interpolate', ['linear'], ['get', 'v'], 0, 0.07, 1, 0.25] },
+          paint: { 'fill-color': token('--map-locality-fill'), 'fill-opacity': 0.25 },
         },
         underLabels,
       )
@@ -321,9 +321,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
     ;(async () => {
       localities.current ??= await fetch('/bogota-localities.geojson').then((r) => r.json())
       if (stale || !localities.current) return
-      const max = Math.max(...areas.map((a) => a.value))
-      const value = new Map(areas.map((a) => [a.code, a.value]))
-      const features = localities.current.features.filter((f) => value.has(f.properties.code)).map((f) => ({ ...f, properties: { ...f.properties, v: value.get(f.properties.code)! / max } }))
+      const wanted = new Set(areas.map((a) => a.code))
+      const features = localities.current.features.filter((f) => wanted.has(f.properties.code))
       source.setData({ type: 'FeatureCollection', features } as never)
       const bounds = new maplibregl.LngLatBounds()
       const extend = (c: unknown): void => {
