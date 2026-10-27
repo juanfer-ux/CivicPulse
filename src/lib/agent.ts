@@ -393,6 +393,7 @@ async function recurring(days: number | null, category: string | null): Promise<
     'Repeated reports at a location do not prove they describe the same event: they may be separate occurrences or several reports of one obstruction.',
     'Exact matches share the same described location; approximate matches are only close in coordinates (about 200 m).',
     `Only locations with at least ${MIN_REPEATS} reports are listed (up to 30).`,
+    AREAS,
     COUNTING,
     SYNTHETIC,
   ]
@@ -406,17 +407,17 @@ async function recurring(days: number | null, category: string | null): Promise<
     }
   }
   const exact = rows.filter((r) => r.match_type === 'exact').length
-  const top = rows.slice(0, 5)
+  const top = rows.slice(0, 8) // the same locations as the bars, so the list and the map agree
   const ids = top.flatMap((r) => r.incident_ids)
   return {
     text:
       `${rows.length} locations have at least ${MIN_REPEATS} reports in ${period}: ${exact} exact ${exact === 1 ? 'match' : 'matches'} (same described location) and ${rows.length - exact} approximate ${rows.length - exact === 1 ? 'match' : 'matches'}. ` +
       `The most repeated is "${rows[0].label}" with ${rows[0].incident_count} reports between ${date(rows[0].first_at)} and ${date(rows[0].last_at)}.`,
-    bars: rows.slice(0, 8).map((r) => ({ label: r.label.replace('Synthetic ', ''), value: r.incident_count })),
+    bars: top.map((r) => ({ label: r.label.replace('Synthetic ', ''), value: r.incident_count })),
     evidence: [
       {
         tool: 'tool_recurring_locations',
-        scope: `top 5 of ${rows.length} locations (${top.map((r) => r.match_type).join(', ')})`,
+        scope: `top ${top.length} of ${rows.length} locations (${top.map((r) => r.match_type).join(', ')})`,
         period,
         incidentCount: ids.length,
         references: await references(ids),
@@ -424,6 +425,7 @@ async function recurring(days: number | null, category: string | null): Promise<
     ],
     limitations,
     highlightIds: ids,
+    areas: [...new Set(top.map((r) => r.locality_code))].map((code) => ({ code, value: 1 })),
   }
 }
 
@@ -455,6 +457,7 @@ async function candidates(category: string | null): Promise<Answer> {
     'History shows where reports concentrated. It does not predict that an incident will occur tomorrow.',
     `Only locations with at least ${MIN_REPEATS} reports in ${CANDIDATE_DAYS} days (same described location) are considered.`,
     ...(top.evening_count < 10 ? [`Small numbers: the top candidate has ${top.evening_count} evening incidents.`] : []),
+    AREAS,
     'Photos are placeholders and nothing was visually inspected. No legal violation is asserted.',
     COUNTING,
     SYNTHETIC,
@@ -480,6 +483,7 @@ async function candidates(category: string | null): Promise<Answer> {
     ],
     limitations,
     highlightIds: top.incident_ids,
+    areas: [{ code: top.locality_code, value: 1 }],
     proposal: {
       locality_code: top.locality_code,
       category: top.category,
