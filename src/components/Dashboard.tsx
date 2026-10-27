@@ -125,7 +125,7 @@ export function Dashboard({ highlightIds, areas, onClearHighlight, tab, onTab, c
       {chatMode && (
         <div className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-800) px-5 text-meta text-(--indigo-200) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-(--agent-w) desk:inset-x-auto">
           <ChatCircleDots weight="fill" className="size-5 shrink-0 text-(--indigo-300)" aria-hidden />
-          <span className="flex-1">While showing the agent's answer, the filters will narrow it down.</span>
+          <span className="flex-1">While showing the agent's answer on the map, filters will narrow it down.</span>
           <Button size="sm" variant="outline" className="h-6" onClick={onClearHighlight}>
             Clear agent results
           </Button>
