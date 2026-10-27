@@ -29,6 +29,8 @@ const METERS_TO_PX_Z0 = 1 / (78271.517 * Math.cos((4.65 * Math.PI) / 180))
 const BUILDING_BLUR = 2
 /** Opacity of the locality fill for an answer about localities (owner, 2026-10-27: 4 %). */
 const LOCALITY_FILL = 0.04
+/** Fill of the locality whose bar is under the pointer in the agent's answer (owner, 2026-10-28: 6 %). */
+const LOCALITY_FILL_FOCUS = 0.06
 /** How strong the answer radius fill gets at its edge (Figma: 5.9 % on the Fill layer). */
 const ANSWER_FILL_ALPHA = 0.06
 
@@ -365,7 +367,9 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
   // A bar of the answer under the pointer: its locality's outline turns bright.
   useEffect(() => {
     const map = mapRef.current
-    if (ready && map) map.setFilter('answer-areas-focus', ['==', ['get', 'code'], focusCode ?? -1])
+    if (!ready || !map) return
+    map.setFilter('answer-areas-focus', ['==', ['get', 'code'], focusCode ?? -1])
+    map.setPaintProperty('answer-areas-fill', 'fill-opacity', ['case', ['==', ['get', 'code'], focusCode ?? -1], LOCALITY_FILL_FOCUS, LOCALITY_FILL])
   }, [ready, focusCode, areas])
 
   // A bar of the answer clicked: zoom in on that locality.
