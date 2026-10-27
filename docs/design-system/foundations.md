@@ -46,7 +46,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 7 | `neutral-300` | `#737381` | `closed` (`ring`) | Focus ring, border of an active or pressed chip. Until 2026-10-26 it was also `input` (see [Borders](#borders)) |
 | 8 | `neutral-200` | `#A9A9B2` | `muted-foreground` | Supporting text, table headers, placeholders |
 | 9 | `neutral-100` | `#C1C1C8` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
-| 10 | `indigo-700` | `#272A68` | `ai-banner` | Conversation banner background and the answer rings on the map (since 2026-10-27; was a loose map color). Light text on it |
+| 10 | `indigo-700` | `#272A68` | `ai-banner` | Conversation banner background (since 2026-10-27; was a loose map color). The answer rings that also used it were replaced by incident radii. Light text on it |
 | 11 | `indigo-400` | `#5C59FF` | `ai-border` | Agent accents: the bars of an answer, the agent input ring, the panel resize line on hover. Changed from `#6D74E2` to `#524FFB`, then `#5C59FF`, on 2026-10-27 (Figma). 3.9 : 1 on the agent panel, so **graphics only, never text** |
 | 12 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
 | 13 | `amber-400` | `#D0AC6B` | `warning` | Warning border (map list fallback), end of the AI gradient |
@@ -75,7 +75,8 @@ Every border and divider in one place. Width is always `--border-width` (0.5 px)
 | Focus ring | `ring` = `neutral-300` | 4.0:1 on `neutral-800` | Keyboard focus (3 px ring, not a border) |
 | Section header divider | `neutral-400` | decorative | Line before the count |
 | Agent accent | `ai-border` = `indigo-400` | | Gradient ring around the agent input (`ai_gradient`) |
-| Answer rings and banner | `--ai-banner` (`#272A68`, ring at 60 % opacity) | | Incidents ringed on the map for an agent answer |
+| Answer banner | `--ai-banner` (`#272A68`) | | Banner under the map header while an answer is shown |
+| Incident radius | `--map-incident-radius` (`coral-400`, 18 % fill, 1 px ring) | | One circle per group of incidents behind an agent answer (replaced the ring on each incident, 2026-10-27) |
 | Map outlines | `--map-road-outlines`, `--map-road-outlines-minor`, `--map-building-outlines`, `--map-boundary*`, `--map-bogota-border` (off) | | See Map colors below |
 
 Figma follows this: Suggestion, Filter Chip, Input and the other controls all use `neutral-400`.
