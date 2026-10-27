@@ -271,7 +271,7 @@
 .maplibregl-map .maplibregl-ctrl.maplibregl-ctrl-attrib a { color: var(--muted-foreground); }
 .maplibregl-map .maplibregl-ctrl.maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button { filter: invert(1); opacity: 0.6; }
 
-/* Zoom buttons (Figma Map Zoom, 2026-10-27): two 29 px squares with a 0.5 px neutral-500 border, 4 px radius, neutral-500 fill and a bold neutral-100 plus and minus, 10 px, square ends (MapLibre's own icons are thin and dark, so ours replace them). Hover neutral-400, pressed neutral-600, at the zoom limit 50 %. */
+/* Zoom buttons (Figma Map Zoom, 2026-10-27): two 29 px squares with a 0.5 px neutral-500 border, 4 px radius, neutral-500 fill and a bold neutral-200 plus and minus, 10 px, square ends (MapLibre's own icons are thin and dark, so ours replace them). Hover neutral-400, pressed neutral-600, at the zoom limit 50 %. */
 .maplibregl-map .maplibregl-ctrl-group { background: var(--secondary); box-shadow: none; border: 0.5px solid var(--secondary); }
 .maplibregl-map .maplibregl-ctrl-group button + button { border-top: 0.5px solid var(--secondary); }
 .maplibregl-map .maplibregl-ctrl-group button:not(:disabled):hover { background: var(--neutral-400); }
@@ -279,8 +279,8 @@
 .maplibregl-map .maplibregl-ctrl-group button:focus-visible { box-shadow: inset 0 0 0 1.5px var(--foreground); }
 .maplibregl-map .maplibregl-ctrl-group button:disabled .maplibregl-ctrl-icon { opacity: 0.5; }
 .maplibregl-map .maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: none; background-position: center; background-repeat: no-repeat; background-size: 10px 10px; }
-.maplibregl-map .maplibregl-ctrl-group button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M5 0v10M0 5h10' stroke='%23C1C1C8' stroke-width='2'/%3E%3C/svg%3E"); }
-.maplibregl-map .maplibregl-ctrl-group button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M0 5h10' stroke='%23C1C1C8' stroke-width='2'/%3E%3C/svg%3E"); }
+.maplibregl-map .maplibregl-ctrl-group button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M5 0v10M0 5h10' stroke='%23A9A9B2' stroke-width='2'/%3E%3C/svg%3E"); }
+.maplibregl-map .maplibregl-ctrl-group button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M0 5h10' stroke='%23A9A9B2' stroke-width='2'/%3E%3C/svg%3E"); }
 
 @layer base {
   /* Letter-spacing in em on every element, not inherited from the root: an inherited em would turn into one fixed pixel value (0.16 px) for all sizes. */
