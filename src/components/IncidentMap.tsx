@@ -25,6 +25,8 @@ const ROAD_BLUR = 0.6
 const METERS_TO_PX_Z0 = 1 / (78271.517 * Math.cos((4.65 * Math.PI) / 180))
 /** Same for the building outlines, in pixels. */
 const BUILDING_BLUR = 2
+/** How strong the answer radius fill gets at its edge (Figma: 5.9 % on the Fill layer). */
+const ANSWER_FILL_ALPHA = 0.06
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
 /** The map always opens here (owner's choice, 2026-10-26). */
@@ -174,19 +176,32 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       })
       // The agent's answer (owner, 2026-10-27): one incident radius per group of incidents instead of one ring per incident. Its size is in meters, so it is a real area at every zoom. It draws under the dots and pins.
       map.addSource('answer-radius', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      // Figma Incident Radius (agent): a radial gradient fill, clear up to half the radius and strongest at the edge, and a 1 px ring. A circle layer cannot hold a gradient, so the fill is three bands (outer half of the radius) stacked as wide strokes, each a bit stronger than the one inside it.
+      const px = (f: number) => ['interpolate', ['exponential', 2], ['zoom'], 0, ['*', ['get', 'r'], METERS_TO_PX_Z0 * f], 22, ['*', ['get', 'r'], METERS_TO_PX_Z0 * 2 ** 22 * f]] as never
+      const BANDS = [[0.5, 0.667], [0.667, 0.833], [0.833, 1]] // from the radius' center, as fractions of it
+      BANDS.forEach(([from, to], i) =>
+        map.addLayer(
+          {
+            id: `answer-radius-fill-${i}`,
+            type: 'circle',
+            source: 'answer-radius',
+            paint: {
+              'circle-radius': px((from + to) / 2),
+              'circle-opacity': 0,
+              'circle-stroke-width': px(to - from),
+              'circle-stroke-color': token('--map-answer-radius'),
+              'circle-stroke-opacity': (ANSWER_FILL_ALPHA * (i + 1)) / BANDS.length,
+            },
+          },
+          'incidents',
+        ),
+      )
       map.addLayer(
         {
-          id: 'answer-radius',
+          id: 'answer-radius-ring',
           type: 'circle',
           source: 'answer-radius',
-          paint: {
-            // meters to pixels: a pixel is 78271.5 m x cos(lat) / 2^zoom wide (512 px tiles); zoom may only drive a top-level interpolate
-            'circle-radius': ['interpolate', ['exponential', 2], ['zoom'], 0, ['*', ['get', 'r'], METERS_TO_PX_Z0], 22, ['*', ['get', 'r'], METERS_TO_PX_Z0 * 2 ** 22]],
-            'circle-color': token('--map-answer-radius'),
-            'circle-opacity': 0.06, // Figma: indigo-400 fill, 6 % shown
-            'circle-stroke-color': token('--map-answer-radius-ring'),
-            'circle-stroke-width': 1,
-          },
+          paint: { 'circle-radius': px(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': token('--map-answer-radius-ring') },
         },
         'incidents',
       )
