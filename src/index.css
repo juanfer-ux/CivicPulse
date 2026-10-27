@@ -191,7 +191,7 @@
   --foreground: var(--neutral-100);
   --ai: var(--neutral-800);
   --ai-border: var(--indigo-400);
-  --answer-banner-h: 38px; /* conversation banner height (Figma Answer Banner, owner 2026-10-26); the filters and the stats card move down by this much while it shows */
+  --answer-banner-h: 44px; /* conversation banner height (Figma Answer Banner, owner 2026-10-28; was 38); the filters and the stats card move down by this much while it shows */
   --ai-banner: var(--indigo-700); /* conversation banner background and the answer rings on the map, light text on it. Figma indigo-700 (map/banner is its alias) */
   --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
   --warning: var(--amber-400);
