@@ -177,6 +177,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
       // The agent's answer (owner, 2026-10-27): one incident radius per group of incidents instead of one ring per incident. Its size is in meters, so it is a real area at every zoom. It draws under the dots and pins.
       map.addSource('answer-radius', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       // Figma Incident Radius (agent): a radial gradient fill, clear up to half the radius and strongest at the edge, and a 1 px ring. A circle layer cannot hold a gradient, so the fill is three bands (outer half of the radius) stacked as wide strokes, each a bit stronger than the one inside it.
+      // Under the basemap's place and street names (owner, 2026-10-27), so the names stay readable inside a radius; still above roads, land and buildings.
+      const underLabels = map.getStyle().layers.find((l) => l.type === 'symbol')?.id
       const px = (f: number) => ['interpolate', ['exponential', 2], ['zoom'], 0, ['*', ['get', 'r'], METERS_TO_PX_Z0 * f], 22, ['*', ['get', 'r'], METERS_TO_PX_Z0 * 2 ** 22 * f]] as never
       const BANDS = [[0.5, 0.667], [0.667, 0.833], [0.833, 1]] // from the radius' center, as fractions of it
       BANDS.forEach(([from, to], i) =>
@@ -193,7 +195,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
               'circle-stroke-opacity': (ANSWER_FILL_ALPHA * (i + 1)) / BANDS.length,
             },
           },
-          'incidents',
+          underLabels,
         ),
       )
       map.addLayer(
@@ -203,7 +205,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           source: 'answer-radius',
           paint: { 'circle-radius': px(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': token('--map-answer-radius-ring') },
         },
-        'incidents',
+        underLabels,
       )
       map.addLayer({
         id: 'incident-selected',
