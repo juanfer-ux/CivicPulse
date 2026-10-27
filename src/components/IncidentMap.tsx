@@ -26,8 +26,8 @@ const ROAD_BLUR = 0.6
 const METERS_TO_PX_Z0 = 1 / (78271.517 * Math.cos((4.65 * Math.PI) / 180))
 /** Same for the building outlines, in pixels. */
 const BUILDING_BLUR = 2
-/** Opacity of the locality fill for an answer about localities (owner, 2026-10-27: 2 %). */
-const LOCALITY_FILL = 0.02
+/** Opacity of the locality fill for an answer about localities (owner, 2026-10-27: 4 %). */
+const LOCALITY_FILL = 0.04
 /** How strong the answer radius fill gets at its edge (Figma: 5.9 % on the Fill layer). */
 const ANSWER_FILL_ALPHA = 0.06
 
@@ -212,7 +212,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
         },
         underLabels,
       )
-      // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same 2 % for every locality), with their names in neutral-100. No circles then.
+      // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same 4 % for every locality), with their names in neutral-100. No circles then.
       // The locality fill sits above the roads and under the names (owner, 2026-10-27), so it tints everything under it evenly and each locality reads as one shade; the outline is drawn on top of everything.
       map.addSource('answer-areas', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer(
@@ -225,7 +225,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
         underLabels,
       )
       map.addLayer(
-        { id: 'answer-areas-line', type: 'line', source: 'answer-areas', paint: { 'line-color': token('--map-locality-line'), 'line-width': 1.5 } },
+        { id: 'answer-areas-line', type: 'line', source: 'answer-areas', paint: { 'line-color': token('--map-locality-line'), 'line-width': 1.4 } },
         'incidents', // the outline is on top of the whole basemap (owner, 2026-10-27), so roads and water do not cut it; only the names and the incidents are above it
       )
       map.addLayer(
