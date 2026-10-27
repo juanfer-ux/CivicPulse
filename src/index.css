@@ -152,7 +152,7 @@
   --radius: 0.5rem;
   --section-header-h: 70px; /* Section header height (Figma Section Header, the Map and Users headers); the map and filters start below it */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
-  /* The whole palette is these 17 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
+  /* The whole palette is these 24 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
   --neutral-900: #0E0E10;
   --neutral-800: #111113;
@@ -164,8 +164,15 @@
   --neutral-200: #A9A9B2; /* secondary text */
   --neutral-100: #C1C1C8;
   /* Colored */
+  --indigo-900: #10112A;
+  --indigo-800: #191B44;
   --indigo-700: #272A68;
+  --indigo-600: #343193;
+  --indigo-500: #4C49C1;
   --indigo-400: #5C59FF;
+  --indigo-300: #9593FF;
+  --indigo-200: #C1C0FF;
+  --indigo-100: #E7E6FF;
   --red-400: #EE8688;
   --amber-400: #D0AC6B;
   --coral-400: #E58C7D;
@@ -173,7 +180,7 @@
   --blue-400: #495C8B;
   --yellow-400: #FFEE6C;
 
-  /* Usage names the components use, each pointing at one of the 17 colors. */
+  /* Usage names the components use, each pointing at one of the 24 colors. */
   --background: var(--neutral-700);
   --card: var(--neutral-600);
   --sidebar: var(--neutral-900);
@@ -197,13 +204,13 @@
   --map-rejected: var(--red-400);
   --map-dot-outline: var(--neutral-700);
   --map-answer-ring: var(--ai-banner);
-  --map-answer-radius: #545EFF; /* map only, outside the 17 (owner, 2026-10-27): the edge color of the agent's answer radius fill (radial gradient: clear up to half the radius, #545EFF at the edge). Figma map/answer-radius */
-  --map-answer-radius-ring: #4C49C1; /* map only, outside the 17 (owner, 2026-10-27): the 1 px ring of the agent's answer radius. Figma map/answer-radius-ring */
+  --map-answer-radius: #545EFF; /* map only, outside the palette (owner, 2026-10-27): the edge color of the agent's answer radius fill (radial gradient: clear up to half the radius, #545EFF at the edge). Figma map/answer-radius */
+  --map-answer-radius-ring: var(--indigo-500); /* the 1 px ring of the agent's answer radius (circle). Figma map/answer-radius-ring */
   --map-locality-fill: var(--map-answer-radius); /* the localities an agent answer outlines: fill, 4 % for every locality (LOCALITY_FILL in IncidentMap.tsx). Figma map/locality-fill */
-  --map-locality-line: #343193; /* map only, outside the 17 (owner, 2026-10-27): the 1.4 px outline of the localities an agent answer outlines (its own color, no longer the radius ring's). Figma map/locality-line */
+  --map-locality-line: var(--indigo-600); /* the 1.4 px outline of the localities an agent answer outlines. Figma map/locality-line */
   --map-selected-ring: var(--neutral-100);
-  --map-roads: #363644; /* map only, outside the 17 (owner, 2026-10-26): minor and secondary streets; CARTO's is #414758. Figma map/roads */
-  --map-buildings: #3F4550; /* map only, outside the 17 (owner, 2026-10-26): building tops, they fade in from zoom 13 to 16. CARTO's is #393939. Figma map/buildings */
+  --map-roads: #363644; /* map only, outside the palette (owner, 2026-10-26): minor and secondary streets; CARTO's is #414758. Figma map/roads */
+  --map-buildings: #3F4550; /* map only, outside the palette (owner, 2026-10-26): building tops, they fade in from zoom 13 to 16. CARTO's is #393939. Figma map/buildings */
   --map-road-outlines-minor: #1A1A1A; /* map only (owner, 2026-10-26): outline under tunnels, minor roads and bridges; CARTO's own. Figma map/road-outlines-minor */
   --map-building-outlines: #0E0E0E; /* map only: 1 px outline of each building; CARTO's own. Figma map/building-outlines */
   --map-label-halo: #222222; /* map only: 1 px outline around place and street names; CARTO uses #222, #111 and #181818, now one color. Figma map/label-halo */
@@ -212,9 +219,9 @@
   --map-boundary-country: #2C353C; /* map only: country border glow; CARTO's own. Figma map/boundary-country */
   --map-rail: #1A1A1A; /* map only: railways; CARTO's own. Figma map/rail */
   --map-airport: #111111; /* map only: runways and taxiways; CARTO's own. Figma map/airport */
-  --map-road-outlines: #363644; /* map only, outside the 17 (owner, 2026-10-26): the thin outline under roads; CARTO's is #232323. Figma map/road-outlines */
+  --map-road-outlines: #363644; /* map only, outside the palette (owner, 2026-10-26): the thin outline under roads; CARTO's is #232323. Figma map/road-outlines */
   --map-main-roads: #2B2B36; /* map only: primary roads; CARTO's is #535666. Figma map/main-roads */
-  --map-boundary: #32323E; /* map only, outside the 17 (owner, 2026-10-26): state borders; CARTO's is #676772. Figma map/boundary */
+  --map-boundary: #32323E; /* map only, outside the palette (owner, 2026-10-26): state borders; CARTO's is #676772. Figma map/boundary */
   --map-water: #2C353C; /* map only (owner, 2026-10-27): rivers and lakes; CARTO's own color, now a token. Figma map/water */
   --map-waterway: #21303B; /* map only (owner, 2026-10-27): thin river lines; CARTO's is #3F5A6D. Figma map/waterway */
   --map-bogota-border: var(--neutral-200); /* map only (owner, 2026-10-26): the outline of the city of Bogotá, from OpenStreetMap. Not in Figma yet */
@@ -234,7 +241,7 @@
   --border: var(--secondary);
   --ring: var(--closed);
   --inset: var(--sidebar);
-  /* Not a new color: built from three of the 17. Same stops as the Figma style ai_gradient (top to bottom). */
+  /* Not a new color: built from three of the palette. Same stops as the Figma style ai_gradient (top to bottom). */
   --ai-gradient: linear-gradient(180deg, var(--ai-border) 10%, var(--incident) 64%, var(--warning) 105%);
 }
 
