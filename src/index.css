@@ -197,7 +197,7 @@
   --map-rejected: var(--red-400);
   --map-dot-outline: var(--neutral-700);
   --map-answer-ring: var(--ai-banner);
-  --map-answer-radius: var(--indigo-400); /* the agent's answer: one radius per wide group of incidents (400 m or more) (Figma Incident Radius, indigo version: 18 % fill and a 1 px ring); the coral Incident Radius is for incident areas (owner, 2026-10-27) */
+  --map-answer-radius: var(--indigo-400); /* the agent's answer: one radius per wide group of incidents (320 m or more from its center) (Figma Incident Radius, indigo version: 18 % fill and a 1 px ring); the coral Incident Radius is for incident areas (owner, 2026-10-27) */
   --map-answer-radius-ring: #312F92; /* map only, outside the 17 (owner, 2026-10-27): the 1 px ring of the agent's answer radius; the fill is --map-answer-radius at 6 %. Figma map/answer-radius-ring */
   --map-selected-ring: var(--neutral-100);
   --map-roads: #363644; /* map only, outside the 17 (owner, 2026-10-26): minor and secondary streets; CARTO's is #414758. Figma map/roads */
