@@ -55,5 +55,9 @@ function Period({ bars }: { bars: Answer['bars'] }) {
 }
 
 export default function AnswerChart({ kind, bars }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars'] }) {
-  return kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : <Ranking bars={bars} />
+  return (
+    <div className="rounded-[6px] bg-(--neutral-700) p-2.5">
+      {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : <Ranking bars={bars} />}
+    </div>
+  )
 }
