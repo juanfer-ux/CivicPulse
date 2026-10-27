@@ -4,7 +4,7 @@
 > 🔐 What each role may see: [roles-and-permissions.md](roles-and-permissions.md). Tables: [data-model.md](data-model.md).
 
 ## 🎯 What it is
-A question box. An operator asks about the incidents they are allowed to see; the agent answers with numbers, a small chart, the evidence behind them, and its limitations, and rings the relevant incidents on the map and, while the answer is shown, hides the others and limits the header count, the summary card and the status counts to the answer's incidents. **The agent recommends. The human decides.**
+A question box. An operator asks about the incidents they are allowed to see; the agent answers with numbers, a small chart, the evidence behind them, and its limitations, and draws one incident radius per group of the relevant incidents on the map (groups: incidents within 1.2 km of each other; the circle covers the whole group, in meters, so its size follows the group) and, while the answer is shown, hides the others and limits the header count, the summary card and the status counts to the answer's incidents. **The agent recommends. The human decides.**
 
 ## ⚙️ How it works today (mock mode)
 ```mermaid
@@ -35,7 +35,7 @@ Say "illegal dumping" or "parking" in the question to limit it to that category.
 Unsupported questions get an honest "I cannot answer that yet". The agent does not guess.
 
 ## 📦 What every answer contains
-`text` · `bars` (small chart) · `evidence` (tool, scope, period, incident count, example references) · `limitations` (always) · `highlightIds` (incidents ringed on the map) · optional `proposal` (a recommendation draft, investigation E only).
+`text` · `bars` (small chart) · `evidence` (tool, scope, period, incident count, example references) · `limitations` (always) · `highlightIds` (incidents behind the answer, shown inside incident radii on the map) · optional `proposal` (a recommendation draft, investigation E only).
 
 ## 🛡️ Rules (never break these)
 1. 🔢 Never invent a statistic. Numbers, comparisons, percentages and counts are **calculated by SQL or deterministic code**, not by a language model.
