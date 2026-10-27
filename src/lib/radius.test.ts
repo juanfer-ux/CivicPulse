@@ -24,6 +24,20 @@ describe('radiusGroups', () => {
     expect(radiusGroups(wide)).toHaveLength(1)
   })
 
+  it('a small group far from a wide one is absorbed: every point ends up inside a circle', () => {
+    const wide = [{ lng: -74.08, lat: 4.65 }, { lng: -74.0745, lat: 4.65 }, { lng: -74.077, lat: 4.652 }]
+    const lone = { lng: -74.04, lat: 4.65 } // about 4.4 km east, no link to the wide group
+    const circles = radiusGroups([...wide, lone])
+    expect(circles).toHaveLength(1)
+    const mLng = 111_320 * Math.cos((4.65 * Math.PI) / 180)
+    const [c] = circles
+    for (const p of [...wide, lone]) expect(Math.hypot((p.lng - c.lng) * mLng, (p.lat - c.lat) * 110_574)).toBeLessThanOrEqual(c.radius)
+  })
+
+  it('no circles at all when there is no wide group', () => {
+    expect(radiusGroups([{ lng: -74.08, lat: 4.65 }, { lng: -74.04, lat: 4.65 }])).toEqual([])
+  })
+
   it('separate circles for far apart groups, and a bigger group gets a bigger circle', () => {
     const near = [{ lng: -74.1, lat: 4.6 }]
     const spread = [

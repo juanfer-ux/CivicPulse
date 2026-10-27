@@ -4,7 +4,7 @@ import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { PIN_RISE, addBadges, iconCategory } from '@/lib/markerIcons'
-import { radiusGroups } from '@/lib/radius'
+import { circleBounds, radiusGroups } from '@/lib/radius'
 import { GROUPS, groupOf, label, typeOf, type Incident } from '@/lib/incidents'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.
@@ -183,8 +183,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
             // meters to pixels: a pixel is 78271.5 m x cos(lat) / 2^zoom wide (512 px tiles); zoom may only drive a top-level interpolate
             'circle-radius': ['interpolate', ['exponential', 2], ['zoom'], 0, ['*', ['get', 'r'], METERS_TO_PX_Z0], 22, ['*', ['get', 'r'], METERS_TO_PX_Z0 * 2 ** 22]],
             'circle-color': token('--map-answer-radius'),
-            'circle-opacity': 0.18,
-            'circle-stroke-color': token('--map-answer-radius'),
+            'circle-opacity': 0.06, // Figma: indigo-400 fill, 6 % shown
+            'circle-stroke-color': token('--map-answer-radius-ring'),
             'circle-stroke-width': 1,
           },
         },
@@ -248,6 +248,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
     if (!pts.length) return
     const bounds = new maplibregl.LngLatBounds([pts[0].lng, pts[0].lat], [pts[0].lng, pts[0].lat])
     for (const i of pts) bounds.extend([i.lng, i.lat])
+    for (const c of radiusGroups(pts)) for (const corner of circleBounds(c)) bounds.extend(corner) // the circles too, not only their incidents
     const wide = map.getContainer().clientWidth > 700
     map.fitBounds(bounds, { padding: { top: wide ? 120 : 100, bottom: wide ? 40 : 60, left: 40, right: wide ? 320 : 40 }, maxZoom: 15, duration: 700 })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the answer changes, not when filters change the list
