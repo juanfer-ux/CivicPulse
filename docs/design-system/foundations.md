@@ -47,7 +47,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 8 | `neutral-200` | `#A9A9B2` | `muted-foreground` | Supporting text, table headers, placeholders |
 | 9 | `neutral-100` | `#C1C1C8` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
 | 10 | `indigo-700` | `#272A68` | `ai-banner` | Conversation banner background and the answer rings on the map (since 2026-10-27; was a loose map color). Light text on it |
-| 11 | `indigo-400` | `#524FFB` | `ai-border` | Agent accents: the bars of an answer, the agent input ring, the panel resize line on hover. Changed from `#6D74E2` on 2026-10-27 (Figma). 3.5 : 1 on the agent panel, so **graphics only, never text** |
+| 11 | `indigo-400` | `#5C59FF` | `ai-border` | Agent accents: the bars of an answer, the agent input ring, the panel resize line on hover. Changed from `#6D74E2` to `#524FFB`, then `#5C59FF`, on 2026-10-27 (Figma). 3.9 : 1 on the agent panel, so **graphics only, never text** |
 | 12 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
 | 13 | `amber-400` | `#D0AC6B` | `warning` | Warning border (map list fallback), end of the AI gradient |
 | 14 | `coral-400` | `#E58C7D` | `incident` | Invalid fields, **all error text** |
