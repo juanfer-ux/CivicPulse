@@ -76,6 +76,7 @@ Every border and divider in one place. Width is always `--border-width` (0.5 px)
 | Section header divider | `neutral-400` | decorative | Line before the count |
 | Agent accent | `ai-border` = `indigo-400` | | Gradient ring around the agent input (`ai_gradient`) |
 | Answer banner | `--ai-banner` (`#272A68`) | | Banner under the map header while an answer is shown |
+| Locality outline (agent) | fill `--map-answer-radius` (`#545EFF`) at 4 % to 14 % by incident count, 1.5 px line in `--map-answer-radius-ring` (`#4C49C1`), names in `neutral-100` with a `neutral-900` halo | | An answer about localities outlines them instead of drawing circles; boundaries from `public/bogota-localities.geojson` (OpenStreetMap, ODbL, 20 localidades, 174 KB, downloaded 2026-10-27, simplified) |
 | Incident radius (agent) | fill: radial gradient, clear up to half the radius and `--map-answer-radius` (`#545EFF`) at the edge, shown at 6 %; ring: 1 px `--map-answer-radius-ring` (`#4C49C1`). Both map only, outside the 17 | | One circle per wide group (reaching 320 m or more from its center) of incidents behind an agent answer; tight hotspots show only pins (replaced the ring on each incident, 2026-10-27). The coral Incident Radius stays for incident areas |
 | Map outlines | `--map-road-outlines`, `--map-road-outlines-minor`, `--map-building-outlines`, `--map-boundary*`, `--map-bogota-border` (off) | | See Map colors below |
 

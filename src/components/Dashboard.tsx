@@ -17,6 +17,7 @@ import {
   type Incident,
   type Locality,
 } from '@/lib/incidents'
+import type { Area } from '@/lib/agent'
 import { useAuth } from '@/lib/auth'
 import { shortName } from '@/lib/utils'
 
@@ -28,6 +29,8 @@ export type Tab = 'explore' | 'ask'
 
 interface Props {
   highlightIds: string[]
+  /** Localities to outline for an answer about localities. */
+  areas: Area[]
   onClearHighlight: () => void
   /** Active panel on mobile (on desktop everything is visible). */
   tab: Tab
@@ -35,7 +38,7 @@ interface Props {
   children?: ReactNode
 }
 
-export function Dashboard({ highlightIds, onClearHighlight, tab, onTab, children }: Props) {
+export function Dashboard({ highlightIds, areas, onClearHighlight, tab, onTab, children }: Props) {
   const { profile } = useAuth()
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -104,6 +107,7 @@ export function Dashboard({ highlightIds, onClearHighlight, tab, onTab, children
         incidents={filtered}
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
+        areas={areas}
         onSelect={select}
       />
 

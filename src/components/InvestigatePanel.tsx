@@ -3,7 +3,7 @@ import { ArrowUp, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { SUGGESTIONS, answer, type Answer } from '@/lib/agent'
+import { SUGGESTIONS, answer, type Answer, type Area } from '@/lib/agent'
 import { fetchLocalities } from '@/lib/incidents'
 
 // The charts (Recharts) load with the first answer, not with the app; the plain bars show meanwhile.
@@ -11,7 +11,7 @@ const AnswerChart = lazy(() => import('@/components/AnswerCharts'))
 
 type Turn = { question: string; result?: Answer; error?: string }
 
-export function InvestigatePanel({ onHighlight, highlightIds }: { onHighlight: (ids: string[]) => void; highlightIds: string[] }) {
+export function InvestigatePanel({ onHighlight, highlightIds }: { onHighlight: (ids: string[], areas?: Area[]) => void; highlightIds: string[] }) {
   const [turns, setTurns] = useState<Turn[]>([])
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
@@ -29,7 +29,7 @@ export function InvestigatePanel({ onHighlight, highlightIds }: { onHighlight: (
     let turn: Turn
     try {
       const result = await answer(q, await fetchLocalities())
-      onHighlight(result.highlightIds)
+      onHighlight(result.highlightIds, result.areas)
       turn = { question: q, result }
     } catch (e) {
       turn = { question: q, error: e instanceof Error ? e.message : 'Something went wrong' }
@@ -71,7 +71,7 @@ export function InvestigatePanel({ onHighlight, highlightIds }: { onHighlight: (
               <Question text={t.question} />
               {!t.result && !t.error && <p className="text-muted-foreground">Querying…</p>}
               {t.error && <p className="text-incident">{t.error}</p>}
-              {t.result && <AnswerView result={t.result} shown={t.result.highlightIds === highlightIds} onToggle={(on) => onHighlight(on ? t.result!.highlightIds : [])} />}
+              {t.result && <AnswerView result={t.result} shown={t.result.highlightIds === highlightIds} onToggle={(on) => onHighlight(on ? t.result!.highlightIds : [], on ? t.result!.areas : [])} />}
             </div>
           ))}
           <div ref={end} />

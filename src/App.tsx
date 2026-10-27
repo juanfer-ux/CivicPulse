@@ -1,5 +1,6 @@
 import { useCallback, useState, type CSSProperties } from 'react'
 import { Dashboard, type Tab } from '@/components/Dashboard'
+import type { Area } from '@/lib/agent'
 import { InvestigatePanel } from '@/components/InvestigatePanel'
 import { UsersAdmin } from '@/components/UsersAdmin'
 import { Sidebar, type View } from '@/components/Sidebar'
@@ -32,6 +33,11 @@ function useAgentWidth() {
 export default function App() {
   const { can } = useAuth()
   const [highlightIds, setHighlightIds] = useState<string[]>([])
+  const [areas, setAreas] = useState<Area[]>([])
+  const show = (ids: string[], a: Area[] = []) => {
+    setHighlightIds(ids)
+    setAreas(a)
+  }
   const [tab, setTab] = useState<Tab>('explore')
   const [view, setView] = useState<View>('map')
   const showUsers = view === 'users' && can('manage_users')
@@ -43,10 +49,10 @@ export default function App() {
       <main className="relative min-w-0 flex-1" style={{ '--agent-w': agentWidthCss(agentWidth) } as CSSProperties}>
         {/* Kept mounted while the Users page is open, so the map and the agent's answer are still there on return. */}
         <div className={showUsers ? 'hidden' : 'contents'}>
-          <Dashboard highlightIds={highlightIds} onClearHighlight={() => setHighlightIds([])} tab={tab} onTab={setTab}>
+          <Dashboard highlightIds={highlightIds} areas={areas} onClearHighlight={() => show([])} tab={tab} onTab={setTab}>
             {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
-              <InvestigatePanel onHighlight={setHighlightIds} highlightIds={highlightIds} />
+              <InvestigatePanel onHighlight={show} highlightIds={highlightIds} />
             </div>
           </Dashboard>
         </div>
