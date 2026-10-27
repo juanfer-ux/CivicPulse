@@ -239,7 +239,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         'incidents', // the outline is on top of the whole basemap (owner, 2026-10-27), so roads and water do not cut it; only the names and the incidents are above it
       )
       map.addLayer(
-        { id: 'answer-areas-focus', type: 'line', source: 'answer-areas', filter: ['==', ['get', 'code'], -1], paint: { 'line-color': token('--map-locality-line-focus'), 'line-width': 3 } },
+        { id: 'answer-areas-focus', type: 'line', source: 'answer-areas', filter: ['==', ['get', 'code'], -1], paint: { 'line-color': token('--map-locality-line-focus'), 'line-width': 1.4 } },
         'incidents',
       )
       map.addLayer(
