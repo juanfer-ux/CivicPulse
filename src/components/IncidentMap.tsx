@@ -46,10 +46,14 @@ interface Props {
   highlightIds: string[]
   /** Localities to outline and shade (an answer about localities); they replace the circles. */
   areas: Area[]
+  /** Locality whose outline lights up (a bar of the answer is under the pointer). */
+  focusCode?: number | null
+  /** Locality to zoom to (a bar was clicked); n changes on every click. */
+  zoomTo?: { code: number; n: number } | null
   onSelect: (id: string | null) => void
 }
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSelect }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
@@ -235,6 +239,10 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
         'incidents', // the outline is on top of the whole basemap (owner, 2026-10-27), so roads and water do not cut it; only the names and the incidents are above it
       )
       map.addLayer(
+        { id: 'answer-areas-focus', type: 'line', source: 'answer-areas', filter: ['==', ['get', 'code'], -1], paint: { 'line-color': token('--map-locality-line-focus'), 'line-width': 3 } },
+        'incidents',
+      )
+      map.addLayer(
         {
           id: 'answer-areas-name',
           type: 'symbol',
@@ -353,6 +361,27 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
       stale = true
     }
   }, [ready, areas])
+
+  // A bar of the answer under the pointer: its locality's outline turns bright.
+  useEffect(() => {
+    const map = mapRef.current
+    if (ready && map) map.setFilter('answer-areas-focus', ['==', ['get', 'code'], focusCode ?? -1])
+  }, [ready, focusCode, areas])
+
+  // A bar of the answer clicked: zoom in on that locality.
+  useEffect(() => {
+    const map = mapRef.current
+    const f = zoomTo && localities.current?.features.find((x) => x.properties.code === zoomTo.code)
+    if (!ready || !map || !f) return
+    const bounds = new maplibregl.LngLatBounds()
+    const extend = (c: unknown): void => {
+      if (Array.isArray(c) && typeof c[0] === 'number') bounds.extend(c as [number, number])
+      else (c as unknown[]).forEach(extend)
+    }
+    extend(f.geometry.coordinates)
+    const wide = map.getContainer().clientWidth > 700
+    map.fitBounds(bounds, { padding: { top: wide ? 120 : 100, bottom: wide ? 40 : 60, left: 40, right: wide ? 320 : 40 }, maxZoom: 14, duration: 700 })
+  }, [ready, zoomTo])
 
   // One radius per group of incidents behind the agent's answer.
   useEffect(() => {

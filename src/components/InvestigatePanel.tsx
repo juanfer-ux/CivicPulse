@@ -12,7 +12,7 @@ const AnswerChart = lazy(loadChart)
 
 type Turn = { question: string; result?: Answer; error?: string }
 
-export function InvestigatePanel({ onHighlight, highlightIds }: { onHighlight: (ids: string[], areas?: Area[]) => void; highlightIds: string[] }) {
+export function InvestigatePanel({ onHighlight, highlightIds, onFocusArea, onZoomArea }: { onHighlight: (ids: string[], areas?: Area[]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
   const [turns, setTurns] = useState<Turn[]>([])
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
@@ -74,7 +74,7 @@ export function InvestigatePanel({ onHighlight, highlightIds }: { onHighlight: (
               <Question text={t.question} />
               {!t.result && !t.error && <p className="text-muted-foreground">Querying…</p>}
               {t.error && <p className="text-incident">{t.error}</p>}
-              {t.result && <AnswerView result={t.result} shown={t.result.highlightIds === highlightIds} onToggle={(on) => onHighlight(on ? t.result!.highlightIds : [], on ? t.result!.areas : [])} />}
+              {t.result && <AnswerView result={t.result} shown={t.result.highlightIds === highlightIds} onFocusArea={onFocusArea} onZoomArea={onZoomArea} onToggle={(on) => onHighlight(on ? t.result!.highlightIds : [], on ? t.result!.areas : [])} />}
             </div>
           ))}
           <div ref={end} />
@@ -114,12 +114,18 @@ function Feedback() {
 /** `shown`: this answer is the one ringed on the map. The button clears it, or brings it back after clearing (or from an older answer). */
 
 /** The answer's small bar list: a label, a bar sized by value, and the number. */
-export function Bars({ bars }: { bars: Answer['bars'] }) {
+export function Bars({ bars, onFocus, onPick }: { bars: Answer['bars']; onFocus?: (code: number | null) => void; onPick?: (code: number) => void }) {
   const max = Math.max(1, ...bars.map((b) => b.value))
   return (
     <ul className="flex flex-col gap-1">
       {bars.map((b) => (
-        <li key={b.label} className="grid grid-cols-[7.5rem_1fr_2rem] items-center gap-2 text-meta">
+        <li
+          key={b.label}
+          className={`grid grid-cols-[7.5rem_1fr_2rem] items-center gap-2 text-meta ${b.code && onPick ? 'cursor-pointer' : ''}`}
+          onMouseEnter={() => b.code && onFocus?.(b.code)}
+          onMouseLeave={() => onFocus?.(null)}
+          onClick={() => b.code && onPick?.(b.code)}
+        >
           <span className="truncate text-muted-foreground">{b.label}</span>
           <span className="h-2 rounded-full bg-muted">
             <span className="block h-2 rounded-full bg-ai-border" style={{ width: `${(b.value / max) * 100}%` }} />
@@ -131,17 +137,19 @@ export function Bars({ bars }: { bars: Answer['bars'] }) {
   )
 }
 
-export function AnswerView({ result, shown, onToggle }: { result: Answer; shown: boolean; onToggle: (on: boolean) => void }) {
+export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea }: { result: Answer; shown: boolean; onToggle: (on: boolean) => void; onFocusArea?: (code: number | null) => void; onZoomArea?: (code: number) => void }) {
+  // Only the answer that is on the map can point at it.
+  const link = shown && result.areas?.length ? { onFocus: onFocusArea, onPick: onZoomArea } : {}
   return (
     <div className="flex flex-col gap-3">
       <p className="text-muted-foreground">{result.text}</p>
       {result.bars.length > 0 &&
         (result.chart ? (
           <Suspense fallback={null}>
-            <AnswerChart kind={result.chart} bars={result.bars} />
+            <AnswerChart kind={result.chart} bars={result.bars} {...link} />
           </Suspense>
         ) : (
-          <Bars bars={result.bars} />
+          <Bars bars={result.bars} {...link} />
         ))}
       {result.evidence.map((e) => (
         <details key={e.tool + e.scope} className="text-meta text-muted-foreground">

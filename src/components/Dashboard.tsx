@@ -31,6 +31,8 @@ interface Props {
   highlightIds: string[]
   /** Localities to outline for an answer about localities. */
   areas: Area[]
+  focusCode: number | null
+  zoomTo: { code: number; n: number } | null
   onClearHighlight: () => void
   /** Active panel on mobile (on desktop everything is visible). */
   tab: Tab
@@ -38,7 +40,7 @@ interface Props {
   children?: ReactNode
 }
 
-export function Dashboard({ highlightIds, areas, onClearHighlight, tab, onTab, children }: Props) {
+export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighlight, tab, onTab, children }: Props) {
   const { profile } = useAuth()
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -108,6 +110,8 @@ export function Dashboard({ highlightIds, areas, onClearHighlight, tab, onTab, c
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
         areas={areas}
+        focusCode={focusCode}
+        zoomTo={zoomTo}
         onSelect={select}
       />
 

@@ -13,6 +13,8 @@ import { timeBlockLabel } from '@/lib/utils'
 export interface Bar {
   label: string
   value: number
+  /** Locality code when the bar is a locality: hovering it lights its outline on the map and clicking it zooms there. */
+  code?: number
 }
 export interface Evidence {
   tool: string
@@ -235,7 +237,7 @@ async function ranking(days: number | null, category: string | null): Promise<An
 
   return {
     text: `${lead}, across ${rows.length} localities, ${period}.${next ? ` Next: ${next}.` : ''}`,
-    bars: shown.map((r) => ({ label: r.locality_name, value: r.incident_count })),
+    bars: shown.map((r) => ({ label: r.locality_name, value: r.incident_count, code: r.locality_code })),
     chart: 'ranking',
     areas: shown.map((r) => ({ code: r.locality_code, value: r.incident_count })),
     evidence: [

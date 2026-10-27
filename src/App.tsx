@@ -38,6 +38,8 @@ export default function App() {
     setHighlightIds(ids)
     setAreas(a)
   }
+  const [focusCode, setFocusCode] = useState<number | null>(null) // a bar of the answer is under the pointer: its locality lights up on the map
+  const [zoomTo, setZoomTo] = useState<{ code: number; n: number } | null>(null) // a bar was clicked: the map zooms to that locality (n makes a second click on the same bar count)
   const [tab, setTab] = useState<Tab>('explore')
   const [view, setView] = useState<View>('map')
   const showUsers = view === 'users' && can('manage_users')
@@ -49,10 +51,10 @@ export default function App() {
       <main className="relative min-w-0 flex-1" style={{ '--agent-w': agentWidthCss(agentWidth) } as CSSProperties}>
         {/* Kept mounted while the Users page is open, so the map and the agent's answer are still there on return. */}
         <div className={showUsers ? 'hidden' : 'contents'}>
-          <Dashboard highlightIds={highlightIds} areas={areas} onClearHighlight={() => show([])} tab={tab} onTab={setTab}>
+          <Dashboard highlightIds={highlightIds} areas={areas} focusCode={focusCode} zoomTo={zoomTo} onClearHighlight={() => show([])} tab={tab} onTab={setTab}>
             {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
-              <InvestigatePanel onHighlight={show} highlightIds={highlightIds} />
+              <InvestigatePanel onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={(code) => setZoomTo((z) => ({ code, n: (z?.n ?? 0) + 1 }))} />
             </div>
           </Dashboard>
         </div>

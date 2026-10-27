@@ -12,23 +12,37 @@ const tooltip = <ChartTooltipContent hideLabel />
 const summary = (title: string, bars: Answer['bars']) => `${title}: ${bars.map((b) => `${b.label} ${b.value}`).join(', ')}`
 
 /** Labels start at the left edge of the box (Recharts right-aligns them against the bars by default). */
-function LeftTick({ y = 0, payload }: { y?: number; payload?: { value: string } }) {
+type Link = { onFocus?: (code: number | null) => void; onPick?: (code: number) => void }
+
+function LeftTick({ y = 0, payload, bars, onFocus, onPick }: { y?: number; payload?: { value: string }; bars: Answer['bars'] } & Link) {
+  const code = bars.find((b) => b.label === payload?.value)?.code
   return (
-    <text x={0} y={y} dy={4} textAnchor="start" fill="var(--muted-foreground)" fontSize={12}>
+    <text x={0} y={y} dy={4} textAnchor="start" fill="var(--muted-foreground)" fontSize={12} className={code && onPick ? 'cursor-pointer' : undefined} onMouseEnter={() => code && onFocus?.(code)} onMouseLeave={() => onFocus?.(null)} onClick={() => code && onPick?.(code)}>
       {payload?.value}
     </text>
   )
 }
 
-function Ranking({ bars }: { bars: Answer['bars'] }) {
+function Ranking({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
   const labelWidth = Math.min(150, Math.max(...bars.map((b) => b.label.length)) * 8 + 12)
   return (
     <ChartContainer config={config} className="w-full" style={{ height: Math.max(110, bars.length * 28 + 8) }} role="img" aria-label={summary('Bar chart', bars)}>
       <BarChart data={bars} layout="vertical" margin={{ left: 0, right: 28 }}>
-        <YAxis dataKey="label" type="category" tickLine={false} axisLine={false} width={labelWidth} tick={<LeftTick />} interval={0} />
+        <YAxis dataKey="label" type="category" tickLine={false} axisLine={false} width={labelWidth} tick={<LeftTick bars={bars} onFocus={onFocus} onPick={onPick} />} interval={0} />
         <XAxis type="number" hide />
         <ChartTooltip cursor={false} content={tooltip} />
-        <Bar dataKey="value" fill="var(--color-value)" radius={4}>
+        <Bar
+          dataKey="value"
+          fill="var(--color-value)"
+          radius={4}
+          cursor={onPick ? 'pointer' : undefined}
+          onMouseEnter={(d) => onFocus?.((d.payload as Answer['bars'][number]).code ?? null)}
+          onMouseLeave={() => onFocus?.(null)}
+          onClick={(d) => {
+            const code = (d.payload as Answer['bars'][number]).code
+            if (code) onPick?.(code)
+          }}
+        >
           <LabelList dataKey="value" position="right" fill="var(--foreground)" fontSize={12} />
         </Bar>
       </BarChart>
@@ -63,10 +77,10 @@ function Period({ bars }: { bars: Answer['bars'] }) {
   )
 }
 
-export default function AnswerChart({ kind, bars }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars'] }) {
+export default function AnswerChart({ kind, bars, onFocus, onPick }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars'] } & Link) {
   return (
     <div className="rounded-[6px] bg-(--neutral-700) p-4">
-      {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : <Ranking bars={bars} />}
+      {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : <Ranking bars={bars} onFocus={onFocus} onPick={onPick} />}
     </div>
   )
 }
