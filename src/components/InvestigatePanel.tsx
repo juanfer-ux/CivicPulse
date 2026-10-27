@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input'
 import { SUGGESTIONS, answer, type Answer, type Area } from '@/lib/agent'
 import { fetchLocalities } from '@/lib/incidents'
 
-// The charts (Recharts) load with the first answer, not with the app; the plain bars show meanwhile.
-const AnswerChart = lazy(() => import('@/components/AnswerCharts'))
+// The charts (Recharts) are their own file, fetched right after the app loads so the first answer already has them; nothing is drawn while they load, never the plain bars.
+const loadChart = () => import('@/components/AnswerCharts')
+const AnswerChart = lazy(loadChart)
 
 type Turn = { question: string; result?: Answer; error?: string }
 
@@ -16,6 +17,8 @@ export function InvestigatePanel({ onHighlight, highlightIds }: { onHighlight: (
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
   const end = useRef<HTMLDivElement>(null)
+
+  useEffect(() => void loadChart(), [])
 
   useEffect(() => {
     end.current?.scrollIntoView({ block: 'end' })
@@ -134,7 +137,7 @@ export function AnswerView({ result, shown, onToggle }: { result: Answer; shown:
       <p className="text-muted-foreground">{result.text}</p>
       {result.bars.length > 0 &&
         (result.chart ? (
-          <Suspense fallback={<Bars bars={result.bars} />}>
+          <Suspense fallback={null}>
             <AnswerChart kind={result.chart} bars={result.bars} />
           </Suspense>
         ) : (

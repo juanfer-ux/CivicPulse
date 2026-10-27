@@ -2,7 +2,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
 import type { Answer } from '@/lib/agent'
 
-/** The agent's answer charts (shadcn Chart on Recharts), in the app's own colors. Loaded on the first answer, not with the app. */
+/** The agent's answer charts (shadcn Chart on Recharts), in the app's own colors. Fetched right after the app loads (see InvestigatePanel), so no placeholder is needed. */
 const config = { value: { label: 'Incidents', color: 'var(--ai-border)' } } satisfies ChartConfig
 const tick = { fill: 'var(--muted-foreground)', fontSize: 12 }
 const grid = 'var(--secondary)'
