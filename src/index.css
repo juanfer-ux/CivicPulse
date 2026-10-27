@@ -199,7 +199,7 @@
   --map-answer-ring: var(--ai-banner);
   --map-answer-radius: #545EFF; /* map only, outside the 17 (owner, 2026-10-27): the edge color of the agent's answer radius fill (radial gradient: clear up to half the radius, #545EFF at the edge). Figma map/answer-radius */
   --map-answer-radius-ring: #4C49C1; /* map only, outside the 17 (owner, 2026-10-27): the 1 px ring of the agent's answer radius. Figma map/answer-radius-ring */
-  --map-locality-fill: var(--map-answer-radius); /* the localities an agent answer outlines: fill, 4 % to 14 % by incident count. Figma map/locality-fill */
+  --map-locality-fill: var(--map-answer-radius); /* the localities an agent answer outlines: fill, 11 % to 40 % by incident count. Figma map/locality-fill */
   --map-locality-line: var(--map-answer-radius-ring); /* their 1.5 px outline. Figma map/locality-line */
   --map-selected-ring: var(--neutral-100);
   --map-roads: #363644; /* map only, outside the 17 (owner, 2026-10-26): minor and secondary streets; CARTO's is #414758. Figma map/roads */

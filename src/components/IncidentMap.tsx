@@ -221,7 +221,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, onSele
           id: 'answer-areas-fill',
           type: 'fill',
           source: 'answer-areas',
-          paint: { 'fill-color': token('--map-locality-fill'), 'fill-opacity': ['interpolate', ['linear'], ['get', 'v'], 0, 0.04, 1, 0.14] },
+          paint: { 'fill-color': token('--map-locality-fill'), 'fill-opacity': ['interpolate', ['linear'], ['get', 'v'], 0, 0.11, 1, 0.4] },
         },
         aboveLand,
       )
