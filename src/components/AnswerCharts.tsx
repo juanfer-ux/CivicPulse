@@ -11,12 +11,21 @@ const tooltip = <ChartTooltipContent hideLabel />
 /** Screen readers get the numbers as text, since a chart is a picture. */
 const summary = (title: string, bars: Answer['bars']) => `${title}: ${bars.map((b) => `${b.label} ${b.value}`).join(', ')}`
 
+/** Labels start at the left edge of the box (Recharts right-aligns them against the bars by default). */
+function LeftTick({ y = 0, payload }: { y?: number; payload?: { value: string } }) {
+  return (
+    <text x={0} y={y} dy={4} textAnchor="start" fill="var(--muted-foreground)" fontSize={12}>
+      {payload?.value}
+    </text>
+  )
+}
+
 function Ranking({ bars }: { bars: Answer['bars'] }) {
   const labelWidth = Math.min(150, Math.max(...bars.map((b) => b.label.length)) * 8 + 12)
   return (
     <ChartContainer config={config} className="w-full" style={{ height: Math.max(110, bars.length * 28 + 8) }} role="img" aria-label={summary('Bar chart', bars)}>
       <BarChart data={bars} layout="vertical" margin={{ left: 0, right: 28 }}>
-        <YAxis dataKey="label" type="category" tickLine={false} axisLine={false} width={labelWidth} tick={tick} interval={0} />
+        <YAxis dataKey="label" type="category" tickLine={false} axisLine={false} width={labelWidth} tick={<LeftTick />} interval={0} />
         <XAxis type="number" hide />
         <ChartTooltip cursor={false} content={tooltip} />
         <Bar dataKey="value" fill="var(--color-value)" radius={4}>
