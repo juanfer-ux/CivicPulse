@@ -47,6 +47,7 @@ const DAY = 86_400_000
 const TZ = 'America/Bogota'
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const SYNTHETIC = 'All records are synthetic.'
+const CIRCLES = 'Circles on the map show where the incidents are, not an area of risk.'
 const MIN_REPEATS = 3
 const CANDIDATE_DAYS = 90
 const COUNTING = 'Counts exclude reports marked duplicate or rejected.'
@@ -237,6 +238,7 @@ async function ranking(days: number | null, category: string | null): Promise<An
       COUNTING,
       'Only localities in your authorized scope are included.',
       'Raw counts are not adjusted for population, area or reporting rates: they show where reports concentrate, not where the problem is worst.',
+      CIRCLES,
       SYNTHETIC,
     ],
     highlightIds: topIds,
@@ -289,6 +291,7 @@ async function timeOfDay(locality: Locality | null, days: number | null, categor
       ...(total < 30 ? [`Small sample (${total} incidents): treat the distribution as indicative only.`] : []),
       'Times are when the incident occurred (Bogotá time), in 4-hour intervals.',
       COUNTING,
+      CIRCLES,
       SYNTHETIC,
     ],
     highlightIds: ids,
@@ -352,6 +355,7 @@ async function compare(locality: Locality | null, days: number, category: string
         : []),
       'This compares counts only. It does not explain why the numbers differ.',
       COUNTING,
+      CIRCLES,
       SYNTHETIC,
     ],
     highlightIds: ids,

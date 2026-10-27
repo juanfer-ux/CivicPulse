@@ -4,6 +4,7 @@ import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { PIN_RISE, addBadges, iconCategory } from '@/lib/markerIcons'
+import { radiusGroups } from '@/lib/radius'
 import { GROUPS, groupOf, label, typeOf, type Incident } from '@/lib/incidents'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.
@@ -20,6 +21,8 @@ const LAND_ON = false
 const BOGOTA_OUTLINE_ON = false
 // Very subtle softness on the roads and their outlines, in pixels (owner, 2026-10-26). 0 = sharp.
 const ROAD_BLUR = 0.6
+/** Pixels per meter at zoom 0 around Bogotá (512 px tiles), for the answer radius. */
+const METERS_TO_PX_Z0 = 1 / (78271.517 * Math.cos((4.65 * Math.PI) / 180))
 /** Same for the building outlines, in pixels. */
 const BUILDING_BLUR = 2
 
@@ -169,20 +172,24 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
           'icon-allow-overlap': true,
         },
       })
-      map.addLayer({
-        id: 'incident-highlight',
-        type: 'circle',
-        source: 'incidents',
-        filter: ['==', ['get', 'hl'], true],
-        paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 11.99, 7, 12, 9, BADGE_ZOOM, 9, BADGE_ZOOM + 0.01, 17, 15, 22, 18, 31],
-          'circle-color': 'rgba(0,0,0,0)',
-          'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, 0]], BADGE_ZOOM + 0.01, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': token('--map-answer-ring'),
-          'circle-stroke-opacity': 0.6, // rings in a crowd overlap: see-through, so the overlaps stay readable
+      // The agent's answer (owner, 2026-10-27): one incident radius per group of incidents instead of one ring per incident. Its size is in meters, so it is a real area at every zoom. It draws under the dots and pins.
+      map.addSource('answer-radius', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      map.addLayer(
+        {
+          id: 'answer-radius',
+          type: 'circle',
+          source: 'answer-radius',
+          paint: {
+            // meters to pixels: a pixel is 78271.5 m x cos(lat) / 2^zoom wide (512 px tiles); zoom may only drive a top-level interpolate
+            'circle-radius': ['interpolate', ['exponential', 2], ['zoom'], 0, ['*', ['get', 'r'], METERS_TO_PX_Z0], 22, ['*', ['get', 'r'], METERS_TO_PX_Z0 * 2 ** 22]],
+            'circle-color': token('--map-answer-radius'),
+            'circle-opacity': 0.18,
+            'circle-stroke-color': token('--map-answer-radius'),
+            'circle-stroke-width': 1,
+          },
         },
-      })
+        'incidents',
+      )
       map.addLayer({
         id: 'incident-selected',
         type: 'circle',
@@ -229,6 +236,32 @@ export function IncidentMap({ incidents, selectedId, highlightIds, onSelect }: P
         geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
         properties: { id: i.id, color: token(GROUPS[groupOf(i.status)].token), dim: mix(token(GROUPS[groupOf(i.status)].token), token('--map-background'), KEEP), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id) },
       })),
+    })
+  }, [ready, incidents, highlightIds])
+
+  // When an answer arrives the map moves to show all of it (owner, 2026-10-27), clear of the banner, the filters and the summary card.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map || !highlightIds.length) return
+    const highlight = new Set(highlightIds)
+    const pts = incidents.filter((i) => highlight.has(i.id))
+    if (!pts.length) return
+    const bounds = new maplibregl.LngLatBounds([pts[0].lng, pts[0].lat], [pts[0].lng, pts[0].lat])
+    for (const i of pts) bounds.extend([i.lng, i.lat])
+    const wide = map.getContainer().clientWidth > 700
+    map.fitBounds(bounds, { padding: { top: wide ? 120 : 100, bottom: wide ? 40 : 60, left: 40, right: wide ? 320 : 40 }, maxZoom: 15, duration: 700 })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the answer changes, not when filters change the list
+  }, [ready, highlightIds])
+
+  // One radius per group of incidents behind the agent's answer.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    const highlight = new Set(highlightIds)
+    const circles = highlightIds.length ? radiusGroups(incidents.filter((i) => highlight.has(i.id))) : []
+    ;(map.getSource('answer-radius') as maplibregl.GeoJSONSource).setData({
+      type: 'FeatureCollection',
+      features: circles.map((c) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [c.lng, c.lat] }, properties: { r: c.radius } })),
     })
   }, [ready, incidents, highlightIds])
 
