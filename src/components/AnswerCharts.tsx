@@ -79,7 +79,7 @@ function Period({ bars }: { bars: Answer['bars'] }) {
 
 export default function AnswerChart({ kind, bars, onFocus, onPick }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars'] } & Link) {
   return (
-    <div className="rounded-[6px] bg-(--neutral-700) p-4">
+    <div className="rounded-[6px] border-[0.5px] border-(--neutral-500) bg-(--neutral-700) p-4">
       {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : <Ranking bars={bars} onFocus={onFocus} onPick={onPick} />}
     </div>
   )
