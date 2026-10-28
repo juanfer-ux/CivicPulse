@@ -9,13 +9,13 @@ const TREND = {
   below: { Icon: ArrowDown, text: 'Below usual' },
 } as const
 
-/** A number with its name and, below it in the same card, how it compares with usual (Figma Stat Card): `inset` top with the label in `label` / neutral-200 and the value in `stat` / neutral-100, then a `secondary` strip with a trend icon and text in `meta`. 0.5 px `input` border, 4 px radius. A button when it has an `onClick`. */
+/** A number with its name and, below it in the same card, how it compares with usual (Figma Stat Card): `inset` top with the label in `label` / neutral-200 and the value in `stat` / neutral-100, then a `secondary` strip with a trend icon and text in `meta`. 0.5 px `neutral-300` border, 4 px radius. A button when it has an `onClick`. */
 export function StatCard({ label, value, trend, onClick }: { label: ReactNode; value: ReactNode; trend?: Trend; onClick?: () => void }) {
   const Tag = onClick ? 'button' : 'div'
   const t = trend && TREND[trend]
   return (
     <Tag
-      className="flex min-w-0 flex-col overflow-hidden rounded-sm border-[0.5px] border-input text-left enabled:hover:border-foreground"
+      className="flex min-w-0 flex-col overflow-hidden rounded-sm border-[0.5px] border-(--neutral-300) text-left enabled:hover:border-foreground"
       {...(onClick ? { type: 'button' as const, onClick } : {})}
     >
       <span className="flex w-full flex-col gap-1 bg-inset p-3">
