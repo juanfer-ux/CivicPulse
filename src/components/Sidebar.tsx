@@ -26,8 +26,8 @@ const PLACEHOLDERS = [
   'Debris on main roads',
 ]
 
-/** The tiny bullet that marks a conversation or a case in a list (Figma icon/bullet): Phosphor DotOutline, fill weight, always solid. */
-const Bullet = (props: IconProps) => <DotOutline {...props} weight="fill" />
+/** The tiny bullet that marks a conversation or a case in a list (Figma icon/bullet): Phosphor DotOutline, fill weight, always solid, `neutral-300`. */
+const Bullet = (props: IconProps) => <DotOutline {...props} weight="fill" className={`${props.className ?? ""} text-(--neutral-300)`} />
 
 const KEY = 'sidebar-collapsed'
 const read = () => {
