@@ -26,6 +26,7 @@ Each class sets size, line height and weight together, so a component never need
 | body-sm-strong | 13.5 / 22 (spacing 2%) | **16 / 24** | 400 | Small body, strong | `text-body-sm-strong` |
 | meta | 13 / 21 | **14 / 20** | 300 | Secondary info | `text-meta` |
 | caption | 12.5 / 16 | **12 / 16** | 360 | Small tags and badges | `text-caption` |
+| section-label | 10 / 16 (spacing 16 %) | 10 / 16 | 450 (Figma Bold) | Uppercase title above a group of sidebar items (Investigations); color `neutral-300` (new 2026-10-28) | `text-section-label` + `uppercase` |
 
 - **Desktop = 1,440 px and wider; Mobile = anything narrower** (the `desk` breakpoint). The sizes come from Figma's Device collection and switch through CSS variables in `src/index.css` (`--fs-body`, `--lh-body`…); class names do not change.
 - **Weights** (Manrope is a variable font, so any number from 200 to 800 works; the owner chose these on 2026-10-23 by looking at the result): **Regular 300** for reading text, typed text, placeholders and secondary text; **Medium 360** for anything that labels something (field names, menu items, subtitles, badges, captions); **SemiBold 400** for headings, numbers, titles and button text.

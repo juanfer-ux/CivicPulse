@@ -4,6 +4,7 @@ import { cn, initials, shortName, timeBlockLabel } from '@/lib/utils'
 describe('cn', () => {
   it('keeps a text style when a text color follows it', () => {
     expect(cn('text-label', 'text-primary-foreground')).toBe('text-label text-primary-foreground')
+    expect(cn('text-section-label', 'text-primary-foreground')).toBe('text-section-label text-primary-foreground')
   })
   it('lets the small button text replace the default button text', () => {
     expect(cn('text-button', 'text-button-sm')).toBe('text-button-sm')

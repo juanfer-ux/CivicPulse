@@ -41,7 +41,7 @@ function MobileBrand() {
 /** `flush` = no side padding when expanded (Figma: Sign out lines up with the user row above it). */
 function NavItem({ icon: Icon, label, active, collapsed, flush, onClick }: { icon: ComponentType<IconProps>; label: string; active?: boolean; collapsed: boolean; flush?: boolean; onClick: () => void }) {
   return (
-    <Button variant="ghost" className={`h-11 hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'w-10 gap-2 px-2 justify-center' : `gap-4 justify-start ${flush ? 'px-0' : 'px-3'}`}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
+    <Button variant="ghost" className={`hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : `h-8 gap-2.5 justify-start ${flush ? 'px-0' : 'px-3'}`}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
       <Icon className="size-5 shrink-0" weight={active ? 'fill' : 'regular'} />
       {!collapsed && label}
     </Button>
@@ -58,7 +58,8 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
         <hr className="border-t" />
       </div>
       {toggleItem}
-      <nav className={`flex flex-col gap-3 ${collapsed ? 'items-center' : ''}`}>
+      <nav className={`flex flex-col ${collapsed ? 'items-center gap-3' : 'gap-2.5'}`}>
+        {!collapsed && <p className="flex h-8 items-center px-3 text-section-label uppercase text-(--neutral-300)">Investigations</p>}
         <NavItem icon={MapTrifold} label="Map" active={view === 'map'} collapsed={collapsed} onClick={() => onView('map')} />
         {can('manage_users') && <NavItem icon={UsersThree} label="Users" active={view === 'users'} collapsed={collapsed} onClick={() => onView('users')} />}
       </nav>
