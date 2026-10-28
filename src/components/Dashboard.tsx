@@ -83,11 +83,13 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
   }, [beforeStatus])
 
   const topLocalities = useMemo(() => {
+    // Informational (owner, 2026-10-29): always every incident in the person's scope, never narrowed by the filters, a clicked card or the agent's answer.
     // The last 30 days and the 30 before, counted back from the newest report (the data is a fixed set, not live).
+    const all = data?.incidents ?? []
     const DAY = 86_400_000
-    const end = Math.max(0, ...filtered.map((i) => Date.parse(i.occurred_at)))
+    const end = Math.max(0, ...all.map((i) => Date.parse(i.occurred_at)))
     const counts = new Map<number, { n: number; recent: number; before: number }>()
-    for (const i of filtered) {
+    for (const i of all) {
       const c = counts.get(i.locality_code) ?? { n: 0, recent: 0, before: 0 }
       const age = (end - Date.parse(i.occurred_at)) / DAY
       c.n++
@@ -96,7 +98,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
       counts.set(i.locality_code, c)
     }
     return [...counts].sort((a, b) => b[1].n - a[1].n).slice(0, 4)
-  }, [filtered])
+  }, [data])
 
   const chatMode = highlightIds.length > 0 // an answer is on the map: the banner shows and everything below it moves down by --answer-banner-h
   const selected = filtered.find((i) => i.id === selectedId) ?? null
@@ -173,7 +175,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
 
       {/* The four localities with most incidents (Figma Stat Card), in a row above the filters; a click filters the map to that locality. On phones they sit in the Explore tab, two by two. */}
       <div
-        className={`${tab === 'explore' && !selected ? 'grid' : 'hidden'} grid-cols-2 gap-3 overflow-y-auto desk:absolute desk:right-6 desk:left-[calc(var(--agent-w)+1.5rem)] desk:z-10 desk:grid desk:mx-auto desk:max-w-[1200px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1.5rem)]' : 'desk:top-[calc(var(--section-header-h)+1.5rem)]'}`}
+        className={`${tab === 'explore' && !selected ? 'grid' : 'hidden'} grid-cols-2 gap-3 overflow-y-auto desk:absolute desk:right-6 desk:left-[calc(var(--agent-w)+1.5rem)] desk:z-10 desk:grid desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1.5rem)]' : 'desk:top-[calc(var(--section-header-h)+1.5rem)]'}`}
       >
         {error ? (
           <p className="col-span-full text-incident">{error}</p>
