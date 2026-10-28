@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { CaretDown, CaretUp, ChatCircleDots, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
+import { StatCard } from '@/components/ui/stat-card'
 import { MediaGallery } from '@/components/MediaGallery'
 import { Badge } from '@/components/ui/badge'
 import { FilterBar, NO_FILTERS, type Filters } from '@/components/FilterBar'
@@ -83,7 +84,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
   const topLocalities = useMemo(() => {
     const counts = new Map<number, number>()
     for (const i of filtered) counts.set(i.locality_code, (counts.get(i.locality_code) ?? 0) + 1)
-    return [...counts].sort((a, b) => b[1] - a[1]).slice(0, 5)
+    return [...counts].sort((a, b) => b[1] - a[1]).slice(0, 4)
   }, [filtered])
 
   const chatMode = highlightIds.length > 0 // an answer is on the map: the banner shows and everything below it moves down by --answer-banner-h
@@ -135,7 +136,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
           localities={data.localities}
           categories={data.categories}
           counts={byGroup}
-          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+0.75rem)]' : 'desk:top-[calc(var(--section-header-h)+0.75rem)]'} desk:right-4 desk:left-[calc(var(--agent-w)+1rem)]`}
+          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+1.5rem)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+1.5rem)]'} desk:right-4 desk:left-[calc(var(--agent-w)+1rem)]`}
         />
       )}
 
@@ -159,41 +160,19 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
           </Button>
         </div>
 
+      {/* The four localities with most incidents (Figma Stat Card), in a row above the filters; a click filters the map to that locality. On phones they sit in the Explore tab, two by two. */}
       <div
-        className={`${tab === 'explore' && !selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 overflow-y-auto desk:absolute desk:right-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1rem+2.25rem+0.75rem)]' : 'desk:top-[calc(var(--section-header-h)+1rem+2.25rem+0.75rem)]'} desk:flex desk:w-72 desk:flex-none desk:overflow-visible`}
+        className={`${tab === 'explore' && !selected ? 'grid' : 'hidden'} grid-cols-2 gap-3 overflow-y-auto desk:absolute desk:right-4 desk:left-[calc(var(--agent-w)+1rem)] desk:z-10 desk:grid desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+0.75rem)]' : 'desk:top-[calc(var(--section-header-h)+0.75rem)]'}`}
       >
-        <Card className="bg-card/95">
-          <CardHeader>
-            <CardTitle>
-              {error ? 'Could not load incidents' : data ? `${filtered.length} incidents` : 'Loading…'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3 text-body-sm">
-            {error && <p className="text-incident">{error}</p>}
-            {data && !error && (
-              <>
-                {topLocalities.length > 0 && (
-                  <div>
-                    <p className="mb-1 text-meta uppercase tracking-[0.05em] text-muted-foreground">Top localities</p>
-                    <ol className="flex flex-col gap-1">
-                      {topLocalities.map(([code, n]) => (
-                        <li key={code} className="flex justify-between">
-                          <button className="text-left hover:underline" onClick={() => setFilters({ ...filters, locality: String(code) })}>
-                            {localityName.get(code)}
-                          </button>
-                          <span>{n}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                )}
-                {data.incidents.length === 0 && (
-                  <p className="text-muted-foreground">No incidents in your scope.</p>
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
+        {error ? (
+          <p className="col-span-full text-incident">{error}</p>
+        ) : !data ? (
+          <p className="col-span-full text-muted-foreground">Loading…</p>
+        ) : topLocalities.length ? (
+          topLocalities.map(([code, n]) => <StatCard key={code} label={localityName.get(code)} value={n} onClick={() => setFilters({ ...filters, locality: String(code) })} />)
+        ) : (
+          <p className="col-span-full text-muted-foreground">No incidents in your scope.</p>
+        )}
       </div>
 
       <div

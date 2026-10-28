@@ -34,7 +34,7 @@ Which page holds which component (the "Components · " prefix was replaced by th
 | Page | Components |
 |---|---|
 | Actions & inputs | Button, Input, Textarea, Select, Select Menu, Checkbox, Multi-select, Form Field |
-| Data display | Badge, Status Badge, Role Badge, Avatar, Card, Stat Card, Summary Card, Table Row, User Card, Incident Row, Incident Card (with Media Tile, Video Player, Detail Row), Alert, Skeleton, Separator |
+| Data display | Badge, Status Badge, Role Badge, Avatar, Card, Stat Card (with its no-trend variant), Table Row, User Card, Incident Row, Incident Card (with Media Tile, Video Player, Detail Row), Alert, Skeleton, Separator |
 | Navigation & layout | Sidebar, Sidebar Item, Nav Item, Tab Bar, Sheet Tabs, Mobile Top Bar, Section Header, Panel Header, Side Panel, Drawer |
 | Map & agent | Map Marker, Incident Radius, Filters Card (replaced by Filter Chip and Filter Bar, with Status Dot), Map Pin (default, selected, dimmed; the selected one shows at any zoom), Agent Panel, Suggestion, Message, Action Card, Answer Chart, Answer Banner, Map Zoom, Map Legend |
 | Auth & brand | Auth Card, Logo |
