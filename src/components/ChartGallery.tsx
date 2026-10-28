@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts'
 import { Bars } from '@/components/InvestigatePanel'
+import { StatCard } from '@/components/ui/stat-card'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
 
 /** Open /#charts (no sign-in): the agent's answer bars next to alternatives, on the same sample data. */
@@ -94,6 +95,16 @@ export function ChartGallery() {
           Same data in each row. "Current" is what the app shows today; the others are alternatives. Colors are the app's own (indigo-400, neutrals).
         </p>
       </header>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-title">Stat Card · the four states</h2>
+        <div className="grid gap-4 md:grid-cols-4">
+          <StatCard label="Kennedy" value={77} trend="above" />
+          <StatCard label="Chapinero" value={66} trend="about" />
+          <StatCard label="Suba" value={60} trend="below" />
+          <StatCard label="Ciudad Bolívar" value={4} trend="low" />
+        </div>
+      </section>
 
       <Row title="1 · Ranked list: which localities have the most incidents">
         <Option name="Current" note="Hand-made HTML bars. No dependency.">
