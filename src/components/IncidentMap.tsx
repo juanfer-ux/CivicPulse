@@ -276,6 +276,11 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
           'circle-stroke-color': token('--map-selected-ring'),
         },
       })
+      // Layer order, top to bottom (owner, 2026-10-28): all the text (the basemap's names, then ours), the dots and pins, the locality highlights (fill, outline, radius), and under them the rest of the basemap. The basemap's text layers sit under our dots by default, so lift them to the top.
+      const ours = new Set(['incident-badges', 'incident-selected-pin', 'answer-areas-name'])
+      for (const l of map.getStyle().layers) if (l.type === 'symbol' && !ours.has(l.id)) map.moveLayer(l.id)
+      map.moveLayer('answer-areas-name')
+
       // A click on an incident selects it; a click anywhere else on the map clears the selection.
       map.on('click', (e) => {
         const hit = map.queryRenderedFeatures(e.point, { layers: ['incident-selected-pin', 'incidents', 'incident-badges'] })[0]
