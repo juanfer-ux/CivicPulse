@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType } from 'react'
-import { List, Plus, SidebarSimple, SignOut, X, type IconProps } from '@phosphor-icons/react'
+import { DotOutline, List, Plus, SidebarSimple, SignOut, X, type IconProps } from '@phosphor-icons/react'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Avatar } from '@/components/ui/avatar'
@@ -26,14 +26,8 @@ const PLACEHOLDERS = [
   'Debris on main roads',
 ]
 
-/** The tiny bullet that marks a conversation in the list (Figma icon/bullet): a 5 px dot in the 20 px icon slot. */
-function Bullet() {
-  return (
-    <span className="grid size-5 shrink-0 place-items-center" aria-hidden>
-      <span className="size-[5px] rounded-full bg-current" />
-    </span>
-  )
-}
+/** The tiny bullet that marks a conversation or a case in a list (Figma icon/bullet): Phosphor DotOutline, fill weight, always solid. */
+const Bullet = (props: IconProps) => <DotOutline {...props} weight="fill" />
 
 const KEY = 'sidebar-collapsed'
 const read = () => {
