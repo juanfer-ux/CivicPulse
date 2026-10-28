@@ -155,7 +155,7 @@
 :root {
   --radius: 0.5rem;
   --section-header-h: 0px; /* the map has no header (owner, 2026-10-28; it was 70px), so the map and filters start at the top */
-  --stat-row-h: 82px; /* height of the row of Stat Cards over the map (Figma Stat Card: 12 + 22 label + 4 + 32 value + 12); the filters start below it */
+  --stat-row-h: 116px; /* height of the row of Stat Cards over the map (Figma Stat Card: 82 top + 33 trend strip + 1 border); the filters start below it */
   --agent-header-h: 70px; /* height of the Investigate and Ask title row (a line runs across the screen with the map header when it is shown) */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
   /* The whole palette is these 24 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */

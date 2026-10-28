@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { CaretDown, CaretUp, ChatCircleDots, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
+import { trendOf } from '@/lib/trend'
 import { MediaGallery } from '@/components/MediaGallery'
 import { Badge } from '@/components/ui/badge'
 import { FilterBar, NO_FILTERS, type Filters } from '@/components/FilterBar'
@@ -82,9 +83,19 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
   }, [beforeStatus])
 
   const topLocalities = useMemo(() => {
-    const counts = new Map<number, number>()
-    for (const i of filtered) counts.set(i.locality_code, (counts.get(i.locality_code) ?? 0) + 1)
-    return [...counts].sort((a, b) => b[1] - a[1]).slice(0, 4)
+    // The last 30 days and the 30 before, counted back from the newest report (the data is a fixed set, not live).
+    const DAY = 86_400_000
+    const end = Math.max(0, ...filtered.map((i) => Date.parse(i.occurred_at)))
+    const counts = new Map<number, { n: number; recent: number; before: number }>()
+    for (const i of filtered) {
+      const c = counts.get(i.locality_code) ?? { n: 0, recent: 0, before: 0 }
+      const age = (end - Date.parse(i.occurred_at)) / DAY
+      c.n++
+      if (age < 30) c.recent++
+      else if (age < 60) c.before++
+      counts.set(i.locality_code, c)
+    }
+    return [...counts].sort((a, b) => b[1].n - a[1].n).slice(0, 4)
   }, [filtered])
 
   const chatMode = highlightIds.length > 0 // an answer is on the map: the banner shows and everything below it moves down by --answer-banner-h
@@ -169,7 +180,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
         ) : !data ? (
           <p className="col-span-full text-muted-foreground">Loading…</p>
         ) : topLocalities.length ? (
-          topLocalities.map(([code, n]) => <StatCard key={code} label={localityName.get(code)} value={n} onClick={() => setFilters({ ...filters, locality: String(code) })} />)
+          topLocalities.map(([code, c]) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={trendOf(c.recent, c.before)} onClick={() => setFilters({ ...filters, locality: String(code) })} />)
         ) : (
           <p className="col-span-full text-muted-foreground">No incidents in your scope.</p>
         )}
