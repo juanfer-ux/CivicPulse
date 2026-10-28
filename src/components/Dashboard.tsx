@@ -141,6 +141,13 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
         </div>
       )}
 
+      {/* Legend (owner, 2026-10-28, kept from the map header): how many incidents the map shows now, bottom left. */}
+      {data && (
+        <p className="pointer-events-none absolute bottom-[4.5rem] left-3 z-10 rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200) desk:bottom-4 desk:left-[calc(var(--agent-w)+1rem)]">
+          Showing {filtered.length} {filtered.length === 1 ? 'incident' : 'incidents'}
+        </p>
+      )}
+
       {/* Filter chips (Figma: Filter Bar): one row over the map, scrolling sideways when it does not fit; hidden while an incident is open. */}
       {!selected && data && (
         <FilterBar
