@@ -15,6 +15,9 @@ const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 maplibregl.setWorkerUrl(workerUrl)
 
 /** Zoom where small dots turn into icon badges. */
+/** Room kept free around an answer when the map zooms to fit it. Desktop: top = answer banner 44 + 12 + Stat Cards 116 + 12 + filters 36 + 16; bottom = the legend (16 + 26) + 16; the sides 40. Phones: the filter bar on top, the bottom sheet under. */
+const fitPadding = (wide: boolean) => (wide ? { top: 236, bottom: 60, left: 40, right: 40 } : { top: 100, bottom: 60, left: 40, right: 40 })
+
 const BADGE_ZOOM = 14
 
 /** Paint the land with --map-land (true) or leave it invisible (false). */
@@ -319,7 +322,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     for (const i of pts) bounds.extend([i.lng, i.lat])
     for (const c of radiusGroups(pts)) for (const corner of circleBounds(c)) bounds.extend(corner) // the circles too, not only their incidents
     const wide = map.getContainer().clientWidth > 700
-    map.fitBounds(bounds, { padding: { top: wide ? 120 : 100, bottom: wide ? 40 : 60, left: 40, right: wide ? 320 : 40 }, maxZoom: 15, duration: 700 })
+    map.fitBounds(bounds, { padding: fitPadding(wide), maxZoom: 15, duration: 700 })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the answer changes, not when filters change the list
   }, [ready, highlightIds])
 
@@ -356,7 +359,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       for (const f of features) extend(f.geometry.coordinates)
       if (!bounds.isEmpty()) {
         const wide = map.getContainer().clientWidth > 700
-        map.fitBounds(bounds, { padding: { top: wide ? 120 : 100, bottom: wide ? 40 : 60, left: 40, right: wide ? 320 : 40 }, maxZoom: 13, duration: 700 })
+        map.fitBounds(bounds, { padding: fitPadding(wide), maxZoom: 13, duration: 700 })
       }
     })()
     return () => {
@@ -384,7 +387,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     }
     extend(f.geometry.coordinates)
     const wide = map.getContainer().clientWidth > 700
-    map.fitBounds(bounds, { padding: { top: wide ? 120 : 100, bottom: wide ? 40 : 60, left: 40, right: wide ? 320 : 40 }, maxZoom: 14, duration: 700 })
+    map.fitBounds(bounds, { padding: fitPadding(wide), maxZoom: 14, duration: 700 })
   }, [ready, zoomTo])
 
   // One radius per group of incidents behind the agent's answer.
