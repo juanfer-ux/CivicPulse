@@ -147,7 +147,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
           localities={data.localities}
           categories={data.categories}
           counts={byGroup}
-          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+1.5rem)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+1.5rem)]'} desk:right-4 desk:left-[calc(var(--agent-w)+1rem)]`}
+          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+1.75rem)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+1.75rem)]'} desk:right-4 desk:left-[calc(var(--agent-w)+1rem)]`}
         />
       )}
 
@@ -173,7 +173,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
 
       {/* The four localities with most incidents (Figma Stat Card), in a row above the filters; a click filters the map to that locality. On phones they sit in the Explore tab, two by two. */}
       <div
-        className={`${tab === 'explore' && !selected ? 'grid' : 'hidden'} grid-cols-2 gap-3 overflow-y-auto desk:absolute desk:right-4 desk:left-[calc(var(--agent-w)+1rem)] desk:z-10 desk:grid desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+0.75rem)]' : 'desk:top-[calc(var(--section-header-h)+0.75rem)]'}`}
+        className={`${tab === 'explore' && !selected ? 'grid' : 'hidden'} grid-cols-2 gap-3 overflow-y-auto desk:absolute desk:right-4 desk:left-[calc(var(--agent-w)+1rem)] desk:z-10 desk:grid desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1rem)]' : 'desk:top-[calc(var(--section-header-h)+1rem)]'}`}
       >
         {error ? (
           <p className="col-span-full text-incident">{error}</p>
