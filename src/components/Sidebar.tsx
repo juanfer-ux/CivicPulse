@@ -100,9 +100,9 @@ const read = () => {
 
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={`flex items-center ${collapsed ? 'justify-center' : 'h-[52px] gap-[8.7px]'}`}>
-      <img src={mark} alt="" width={collapsed ? 38 : 42} height={collapsed ? 38 : 42} className="shrink-0" />
-      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={153} height={12} className="shrink-0" />}
+    <div className={`flex items-center ${collapsed ? 'justify-center' : 'h-12 gap-[7.2px]'}`}>
+      <img src={mark} alt="" width={38} height={38} className="shrink-0" />
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={142} height={11} className="shrink-0" />}
     </div>
   )
 }
@@ -132,7 +132,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
   const title = 'flex h-8 items-center px-3 text-section-label uppercase text-(--neutral-200)'
   return (
     <div className={`flex h-full flex-col ${collapsed ? 'items-center gap-8 px-5 py-4' : 'justify-between'}`}>
-      {/* Expanded (Figma 2026-10-29): the logo sits in a 12 px padded header with a line under it, then the groups with 8 px at the sides. */}
+      {/* Expanded (Figma 2026-10-29): the logo sits in a 70 px header (16 px at the sides) with a line under it, then the groups with 8 px at the sides. */}
       <div className={collapsed ? 'contents' : 'flex min-h-0 flex-col gap-8'}>
         {collapsed ? (
           <div className="flex flex-col gap-4 self-center">
@@ -140,7 +140,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
             <hr className="border-t" />
           </div>
         ) : (
-          <div className="border-b p-3">
+          <div className="flex h-[70px] items-center border-b px-4">
             <Brand collapsed={false} />
           </div>
         )}
