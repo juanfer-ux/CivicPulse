@@ -10,7 +10,7 @@ import { ROLE_LABELS } from '@/lib/users'
 import { shortName } from '@/lib/utils'
 
 type Chat = { id: number; title: string }
-type Chats = { chats: Chat[]; activeId: number; onPick: (id: number) => void; onNew: () => void }
+type Chats = { chats: Chat[]; activeId: number; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void }
 
 /** Example titles so the list looks like a real history (owner, 2026-10-28). They open nothing; delete this list when conversations are saved for real. */
 const PLACEHOLDERS = [
@@ -26,11 +26,11 @@ const PLACEHOLDERS = [
   'Debris on main roads',
 ]
 
-/** The tiny bullet that marks a conversation in the list (Figma icon/bullet): a 6 px dot in the 20 px icon slot. */
+/** The tiny bullet that marks a conversation in the list (Figma icon/bullet): a 5 px dot in the 20 px icon slot. */
 function Bullet() {
   return (
     <span className="grid size-5 shrink-0 place-items-center" aria-hidden>
-      <span className="size-1.5 rounded-full bg-current" />
+      <span className="size-[5px] rounded-full bg-current" />
     </span>
   )
 }
@@ -73,9 +73,8 @@ function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: Comp
 }
 
 /** The menu itself, as in Figma Sidebar (2026-10-28): logo, a full-width divider, the Investigations and Cases groups, then who is signed in and Sign out. Used by the desktop column and the phone slide-out. */
-function Menu_({ collapsed, chats, activeId, onPick, onNew, toggleItem }: Chats & { collapsed: boolean; toggleItem?: React.ReactNode }) {
+function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, toggleItem }: Chats & { collapsed: boolean; toggleItem?: React.ReactNode }) {
   const { profile, signOut } = useAuth()
-  const current = chats.find((c) => c.id === activeId) // none while the open conversation is still empty
   const title = 'flex h-8 items-center px-3 text-section-label uppercase text-(--neutral-300)'
   return (
     <div className={`flex h-full flex-col gap-8 py-4 ${collapsed ? 'items-center px-5' : ''}`}>
@@ -87,20 +86,17 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, toggleItem }: Chats 
       </div>
       {toggleItem}
       {!collapsed && (
-        <nav className="flex min-h-0 flex-col gap-4 overflow-y-auto px-0.5">
+        <nav className="flex min-h-0 flex-col gap-3 overflow-y-auto px-0.5">
           <div className="flex items-center justify-between pr-1">
             <p className={title}>Investigations</p>
             <Button size="icon" variant="ghost" className="size-6" aria-label="New investigation" title="New investigation" onClick={onNew}>
               <Plus className="size-4" />
             </Button>
           </div>
-          {current && <NavItem icon={Bullet} label={current.title} active collapsed={false} onClick={() => onPick(current.id)} />}
           <div className="flex flex-col gap-0.5">
-            {chats
-              .filter((c) => c.id !== activeId)
-              .map((c) => (
-                <NavItem key={c.id} icon={Bullet} label={c.title} collapsed={false} onClick={() => onPick(c.id)} />
-              ))}
+            {chats.map((c) => (
+              <NavItem key={c.id} icon={Bullet} label={c.title} active={c.id === activeId} collapsed={false} onClick={() => onPick(c.id)} />
+            ))}
             {PLACEHOLDERS.map((t) => (
               <NavItem key={t} icon={Bullet} label={t} collapsed={false} onClick={() => {}} />
             ))}
@@ -111,11 +107,19 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, toggleItem }: Chats 
         <section className="flex flex-col gap-2.5 px-0.5">
           <div className="flex items-center justify-between pr-1">
             <p className={title}>Cases</p>
-            <Button size="icon" variant="ghost" className="size-6" aria-label="New case" title="New case" onClick={() => {}}>
+            <Button size="icon" variant="ghost" className="size-6" aria-label="New case" title="New case" onClick={onNewCase}>
               <Plus className="size-4" />
             </Button>
           </div>
-          <p className="px-3 text-meta text-muted-foreground">No cases yet.</p>
+          {cases.length ? (
+            <div className="flex flex-col gap-0.5">
+              {cases.map((c) => (
+                <NavItem key={c.id} icon={Bullet} label={c.title} collapsed={false} onClick={() => {}} />
+              ))}
+            </div>
+          ) : (
+            <p className="px-3 text-meta text-muted-foreground">No cases yet.</p>
+          )}
         </section>
       )}
       <div className={`mt-auto flex flex-col gap-4 ${collapsed ? 'items-center' : ''}`}>
@@ -163,7 +167,7 @@ export function Sidebar(props: Chats) {
       return !c
     })
   // On phones the menu closes after a choice.
-  const phone: Chats = { ...props, onPick: (id) => (props.onPick(id), setOpen(false)), onNew: () => (props.onNew(), setOpen(false)) }
+  const phone: Chats = { ...props, onPick: (id) => (props.onPick(id), setOpen(false)), onNew: () => (props.onNew(), setOpen(false)), onNewCase: () => (props.onNewCase(), setOpen(false)) }
 
   return (
     <>

@@ -43,6 +43,7 @@ export default function App() {
   const active = chats.find((c) => c.id === activeId) ?? chats[0]
   const editTurns = (id: number, edit: (t: Turn[]) => Turn[]) => setChats((cs) => cs.map((c) => (c.id === id ? { ...c, turns: edit(c.turns) } : c)))
   const pick = (id: number) => {
+    setChats((cs) => cs.filter((c) => c.id === id || c.turns.length)) // an empty new investigation you leave is dropped
     setActiveId(id)
     const last = chats.find((c) => c.id === id)?.turns.findLast((t) => t.result)?.result
     show(last?.highlightIds ?? [], last?.areas) // the map shows the answer of the last question of that conversation
@@ -55,12 +56,15 @@ export default function App() {
     }
     show([])
   }
+  // Cases (sidebar): the plus adds a case to the list; there is no case page yet.
+  const [cases, setCases] = useState<{ id: number; title: string }[]>([])
+  const newCase = () => setCases((cs) => [{ id: (cs[0]?.id ?? 0) + 1, title: `New case ${(cs[0]?.id ?? 0) + 1}` }, ...cs])
   const [tab, setTab] = useState<Tab>('explore')
   const [agentWidth, setAgentWidth] = useAgentWidth()
 
   return (
     <div className="flex h-svh overflow-hidden bg-background">
-      <Sidebar chats={chats.filter((c) => c.turns.length).map((c) => ({ id: c.id, title: c.turns[0].question }))} activeId={active.id} onPick={pick} onNew={startChat} />
+      <Sidebar chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
       <main className="relative min-w-0 flex-1" style={{ '--agent-w': agentWidthCss(agentWidth) } as CSSProperties}>
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
