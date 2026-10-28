@@ -11,11 +11,11 @@ Each class sets size, line height and weight together, so a component never need
 | Style | Desktop | Mobile | Weight | Use | Class |
 |---|---|---|---|---|---|
 | display | 32 / 32 | 32 / 32 | 400 | Big numbers | `text-display` |
-| stat | 24 / 32 | 24 / 32 | 400 | Counts in stat cards | `text-stat` |
+| stat | 32 / 32 (spacing -4 %) | 32 / 32 | 450 (Figma Bold) | Counts in stat cards (Figma 2026-10-29; was SemiBold 24 / 32) | `text-stat` |
 | heading | 20 / 28 | 20 / 28 | 400 | Page title | `text-heading` |
 | title | 18 / 28 | 18 / 28 | 400 | Panel and section titles | `text-title` |
 | subtitle | 16 / 24 | 16 / 24 | 360 | Card titles | `text-subtitle` |
-| label | 14 / 22 | **16 / 24** | 360 | Buttons, field names, menu items, tabs | `text-label` |
+| label | 14 / 22 | **16 / 24** | 400 (Figma SemiBold since 2026-10-29; was 360) | Buttons, field names, menu items, tabs | `text-label` |
 | button | 14 / 20 (spacing 2.2%) | **16 / 24** | 400 | Text in Button (default, lg, icon-lg) | `text-button` |
 | button-sm | 13.5 / 24 (spacing 2.2%) | **16 / 24** | 400 | Text in small Button | `text-button-sm` |
 | body | 14 / 22 (spacing 2.2%) | **16 / 24** | 300 | Default paragraph text (new; not used by a screen yet) | `text-body` |

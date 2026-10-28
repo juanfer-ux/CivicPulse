@@ -16,9 +16,10 @@
   --text-display: 32px;
   --text-display--font-weight: 400;
   --text-display--line-height: 32px;
-  --text-stat: 24px;
-  --text-stat--font-weight: 400;
+  --text-stat: 32px; /* Figma stat (2026-10-29): Bold 32 / 32, tracking -4 %; the number in a Stat Card */
+  --text-stat--font-weight: 450;
   --text-stat--line-height: 32px;
+  --text-stat--letter-spacing: -0.04em;
   --text-heading: 20px;
   --text-heading--font-weight: 400;
   --text-heading--line-height: 28px;
@@ -29,7 +30,7 @@
   --text-subtitle--font-weight: 360;
   --text-subtitle--line-height: 24px;
   --text-label: var(--fs-label);
-  --text-label--font-weight: 360;
+  --text-label--font-weight: 400; /* Figma label is SemiBold since 2026-10-29 (was Medium, 360) */
   --text-label--line-height: var(--lh-label);
   /* Button text (Figma: button and button-sm): same size as label, and one step down for small buttons. */
   --text-button: var(--fs-label);
