@@ -67,10 +67,10 @@
   --text-caption: var(--fs-caption);
   --text-caption--font-weight: 360;
   --text-caption--line-height: 16px;
-  --text-section-label: 10px; /* the small uppercase title above a group of sidebar items (Figma section-label, 2026-10-28): Bold 10 / 16, spacing 16 %; the same on every screen size */
+  --text-section-label: 11px; /* the small uppercase title above a group of sidebar items (Figma section-label, 2026-10-28): Bold 11 / 16, spacing 18 %; the same on every screen size */
   --text-section-label--font-weight: 450;
   --text-section-label--line-height: 16px;
-  --text-section-label--letter-spacing: 0.16em;
+  --text-section-label--letter-spacing: 0.18em;
 }
 
 /* Sizes from Figma's Device collection: Mobile values by default (windows under 1,440 px), Desktop values from 1,440 px. */

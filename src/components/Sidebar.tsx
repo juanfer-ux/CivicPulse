@@ -86,15 +86,24 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, toggleItem }: Chats 
       </div>
       {toggleItem}
       {!collapsed && (
-        <nav className="flex min-h-0 flex-col gap-2.5 overflow-y-auto px-0.5">
-          <p className={title}>Investigations</p>
-          <NavItem icon={Plus} label="New investigation" collapsed={false} onClick={onNew} />
-          {chats.map((c) => (
-            <NavItem key={c.id} icon={Bullet} label={c.title} active={c.id === activeId} collapsed={false} onClick={() => onPick(c.id)} />
-          ))}
-          {PLACEHOLDERS.map((t) => (
-            <NavItem key={t} icon={Bullet} label={t} collapsed={false} onClick={() => {}} />
-          ))}
+        <nav className="flex min-h-0 flex-col gap-4 overflow-y-auto px-0.5">
+          <div className="flex items-center justify-between pr-1">
+            <p className={title}>Investigations</p>
+            <Button size="icon" variant="ghost" className="size-6" aria-label="New investigation" title="New investigation" onClick={onNew}>
+              <Plus className="size-4" />
+            </Button>
+          </div>
+          <NavItem icon={Bullet} label={chats.find((c) => c.id === activeId)?.title ?? 'New investigation'} active collapsed={false} onClick={() => onPick(activeId)} />
+          <div className="flex flex-col gap-0.5">
+            {chats
+              .filter((c) => c.id !== activeId)
+              .map((c) => (
+                <NavItem key={c.id} icon={Bullet} label={c.title} collapsed={false} onClick={() => onPick(c.id)} />
+              ))}
+            {PLACEHOLDERS.map((t) => (
+              <NavItem key={t} icon={Bullet} label={t} collapsed={false} onClick={() => {}} />
+            ))}
+          </div>
         </nav>
       )}
       {!collapsed && (
