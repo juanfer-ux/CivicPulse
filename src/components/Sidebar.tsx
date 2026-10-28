@@ -12,6 +12,20 @@ import { shortName } from '@/lib/utils'
 type Chat = { id: number; title: string }
 type Chats = { chats: Chat[]; activeId: number; onPick: (id: number) => void; onNew: () => void }
 
+/** Example titles so the list looks like a real history (owner, 2026-10-28). They open nothing; delete this list when conversations are saved for real. */
+const PLACEHOLDERS = [
+  'Parking in Chapinero',
+  'Dumping hotspots',
+  'Repeated reports in Kennedy',
+  'Evening patrol, Usaquén',
+  'Blocked ramps near schools',
+  'Broken traffic lights, Suba',
+  'Recurring locations this month',
+  'Accessibility hazards in Engativá',
+  'Where to inspect tomorrow',
+  'Debris on main roads',
+]
+
 /** The tiny bullet that marks a conversation in the list (Figma icon/bullet): a 6 px dot in the 20 px icon slot. */
 function Bullet() {
   return (
@@ -72,11 +86,14 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, toggleItem }: Chats 
       </div>
       {toggleItem}
       {!collapsed && (
-        <nav className="flex flex-col gap-2.5 px-0.5">
+        <nav className="flex min-h-0 flex-col gap-2.5 overflow-y-auto px-0.5">
           <p className={title}>Investigations</p>
           <NavItem icon={Plus} label="New investigation" collapsed={false} onClick={onNew} />
           {chats.map((c) => (
             <NavItem key={c.id} icon={Bullet} label={c.title} active={c.id === activeId} collapsed={false} onClick={() => onPick(c.id)} />
+          ))}
+          {PLACEHOLDERS.map((t) => (
+            <NavItem key={t} icon={Bullet} label={t} collapsed={false} onClick={() => {}} />
           ))}
         </nav>
       )}
