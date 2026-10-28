@@ -109,7 +109,12 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, toggleItem }: Chats 
       )}
       {!collapsed && (
         <section className="flex flex-col gap-2.5 px-0.5">
-          <p className={title}>Cases</p>
+          <div className="flex items-center justify-between pr-1">
+            <p className={title}>Cases</p>
+            <Button size="icon" variant="ghost" className="size-6" aria-label="New case" title="New case" onClick={() => {}}>
+              <Plus className="size-4" />
+            </Button>
+          </div>
           <p className="px-3 text-meta text-muted-foreground">No cases yet.</p>
         </section>
       )}
