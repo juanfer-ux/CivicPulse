@@ -182,7 +182,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
         ) : !data ? (
           <p className="col-span-full text-muted-foreground">Loading…</p>
         ) : topLocalities.length ? (
-          topLocalities.map(([code, c]) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={trendOf(c.recent, c.before)} onClick={() => setFilters({ ...filters, locality: String(code) })} />)
+          topLocalities.map(([code, c]) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => setFilters({ ...filters, locality: filters.locality === String(code) ? '' : String(code) })} />)
         ) : (
           <p className="col-span-full text-muted-foreground">No incidents in your scope.</p>
         )}
