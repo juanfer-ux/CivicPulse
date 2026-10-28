@@ -3,6 +3,7 @@ import { List, MapTrifold, SidebarSimple, SignOut, UsersThree, X, type IconProps
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Avatar } from '@/components/ui/avatar'
+import { RoleBadge } from '@/components/ui/role-badge'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth'
 import { ROLE_LABELS } from '@/lib/users'
@@ -38,42 +39,58 @@ function MobileBrand() {
   )
 }
 
-/** `flush` = no side padding when expanded (Figma: Sign out lines up with the user row above it). */
-function NavItem({ icon: Icon, label, active, collapsed, flush, onClick }: { icon: ComponentType<IconProps>; label: string; active?: boolean; collapsed: boolean; flush?: boolean; onClick: () => void }) {
+function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: ComponentType<IconProps>; label: string; active?: boolean; collapsed: boolean; onClick: () => void }) {
   return (
-    <Button variant="ghost" className={`hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : `h-8 gap-2.5 justify-start ${flush ? 'px-0' : 'px-3'}`}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
+    <Button variant="ghost" className={`hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-8 gap-2.5 justify-start px-3'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
       <Icon className="size-5 shrink-0" weight={active ? 'fill' : 'regular'} />
       {!collapsed && label}
     </Button>
   )
 }
 
-/** The menu itself: logo, sections, and who is signed in. Used by the desktop column and the phone slide-out. */
+/** The menu itself, as in Figma Sidebar (2026-10-28): logo, a full-width divider, the Investigations and Cases groups, then who is signed in and Sign out. Used by the desktop column and the phone slide-out. */
 function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; view: View; onView: (v: View) => void; toggleItem?: React.ReactNode }) {
   const { profile, can, signOut } = useAuth()
+  const title = 'flex h-8 items-center px-3 text-section-label uppercase text-(--neutral-300)'
   return (
-    <div className="flex h-full flex-col gap-8 px-3 py-4">
+    <div className={`flex h-full flex-col gap-8 py-4 ${collapsed ? 'items-center px-5' : ''}`}>
       <div className={`flex flex-col gap-4 ${collapsed ? 'self-center' : ''}`}>
-        <Brand collapsed={collapsed} />
+        <div className={collapsed ? '' : 'px-4'}>
+          <Brand collapsed={collapsed} />
+        </div>
         <hr className="border-t" />
       </div>
       {toggleItem}
-      <nav className={`flex flex-col ${collapsed ? 'items-center gap-3' : 'gap-2.5'}`}>
-        {!collapsed && <p className="flex h-8 items-center px-3 text-section-label uppercase text-(--neutral-300)">Investigations</p>}
+      <nav className={`flex flex-col ${collapsed ? 'items-center gap-3' : 'gap-2.5 px-0.5'}`}>
+        {!collapsed && <p className={title}>Investigations</p>}
         <NavItem icon={MapTrifold} label="Map" active={view === 'map'} collapsed={collapsed} onClick={() => onView('map')} />
         {can('manage_users') && <NavItem icon={UsersThree} label="Users" active={view === 'users'} collapsed={collapsed} onClick={() => onView('users')} />}
       </nav>
+      {!collapsed && (
+        <section className="flex flex-col gap-2.5 px-0.5">
+          <p className={title}>Cases</p>
+          <p className="px-3 text-meta text-muted-foreground">No cases yet.</p>
+        </section>
+      )}
       <div className={`mt-auto flex flex-col gap-4 ${collapsed ? 'items-center' : ''}`}>
         {!collapsed && profile && (
-          <div className="flex items-center gap-3 text-body-sm desk:hidden">
-            <Avatar name={profile.full_name || 'Signed in'} />
-            <div className="min-w-0">
-              <p className="truncate">{shortName(profile.full_name) || 'Signed in'}</p>
-              <p className="truncate text-meta text-muted-foreground">{profile.role ? ROLE_LABELS[profile.role] : ''}</p>
+          <>
+            <div className="flex items-center gap-3 px-4 desk:hidden">
+              <Avatar name={profile.full_name || 'Signed in'} />
+              <div className="min-w-0 text-body-sm">
+                <p className="truncate">{shortName(profile.full_name) || 'Signed in'}</p>
+                <p className="truncate text-meta text-muted-foreground">{profile.role ? ROLE_LABELS[profile.role] : ''}</p>
+              </div>
             </div>
-          </div>
+            <div className="hidden items-center gap-3 px-4 desk:flex">
+              <Avatar name={profile.full_name || 'Signed in'} title={shortName(profile.full_name) || 'Signed in'} />
+              <RoleBadge role={profile.role} />
+            </div>
+          </>
         )}
-        <NavItem icon={SignOut} label="Sign out" flush collapsed={collapsed} onClick={signOut} />
+        <div className={collapsed ? '' : 'px-0.5'}>
+          <NavItem icon={SignOut} label="Sign out" collapsed={collapsed} onClick={signOut} />
+        </div>
       </div>
     </div>
   )
@@ -107,16 +124,17 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside className={`hidden shrink-0 border-r bg-card transition-[width] desk:block ${collapsed ? 'w-[64.5px]' : 'w-54'}`}>
+      <aside className={`hidden shrink-0 border-r bg-card transition-[width] desk:block ${collapsed ? 'w-[81px]' : 'w-60'}`}>
         <Menu_
           collapsed={collapsed}
           view={view}
           onView={onView}
           toggleItem={
-            <Button variant="ghost" className={collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-11 gap-4 px-3 justify-start hover:bg-sidebar'} aria-label={collapsed ? 'Expand menu' : 'Collapse menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'} onClick={toggle}>
-              {collapsed ? <SidebarSimple className="size-5 shrink-0 -scale-x-100" /> : <SidebarSimple className="size-5 shrink-0" />}
-              {!collapsed && 'Collapse'}
-            </Button>
+            collapsed && (
+              <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Expand menu" title="Expand menu" onClick={toggle}>
+                <SidebarSimple className="size-5 shrink-0 -scale-x-100" />
+              </Button>
+            )
           }
         />
       </aside>
