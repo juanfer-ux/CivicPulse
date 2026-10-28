@@ -241,11 +241,11 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       )
       map.addLayer(
         { id: 'answer-areas-line', type: 'line', source: 'answer-areas', paint: { 'line-color': token('--map-locality-line'), 'line-width': 1.4 } },
-        'incidents', // the outline is on top of the whole basemap (owner, 2026-10-27), so roads and water do not cut it; only the names and the incidents are above it
+        underLabels, // the outline is above every road, water and building (owner, 2026-10-27) but under every text (owner, 2026-10-28): the basemap's place and street names, and ours, are always the top layer
       )
       map.addLayer(
         { id: 'answer-areas-focus', type: 'line', source: 'answer-areas', filter: ['==', ['get', 'code'], -1], paint: { 'line-color': token('--map-locality-line-focus'), 'line-width': 1.4 } },
-        'incidents',
+        underLabels,
       )
       map.addLayer(
         {
