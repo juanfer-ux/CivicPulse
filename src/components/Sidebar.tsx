@@ -1,4 +1,4 @@
-import { useEffect, useState, type ComponentType } from 'react'
+import { useEffect, useRef, useState, type ComponentType, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent } from 'react'
 import { DotOutline, List, Plus, SidebarSimple, SignOut, X, type IconProps } from '@phosphor-icons/react'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
@@ -28,6 +28,66 @@ const PLACEHOLDERS = [
 
 /** The tiny bullet that marks a conversation or a case in a list (Figma icon/bullet): Phosphor DotOutline, fill weight, always solid, `neutral-300`. */
 const Bullet = (props: IconProps) => <DotOutline {...props} weight="fill" className={`${props.className ?? ""} text-(--neutral-300)`} />
+
+const WIDTH_KEY = 'sidebar-width'
+const SIDEBAR_MIN = 240
+const SIDEBAR_MAX = 340
+const clampWidth = (n: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, n))
+const readWidth = () => {
+  try {
+    const v = Number(localStorage.getItem(WIDTH_KEY))
+    return v ? clampWidth(v) : SIDEBAR_MIN
+  } catch {
+    return SIDEBAR_MIN
+  }
+}
+
+/** Drag handle on the right edge of the expanded desktop sidebar, like the agent panel's (240 to 340 px, double-click resets). */
+function SidebarResizer({ width, onChange }: { width: number; onChange: (px: number) => void }) {
+  const [dragging, setDragging] = useState(false)
+  const active = useRef(false)
+  const down = (e: PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId)
+    active.current = true
+    setDragging(true)
+  }
+  const move = (e: PointerEvent<HTMLDivElement>) => {
+    if (active.current) onChange(e.clientX - e.currentTarget.parentElement!.getBoundingClientRect().left)
+  }
+  const stop = () => {
+    active.current = false
+    setDragging(false)
+  }
+  const key = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'ArrowLeft') onChange(width - 16)
+    else if (e.key === 'ArrowRight') onChange(width + 16)
+    else if (e.key === 'Home') onChange(SIDEBAR_MIN)
+    else if (e.key === 'End') onChange(SIDEBAR_MAX)
+    else return
+    e.preventDefault()
+  }
+  return (
+    <div
+      role="separator"
+      aria-orientation="vertical"
+      aria-label="Resize the menu"
+      aria-valuenow={Math.round(width)}
+      aria-valuemin={SIDEBAR_MIN}
+      aria-valuemax={SIDEBAR_MAX}
+      tabIndex={0}
+      title="Drag to resize, double-click to reset"
+      onPointerDown={down}
+      onPointerMove={move}
+      onPointerUp={stop}
+      onPointerCancel={stop}
+      onKeyDown={key}
+      onDoubleClick={() => onChange(SIDEBAR_MIN)}
+      className="group absolute top-0 right-0 bottom-0 z-30 w-3 translate-x-1/2 cursor-col-resize touch-none select-none outline-none"
+    >
+      <div className={`mx-auto h-full w-0.5 transition-colors group-hover:bg-ai-border group-focus-visible:bg-ai-border ${dragging ? 'bg-ai-border' : 'bg-transparent'}`} />
+    </div>
+  )
+}
 
 const KEY = 'sidebar-collapsed'
 const read = () => {
@@ -151,6 +211,17 @@ export function Sidebar(props: Chats) {
     return () => document.removeEventListener('keydown', esc)
   }, [open])
 
+  const [width, setWidth] = useState(readWidth)
+  const changeWidth = (px: number) => {
+    const w = clampWidth(px)
+    setWidth(w)
+    try {
+      localStorage.setItem(WIDTH_KEY, String(w))
+    } catch {
+      /* works without storage */
+    }
+  }
+
   const toggle = () =>
     setCollapsed((c) => {
       try {
@@ -166,7 +237,8 @@ export function Sidebar(props: Chats) {
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside className={`hidden shrink-0 border-r bg-card transition-[width] desk:block ${collapsed ? 'w-[81px]' : 'w-60'}`}>
+      <aside style={{ width: collapsed ? 81 : width }} className="relative hidden shrink-0 border-r bg-card desk:block">
+        {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         <Menu_
           {...props}
           collapsed={collapsed}
