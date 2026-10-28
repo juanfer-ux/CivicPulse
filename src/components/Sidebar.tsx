@@ -75,6 +75,7 @@ function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: Comp
 /** The menu itself, as in Figma Sidebar (2026-10-28): logo, a full-width divider, the Investigations and Cases groups, then who is signed in and Sign out. Used by the desktop column and the phone slide-out. */
 function Menu_({ collapsed, chats, activeId, onPick, onNew, toggleItem }: Chats & { collapsed: boolean; toggleItem?: React.ReactNode }) {
   const { profile, signOut } = useAuth()
+  const current = chats.find((c) => c.id === activeId) // none while the open conversation is still empty
   const title = 'flex h-8 items-center px-3 text-section-label uppercase text-(--neutral-300)'
   return (
     <div className={`flex h-full flex-col gap-8 py-4 ${collapsed ? 'items-center px-5' : ''}`}>
@@ -93,7 +94,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, toggleItem }: Chats 
               <Plus className="size-4" />
             </Button>
           </div>
-          <NavItem icon={Bullet} label={chats.find((c) => c.id === activeId)?.title ?? 'New investigation'} active collapsed={false} onClick={() => onPick(activeId)} />
+          {current && <NavItem icon={Bullet} label={current.title} active collapsed={false} onClick={() => onPick(current.id)} />}
           <div className="flex flex-col gap-0.5">
             {chats
               .filter((c) => c.id !== activeId)
