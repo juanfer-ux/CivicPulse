@@ -30,7 +30,7 @@ const PLACEHOLDERS = [
 const Bullet = (props: IconProps) => <DotOutline {...props} weight="fill" className={`${props.className ?? ""} text-(--neutral-300)`} />
 
 const WIDTH_KEY = 'sidebar-width'
-const SIDEBAR_MIN = 240
+const SIDEBAR_MIN = 262 // Figma Sidebar (2026-10-29); it was 240
 const SIDEBAR_MAX = 340
 const clampWidth = (n: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, n))
 const readWidth = () => {
@@ -100,9 +100,9 @@ const read = () => {
 
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-[7.13px]'}`}>
-      <img src={mark} alt="" width={38} height={38} className="shrink-0" />
-      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={140} height={11} className="shrink-0" />}
+    <div className={`flex items-center ${collapsed ? 'justify-center' : 'h-[52px] gap-[8.7px]'}`}>
+      <img src={mark} alt="" width={collapsed ? 38 : 42} height={collapsed ? 38 : 42} className="shrink-0" />
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={153} height={12} className="shrink-0" />}
     </div>
   )
 }
@@ -131,52 +131,59 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
   const { profile, signOut } = useAuth()
   const title = 'flex h-8 items-center px-3 text-section-label uppercase text-(--neutral-200)'
   return (
-    <div className={`flex h-full flex-col gap-8 py-4 ${collapsed ? 'items-center px-5' : ''}`}>
-      <div className={`flex flex-col gap-4 ${collapsed ? 'self-center' : ''}`}>
-        <div className={collapsed ? '' : 'px-4'}>
-          <Brand collapsed={collapsed} />
-        </div>
-        <hr className="border-t" />
+    <div className={`flex h-full flex-col ${collapsed ? 'items-center gap-8 px-5 py-4' : 'justify-between'}`}>
+      {/* Expanded (Figma 2026-10-29): the logo sits in a 12 px padded header with a line under it, then the groups with 8 px at the sides. */}
+      <div className={collapsed ? 'contents' : 'flex min-h-0 flex-col gap-8'}>
+        {collapsed ? (
+          <div className="flex flex-col gap-4 self-center">
+            <Brand collapsed />
+            <hr className="border-t" />
+          </div>
+        ) : (
+          <div className="border-b p-3">
+            <Brand collapsed={false} />
+          </div>
+        )}
+        {toggleItem}
+        {!collapsed && (
+          <div className="flex min-h-0 flex-col gap-8 overflow-y-auto px-2">
+            <nav className="flex flex-col gap-3">
+              <div className="flex items-center justify-between pr-1">
+                <p className={title}>Investigations</p>
+                <Button size="icon" variant="ghost" className="size-6" aria-label="New investigation" title="New investigation" onClick={onNew}>
+                  <Plus className="size-4 text-(--neutral-200)" />
+                </Button>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                {chats.map((c) => (
+                  <NavItem key={c.id} icon={Bullet} label={c.title} active={c.id === activeId} collapsed={false} onClick={() => onPick(c.id)} />
+                ))}
+                {PLACEHOLDERS.map((t) => (
+                  <NavItem key={t} icon={Bullet} label={t} collapsed={false} onClick={() => {}} />
+                ))}
+              </div>
+            </nav>
+            <section className="flex flex-col gap-2.5">
+              <div className="flex items-center justify-between pr-1">
+                <p className={title}>Cases</p>
+                <Button size="icon" variant="ghost" className="size-6" aria-label="New case" title="New case" onClick={onNewCase}>
+                  <Plus className="size-4 text-(--neutral-200)" />
+                </Button>
+              </div>
+              {cases.length ? (
+                <div className="flex flex-col gap-0.5">
+                  {cases.map((c) => (
+                    <NavItem key={c.id} icon={Bullet} label={c.title} collapsed={false} onClick={() => {}} />
+                  ))}
+                </div>
+              ) : (
+                <p className="px-3 text-meta text-muted-foreground">No cases yet.</p>
+              )}
+            </section>
+          </div>
+        )}
       </div>
-      {toggleItem}
-      {!collapsed && (
-        <nav className="flex min-h-0 flex-col gap-3 overflow-y-auto px-0.5">
-          <div className="flex items-center justify-between pr-1">
-            <p className={title}>Investigations</p>
-            <Button size="icon" variant="ghost" className="size-6" aria-label="New investigation" title="New investigation" onClick={onNew}>
-              <Plus className="size-4 text-(--neutral-200)" />
-            </Button>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            {chats.map((c) => (
-              <NavItem key={c.id} icon={Bullet} label={c.title} active={c.id === activeId} collapsed={false} onClick={() => onPick(c.id)} />
-            ))}
-            {PLACEHOLDERS.map((t) => (
-              <NavItem key={t} icon={Bullet} label={t} collapsed={false} onClick={() => {}} />
-            ))}
-          </div>
-        </nav>
-      )}
-      {!collapsed && (
-        <section className="flex flex-col gap-2.5 px-0.5">
-          <div className="flex items-center justify-between pr-1">
-            <p className={title}>Cases</p>
-            <Button size="icon" variant="ghost" className="size-6" aria-label="New case" title="New case" onClick={onNewCase}>
-              <Plus className="size-4 text-(--neutral-200)" />
-            </Button>
-          </div>
-          {cases.length ? (
-            <div className="flex flex-col gap-0.5">
-              {cases.map((c) => (
-                <NavItem key={c.id} icon={Bullet} label={c.title} collapsed={false} onClick={() => {}} />
-              ))}
-            </div>
-          ) : (
-            <p className="px-3 text-meta text-muted-foreground">No cases yet.</p>
-          )}
-        </section>
-      )}
-      <div className={`mt-auto flex flex-col gap-4 ${collapsed ? 'items-center' : ''}`}>
+      <div className={collapsed ? 'mt-auto flex flex-col items-center gap-4' : 'flex flex-col gap-3 py-4'}>
         {!collapsed && profile && (
           <>
             <div className="flex items-center gap-3 px-4 desk:hidden">
@@ -192,7 +199,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
             </div>
           </>
         )}
-        <div className={collapsed ? '' : 'px-0.5'}>
+        <div className={collapsed ? '' : 'flex flex-col px-0.5'}>
           <NavItem icon={SignOut} label="Sign out" collapsed={collapsed} onClick={signOut} />
         </div>
       </div>
