@@ -59,7 +59,7 @@ function MobileBrand() {
 
 function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: ComponentType<IconProps>; label: string; active?: boolean; collapsed: boolean; onClick: () => void }) {
   return (
-    <Button variant="ghost" className={`hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-8 gap-2.5 justify-start px-3'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
+    <Button variant="ghost" className={`hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-8 gap-0.5 justify-start px-3'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
       <Icon className="size-5 shrink-0" weight={active ? 'fill' : 'regular'} />
       {!collapsed && <span className="truncate">{label}</span>}
     </Button>
@@ -69,7 +69,7 @@ function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: Comp
 /** The menu itself, as in Figma Sidebar (2026-10-28): logo, a full-width divider, the Investigations and Cases groups, then who is signed in and Sign out. Used by the desktop column and the phone slide-out. */
 function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, toggleItem }: Chats & { collapsed: boolean; toggleItem?: React.ReactNode }) {
   const { profile, signOut } = useAuth()
-  const title = 'flex h-8 items-center px-3 text-section-label uppercase text-(--neutral-300)'
+  const title = 'flex h-8 items-center px-3 text-section-label uppercase text-(--neutral-200)'
   return (
     <div className={`flex h-full flex-col gap-8 py-4 ${collapsed ? 'items-center px-5' : ''}`}>
       <div className={`flex flex-col gap-4 ${collapsed ? 'self-center' : ''}`}>
@@ -84,7 +84,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
           <div className="flex items-center justify-between pr-1">
             <p className={title}>Investigations</p>
             <Button size="icon" variant="ghost" className="size-6" aria-label="New investigation" title="New investigation" onClick={onNew}>
-              <Plus className="size-4" />
+              <Plus className="size-4 text-(--neutral-200)" />
             </Button>
           </div>
           <div className="flex flex-col gap-0.5">
@@ -102,7 +102,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
           <div className="flex items-center justify-between pr-1">
             <p className={title}>Cases</p>
             <Button size="icon" variant="ghost" className="size-6" aria-label="New case" title="New case" onClick={onNewCase}>
-              <Plus className="size-4" />
+              <Plus className="size-4 text-(--neutral-200)" />
             </Button>
           </div>
           {cases.length ? (
