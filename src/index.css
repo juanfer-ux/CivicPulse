@@ -154,7 +154,8 @@
 
 :root {
   --radius: 0.5rem;
-  --section-header-h: 70px; /* Section header height (Figma Section Header, the Map and Users headers); the map and filters start below it */
+  --section-header-h: 0px; /* TEST (2026-10-28): the map has no header, so the map and filters start at the top. Was 70px (Figma Section Header). Set SHOW_MAP_HEADER in Dashboard.tsx back to true and this back to 70px to restore. */
+  --agent-header-h: 70px; /* height of the Investigate and Ask title row (a line runs across the screen with the map header when it is shown) */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
   /* The whole palette is these 24 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */

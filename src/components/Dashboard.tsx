@@ -40,6 +40,9 @@ interface Props {
   children?: ReactNode
 }
 
+/** Test (owner, 2026-10-28): the map has no header. */
+const SHOW_MAP_HEADER = false
+
 export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighlight, tab, onTab, children }: Props) {
   const { profile } = useAuth()
   const [data, setData] = useState<Data | null>(null)
@@ -116,14 +119,16 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
       />
 
       {/* Section header (desktop only): 70 px, over the map to the right of the agent panel. */}
-      <SectionHeader title="Map" count={data ? `${filtered.length} incidents` : undefined} className="absolute top-0 right-0 left-(--agent-w) z-10">
-        {profile && (
-          <>
-            <RoleBadge role={profile.role} />
-            <Avatar name={profile.full_name || 'Signed in'} title={shortName(profile.full_name) || 'Signed in'} />
-          </>
-        )}
-      </SectionHeader>
+      {SHOW_MAP_HEADER && (
+        <SectionHeader title="Map" count={data ? `${filtered.length} incidents` : undefined} className="absolute top-0 right-0 left-(--agent-w) z-10">
+          {profile && (
+            <>
+              <RoleBadge role={profile.role} />
+              <Avatar name={profile.full_name || 'Signed in'} title={shortName(profile.full_name) || 'Signed in'} />
+            </>
+          )}
+        </SectionHeader>
+      )}
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. */}
       {chatMode && (
