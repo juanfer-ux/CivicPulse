@@ -10,10 +10,11 @@ import { fetchLocalities } from '@/lib/incidents'
 const loadChart = () => import('@/components/AnswerCharts')
 const AnswerChart = lazy(loadChart)
 
-type Turn = { question: string; result?: Answer; error?: string }
+export type Turn = { question: string; result?: Answer; error?: string }
 
-export function InvestigatePanel({ onHighlight, highlightIds, onFocusArea, onZoomArea }: { onHighlight: (ids: string[], areas?: Area[]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
-  const [turns, setTurns] = useState<Turn[]>([])
+/** `turns` are this conversation's questions and answers; the app keeps one list per conversation (the sidebar's Investigations). `onTurns` edits the conversation with this id, even if the person has switched to another one meanwhile. */
+export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea }: { chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
+  const setTurns = (edit: (t: Turn[]) => Turn[]) => onTurns(chatId, edit)
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
   const end = useRef<HTMLDivElement>(null)

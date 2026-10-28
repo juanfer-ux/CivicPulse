@@ -1,5 +1,5 @@
 import { useEffect, useState, type ComponentType } from 'react'
-import { List, MapTrifold, SidebarSimple, SignOut, UsersThree, X, type IconProps } from '@phosphor-icons/react'
+import { List, Plus, SidebarSimple, SignOut, X, type IconProps } from '@phosphor-icons/react'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Avatar } from '@/components/ui/avatar'
@@ -9,7 +9,17 @@ import { useAuth } from '@/lib/auth'
 import { ROLE_LABELS } from '@/lib/users'
 import { shortName } from '@/lib/utils'
 
-export type View = 'map' | 'users'
+type Chat = { id: number; title: string }
+type Chats = { chats: Chat[]; activeId: number; onPick: (id: number) => void; onNew: () => void }
+
+/** The tiny bullet that marks a conversation in the list (Figma icon/bullet): a 6 px dot in the 20 px icon slot. */
+function Bullet() {
+  return (
+    <span className="grid size-5 shrink-0 place-items-center" aria-hidden>
+      <span className="size-1.5 rounded-full bg-current" />
+    </span>
+  )
+}
 
 const KEY = 'sidebar-collapsed'
 const read = () => {
@@ -43,14 +53,14 @@ function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: Comp
   return (
     <Button variant="ghost" className={`hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-8 gap-2.5 justify-start px-3'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
       <Icon className="size-5 shrink-0" weight={active ? 'fill' : 'regular'} />
-      {!collapsed && label}
+      {!collapsed && <span className="truncate">{label}</span>}
     </Button>
   )
 }
 
 /** The menu itself, as in Figma Sidebar (2026-10-28): logo, a full-width divider, the Investigations and Cases groups, then who is signed in and Sign out. Used by the desktop column and the phone slide-out. */
-function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; view: View; onView: (v: View) => void; toggleItem?: React.ReactNode }) {
-  const { profile, can, signOut } = useAuth()
+function Menu_({ collapsed, chats, activeId, onPick, onNew, toggleItem }: Chats & { collapsed: boolean; toggleItem?: React.ReactNode }) {
+  const { profile, signOut } = useAuth()
   const title = 'flex h-8 items-center px-3 text-section-label uppercase text-(--neutral-300)'
   return (
     <div className={`flex h-full flex-col gap-8 py-4 ${collapsed ? 'items-center px-5' : ''}`}>
@@ -61,11 +71,15 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
         <hr className="border-t" />
       </div>
       {toggleItem}
-      <nav className={`flex flex-col ${collapsed ? 'items-center gap-3' : 'gap-2.5 px-0.5'}`}>
-        {!collapsed && <p className={title}>Investigations</p>}
-        <NavItem icon={MapTrifold} label="Map" active={view === 'map'} collapsed={collapsed} onClick={() => onView('map')} />
-        {can('manage_users') && <NavItem icon={UsersThree} label="Users" active={view === 'users'} collapsed={collapsed} onClick={() => onView('users')} />}
-      </nav>
+      {!collapsed && (
+        <nav className="flex flex-col gap-2.5 px-0.5">
+          <p className={title}>Investigations</p>
+          <NavItem icon={Plus} label="New investigation" collapsed={false} onClick={onNew} />
+          {chats.map((c) => (
+            <NavItem key={c.id} icon={Bullet} label={c.title} active={c.id === activeId} collapsed={false} onClick={() => onPick(c.id)} />
+          ))}
+        </nav>
+      )}
       {!collapsed && (
         <section className="flex flex-col gap-2.5 px-0.5">
           <p className={title}>Cases</p>
@@ -96,7 +110,7 @@ function Menu_({ collapsed, view, onView, toggleItem }: { collapsed: boolean; vi
   )
 }
 
-export function Sidebar({ view, onView }: { view: View; onView: (v: View) => void }) {
+export function Sidebar(props: Chats) {
   const [collapsed, setCollapsed] = useState(read)
   const [open, setOpen] = useState(false)
 
@@ -116,19 +130,16 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
       }
       return !c
     })
-  const go = (v: View) => {
-    onView(v)
-    setOpen(false)
-  }
+  // On phones the menu closes after a choice.
+  const phone: Chats = { ...props, onPick: (id) => (props.onPick(id), setOpen(false)), onNew: () => (props.onNew(), setOpen(false)) }
 
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
       <aside className={`hidden shrink-0 border-r bg-card transition-[width] desk:block ${collapsed ? 'w-[81px]' : 'w-60'}`}>
         <Menu_
+          {...props}
           collapsed={collapsed}
-          view={view}
-          onView={onView}
           toggleItem={
             collapsed && (
               <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Expand menu" title="Expand menu" onClick={toggle}>
@@ -154,7 +165,7 @@ export function Sidebar({ view, onView }: { view: View; onView: (v: View) => voi
             <Button size="icon" variant="ghost" className="absolute right-2 top-2" aria-label="Close menu" onClick={() => setOpen(false)}>
               <X className="size-5" />
             </Button>
-            <Menu_ collapsed={false} view={view} onView={go} />
+            <Menu_ {...phone} collapsed={false} />
           </aside>
         </div>
       )}
