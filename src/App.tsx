@@ -59,6 +59,7 @@ export default function App() {
   // Cases (sidebar): the plus adds a case to the list; there is no case page yet.
   const [cases, setCases] = useState<{ id: number; title: string }[]>([])
   const newCase = () => setCases((cs) => [{ id: (cs[0]?.id ?? 0) + 1, title: `New case ${(cs[0]?.id ?? 0) + 1}` }, ...cs])
+  const zoomArea = (code: number) => setZoomTo((z) => ({ code, n: (z?.n ?? 0) + 1 }))
   const [tab, setTab] = useState<Tab>('explore')
   const [agentWidth, setAgentWidth] = useAgentWidth()
 
@@ -68,10 +69,10 @@ export default function App() {
       <main className="relative min-w-0 flex-1" style={{ '--agent-w': agentWidthCss(agentWidth) } as CSSProperties}>
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
-          <Dashboard highlightIds={highlightIds} areas={areas} focusCode={focusCode} zoomTo={zoomTo} onClearHighlight={() => show([])} tab={tab} onTab={setTab}>
+          <Dashboard highlightIds={highlightIds} areas={areas} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab}>
             {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
-              <InvestigatePanel chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={(code) => setZoomTo((z) => ({ code, n: (z?.n ?? 0) + 1 }))} />
+              <InvestigatePanel chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} />
             </div>
           </Dashboard>
         </div>

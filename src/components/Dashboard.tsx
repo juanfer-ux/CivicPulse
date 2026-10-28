@@ -30,6 +30,8 @@ interface Props {
   areas: Area[]
   focusCode: number | null
   zoomTo: { code: number; n: number } | null
+  /** Ask the map to fly to a locality (a Stat Card was clicked). */
+  onZoomLocality: (code: number) => void
   onClearHighlight: () => void
   /** Active panel on mobile (on desktop everything is visible). */
   tab: Tab
@@ -37,7 +39,7 @@ interface Props {
   children?: ReactNode
 }
 
-export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighlight, tab, onTab, children }: Props) {
+export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -182,7 +184,11 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
         ) : !data ? (
           <p className="col-span-full text-muted-foreground">Loading…</p>
         ) : topLocalities.length ? (
-          topLocalities.map(([code, c]) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => setFilters({ ...filters, locality: filters.locality === String(code) ? '' : String(code) })} />)
+          topLocalities.map(([code, c]) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
+                const on = filters.locality !== String(code)
+                setFilters({ ...filters, locality: on ? String(code) : '' })
+                if (on) onZoomLocality(code) // fly to the locality, wherever the map is now
+              }} />)
         ) : (
           <p className="col-span-full text-muted-foreground">No incidents in your scope.</p>
         )}

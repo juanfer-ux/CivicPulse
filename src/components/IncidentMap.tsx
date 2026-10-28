@@ -383,16 +383,25 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
   // A bar of the answer clicked: zoom in on that locality.
   useEffect(() => {
     const map = mapRef.current
-    const f = zoomTo && localities.current?.features.find((x) => x.properties.code === zoomTo.code)
-    if (!ready || !map || !f) return
-    const bounds = new maplibregl.LngLatBounds()
-    const extend = (c: unknown): void => {
-      if (Array.isArray(c) && typeof c[0] === 'number') bounds.extend(c as [number, number])
-      else (c as unknown[]).forEach(extend)
+    if (!ready || !map || !zoomTo) return
+    let stale = false
+    ;(async () => {
+      // The boundaries are also needed when no answer is on the map (a Stat Card was clicked), so load them here too.
+      localities.current ??= await fetch('/bogota-localities.geojson').then((r) => r.json())
+      const f = localities.current?.features.find((x) => x.properties.code === zoomTo.code)
+      if (stale || !f) return
+      const bounds = new maplibregl.LngLatBounds()
+      const extend = (c: unknown): void => {
+        if (Array.isArray(c) && typeof c[0] === 'number') bounds.extend(c as [number, number])
+        else (c as unknown[]).forEach(extend)
+      }
+      extend(f.geometry.coordinates)
+      const wide = map.getContainer().clientWidth > 700
+      map.fitBounds(bounds, { padding: fitPadding(wide), maxZoom: 14, duration: 700 })
+    })()
+    return () => {
+      stale = true
     }
-    extend(f.geometry.coordinates)
-    const wide = map.getContainer().clientWidth > 700
-    map.fitBounds(bounds, { padding: fitPadding(wide), maxZoom: 14, duration: 700 })
   }, [ready, zoomTo])
 
   // One radius per group of incidents behind the agent's answer.
