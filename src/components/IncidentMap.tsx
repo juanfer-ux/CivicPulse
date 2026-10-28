@@ -15,8 +15,8 @@ const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 maplibregl.setWorkerUrl(workerUrl)
 
 /** Zoom where small dots turn into icon badges. */
-/** Room kept free around an answer when the map zooms to fit it. Desktop: top = answer banner 44 + 24 + Stat Cards 116 + 12 + filters 36 + 24; bottom = the legend (24 + 26) + 24; the sides 40. Phones: the filter bar on top, the bottom sheet under. */
-const fitPadding = (wide: boolean) => (wide ? { top: 256, bottom: 74, left: 40, right: 40 } : { top: 100, bottom: 60, left: 40, right: 40 })
+/** Room kept free around an answer when the map zooms to fit it. Desktop: top = answer banner 44 + 24 + Stat Cards 116 + 24 + filters 36 + 24; bottom = the legend (24 + 26) + 24; the sides 40. Phones: the filter bar on top, the bottom sheet under. */
+const fitPadding = (wide: boolean) => (wide ? { top: 268, bottom: 74, left: 40, right: 40 } : { top: 100, bottom: 60, left: 40, right: 40 })
 
 const BADGE_ZOOM = 14
 
