@@ -36,7 +36,7 @@ Which page holds which component (the "Components · " prefix was replaced by th
 | Actions & inputs | Button, Input, Textarea, Select, Select Menu, Checkbox, Multi-select, Form Field |
 | Data display | Badge, Status Badge, Role Badge, Avatar, Card, Stat Card, Summary Card, Table Row, User Card, Incident Row, Incident Card (with Media Tile, Video Player, Detail Row), Alert, Skeleton, Separator |
 | Navigation & layout | Sidebar, Sidebar Item, Nav Item, Tab Bar, Sheet Tabs, Mobile Top Bar, Section Header, Panel Header, Side Panel, Drawer |
-| Map & agent | Map Marker, Incident Radius, Filters Card (replaced by Filter Chip and Filter Bar, with Status Dot), Map Pin (default, selected, dimmed; the selected one shows at any zoom), Agent Panel, Suggestion, Message, Action Card, Answer Chart, Answer Banner, Map Zoom |
+| Map & agent | Map Marker, Incident Radius, Filters Card (replaced by Filter Chip and Filter Bar, with Status Dot), Map Pin (default, selected, dimmed; the selected one shows at any zoom), Agent Panel, Suggestion, Message, Action Card, Answer Chart, Answer Banner, Map Zoom, Map Legend |
 | Auth & brand | Auth Card, Logo |
 
 Rules (also in `CLAUDE.md` and the owner's Obsidian note *Design System Rules - Figma Pages and Layout*): frames on each page sit in **one horizontal row** (left to right, 100 px apart, same y), and every Components page has the background **`#3D3D43`**, including pages created later.

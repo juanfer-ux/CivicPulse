@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { CaretDown, CaretUp, ChatCircleDots, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
-import { SectionHeader } from '@/components/SectionHeader'
 import { MediaGallery } from '@/components/MediaGallery'
-import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { RoleBadge } from '@/components/ui/role-badge'
 import { FilterBar, NO_FILTERS, type Filters } from '@/components/FilterBar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,8 +15,6 @@ import {
   type Locality,
 } from '@/lib/incidents'
 import type { Area } from '@/lib/agent'
-import { useAuth } from '@/lib/auth'
-import { shortName } from '@/lib/utils'
 
 const DAY = 86_400_000
 
@@ -40,11 +35,7 @@ interface Props {
   children?: ReactNode
 }
 
-/** Test (owner, 2026-10-28): the map has no header. */
-const SHOW_MAP_HEADER = false
-
 export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighlight, tab, onTab, children }: Props) {
-  const { profile } = useAuth()
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -117,18 +108,6 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onClearHighl
         zoomTo={zoomTo}
         onSelect={select}
       />
-
-      {/* Section header (desktop only): 70 px, over the map to the right of the agent panel. */}
-      {SHOW_MAP_HEADER && (
-        <SectionHeader title="Map" count={data ? `${filtered.length} incidents` : undefined} className="absolute top-0 right-0 left-(--agent-w) z-10">
-          {profile && (
-            <>
-              <RoleBadge role={profile.role} />
-              <Avatar name={profile.full_name || 'Signed in'} title={shortName(profile.full_name) || 'Signed in'} />
-            </>
-          )}
-        </SectionHeader>
-      )}
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. */}
       {chatMode && (
