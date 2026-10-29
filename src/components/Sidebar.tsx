@@ -262,7 +262,7 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside style={{ width: collapsed ? 81 : width }} className="relative hidden shrink-0 bg-card desk:block desk:border-r desk:border-secondary">
+      <aside style={{ width: collapsed ? 72 : width }} className="relative hidden shrink-0 bg-card desk:block desk:border-r desk:border-secondary">
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         <Menu_
           {...props}
