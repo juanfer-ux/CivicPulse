@@ -67,7 +67,7 @@ export function AgentResizer({ frac, onChange }: { frac: number; onChange: (frac
       onPointerCancel={stop}
       onKeyDown={key}
       onDoubleClick={() => onChange(AGENT_DEFAULT)}
-      style={{ left: 'var(--agent-w)' }}
+      style={{ left: 'calc(var(--agent-w) + var(--panel-gap) / 2)' }}
       className="group absolute top-0 bottom-0 z-30 hidden w-3 -translate-x-1/2 cursor-col-resize touch-none select-none outline-none desk:block"
     >
       {/* The visible line: thin at rest, ai-border blue on hover, drag or keyboard focus. */}
