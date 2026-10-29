@@ -112,7 +112,7 @@ function AccountMenu({ onSignOut, side }: { onSignOut: () => void; side: 'above'
   return (
     <div className="relative" onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
       <Button variant="ghost" size="icon" aria-label="Account menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        <DotsThreeVertical className={`size-5 ${side === 'above' ? 'text-(--white)' : ''}`} />
+        <DotsThreeVertical weight="bold" className={`size-5 ${side === 'above' ? 'text-(--white)' : ''}`} />
       </Button>
       {open && (
         <div className={`absolute z-40 w-40 rounded-sm border bg-card p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
@@ -152,7 +152,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
   const title = 'flex h-8 items-center text-section-label uppercase text-(--neutral-200)'
   const plus = (label: string, onClick: () => void) => (
     <Button size="icon" variant="ghost" className="size-8" aria-label={label} title={label} onClick={onClick}>
-      <Plus className="size-4 text-(--white)" />
+      <Plus weight="bold" className="size-4 text-(--white)" />
     </Button>
   )
   return (
