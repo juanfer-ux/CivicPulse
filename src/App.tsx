@@ -64,7 +64,8 @@ export default function App() {
   const [agentWidth, setAgentWidth] = useAgentWidth()
 
   return (
-    <div className="flex h-svh overflow-hidden bg-(image:--screen-gradient) desk:gap-(--panel-gap) desk:p-3">
+    <div className="flex h-svh overflow-hidden bg-(image:--screen-gradient) desk:gap-1 desk:p-3">
+      {/* The sidebar and the agent panel sit 4 px apart (owner, 2026-10-30); the map keeps 8 px (--panel-gap) from the agent panel. */}
       <Sidebar chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
       <main className="relative min-w-0 flex-1" style={{ '--agent-w': agentWidthCss(agentWidth) } as CSSProperties}>
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
