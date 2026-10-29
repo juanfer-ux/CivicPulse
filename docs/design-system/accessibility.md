@@ -84,3 +84,5 @@ See the weight options on localhost: `/#components` → "Description text · wei
 2. Walk each screen with the keyboard only: every control reachable, focus visible, no traps.
 3. One VoiceOver pass over Sign in, Users and Create user.
 4. Re-check contrast whenever a color changes.
+
+- **Map focus ring (owner, 2026-10-30):** the map canvas has no focus outline, so clicking or dragging the map never draws a ring. The map still takes keyboard focus (arrow keys pan and zoom) but shows no ring; the zoom buttons keep their focus look. This is a deliberate trade-off against WCAG 2.4.7 for the map surface only.
