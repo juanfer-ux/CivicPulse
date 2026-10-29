@@ -234,7 +234,7 @@
   --map-water: #2C353C; /* map only (owner, 2026-10-27): rivers and lakes; CARTO's own color, now a token. Figma map/water */
   --map-waterway: #21303B; /* map only (owner, 2026-10-27): thin river lines; CARTO's is #3F5A6D. Figma map/waterway */
   --map-bogota-border: var(--neutral-200); /* map only (owner, 2026-10-26): the outline of the city of Bogotá, from OpenStreetMap. Not in Figma yet */
-  --map-background-gradient: radial-gradient(ellipse 71% 104% at 35% 21%, var(--neutral-400), var(--neutral-800)); /* owner, 2026-10-30: neutral-400 in the middle to neutral-800 at the edges; it was neutral-700 to neutral-900 */ /* subtle radial gradient behind the map, as in Figma (owner, 2026-10-26): neutral-700 near the top left, fading to neutral-900 at the edges, laid out over the whole screen (the map shows the part under it; Figma paint style map_background). Figma's gradient is slightly tilted; CSS cannot tilt it. */
+  --screen-gradient: radial-gradient(farthest-corner at 0% 0%, var(--neutral-400), var(--neutral-800)); /* the background of the whole screen (owner, 2026-10-30): neutral-400 in the top left corner, fading to neutral-800 at the opposite corner. The map has no background of its own and shows this through. Figma paint style screen_background */
   --map-background: var(--neutral-800); /* What shows behind the map while the land is off, i.e. the map screen background (owner, 2026-10-26). Figma map/background */
   --map-land: var(--neutral-700); /* The land is OFF for now (owner, 2026-10-26): its layers are hidden and the page color shows through, so this is only what dimmed pins blend toward. To use a land color, set LAND_ON in IncidentMap.tsx and this value (the one picked in Figma was #19191F). */
 
