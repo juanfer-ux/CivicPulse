@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type ComponentType, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent } from 'react'
 import { DotOutline, DotsThreeVertical, List, Plus, SidebarSimple, SignOut, X, type IconProps } from '@phosphor-icons/react'
+import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Avatar } from '@/components/ui/avatar'
@@ -89,6 +90,7 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
 }
 
 const KEY = 'sidebar-collapsed'
+const COLLAPSED_W = 64
 const read = () => {
   try {
     return localStorage.getItem(KEY) !== '0'
@@ -237,6 +239,19 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
   }, [open])
 
   const [width, setWidth] = useState(readWidth)
+  const aside = useRef<HTMLElement>(null)
+  const shownWidth = useRef(0) // the width on the last render: where a collapse or expand starts from (a drag changes it without animating)
+  // Collapse and expand: a quick GSAP tween of the width (0.2 s); the content is clipped while it runs.
+  useLayoutEffect(() => {
+    const el = aside.current
+    const to = collapsed ? COLLAPSED_W : width
+    if (el && shownWidth.current && shownWidth.current !== to && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      gsap.fromTo(el, { width: shownWidth.current, overflow: 'hidden' }, { width: to, duration: 0.2, ease: 'power2.out', clearProps: 'overflow' })
+    }
+  }, [collapsed]) // eslint-disable-line react-hooks/exhaustive-deps -- only the toggle animates, not a drag of the width
+  useLayoutEffect(() => {
+    shownWidth.current = collapsed ? COLLAPSED_W : width
+  })
   const changeWidth = (px: number) => {
     const w = clampWidth(px)
     setWidth(w)
@@ -262,7 +277,7 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside style={{ width: collapsed ? 64 : width }} className="relative hidden shrink-0 bg-card desk:block desk:border-r desk:border-secondary">
+      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className="relative hidden shrink-0 bg-card desk:block desk:border-r desk:border-secondary">
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         <Menu_
           {...props}
