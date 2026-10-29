@@ -36,10 +36,11 @@ interface Props {
   /** Active panel on mobile (on desktop everything is visible). */
   tab: Tab
   onTab: (tab: Tab) => void
+  onInspect: (open: boolean) => void // an incident is open: App makes room for its panel and collapses the sidebar
   children?: ReactNode
 }
 
-export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, children }: Props) {
+export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -104,6 +105,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
   const chatMode = highlightIds.length > 0 // an answer is on the map: the banner shows and everything below it moves down by --answer-banner-h
   const selected = filtered.find((i) => i.id === selectedId) ?? null
+  useEffect(() => onInspect(!!selected), [selected, onInspect])
   const select = (id: string | null) => {
     setSelectedId(id)
     if (id) setCollapsed(false)
@@ -127,7 +129,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. */}
       {chatMode && (
-        <div className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-800) px-5 text-meta text-(--indigo-200) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-[calc(var(--agent-w)+var(--panel-gap))] desk:inset-x-auto">
+        <div className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-800) px-5 text-meta text-(--indigo-200) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-[var(--map-left)] desk:inset-x-auto">
           <ChatCircleDots weight="fill" className="size-5 shrink-0 text-(--indigo-300)" aria-hidden />
           <span className="flex-1">While showing the agent's answer on the map, filters will narrow it down.</span>
           <Button size="sm" variant="outline" className="h-6" onClick={onClearHighlight}>
@@ -138,7 +140,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
       {/* Legend (owner, 2026-10-28, kept from the map header): how many incidents the map shows now, bottom left. */}
       {data && (
-        <p className="pointer-events-none absolute bottom-[4.5rem] left-3 z-10 rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200) desk:bottom-6 desk:left-[calc(var(--agent-w)+var(--panel-gap)+1.5rem)]">
+        <p className="pointer-events-none absolute bottom-[4.5rem] left-3 z-10 rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200) desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)]">
           Showing {filtered.length} {filtered.length === 1 ? 'incident' : 'incidents'}
         </p>
       )}
@@ -151,7 +153,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
           localities={data.localities}
           categories={data.categories}
           counts={byGroup}
-          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+3rem)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+3rem)]'} desk:right-6 desk:left-[calc(var(--agent-w)+var(--panel-gap)+1.5rem)] desk:mx-auto desk:max-w-[1280px]`}
+          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+3rem)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+3rem)]'} desk:right-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:mx-auto desk:max-w-[1280px]`}
         />
       )}
 
@@ -177,7 +179,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
       {/* The four localities with most incidents (Figma Stat Card), in a row above the filters; hidden while an incident is open, like the filters (owner, 2026-10-30); a click filters the map to that locality. On phones they sit in the Explore tab, two by two. */}
       <div
-        className={`${selected ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-4 overflow-y-auto desk:absolute desk:right-6 desk:left-[calc(var(--agent-w)+var(--panel-gap)+1.5rem)] desk:z-10 desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1.5rem)]' : 'desk:top-[calc(var(--section-header-h)+1.5rem)]'}`}
+        className={`${selected ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-4 overflow-y-auto desk:absolute desk:right-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:z-10 desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1.5rem)]' : 'desk:top-[calc(var(--section-header-h)+1.5rem)]'}`}
       >
         {error ? (
           <p className="col-span-full text-incident">{error}</p>
@@ -201,7 +203,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       </div>
       {/* The incident detail (owner, 2026-10-30, test): its own panel on the map, to the right of the agent panel, like one more sidebar. On phones it stays in the bottom sheet. */}
       {selected && (
-      <Card className={`max-h-[45%] shrink-0 overflow-auto bg-card/95 desk:absolute desk:bottom-0 desk:left-[calc(var(--agent-w)+var(--panel-gap))] desk:z-20 desk:max-h-none desk:w-[360px] desk:rounded-lg desk:border desk:bg-card ${chatMode ? 'desk:top-(--answer-banner-h)' : 'desk:top-0'}`}>
+      <Card className={`max-h-[45%] shrink-0 overflow-auto bg-card/95 desk:absolute desk:top-0 desk:bottom-0 desk:left-[calc(var(--agent-w)+var(--panel-gap))] desk:z-20 desk:max-h-none desk:w-[360px] desk:rounded-lg desk:border desk:bg-card`}>
         <CardHeader className="flex flex-row items-start justify-between gap-2">
           <div>
             <CardTitle>{selected.title}</CardTitle>

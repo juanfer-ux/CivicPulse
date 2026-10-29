@@ -222,8 +222,11 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
   )
 }
 
-export function Sidebar(props: Chats) {
+export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) {
   const [collapsed, setCollapsed] = useState(read)
+  useEffect(() => {
+    if (collapse) setCollapsed(true) // opening an incident frees space; not remembered, the owner's own toggle is
+  }, [collapse])
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
