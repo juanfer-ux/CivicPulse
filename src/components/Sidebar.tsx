@@ -3,10 +3,8 @@ import { DotOutline, List, Plus, SidebarSimple, SignOut, X, type IconProps } fro
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Avatar } from '@/components/ui/avatar'
-import { RoleBadge } from '@/components/ui/role-badge'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth'
-import { ROLE_LABELS } from '@/lib/users'
 import { shortName } from '@/lib/utils'
 
 type Chat = { id: number; title: string }
@@ -27,7 +25,7 @@ const PLACEHOLDERS = [
 ]
 
 /** The tiny bullet that marks a conversation or a case in a list (Figma icon/bullet): Phosphor DotOutline, fill weight, always solid, `neutral-300`. */
-const Bullet = (props: IconProps) => <DotOutline {...props} weight="fill" className={`${props.className ?? ""} text-(--neutral-300)`} />
+const Bullet = (props: IconProps) => <DotOutline {...props} weight="fill" className={`${props.className ?? ""} text-(--neutral-400)`} />
 
 const WIDTH_KEY = 'sidebar-width'
 const SIDEBAR_MIN = 266 // owner, 2026-10-29 (it was 262, and 240 before)
@@ -100,9 +98,28 @@ const read = () => {
 
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={`flex items-center ${collapsed ? 'justify-center' : 'h-12 gap-[7.2px]'}`}>
-      <img src={mark} alt="" width={38} height={38} className="shrink-0" />
-      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={142} height={11} className="shrink-0" />}
+    <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-[5.6px]'}`}>
+      <img src={mark} alt="" width={30} height={30} className="shrink-0" />
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={112} height={9} className="shrink-0" />}
+    </div>
+  )
+}
+
+/** The menu behind the hamburger in the account row (Figma 2026-10-29): Sign out. `side` = where the popover opens. */
+function AccountMenu({ onSignOut, side }: { onSignOut: () => void; side: 'above' | 'right' }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="relative" onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
+      <Button variant="ghost" size="icon" aria-label="Account menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <List className="size-5" />
+      </Button>
+      {open && (
+        <div className={`absolute z-40 w-40 rounded-sm border bg-card p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
+          <Button variant="ghost" className="h-8 w-full justify-start gap-2 px-3 hover:bg-sidebar" onClick={onSignOut}>
+            <SignOut className="size-5 shrink-0" /> Sign out
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
@@ -119,40 +136,41 @@ function MobileBrand() {
 
 function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: ComponentType<IconProps>; label: string; active?: boolean; collapsed: boolean; onClick: () => void }) {
   return (
-    <Button variant="ghost" className={`hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-8 gap-0.5 justify-start px-3'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
+    <Button variant="ghost" className={`hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-8 gap-0 justify-start pl-0 pr-5'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
       <Icon className="size-5 shrink-0" weight={active ? 'fill' : 'regular'} />
       {!collapsed && <span className="truncate">{label}</span>}
     </Button>
   )
 }
 
-/** The menu itself, as in Figma Sidebar (2026-10-28): logo, a full-width divider, the Investigations and Cases groups, then who is signed in and Sign out. Used by the desktop column and the phone slide-out. */
-function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, toggleItem }: Chats & { collapsed: boolean; toggleItem?: React.ReactNode }) {
-  const { profile, signOut } = useAuth()
-  const title = 'flex h-8 items-center px-3 text-section-label uppercase text-(--neutral-200)'
+/** The menu itself, as in Figma Sidebar (2026-10-29): a 70 px header with the logo and the collapse button, the Investigations and Cases groups, and at the bottom the account row. Used by the desktop column and the phone slide-out. */
+function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, toggleItem, onToggle }: Chats & { collapsed: boolean; toggleItem?: React.ReactNode; onToggle?: () => void }) {
+  const { profile, session, signOut } = useAuth()
+  const name = shortName(profile?.full_name) || 'Signed in'
+  const email = session?.user?.email
+  const title = 'flex h-8 items-center text-section-label uppercase text-(--neutral-200)'
+  const plus = (label: string, onClick: () => void) => (
+    <Button size="icon" variant="ghost" className="size-8" aria-label={label} title={label} onClick={onClick}>
+      <Plus className="size-4 text-(--neutral-200)" />
+    </Button>
+  )
   return (
-    <div className={`flex h-full flex-col ${collapsed ? 'items-center gap-8 px-5 py-4' : 'justify-between'}`}>
-      {/* Expanded (Figma 2026-10-29): the logo sits in a 70 px header (16 px at the sides) with a line under it, then the groups with 8 px at the sides. */}
-      <div className={collapsed ? 'contents' : 'flex min-h-0 flex-col gap-8'}>
-        {collapsed ? (
-          <div className="flex flex-col gap-4 self-center">
-            <Brand collapsed />
-            <hr className="border-t" />
-          </div>
-        ) : (
-          <div className="flex h-[70px] items-center border-b px-4">
-            <Brand collapsed={false} />
-          </div>
-        )}
-        {toggleItem}
+    <div className="flex h-full flex-col justify-between">
+      <div className="flex min-h-0 flex-col gap-4">
+        <div className={`flex h-[70px] shrink-0 items-center border-b ${collapsed ? 'justify-center border-(--neutral-500)' : 'justify-between border-(--neutral-400) px-3'}`}>
+          <Brand collapsed={collapsed} />
+          {!collapsed && onToggle && (
+            <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
+              <SidebarSimple className="size-5 shrink-0" />
+            </Button>
+          )}
+        </div>
         {!collapsed && (
-          <div className="flex min-h-0 flex-col gap-8 overflow-y-auto px-2">
-            <nav className="flex flex-col gap-3">
-              <div className="flex items-center justify-between pr-1">
+          <div className="flex min-h-0 flex-col gap-8 overflow-y-auto px-2.5 py-4">
+            <nav className="flex flex-col gap-4">
+              <div className="flex items-center justify-between pl-2.5 pr-1.5">
                 <p className={title}>Investigations</p>
-                <Button size="icon" variant="ghost" className="size-6" aria-label="New investigation" title="New investigation" onClick={onNew}>
-                  <Plus className="size-4 text-(--neutral-200)" />
-                </Button>
+                {plus('New investigation', onNew)}
               </div>
               <div className="flex flex-col gap-0.5">
                 {chats.map((c) => (
@@ -163,12 +181,10 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
                 ))}
               </div>
             </nav>
-            <section className="flex flex-col gap-2.5">
-              <div className="flex items-center justify-between pr-1">
+            <section className="flex flex-col gap-4">
+              <div className="flex items-center justify-between pl-2.5 pr-1.5">
                 <p className={title}>Cases</p>
-                <Button size="icon" variant="ghost" className="size-6" aria-label="New case" title="New case" onClick={onNewCase}>
-                  <Plus className="size-4 text-(--neutral-200)" />
-                </Button>
+                {plus('New case', onNewCase)}
               </div>
               {cases.length ? (
                 <div className="flex flex-col gap-0.5">
@@ -177,31 +193,29 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
                   ))}
                 </div>
               ) : (
-                <p className="px-3 text-meta text-muted-foreground">No cases yet.</p>
+                <p className="pl-2.5 text-meta text-muted-foreground">No cases yet.</p>
               )}
             </section>
           </div>
         )}
       </div>
-      <div className={collapsed ? 'mt-auto flex flex-col items-center gap-4' : 'flex flex-col gap-3 py-4'}>
-        {!collapsed && profile && (
+      {collapsed && <div className="flex justify-center">{toggleItem}</div>}
+      <div className={`flex shrink-0 flex-col border-t border-(--neutral-400) py-4 ${collapsed ? 'items-center gap-3' : ''}`}>
+        {collapsed ? (
           <>
-            <div className="flex items-center gap-3 px-4 desk:hidden">
-              <Avatar name={profile.full_name || 'Signed in'} />
-              <div className="min-w-0 text-body-sm">
-                <p className="truncate">{shortName(profile.full_name) || 'Signed in'}</p>
-                <p className="truncate text-meta text-muted-foreground">{profile.role ? ROLE_LABELS[profile.role] : ''}</p>
-              </div>
-            </div>
-            <div className="hidden items-center gap-3 px-4 desk:flex">
-              <Avatar name={profile.full_name || 'Signed in'} title={shortName(profile.full_name) || 'Signed in'} />
-              <RoleBadge role={profile.role} />
-            </div>
+            <AccountMenu onSignOut={signOut} side="right" />
+            <Avatar name={profile?.full_name || 'Signed in'} size="lg" title={name} />
           </>
+        ) : (
+          <div className="flex items-center gap-3 py-1 pl-4 pr-5">
+            <Avatar name={profile?.full_name || 'Signed in'} size="lg" />
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <p className="truncate text-body-strong text-(--neutral-100)">{name}</p>
+              {email && <p className="truncate text-caption text-(--neutral-200)">{email}</p>}
+            </div>
+            <AccountMenu onSignOut={signOut} side="above" />
+          </div>
         )}
-        <div className={collapsed ? '' : 'flex flex-col px-0.5'}>
-          <NavItem icon={SignOut} label="Sign out" collapsed={collapsed} onClick={signOut} />
-        </div>
       </div>
     </div>
   )
@@ -249,6 +263,7 @@ export function Sidebar(props: Chats) {
         <Menu_
           {...props}
           collapsed={collapsed}
+          onToggle={toggle}
           toggleItem={
             collapsed && (
               <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Expand menu" title="Expand menu" onClick={toggle}>
