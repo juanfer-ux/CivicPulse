@@ -175,9 +175,9 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
           </Button>
         </div>
 
-      {/* The four localities with most incidents (Figma Stat Card), in a row above the filters; a click filters the map to that locality. On phones they sit in the Explore tab, two by two. */}
+      {/* The four localities with most incidents (Figma Stat Card), in a row above the filters; hidden while an incident is open, like the filters (owner, 2026-10-30); a click filters the map to that locality. On phones they sit in the Explore tab, two by two. */}
       <div
-        className={`${tab === 'explore' && !selected ? 'grid' : 'hidden'} grid-cols-2 gap-4 overflow-y-auto desk:absolute desk:right-6 desk:left-[calc(var(--agent-w)+1.5rem)] desk:z-10 desk:grid desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1.5rem)]' : 'desk:top-[calc(var(--section-header-h)+1.5rem)]'}`}
+        className={`${selected ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-4 overflow-y-auto desk:absolute desk:right-6 desk:left-[calc(var(--agent-w)+1.5rem)] desk:z-10 desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1.5rem)]' : 'desk:top-[calc(var(--section-header-h)+1.5rem)]'}`}
       >
         {error ? (
           <p className="col-span-full text-incident">{error}</p>
