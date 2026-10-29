@@ -161,10 +161,11 @@
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
   /* The whole palette is these 24 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
+  --white: #ECECEE; /* new in Figma (2026-10-29), brighter than neutral-100; not used on screen yet */
   --neutral-900: #0E0E10;
   --neutral-800: #111113;
   --neutral-700: #18181B;
-  --neutral-600: #1B1B1F;
+  --neutral-600: #1F1F23; /* Figma (2026-10-29); it was #1B1B1F */
   --neutral-500: #303036;
   --neutral-400: #3C3C44;
   --neutral-300: #737381;

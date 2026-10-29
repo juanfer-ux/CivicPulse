@@ -23,8 +23,8 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 | Pair | Ratio | Use |
 |---|---|---|
 | `foreground` `#C1C1C8` on `background` `#18181B` | 9.9 | Normal text |
-| `foreground` on `card` `#1B1B1F` | 9.6 | Text in cards and inputs |
-| `muted-foreground` `#A9A9B2` on page / on card | 7.6 / 7.4 | Supporting text |
+| `foreground` on `card` `#1F1F23` | 9.2 | Text in cards and inputs |
+| `muted-foreground` `#A9A9B2` on page / on card | 7.6 / 7.0 | Supporting text |
 | `incident` `#E58C7D` on card | 6.9 | **All error text** |
 | `sidebar` on `primary` `#C1C1C8` | 10.8 | Text on the main button (rule: text on a light fill uses the `sidebar` color) |
 | `sidebar` on `destructive` `#EE8688` | 7.7 | Dangerous buttons and badges now use dark `sidebar` text (light text on it was 1.7 and failed 4.5) |
@@ -42,7 +42,7 @@ Method: keyboard walk, computed styles and the real page in a browser, contrast 
 | Check | Result |
 |---|---|
 | 1.4.3 Text over the moving video | Worst case over the whole loop: headline 7.9 : 1 (needs 3), subtitle 6.5 (needs 4.5), card description 7.2, Forgot password 10.0. The glow never gets close to a fail. |
-| 1.4.3 Other text | Button text 10.8, errors 6.9, placeholders 7.4 |
+| 1.4.3 Other text | Button text 10.8, errors 6.9, placeholders 7.0 |
 | 2.4.7 Focus visible | On focus the field border becomes `foreground` `#C1C1C8` (it was `ring` `#737381` until the `input` token moved to the same color, see decision 0022): more than 9 : 1 against the field. The 3 px halo alone is only about 1.9 : 1, so **keep the border change**. |
 | 2.2.2, 2.3.1 Motion | Pause button (36 px, labelled, toggles); autoplay is off with reduced motion; nothing flashes (pulses fade over seconds); video and still are hidden from screen readers |
 | 1.3.5, 3.3.8 Inputs | `autocomplete` on email and password, paste allowed, no puzzle or memory test |

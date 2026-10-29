@@ -33,35 +33,36 @@ Each class sets size, line height and weight together, so a component never need
 - Figma also has `meta-medium` (12 / 16, 500) for table headers; the code uses `text-meta` plus `font-medium`.
 - ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes; without that, the class merger dropped `text-label` from colored buttons (test in `utils.test.ts`).
 
-## 🎨 Colors (dark theme): 24 in total
+## 🎨 Colors (dark theme): 25 in total
 Every other token name (`primary`, `muted`, `accent`, `border`…) is only an alias of one of these 16, because shadcn components expect those names ([decision 0015](../decisions/0015-thirteen-color-palette.md)). Add a color only if none of these can do the job.
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
 |---|---|---|---|---|
-| 1 | `neutral-900` | `#0E0E10` | `sidebar` (`inset`) | Outline buttons, suggestions, role badge, agent panel, mobile bars, deepest surface; text on a light fill |
-| 2 | `neutral-800` | `#111113` | `ai` | Agent surfaces, Side Panel, section header (Figma 2026-10-26) |
-| 3 | `neutral-700` | `#18181B` | `background` | Page (Figma 2026-10-26) |
-| 4 | `neutral-600` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns, desktop sidebar (since 2026-10-27) |
-| 5 | `neutral-500` | `#303036` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
-| 6 | `neutral-400` | `#3C3C44` | `input` | `input` (borders of every control: inputs, dropdowns, chips, suggestions, outline buttons; since 2026-10-26, [decision 0026](../decisions/0026-control-border-neutral-400.md)); divider before the count in the section header |
-| 7 | `neutral-300` | `#737381` | `closed` (`ring`) | Focus ring, border of an active or pressed chip. Until 2026-10-26 it was also `input` (see [Borders](#borders)) |
-| 8 | `neutral-200` | `#A9A9B2` | `muted-foreground` | Supporting text, table headers, placeholders |
-| 9 | `neutral-100` | `#C1C1C8` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
-| 10 | `indigo-900` | `#10112A` | none | Deepest agent indigo. New (2026-10-28), not used on screen yet |
-| 11 | `indigo-800` | `#191B44` | none | New (2026-10-28), not used on screen yet |
-| 12 | `indigo-700` | `#272A68` | `ai-banner` (also map only, `--map-locality-line`) | Was the conversation banner background and the answer rings; not used on screen at the moment |
-| 13 | `indigo-600` | `#343193` | none | Not used on screen at the moment (was the locality outline until 2026-10-28). |
-| 14 | `indigo-500` | `#4C49C1` | none (map only, `--map-answer-radius-ring`) | Ring of the agent's answer radius (circle). |
-| 15 | `indigo-400` | `#5C59FF` | `ai-border` | Agent accents: the bars of an answer, the agent input ring, the panel resize line on hover. 3.9 : 1 on the agent panel, so **graphics only, never text** |
-| 16 | `indigo-300` | `#9593FF` | none | New (2026-10-28), not used on screen yet |
-| 17 | `indigo-200` | `#C1C0FF` | none | New (2026-10-28), not used on screen yet |
-| 18 | `indigo-100` | `#E7E6FF` | none | Lightest agent indigo. New (2026-10-28), not used on screen yet |
-| 19 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
-| 20 | `amber-400` | `#D0AC6B` | `warning` | Warning border (map list fallback), end of the AI gradient |
-| 21 | `coral-400` | `#E58C7D` | `incident` | Invalid fields, **all error text** |
-| 22 | `orange-400` | `#FF9F50` | none (map only, `--map-reviewing`) | Reviewing dots (added 2026-10-26, [decision 0024](../decisions/0024-sixteen-colors-map-statuses.md)) |
-| 23 | `blue-400` | `#495C8B` | none (map only, `--map-approved`) | Approved dots (same decision) |
-| 24 | `yellow-400` | `#FFEE6C` | none (map only, `--map-pending`) | Pending dots (same decision) |
+| 1 | `white` | `#ECECEE` | none | New in Figma (2026-10-29): brighter than `neutral-100`; not used on screen yet |
+| 2 | `neutral-900` | `#0E0E10` | `sidebar` (`inset`) | Outline buttons, suggestions, role badge, agent panel, mobile bars, deepest surface; text on a light fill |
+| 3 | `neutral-800` | `#111113` | `ai` | Agent surfaces, Side Panel, section header (Figma 2026-10-26) |
+| 4 | `neutral-700` | `#18181B` | `background` | Page (Figma 2026-10-26) |
+| 5 | `neutral-600` | `#1F1F23` | `card` (`popover`) | Cards, inputs, panels, dropdowns, desktop sidebar (since 2026-10-27) |
+| 6 | `neutral-500` | `#303036` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
+| 7 | `neutral-400` | `#3C3C44` | `input` | `input` (borders of every control: inputs, dropdowns, chips, suggestions, outline buttons; since 2026-10-26, [decision 0026](../decisions/0026-control-border-neutral-400.md)); divider before the count in the section header |
+| 8 | `neutral-300` | `#737381` | `closed` (`ring`) | Focus ring, border of an active or pressed chip. Until 2026-10-26 it was also `input` (see [Borders](#borders)) |
+| 9 | `neutral-200` | `#A9A9B2` | `muted-foreground` | Supporting text, table headers, placeholders |
+| 10 | `neutral-100` | `#C1C1C8` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, main button fill, "white" |
+| 11 | `indigo-900` | `#10112A` | none | Deepest agent indigo. New (2026-10-28), not used on screen yet |
+| 12 | `indigo-800` | `#191B44` | none | New (2026-10-28), not used on screen yet |
+| 13 | `indigo-700` | `#272A68` | `ai-banner` (also map only, `--map-locality-line`) | Was the conversation banner background and the answer rings; not used on screen at the moment |
+| 14 | `indigo-600` | `#343193` | none | Not used on screen at the moment (was the locality outline until 2026-10-28). |
+| 15 | `indigo-500` | `#4C49C1` | none (map only, `--map-answer-radius-ring`) | Ring of the agent's answer radius (circle). |
+| 16 | `indigo-400` | `#5C59FF` | `ai-border` | Agent accents: the bars of an answer, the agent input ring, the panel resize line on hover. 3.9 : 1 on the agent panel, so **graphics only, never text** |
+| 17 | `indigo-300` | `#9593FF` | none | New (2026-10-28), not used on screen yet |
+| 18 | `indigo-200` | `#C1C0FF` | none | New (2026-10-28), not used on screen yet |
+| 19 | `indigo-100` | `#E7E6FF` | none | Lightest agent indigo. New (2026-10-28), not used on screen yet |
+| 20 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
+| 21 | `amber-400` | `#D0AC6B` | `warning` | Warning border (map list fallback), end of the AI gradient |
+| 22 | `coral-400` | `#E58C7D` | `incident` | Invalid fields, **all error text** |
+| 23 | `orange-400` | `#FF9F50` | none (map only, `--map-reviewing`) | Reviewing dots (added 2026-10-26, [decision 0024](../decisions/0024-sixteen-colors-map-statuses.md)) |
+| 24 | `blue-400` | `#495C8B` | none (map only, `--map-approved`) | Approved dots (same decision) |
+| 25 | `yellow-400` | `#FFEE6C` | none (map only, `--map-pending`) | Pending dots (same decision) |
 
 Names say what a color is (family and lightness: neutrals are always 100–900 and listed 900 first; higher number = darker), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 16.
 
@@ -71,7 +72,7 @@ Names say what a color is (family and lightness: neutrals are always 100–900 a
 - **Bogotá outline** (`--map-bogota-border`, alias of `neutral-200`, 1.5 px, softened like the roads; not in Figma yet): the city's limit as one line, from `public/bogota-boundary.geojson` (OpenStreetMap relation 7426387, ODbL, downloaded 2026-10-26 via Nominatim, 19 KB; the basemap already credits OpenStreetMap). The 20 localidades are not in it.
 - **Map colors** (Figma `Map` collection, 2026-10-25): the map reads its own tokens, each an alias of a base color: the four statuses `--map-pending` (yellow-400), `--map-reviewing` (orange-400), `--map-approved` (blue-400), `--map-rejected` (red-400), `--map-dot-outline` (neutral-700), `--map-answer-ring` (`--ai-banner`), `--map-selected-ring` (neutral-100), `--map-roads` (`#363644`, minor and secondary streets, CARTO's is #414758) and `--map-main-roads` (`#2B2B36`, primary roads, CARTO's is #535666), both map-only colors outside the palette (owner 2026-10-26), outline and line tokens, all map-only and starting at CARTO's own colors so you set them in the Figma sheet (sizes stay CARTO's and are written next to each swatch): `--map-road-outlines` (about 1 px each side from zoom 14), `--map-road-outlines-minor` (`#1A1A1A`, tunnels, minor roads, bridges), `--map-building-outlines` (`#0E0E0E`, 1 px), `--map-label-halo` (`#222222`, 1 px; before it CARTO used #222, #111 and #181818), `--map-paths` (`#262626`), `--map-boundary-county` (`#222222`), `--map-boundary-country` (`#2C353C`), `--map-rail` (`#1A1A1A`) and `--map-airport` (`#111111`); and `--map-buildings` (`#3F4550`, building tops, they fade in over the land from zoom 13 to 16 so in between they look like a blend, map-only), `--map-road-outlines` (`#363644`, the thin outline under roads, CARTO's is #232323, map-only), `--map-boundary` (`#32323E`, state borders, CARTO's is #676772, map-only), `--map-water` (`#2C353C`, rivers and lakes, CARTO's own color made a token) and `--map-waterway` (`#21303B`, the thin river lines, CARTO's is `#3F5A6D`; owner 2026-10-27, both map-only and outside the palette), `--map-background-gradient` (a subtle radial gradient, neutral-700 near the top left fading to neutral-900 at the edges, laid out over the whole screen so the map shows the part under it: what shows behind the map while the land is off; owner 2026-10-26; Figma paint style `map_background`; CSS cannot reproduce Figma's slight tilt) and `--map-background` (its start color, neutral-800, which dimmed pins blend toward), `--map-land` (OFF for now: the land layers are hidden, as if invisible, and the page color shows through; `LAND_ON` in `IncidentMap.tsx` turns it back on, with the Figma color `#19191F`, a map-only color outside the palette: land, parks and the map background, overriding CARTO's #0E0E0E; owner 2026-10-26). Recolor the map by re-pointing these; the UI (warning badges, error text, focus rings) is untouched. Dots show four statuses: 🟨 Pending, 🟧 Reviewing, 🟦 Approved, 🟥 Rejected (`GROUPS` and `groupOf` in `src/lib/incidents.ts`; the nine database states are grouped as listed in [incident-lifecycle.md](../incident-lifecycle.md#-incident-status-9-values)). The other basemap (CARTO Dark Matter) colors are listed in the Figma sheet `Map colors` but are not tokens.
 - **Gradient** `--ai-gradient` (Figma paint style `ai_gradient`): `ai-border`, `incident`, `warning`, top to bottom at 10 %, 64 %, 105 %. Built from three of the 16, so not a new color. Used on the border of the Agent Panel (`gradient-border` utility in `src/index.css`).
-- In Figma the **Colors** collection holds exactly these 24 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 16`). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
+- In Figma the **Colors** collection holds exactly these 25 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 16`). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
 
 ### Borders
 Every border and divider in one place. Width is always `--border-width` (0.5 px). A border that is the only thing marking a control must keep **3:1 contrast** against what is next to it (WCAG 1.4.11); decorative dividers need not.
@@ -79,7 +80,7 @@ Every border and divider in one place. Width is always `--border-width` (0.5 px)
 | Border | Color | Contrast | Used for |
 |---|---|---|---|
 | Default and dividers | `border` = `neutral-500` | decorative | Cards, tables, section header line, agent panel right line, map zoom buttons |
-| **Controls** | `input` = `neutral-400` (owner's choice 2026-10-26, one border for every control) | 1.6:1 on `neutral-600` (input fill), 1.7:1 on `neutral-800` | Inputs, dropdowns, filter chips, suggestions, outline buttons. ⚠️ Below the 3:1 that WCAG 1.4.11 asks for text inputs (the darkest palette step that passes is `neutral-300`, 3.7:1 to 4.0:1; a custom `#666672` also passes at 3.03:1). Accepted by the owner for look and consistency. Chips, suggestions and buttons are identified by their text, so they are not affected |
+| **Controls** | `input` = `neutral-400` (owner's choice 2026-10-26, one border for every control) | 1.5:1 on `neutral-600` (input fill, `#1F1F23` since 2026-10-29), 1.7:1 on `neutral-800` | Inputs, dropdowns, filter chips, suggestions, outline buttons. ⚠️ Below the 3:1 that WCAG 1.4.11 asks for text inputs (the darkest palette step that passes is `neutral-300`, 3.7:1 to 4.0:1; a custom `#666672` also passes at 3.03:1). Accepted by the owner for look and consistency. Chips, suggestions and buttons are identified by their text, so they are not affected |
 | Focus ring | `ring` = `neutral-300` | 4.0:1 on `neutral-800` | Keyboard focus (3 px ring, not a border) |
 | Section header divider | `neutral-400` | decorative | Line before the count |
 | Agent accent | `ai-border` = `indigo-400` | | Gradient ring around the agent input (`ai_gradient`) |
