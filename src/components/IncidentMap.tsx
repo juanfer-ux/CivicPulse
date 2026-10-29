@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
+import { gsap } from 'gsap'
 import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
@@ -19,6 +20,8 @@ maplibregl.setWorkerUrl(workerUrl)
 const fitPadding = (wide: boolean) => (wide ? { top: 268, bottom: 74, left: 40, right: 40 } : { top: 100, bottom: 60, left: 40, right: 40 })
 
 const BADGE_ZOOM = 14
+/** Zoom the camera flies to when an incident is opened. */
+const INCIDENT_ZOOM = 17
 
 /** Paint the land with --map-land (true) or leave it invisible (false). */
 const LAND_ON = false
@@ -422,6 +425,30 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     map.setFilter('incident-selected', ['==', ['get', 'id'], selectedId ?? ''])
     map.setFilter('incident-selected-pin', ['==', ['get', 'id'], selectedId ?? ''])
   }, [ready, selectedId])
+
+  // Test (owner, 2026-10-30): opening an incident flies the camera to it with GSAP, easing the centre and the zoom together; any touch of the map stops it.
+  useEffect(() => {
+    const map = mapRef.current
+    const target = selectedId ? incidents.find((i) => i.id === selectedId) : null
+    if (!ready || !map || !target) return
+    const from = { lng: map.getCenter().lng, lat: map.getCenter().lat, zoom: map.getZoom() }
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const tween = gsap.to(from, {
+      lng: target.lng,
+      lat: target.lat,
+      zoom: Math.max(from.zoom, INCIDENT_ZOOM),
+      duration: still ? 0 : 1.4,
+      ease: 'power3.inOut',
+      onUpdate: () => map.jumpTo({ center: [from.lng, from.lat], zoom: from.zoom }),
+    })
+    const stop = () => tween.kill()
+    const events = ['mousedown', 'touchstart', 'wheel'] as const
+    for (const e of events) map.on(e, stop)
+    return () => {
+      tween.kill()
+      for (const e of events) map.off(e, stop)
+    }
+  }, [ready, selectedId]) // eslint-disable-line react-hooks/exhaustive-deps -- only a new selection moves the camera, not a filter change
 
   // While the agent's answer is shown (owner, 2026-10-26) the incidents that are not part of it are hidden, not toned down.
   // While an incident is selected every other dot or pin is toned down toward the land color (same hue, so its status stays readable), and the focused one draws on top.
