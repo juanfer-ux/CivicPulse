@@ -426,17 +426,25 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     map.setFilter('incident-selected-pin', ['==', ['get', 'id'], selectedId ?? ''])
   }, [ready, selectedId])
 
-  // Test (owner, 2026-10-30): opening an incident flies the camera to it with GSAP, easing the centre and the zoom together; any touch of the map stops it.
+  // Test (owner, 2026-10-30): opening an incident flies the camera to it with GSAP, easing the centre and the zoom together; any touch of the map stops it. Closing it flies back to where the map was before (a conscious decision to leave it).
+  const home = useRef<{ lng: number; lat: number; zoom: number } | null>(null)
   useEffect(() => {
     const map = mapRef.current
     const target = selectedId ? incidents.find((i) => i.id === selectedId) : null
-    if (!ready || !map || !target) return
+    if (!ready || !map) return
     const from = { lng: map.getCenter().lng, lat: map.getCenter().lat, zoom: map.getZoom() }
+    let to: typeof from | null = null
+    if (target) {
+      home.current ??= { ...from }
+      to = { lng: target.lng, lat: target.lat, zoom: Math.max(from.zoom, INCIDENT_ZOOM) }
+    } else if (home.current) {
+      to = home.current
+      home.current = null
+    }
+    if (!to) return
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const tween = gsap.to(from, {
-      lng: target.lng,
-      lat: target.lat,
-      zoom: Math.max(from.zoom, INCIDENT_ZOOM),
+      ...to,
       duration: still ? 0 : 1.4,
       ease: 'power3.inOut',
       onUpdate: () => map.jumpTo({ center: [from.lng, from.lat], zoom: from.zoom }),

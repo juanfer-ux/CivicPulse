@@ -226,8 +226,17 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
 
 export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) {
   const [collapsed, setCollapsed] = useState(read)
+  const autoCollapsed = useRef(false) // we collapsed it for an incident, so closing the incident expands it again (unless the owner toggled it meanwhile)
   useEffect(() => {
-    if (collapse) setCollapsed(true) // opening an incident frees space; not remembered, the owner's own toggle is
+    if (collapse) {
+      setCollapsed((c) => {
+        autoCollapsed.current = !c
+        return true
+      })
+    } else if (autoCollapsed.current) {
+      autoCollapsed.current = false
+      setCollapsed(false)
+    }
   }, [collapse])
   const [open, setOpen] = useState(false)
 
@@ -262,7 +271,8 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
     }
   }
 
-  const toggle = () =>
+  const toggle = () => {
+    autoCollapsed.current = false
     setCollapsed((c) => {
       try {
         localStorage.setItem(KEY, c ? '0' : '1')
@@ -271,6 +281,7 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
       }
       return !c
     })
+  }
   // On phones the menu closes after a choice.
   const phone: Chats = { ...props, onPick: (id) => (props.onPick(id), setOpen(false)), onNew: () => (props.onNew(), setOpen(false)), onNewCase: () => (props.onNewCase(), setOpen(false)) }
 
