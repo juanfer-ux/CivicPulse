@@ -7,7 +7,7 @@
 ### shadcn components (`src/components/ui/`)
 | Component | Variants and sizes | States | Code |
 |---|---|---|---|
-| **Button** | default, secondary, destructive, outline, ghost, link · sm, default, lg, icon, icon-lg; text is `text-button` (14 / 20, semi-bold), `text-button-sm` on sm (13.5 / 24) | default, hover, focus (3 px ring), disabled (50 %) | `button.tsx` |
+| **Button** | default, secondary, destructive, outline, ghost, link · sm, default, lg, icon, icon-lg; text is `text-button` (14 / 20, semi-bold), `text-button-sm` on sm (13.5 / 24) | default, hover, focus (3 px ring), disabled (50 %); an icon inside a button is the filled Phosphor weight (Figma `icon/sparkle-fill`, `icon/chevron-right-fill`, 2026-10-29) | `button.tsx` |
 | **Badge** | default, secondary, destructive, outline · default (20 px, caption), lg (30 px, meta) | n/a | `badge.tsx` |
 | **Input** | control height, bg `card`, border `input` (`neutral-300` since 2026-10-24; focus border `foreground` plus the 3 px halo), radius sm, body text, px 12; **every input has a visible label above it** (`text-label`, 6 px gap; a wrapping `<label>`), and the placeholder is only an example hint such as `you@example.com` ([decision 0023](../decisions/0023-labels-above-inputs.md)) | default, focus, filled, disabled, invalid | `input.tsx` |
 | **Card** | bg `card`, border, radius lg, padding 16, gap 12; subtitle title, body description | n/a | `card.tsx` |

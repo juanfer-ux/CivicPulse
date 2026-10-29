@@ -54,7 +54,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
       <div className="flex items-center desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:px-6">
         <CardHeader className="flex w-full flex-row items-center justify-between max-desk:mx-auto max-desk:max-w-[664px]">
           <CardTitle className="flex items-center gap-2 text-label">
-            <Sparkle className="size-4" aria-hidden /> Investigate and Ask
+            <Sparkle weight="fill" className="size-4" aria-hidden /> Investigate and Ask
           </CardTitle>
         </CardHeader>
       </div>

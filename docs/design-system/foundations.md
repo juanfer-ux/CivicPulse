@@ -93,7 +93,7 @@ Every border and divider in one place. Width is always `--border-width` (0.5 px)
 Figma follows this: Suggestion, Filter Chip, Input and the other controls all use `neutral-400`.
 
 ## 🔣 Icons
-Phosphor (`@phosphor-icons/react`, [decision 0025](../decisions/0025-phosphor-icons.md)): the **regular** weight everywhere, 1em by default, sized with `size-*` (sidebar items 20 px, 16 px elsewhere). The **fill** weight only on the map badges (car for parking, trash can for illegal dumping). Colour follows the text (`currentColor`). Phosphor icons are filled shapes, so no stroke tricks are needed. Mapping from the old Iconoir names: Group→UsersThree, LogOut→SignOut, Map→MapTrifold, MediaImage→Image, Menu→List, NavArrow→Caret, Sparks→Sparkle, Xmark→X, SidebarCollapse/Expand→SidebarSimple (mirrored when collapsed).
+Phosphor (`@phosphor-icons/react`, [decision 0025](../decisions/0025-phosphor-icons.md)): the **regular** weight everywhere, 1em by default, sized with `size-*` (sidebar items 20 px, 16 px elsewhere). The **fill** weight on the map badges (car for parking, trash can for illegal dumping), on the icons inside buttons (the Figma Button's leading Sparkle and trailing CaretRight, and the Gallery's Plus examples; owner 2026-10-29), on the "Investigate and Ask" header Sparkle, on the selected sidebar row's old solid icons, and on the sidebar bullet. Colour follows the text (`currentColor`). Phosphor icons are filled shapes, so no stroke tricks are needed. Mapping from the old Iconoir names: Group→UsersThree, LogOut→SignOut, Map→MapTrifold, MediaImage→Image, Menu→List, NavArrow→Caret, Sparks→Sparkle, Xmark→X, SidebarCollapse/Expand→SidebarSimple (mirrored when collapsed).
 
 ## 📏 Spacing, radius, controls
 | | Value |

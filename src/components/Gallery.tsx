@@ -63,7 +63,7 @@ function ConversationDemo({ width = 456 }: { width?: number }) {
     <div style={{ width }} className="flex h-[640px] max-w-full flex-col gap-3 border border-card bg-ai p-6 text-body-sm">
       <div className="mx-auto flex min-h-0 w-full max-w-[664px] flex-1 flex-col gap-8">
         <div className="flex items-center gap-2 text-label">
-          <Sparkle className="size-4" aria-hidden /> Investigate and Ask
+          <Sparkle weight="fill" className="size-4" aria-hidden /> Investigate and Ask
         </div>
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
           <Question text="Which localities have the most parking obstruction incidents?" />
@@ -202,17 +202,17 @@ export function Gallery() {
         <div className="flex flex-wrap items-start gap-4">
           <Measured>
             <Button size="icon" aria-label="Add">
-              <Plus />
+              <Plus weight="fill" />
             </Button>
           </Measured>
           <Measured>
             <Button size="icon-lg" aria-label="Add">
-              <Plus />
+              <Plus weight="fill" />
             </Button>
           </Measured>
           <Measured>
             <Button>
-              <Plus /> With icon
+              <Plus weight="fill" /> With icon
             </Button>
           </Measured>
           <Measured>
