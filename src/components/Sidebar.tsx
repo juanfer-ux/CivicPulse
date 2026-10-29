@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ComponentType, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent } from 'react'
-import { DotOutline, List, Plus, SidebarSimple, SignOut, X, type IconProps } from '@phosphor-icons/react'
+import { DotOutline, DotsThreeVertical, List, Plus, SidebarSimple, SignOut, X, type IconProps } from '@phosphor-icons/react'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Avatar } from '@/components/ui/avatar'
@@ -112,7 +112,7 @@ function AccountMenu({ onSignOut, side }: { onSignOut: () => void; side: 'above'
   return (
     <div className="relative" onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
       <Button variant="ghost" size="icon" aria-label="Account menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        <List className={`size-5 ${side === 'above' ? 'text-(--white)' : ''}`} />
+        <DotsThreeVertical className={`size-5 ${side === 'above' ? 'text-(--white)' : ''}`} />
       </Button>
       {open && (
         <div className={`absolute z-40 w-40 rounded-sm border bg-card p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
