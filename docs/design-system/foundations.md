@@ -38,8 +38,8 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
 |---|---|---|---|---|
-| 1 | `neutral-900` | `#0E0E10` | `sidebar` (`inset`) | Outline buttons, suggestions, role badge, agent panel, mobile bars, deepest surface; text on a light fill |
-| 2 | `neutral-800` | `#111113` | `ai` | Agent surfaces, Side Panel, section header (Figma 2026-10-26) |
+| 1 | `neutral-900` | `#0E0E10` | `sidebar` (`inset`), `ai` | Outline buttons, suggestions, role badge, agent panel background (`ai`, since 2026-10-29), mobile bars, deepest surface; text on a light fill |
+| 2 | `neutral-800` | `#111113` | none | Was the agent surface (`ai`) until 2026-10-29; free for now |
 | 3 | `neutral-700` | `#18181B` | `background` | Page (Figma 2026-10-26) |
 | 4 | `neutral-600` | `#1B1B1F` | `card` (`popover`) | Cards, inputs, panels, dropdowns, desktop sidebar (since 2026-10-27) |
 | 5 | `neutral-500` | `#303036` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
