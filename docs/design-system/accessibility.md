@@ -8,7 +8,7 @@
 | Area | Rule | Where |
 |---|---|---|
 | Language | Page is `lang="en"` | `index.html` |
-| Touch size | Controls are **44 px** tall below 1,440 px (36 px on desktop with a mouse) | Mobile sizes in [foundations.md](foundations.md#-spacing-radius-controls) |
+| Touch size | Controls are **44 px** tall below 1,440 px (36 px on desktop with a mouse, icon buttons 32 px) | Mobile sizes in [foundations.md](foundations.md#-spacing-radius-controls) |
 | Focus | Visible focus ring on buttons and inputs (`focus-visible`: 3 px ring plus a border change) | `ui/button.tsx`, `ui/input.tsx`, `src/lib/ui.ts` |
 | Names | Icon-only buttons and bare selects have an `aria-label` (menu, close, collapse, filters); decorative icons and the ring mark are hidden from screen readers | `Sidebar.tsx`, `Dashboard.tsx`, `UsersAdmin.tsx`, `Logo.tsx` |
 | Current page | The active menu item has `aria-current="page"` | `Sidebar.tsx` |
@@ -44,7 +44,7 @@ Method: keyboard walk, computed styles and the real page in a browser, contrast 
 | 1.4.3 Text over the moving video | Worst case over the whole loop: headline 7.9 : 1 (needs 3), subtitle 6.5 (needs 4.5), card description 7.2, Forgot password 10.0. The glow never gets close to a fail. |
 | 1.4.3 Other text | Button text 10.8, errors 6.9, placeholders 7.0 |
 | 2.4.7 Focus visible | On focus the field border becomes `foreground` `#C1C1C8` (it was `ring` `#737381` until the `input` token moved to the same color, see decision 0022): more than 9 : 1 against the field. The 3 px halo alone is only about 1.9 : 1, so **keep the border change**. |
-| 2.2.2, 2.3.1 Motion | Pause button (36 px, labelled, toggles); autoplay is off with reduced motion; nothing flashes (pulses fade over seconds); video and still are hidden from screen readers |
+| 2.2.2, 2.3.1 Motion | Pause button (32 px on desktop, 44 px on phones, labelled, toggles); autoplay is off with reduced motion; nothing flashes (pulses fade over seconds); video and still are hidden from screen readers |
 | 1.3.5, 3.3.8 Inputs | `autocomplete` on email and password, paste allowed, no puzzle or memory test |
 | 1.4.10, 1.4.12 Reflow, text spacing | No horizontal scroll at 320 px; no clipping with line height 1.5, letter spacing 0.12 em, word spacing 0.16 em |
 | 2.5.8, 2.5.3 | Targets 32–36 px (needs 24); accessible names equal the visible text |

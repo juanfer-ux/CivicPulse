@@ -38,7 +38,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
 |---|---|---|---|---|
-| 1 | `white` | `#ECECEE` | none | New in Figma (2026-10-29): brighter than `neutral-100`; not used on screen yet |
+| 1 | `white` | `#ECECEE` | none | New in Figma (2026-10-29): brighter than `neutral-100`; the plus buttons and the account menu icon in the sidebar use it |
 | 2 | `neutral-900` | `#0E0E10` | `sidebar` (`inset`) | Outline buttons, suggestions, role badge, agent panel, mobile bars, deepest surface; text on a light fill |
 | 3 | `neutral-800` | `#111113` | `ai` | Agent surfaces, Side Panel, section header (Figma 2026-10-26) |
 | 4 | `neutral-700` | `#18181B` | `background` | Page (Figma 2026-10-26) |
@@ -100,7 +100,7 @@ Phosphor (`@phosphor-icons/react`, [decision 0025](../decisions/0025-phosphor-ic
 |---|---|
 | Spacing | 4 px scale: `p-4` = 16, `gap-3` = 12, `gap-2` = 8 |
 | Radius | xs 2 (badges) · **sm 4 (buttons, inputs, selects, dropdowns)** · md 6 · **lg 8 (cards)** · xl 12 · 2xl 16 · full |
-| Control height, desktop | sm 32 · default 36 · lg 44 · icon 36 · icon-lg 44 |
+| Control height, desktop | sm 32 · default 36 · lg 44 · icon 32 (was 36, Figma 2026-10-29) · icon-lg 44 |
 | Control height, mobile | sm 40 · **default 44 (touch)** · lg 48 · icon 44 · icon-lg 48 |
 | Border | **0.5 px**, one token `--border-width` (Figma variable `border-width` in Spacing) for every border and divider; color `border`, inputs use `input`. A hairline on retina screens, drawn as 1 px on standard screens. The 3 px focus ring and map dots are not borders. |
 | Breakpoint | **1,440 px** (`desk`, `--breakpoint-desk: 90rem`): at and above, sidebar and floating panels; below, top bar and bottom sheet |

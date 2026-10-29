@@ -28,19 +28,20 @@ const PLACEHOLDERS = [
 const Bullet = (props: IconProps) => <DotOutline {...props} weight="fill" className={`${props.className ?? ""} text-(--neutral-400)`} />
 
 const WIDTH_KEY = 'sidebar-width'
-const SIDEBAR_MIN = 266 // owner, 2026-10-29 (it was 262, and 240 before)
-const SIDEBAR_MAX = 340
+const SIDEBAR_MIN = 260 // Figma min width of the expanded Sidebar (2026-10-29); it was 266, 262, 240
+const SIDEBAR_MAX = 380 // Figma max width (was 340)
+const SIDEBAR_DEFAULT = 284 // the width drawn in Figma
 const clampWidth = (n: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, n))
 const readWidth = () => {
   try {
     const v = Number(localStorage.getItem(WIDTH_KEY))
-    return v ? clampWidth(v) : SIDEBAR_MIN
+    return v ? clampWidth(v) : SIDEBAR_DEFAULT
   } catch {
-    return SIDEBAR_MIN
+    return SIDEBAR_DEFAULT
   }
 }
 
-/** Drag handle on the right edge of the expanded desktop sidebar, like the agent panel's (240 to 340 px, double-click resets). */
+/** Drag handle on the right edge of the expanded desktop sidebar, like the agent panel's (260 to 380 px, double-click resets to 284). */
 function SidebarResizer({ width, onChange }: { width: number; onChange: (px: number) => void }) {
   const [dragging, setDragging] = useState(false)
   const active = useRef(false)
@@ -79,7 +80,7 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
       onPointerUp={stop}
       onPointerCancel={stop}
       onKeyDown={key}
-      onDoubleClick={() => onChange(SIDEBAR_MIN)}
+      onDoubleClick={() => onChange(SIDEBAR_DEFAULT)}
       className="group absolute top-0 right-0 bottom-0 z-30 w-3 translate-x-1/2 cursor-col-resize touch-none select-none outline-none"
     >
       <div className={`mx-auto h-full w-0.5 transition-colors group-hover:bg-ai-border group-focus-visible:bg-ai-border ${dragging ? 'bg-ai-border' : 'bg-transparent'}`} />
@@ -111,7 +112,7 @@ function AccountMenu({ onSignOut, side }: { onSignOut: () => void; side: 'above'
   return (
     <div className="relative" onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
       <Button variant="ghost" size="icon" aria-label="Account menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        <List className="size-5" />
+        <List className={`size-5 ${side === 'above' ? 'text-(--white)' : ''}`} />
       </Button>
       {open && (
         <div className={`absolute z-40 w-40 rounded-sm border bg-card p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
@@ -151,7 +152,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
   const title = 'flex h-8 items-center text-section-label uppercase text-(--neutral-200)'
   const plus = (label: string, onClick: () => void) => (
     <Button size="icon" variant="ghost" className="size-8" aria-label={label} title={label} onClick={onClick}>
-      <Plus className="size-4 text-(--neutral-200)" />
+      <Plus className="size-4 text-(--white)" />
     </Button>
   )
   return (

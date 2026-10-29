@@ -107,7 +107,7 @@
     --control-sm: 32px;
     --control-default: 36px;
     --control-lg: 44px;
-    --control-icon: 36px;
+    --control-icon: 32px; /* Figma control/icon, desktop (2026-10-29); it was 36. Phones keep 44. */
     --control-icon-lg: 44px;
   }
 }
