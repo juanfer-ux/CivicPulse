@@ -195,63 +195,64 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       </div>
 
       <div
-        className={`${tab !== 'explore' || selected ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:rounded-lg desk:bg-ai desk:p-0`}
+        className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:rounded-lg desk:bg-ai desk:p-0`}
       >
         {children}
-        {selected && (
-        <Card className="max-h-[45%] shrink-0 overflow-auto bg-card/95 desk:mx-6 desk:mb-6">
-          <CardHeader className="flex flex-row items-start justify-between gap-2">
-            <div>
-              <CardTitle>{selected.title}</CardTitle>
-              <p className="text-meta text-muted-foreground">
-                {selected.reference} · {localityName.get(selected.locality_code)}
-              </p>
-            </div>
-            <Button size="icon" variant="ghost" aria-label="Close" onClick={() => setSelectedId(null)}>
-              <X />
-            </Button>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3 text-body-sm">
-            <div className="flex flex-wrap gap-1">
-              <Badge variant="secondary">{label(selected.status)}</Badge>
-              {selected.uncertainty_flags.map((f) => (
-                <Badge key={f} variant="outline">
-                  {label(f)}
-                </Badge>
-              ))}
-            </div>
-            <MediaGallery incidentId={selected.id} />
-            <p>{selected.description}</p>
-            <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-muted-foreground">
-              <dt>Location</dt>
-              <dd className="text-foreground">{selected.location_description}</dd>
-              <dt>Occurred</dt>
-              <dd className="text-foreground">{new Date(selected.occurred_at).toLocaleString('en-GB')}</dd>
-              <dt>Reported</dt>
-              <dd className="text-foreground">{new Date(selected.reported_at).toLocaleString('en-GB')}</dd>
-              <dt>Category</dt>
-              <dd className="text-foreground">
-                {data?.categories.find((c) => c.code === selected.category)?.name ?? label(selected.category)}
-              </dd>
-              <dt>Vehicle</dt>
-              <dd className="text-foreground">{label(selected.vehicle_type)}</dd>
-              <dt>AI</dt>
-              <dd className="text-foreground">
-                {selected.ai_classification} ({Math.round((selected.ai_confidence ?? 0) * 100)}% confidence)
-              </dd>
-              <dt>Validation</dt>
-              <dd className="text-foreground">{label(selected.validation_status)}</dd>
-              {selected.outcome && (
-                <>
-                  <dt>Outcome</dt>
-                  <dd className="text-foreground">{selected.outcome}</dd>
-                </>
-              )}
-            </dl>
-          </CardContent>
-        </Card>
-        )}
       </div>
+      {/* The incident detail (owner, 2026-10-30, test): its own panel on the map, to the right of the agent panel, like one more sidebar. On phones it stays in the bottom sheet. */}
+      {selected && (
+      <Card className={`max-h-[45%] shrink-0 overflow-auto bg-card/95 desk:absolute desk:bottom-0 desk:left-[calc(var(--agent-w)+var(--panel-gap))] desk:z-20 desk:max-h-none desk:w-[360px] desk:rounded-lg desk:border desk:bg-card ${chatMode ? 'desk:top-(--answer-banner-h)' : 'desk:top-0'}`}>
+        <CardHeader className="flex flex-row items-start justify-between gap-2">
+          <div>
+            <CardTitle>{selected.title}</CardTitle>
+            <p className="text-meta text-muted-foreground">
+              {selected.reference} · {localityName.get(selected.locality_code)}
+            </p>
+          </div>
+          <Button size="icon" variant="ghost" aria-label="Close" onClick={() => setSelectedId(null)}>
+            <X />
+          </Button>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3 text-body-sm">
+          <div className="flex flex-wrap gap-1">
+            <Badge variant="secondary">{label(selected.status)}</Badge>
+            {selected.uncertainty_flags.map((f) => (
+              <Badge key={f} variant="outline">
+                {label(f)}
+              </Badge>
+            ))}
+          </div>
+          <MediaGallery incidentId={selected.id} />
+          <p>{selected.description}</p>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-muted-foreground">
+            <dt>Location</dt>
+            <dd className="text-foreground">{selected.location_description}</dd>
+            <dt>Occurred</dt>
+            <dd className="text-foreground">{new Date(selected.occurred_at).toLocaleString('en-GB')}</dd>
+            <dt>Reported</dt>
+            <dd className="text-foreground">{new Date(selected.reported_at).toLocaleString('en-GB')}</dd>
+            <dt>Category</dt>
+            <dd className="text-foreground">
+              {data?.categories.find((c) => c.code === selected.category)?.name ?? label(selected.category)}
+            </dd>
+            <dt>Vehicle</dt>
+            <dd className="text-foreground">{label(selected.vehicle_type)}</dd>
+            <dt>AI</dt>
+            <dd className="text-foreground">
+              {selected.ai_classification} ({Math.round((selected.ai_confidence ?? 0) * 100)}% confidence)
+            </dd>
+            <dt>Validation</dt>
+            <dd className="text-foreground">{label(selected.validation_status)}</dd>
+            {selected.outcome && (
+              <>
+                <dt>Outcome</dt>
+                <dd className="text-foreground">{selected.outcome}</dd>
+              </>
+            )}
+          </dl>
+        </CardContent>
+      </Card>
+      )}
       </div>
     </>
   )
