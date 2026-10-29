@@ -112,7 +112,7 @@ function AccountMenu({ onSignOut, side }: { onSignOut: () => void; side: 'above'
   return (
     <div className="relative" onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
       <Button variant="ghost" size="icon" aria-label="Account menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        <DotsThreeVertical weight="bold" className={`size-5 ${side === 'above' ? 'text-(--white)' : ''}`} />
+        <DotsThreeVertical className={`size-5 ${side === 'above' ? 'text-(--white)' : ''}`} />
       </Button>
       {open && (
         <div className={`absolute z-40 w-40 rounded-sm border bg-card p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
@@ -138,7 +138,7 @@ function MobileBrand() {
 function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: ComponentType<IconProps>; label: string; active?: boolean; collapsed: boolean; onClick: () => void }) {
   return (
     <Button variant="ghost" className={`hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-8 gap-0 justify-start pl-0 pr-5'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
-      <Icon className="size-5 shrink-0" weight={active ? 'fill' : 'regular'} />
+      <Icon className="size-5 shrink-0" />
       {!collapsed && <span className="truncate">{label}</span>}
     </Button>
   )
@@ -152,7 +152,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
   const title = 'flex h-8 items-center text-section-label uppercase text-(--neutral-200)'
   const plus = (label: string, onClick: () => void) => (
     <Button size="icon" variant="ghost" className="size-8" aria-label={label} title={label} onClick={onClick}>
-      <Plus weight="bold" className="size-4 text-(--white)" />
+      <Plus className="size-4 text-(--white)" />
     </Button>
   )
   return (

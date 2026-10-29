@@ -1,5 +1,6 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
+import { IconContext } from '@phosphor-icons/react'
 import './index.css'
 import App from './App.tsx'
 import { AuthGate } from '@/components/AuthGate'
@@ -16,20 +17,23 @@ const charts = location.hash === '#charts' // chart options for the agent's answ
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ErrorBoundary>
-      {charts ? (
-        <Suspense fallback={null}>
-          <ChartGallery />
-        </Suspense>
-      ) : gallery ? (
-        <Gallery />
-      ) : (
-        <AuthProvider>
-          <AuthGate>
-            <App />
-          </AuthGate>
-        </AuthProvider>
-      )}
-    </ErrorBoundary>
+    {/* Every Phosphor icon is the bold weight (owner, 2026-10-30) unless it asks for another (fill on the map badges, the buttons' sparkle and the bullet). */}
+    <IconContext.Provider value={{ weight: 'bold' }}>
+      <ErrorBoundary>
+        {charts ? (
+          <Suspense fallback={null}>
+            <ChartGallery />
+          </Suspense>
+        ) : gallery ? (
+          <Gallery />
+        ) : (
+          <AuthProvider>
+            <AuthGate>
+              <App />
+            </AuthGate>
+          </AuthProvider>
+        )}
+      </ErrorBoundary>
+    </IconContext.Provider>
   </StrictMode>,
 )
