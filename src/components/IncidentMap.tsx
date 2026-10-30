@@ -4,12 +4,12 @@ import { gsap } from 'gsap'
 import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import { PIN_RISE, PROBLEM_CENTER, addBadges, addProblemMarkers, iconCategory } from '@/lib/markerIcons'
+import { PIN_RISE, PROBLEM_COUNT, PROBLEM_OFFSET, PROBLEM_SCALE, addBadges, addProblemMarkers, iconCategory } from '@/lib/markerIcons'
 import { labelPoint } from '@/lib/polygons'
 import { circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
 import { GROUPS, groupOf, label, typeOf, type Incident } from '@/lib/incidents'
-import type { ProblemRow } from '@/lib/problems'
+import { PROBLEM_STATUS, type ProblemRow, type ProblemStatus } from '@/lib/problems'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.
 const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
@@ -23,8 +23,10 @@ const fitPadding = (wide: boolean) => (wide ? { top: 268, bottom: 74, left: 40, 
 const BADGE_ZOOM = 14
 /** Zoom the camera flies to when an incident is opened. */
 const INCIDENT_ZOOM = 17
-/** Zoom the camera flies to when a persistent problem is opened (its incidents are all within about 75 m, so the street level shows them apart). */
-const PROBLEM_ZOOM = 17
+/** Zoom the camera flies to when a persistent problem is opened: close enough that its incidents (a few tens of metres around the marker) show as separate dots around the marker's tile. */
+const PROBLEM_ZOOM = 19
+/** Below this zoom a problem is a plain circle in its status color, like an incident dot (owner, 2026-10-30: the circle only from far out until about zoom 14); from here it is the tile with its count pill, the same zoom where incident dots become pins. Two tiles that would overlap are not both drawn: the one with fewer occurrences waits until you zoom in. */
+const PROBLEM_TILE_ZOOM = 14
 const NO_PROBLEMS: ProblemRow[] = []
 const MAX_FLY_ZOOM = 3 // motion comfort (owner, 2026-10-30): never animate more than 3 zoom levels; a farther trip jumps the rest first
 
@@ -68,9 +70,11 @@ interface Props {
   problems?: ProblemRow[]
   selectedProblemId?: string | null
   onSelectProblem?: (id: string) => void
+  /** Set while a problem is open: its incidents then draw as tiny dots in this problem status color (no pins), with the problem's marker in the middle. */
+  dotStatus?: ProblemStatus | null
 }
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, dotStatus = null }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
@@ -270,7 +274,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
           layout: {
             'text-field': ['get', 'name'],
             'text-font': ['Montserrat Medium', 'Open Sans Regular', 'Noto Sans Regular'], // upright, like the basemap's own place names (the first label layer is italic: waterways)
-            'text-size': 13,
+            'text-size': 12.5,
             'text-allow-overlap': false,
           },
           paint: { 'text-color': token('--neutral-100'), 'text-halo-color': token('--neutral-900'), 'text-halo-width': 1.5 },
@@ -293,23 +297,37 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       })
       // Persistent problems (decision 0030; Figma Problem Marker): one marker per problem, a light disc with the occurrence count over it, a status-colored ring and a category badge. The incidents of the open problem draw with the normal incident layers.
       map.addSource('problems', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      // Zoomed out: one circle per problem in its status color, a little bigger than an incident dot so problems stand out from the rest.
+      map.addLayer({
+        id: 'problem-dots',
+        type: 'circle',
+        source: 'problems',
+        maxzoom: PROBLEM_TILE_ZOOM,
+        paint: {
+          'circle-radius': ['step', ['zoom'], 5, 12, 7], // 10 px across below zoom 12, 14 px from 12
+          'circle-color': ['get', 'color'],
+          'circle-stroke-width': 2,
+          'circle-stroke-color': token('--map-dot-outline'),
+        },
+      })
       map.addLayer({
         id: 'problem-markers',
         type: 'symbol',
         source: 'problems',
-        filter: ['!=', ['get', 'id'], ''], // the open problem's marker is hidden so its incidents show where they are
+        minzoom: PROBLEM_TILE_ZOOM,
         layout: {
           'icon-image': ['concat', 'problem-', ['get', 'category'], '-', ['get', 'status']],
-          'icon-size': 0.5,
-          'icon-allow-overlap': true,
+          'icon-size': PROBLEM_SCALE,
+          'icon-offset': PROBLEM_OFFSET, // puts the tile, not the whole image with its count pill, on the spot
+          'icon-allow-overlap': false, // a tile that would sit on another one waits for more zoom, so no two numbers ever pile up
+          'symbol-sort-key': ['*', -1, ['get', 'count']], // and the problem with more occurrences wins the place
           'text-field': ['to-string', ['get', 'count']],
           'text-font': ['Montserrat Medium', 'Open Sans Regular', 'Noto Sans Regular'],
-          'text-size': 14,
-          'text-allow-overlap': true,
-          'text-ignore-placement': true,
+          'text-size': 12.5,
+          'text-allow-overlap': false,
         },
-        // The count sits on the disc's center, which is a little up and left of the image's center (the badge takes the corner).
-        paint: { 'text-color': token('--neutral-900'), 'text-translate': [(PROBLEM_CENTER - 48) / 2, (PROBLEM_CENTER - 48) / 2] },
+        // The number sits on the pill at the tile's upper right (the text is centered on the spot, so it is moved by the pill's offset).
+        paint: { 'text-color': token('--neutral-100'), 'text-translate': PROBLEM_COUNT },
       })
       // Layer order, top to bottom (owner, 2026-10-28): all the text (the basemap's names, then ours), the dots and pins, the locality highlights (fill, outline, radius), and under them the rest of the basemap. The basemap's text layers sit under our dots by default, so lift them to the top.
       const ours = new Set(['incident-badges', 'incident-selected-pin', 'answer-areas-name', 'problem-markers'])
@@ -319,12 +337,12 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
 
       // A click on an incident selects it; a click anywhere else on the map clears the selection.
       map.on('click', (e) => {
-        const problem = map.queryRenderedFeatures(e.point, { layers: ['problem-markers'] })[0]
+        const problem = map.queryRenderedFeatures(e.point, { layers: ['problem-markers', 'problem-dots'] })[0]
         if (problem) return onSelectProblemRef.current?.(String(problem.properties.id))
         const hit = map.queryRenderedFeatures(e.point, { layers: ['incident-selected-pin', 'incidents', 'incident-badges'] })[0]
         onSelectRef.current(hit ? String(hit.properties.id) : null)
       })
-      for (const layer of ['incident-selected-pin', 'incidents', 'incident-badges', 'problem-markers']) {
+      for (const layer of ['incident-selected-pin', 'incidents', 'incident-badges', 'problem-markers', 'problem-dots']) {
         map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'))
         map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''))
       }
@@ -344,15 +362,28 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     const map = mapRef.current
     if (!ready || !map) return
     const highlight = new Set(highlightIds)
+    const dot = dotStatus ? token(PROBLEM_STATUS[dotStatus].token) : null // an open problem's incidents all take the problem's color
     ;(map.getSource('incidents') as maplibregl.GeoJSONSource).setData({
       type: 'FeatureCollection',
-      features: incidents.map((i) => ({
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
-        properties: { id: i.id, color: token(GROUPS[groupOf(i.status)].token), dim: mix(token(GROUPS[groupOf(i.status)].token), token('--map-background'), KEEP), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id) },
-      })),
+      features: incidents.map((i) => {
+        const color = dot ?? token(GROUPS[groupOf(i.status)].token)
+        return {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
+          properties: { id: i.id, color, dim: mix(color, token('--map-background'), KEEP), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id) },
+        }
+      }),
     })
-  }, [ready, incidents, highlightIds])
+  }, [ready, incidents, highlightIds, dotStatus])
+  // An open problem shows its incidents as tiny dots at every zoom (no pins: a stack of identical pins is harder to read than dots around the marker).
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    const dots = !!dotStatus
+    map.setLayerZoomRange('incidents', 0, dots ? 24 : BADGE_ZOOM)
+    map.setLayoutProperty('incident-badges', 'visibility', dots ? 'none' : 'visible')
+    map.setPaintProperty('incidents', 'circle-radius', (dots ? 3.5 : ['step', ['zoom'], 3, 12, 5]) as never)
+  }, [ready, dotStatus])
 
   useEffect(() => {
     const map = mapRef.current
@@ -362,15 +393,10 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       features: problems.map((p) => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
-        properties: { id: p.id, count: p.occurrences_n, category: iconCategory(p.category), status: p.status },
+        properties: { id: p.id, count: p.occurrences_n, category: iconCategory(p.category), status: p.status, color: token(PROBLEM_STATUS[p.status].token) },
       })),
     })
   }, [ready, problems])
-  useEffect(() => {
-    const map = mapRef.current
-    if (ready && map) map.setFilter('problem-markers', ['!=', ['get', 'id'], selectedProblemId ?? ''])
-  }, [ready, selectedProblemId])
-
   // When an answer arrives the map moves to show all of it (owner, 2026-10-27), clear of the banner, the filters and the summary card.
   useEffect(() => {
     const map = mapRef.current

@@ -252,7 +252,7 @@ $$;
 -- Address text compared without case, accents, punctuation or repeated spaces.
 create function public.norm_addr(t text) returns text language sql immutable set search_path = '' as $$
   select trim(regexp_replace(regexp_replace(lower(translate(coalesce(t, ''),
-    'áéíóúüñÁÉÍÓÚÜÑ', 'aeiouunAEIOUUN')), '[^a-z0-9 ]', ' ', 'g'), '\s+', ' ', 'g'))
+    U&'\00E1\00E9\00ED\00F3\00FA\00FC\00F1\00C1\00C9\00CD\00D3\00DA\00DC\00D1', 'aeiouunAEIOUUN')), '[^a-z0-9 ]', ' ', 'g'), '\s+', ' ', 'g'))
 $$;
 
 -- Stage 2: put a report that belongs to problem p into an occurrence (the same event, or a new one) and write the link.
@@ -435,7 +435,7 @@ begin
   select * into first_partner from public.incidents where id = partner_ids[1];
   insert into public.problems (reference, title, category, locality_code, lat, lng, location_description, dataset, is_synthetic)
   values ('PR-' || lpad(nextval('public.problem_ref_seq')::text, 5, '0'),
-          (select name from public.incident_categories where code = i.category) || ' · ' || first_partner.location_description,
+          (select name from public.incident_categories where code = i.category) || ' - ' || first_partner.location_description,
           i.category, i.locality_code, first_partner.lat, first_partner.lng, first_partner.location_description,
           i.evidence_metadata ->> 'dataset', i.is_synthetic)
   returning id into new_problem;

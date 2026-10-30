@@ -70,45 +70,55 @@ export async function addBadges(map: { addImage: (id: string, data: ImageData) =
   )
 }
 
-/** Persistent-problem marker (decision 0030; Figma Problem Marker): a light disc with a status-colored ring and a small badge with the category's icon. The occurrence count is drawn over the disc by the layer. One image per category and status. */
+/** Persistent-problem marker (decision 0030; Figma Map Marker `type=selected` + `type=count`, owner's test 2026-10-30): a rounded 32 px tile in the problem's status color with the category icon in it, and a count pill (neutral-700, outlined neutral-400) overhanging its upper right. One image per category and status; the number itself is drawn by the layer. */
 export const problemMarkerId = (category: string, status: string) => `problem-${iconCategory(category)}-${status}`
-const P = 96 // image px; shown at 0.5, so 48 px like Figma
-/** Where the disc's center sits in the image, so the layer can center the count on it. */
-export const PROBLEM_CENTER = 44
+/** The image is drawn at 2x and shown at half size, so the tile is 32 px on screen. */
+export const PROBLEM_SCALE = 0.5
+/** Image px: the tile's center, and the image's center, so the layer can put the tile (not the image) on the spot. */
+const OUTLINE_PX = 2 // the tile's outline, outside, in screen px (owner, 2026-10-30): neutral-900
+const PAD = Math.ceil(OUTLINE_PX / PROBLEM_SCALE) // image px kept free left of and below the tile so the outline is not cut off
+const TILE_CENTER = { x: 32 + PAD, y: 60 }
+const PILL_CENTER = { x: 70 + PAD, y: 22 }
+const IMAGE_SIZE = { w: 104 + PAD, h: 92 + PAD }
+export const PROBLEM_OFFSET: [number, number] = [IMAGE_SIZE.w / 2 - TILE_CENTER.x, IMAGE_SIZE.h / 2 - TILE_CENTER.y]
+/** Where the pill's center is from the tile's center, in screen px, for the number. */
+export const PROBLEM_COUNT: [number, number] = [(PILL_CENTER.x - TILE_CENTER.x) * PROBLEM_SCALE, (PILL_CENTER.y - TILE_CENTER.y) * PROBLEM_SCALE]
 
-async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], ring: string) {
+async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string) {
   const { renderToStaticMarkup } = await import('react-dom/server')
-  const svg = renderToStaticMarkup(createElement(Icon, { color: token('--neutral-100'), width: 24, height: 24, weight: 'fill' }))
+  const svg = renderToStaticMarkup(createElement(Icon, { color: token('--neutral-900'), width: 48, height: 48, weight: 'fill' }))
   const img = new Image()
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
   await img.decode()
   const c = document.createElement('canvas')
-  c.width = c.height = P
+  c.width = IMAGE_SIZE.w
+  c.height = IMAGE_SIZE.h
   const g = c.getContext('2d')!
-  g.beginPath() // the disc
-  g.arc(PROBLEM_CENTER, PROBLEM_CENTER, 40, 0, Math.PI * 2)
-  g.fillStyle = token('--neutral-100')
-  g.fill()
-  g.beginPath() // the ring sits inside the disc's edge
-  g.arc(PROBLEM_CENTER, PROBLEM_CENTER, 37, 0, Math.PI * 2)
-  g.lineWidth = 6
-  g.strokeStyle = ring
+  g.beginPath() // the tile, with an outline outside it: stroke twice as wide, then paint the fill over the inner half
+  g.roundRect(PAD, 28, 64, 64, 8)
+  g.lineJoin = 'round'
+  g.lineWidth = (OUTLINE_PX / PROBLEM_SCALE) * 2
+  g.strokeStyle = token('--neutral-900')
   g.stroke()
-  g.beginPath() // the category badge, bottom right, with a thin light outline
-  g.arc(76, 76, 20, 0, Math.PI * 2)
-  g.lineWidth = 3
-  g.strokeStyle = token('--neutral-100')
-  g.stroke()
-  g.fillStyle = token('--neutral-900')
+  g.fillStyle = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token)
   g.fill()
-  g.drawImage(img, 64, 64, 24, 24)
-  return g.getImageData(0, 0, P, P)
+  g.drawImage(img, PAD + 8, 36, 48, 48)
+  g.beginPath() // the count pill: 32 x 22, fully rounded, a 2 px outline inside
+  g.roundRect(38 + PAD, 0, 64, 44, 22)
+  g.fillStyle = token('--neutral-700')
+  g.fill()
+  g.beginPath()
+  g.roundRect(40 + PAD, 2, 60, 40, 20)
+  g.lineWidth = 4
+  g.strokeStyle = token('--neutral-400')
+  g.stroke()
+  return g.getImageData(0, 0, IMAGE_SIZE.w, IMAGE_SIZE.h)
 }
 
 export async function addProblemMarkers(map: { addImage: (id: string, data: ImageData) => void }) {
   await Promise.all(
     Object.entries(ICONS).flatMap(([category, Icon]) =>
-      Object.entries(PROBLEM_STATUS).map(async ([status, s]) => map.addImage(problemMarkerId(category, status), await problemMarker(Icon, token(s.token)))),
+      Object.keys(PROBLEM_STATUS).map(async (status) => map.addImage(problemMarkerId(category, status), await problemMarker(Icon, status))),
     ),
   )
 }

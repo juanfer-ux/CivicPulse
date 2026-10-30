@@ -182,6 +182,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         incidents={mapIncidents}
         problems={mode === 'problems' ? problemsFiltered : undefined}
         selectedProblemId={selectedProblem?.id ?? null}
+        dotStatus={selectedProblem?.status ?? null}
         onSelectProblem={selectProblem}
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
