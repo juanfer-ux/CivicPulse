@@ -452,7 +452,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     const tween = gsap.to(from, {
       ...to,
       duration: still ? 0 : 0.5 + 0.4 * (Math.abs(to.zoom - from.zoom) / MAX_FLY_ZOOM), // 0.5 s for a short hop up to 0.9 s for the longest
-      ease: 'power2.out',
+      ease: 'sine.inOut', // peak speed 5 zoom levels/s and a soft start; power2.out peaked at 10 and started at full speed
       onUpdate: () => map.jumpTo({ center: [from.lng, from.lat], zoom: from.zoom }),
     })
     const stop = () => tween.kill()
