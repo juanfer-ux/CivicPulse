@@ -61,8 +61,8 @@ erDiagram
 | 🛠️ Agent tools | `tool_incidents_by_locality`, `tool_time_distribution`, `tool_period_comparison`, `tool_recurring_locations`, `tool_candidate_areas` | Run **as the signed-in user** (RLS applies), need the `ask_agent` permission, take an optional category. See [ai-agent.md](ai-agent.md). |
 
 ## 🌱 Seed data
-- `supabase/seed/synthetic_incidents.sql`: 500 **parking** incidents over 120 days across 19 localities (Sumapaz has none: it lies south of the allowed latitude), recurring hotspots, a Chapinero spike in the last 30 days.
-- `supabase/seed/synthetic_illegal_dumping.sql`: 150 **illegal dumping** incidents, concentrated in the south (Ciudad Bolívar, Usme, Bosa, Kennedy, Tunjuelito), mostly at night, with recurring hotspots.
+- `supabase/seed/synthetic_incidents.sql`: 500 **parking** incidents over 120 days across 19 localities (Sumapaz has none: it lies south of the allowed latitude), recurring hotspots, a Chapinero spike in the last 30 days. Positions sit on real streets: each locality has a pool of 32 street points (read from the basemap roads, 2026-10-30), hotspots spread reports about 20 m along one street, other reports pick a random street point. The delete, duplicates and media inserts skip the `problems_v1` dataset, so re-running it never touches the problems layer; run `synthetic_problems.sql` last.
+- `supabase/seed/synthetic_illegal_dumping.sql`: 150 **illegal dumping** incidents, concentrated in the south (Ciudad Bolívar, Usme, Bosa, Kennedy, Tunjuelito), mostly at night, with recurring hotspots, placed on streets the same way.
 - Both include placeholder media rows and are re-runnable; each deletes only its own category.
 
 ## 📦 Migrations (run in this order)
@@ -109,7 +109,7 @@ erDiagram
 
 **Matching** (`match_unlinked()`, owner-only, never a trigger, never updates `incidents`): see [ai-agent.md](ai-agent.md#-matching-is-rules-not-ai) and [incident-lifecycle.md](incident-lifecycle.md#-problem-status-4-values).
 
-**Seed:** `supabase/seed/synthetic_problems.sql` adds **200 new reports** (tag `evidence_metadata->>'dataset' = 'problems_v1'`) with 16 problems' worth of planted truth (48 occurrences, 32 interventions, about three months, both categories). The 650 existing incidents are never changed. The seed does not fill problems or links: the matcher builds them and `supabase/tests/matching_smoke.sql` compares the result with the planted truth.
+**Seed:** `supabase/seed/synthetic_problems.sql` adds **200 new reports** (tag `evidence_metadata->>'dataset' = 'problems_v1'`) with 16 problems' worth of planted truth (48 occurrences, 32 interventions, about three months, both categories). The 650 existing incidents are never changed. Each problem sits on a **real street** (positions snapped to the basemap's roads, 2026-10-30) and its reports spread up to 24 m along that street and under 2 m across it, and the problem's position is the middle of its reports. The seed does not fill problems or links: the matcher builds them and `supabase/tests/matching_smoke.sql` compares the result with the planted truth.
 
 ## 🎯 Still to build
 | | Item |

@@ -155,7 +155,7 @@ create table public.match_config (
 );
 insert into public.match_config (key, value) values ('stage1', jsonb_build_object(
   'max_anchor_m', 250, 'high_max_m', 75, 'high', 80, 'medium', 50, 'margin', 10,
-  'distance_points', jsonb_build_array(jsonb_build_array(30, 45), jsonb_build_array(75, 35), jsonb_build_array(150, 15)),
+  'distance_points', jsonb_build_array(jsonb_build_array(50, 45), jsonb_build_array(90, 35), jsonb_build_array(150, 15)), -- reports of one problem spread along a street, so up to 50 m is still the same spot
   'address', 30, 'subtype', 10, 'history', 5, 'address_precision_penalty', 10));
 
 -- ───────── 5. Views (security_invoker: the caller's access rules apply) ─────────

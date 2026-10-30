@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { Car, Trash } from '@phosphor-icons/react'
+import { Car, Trash, Warning } from '@phosphor-icons/react'
 import { GROUPS, type Group } from '@/lib/incidents'
 import { PROBLEM_STATUS } from '@/lib/problems'
 import { KEEP, mix, token } from '@/lib/tokens'
@@ -70,48 +70,50 @@ export async function addBadges(map: { addImage: (id: string, data: ImageData) =
   )
 }
 
-/** Persistent-problem marker (decision 0030; Figma Map Marker `type=selected` + `type=count`, owner's test 2026-10-30): a rounded 32 px tile in the problem's status color with the category icon in it, and a count pill (neutral-700, outlined neutral-400) overhanging its upper right. One image per category and status; the number itself is drawn by the layer. */
+/** Persistent-problem marker (decision 0030; owner's test 2026-10-30): a 32 px circle in the problem's status color with the category icon in it and a 2 px neutral-900 outline, and a small round alert badge (neutral-700, outlined neutral-400) on its upper right. The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category and status. */
 export const problemMarkerId = (category: string, status: string) => `problem-${iconCategory(category)}-${status}`
-/** The image is drawn at 2x and shown at half size, so the tile is 32 px on screen. */
+/** The image is drawn at 2x and shown at half size, so the circle is 32 px on screen. */
 export const PROBLEM_SCALE = 0.5
-/** Image px: the tile's center, and the image's center, so the layer can put the tile (not the image) on the spot. */
-const OUTLINE_PX = 2 // the tile's outline, outside, in screen px (owner, 2026-10-30): neutral-900
-const PAD = Math.ceil(OUTLINE_PX / PROBLEM_SCALE) // image px kept free left of and below the tile so the outline is not cut off
-const TILE_CENTER = { x: 32 + PAD, y: 60 }
-const PILL_CENTER = { x: 70 + PAD, y: 22 }
-const IMAGE_SIZE = { w: 104 + PAD, h: 92 + PAD }
-export const PROBLEM_OFFSET: [number, number] = [IMAGE_SIZE.w / 2 - TILE_CENTER.x, IMAGE_SIZE.h / 2 - TILE_CENTER.y]
-/** Where the pill's center is from the tile's center, in screen px, for the number. */
-export const PROBLEM_COUNT: [number, number] = [(PILL_CENTER.x - TILE_CENTER.x) * PROBLEM_SCALE, (PILL_CENTER.y - TILE_CENTER.y) * PROBLEM_SCALE]
+const OUTLINE_PX = 2 // the circle's outline, outside, in screen px: neutral-900
+const PAD = Math.ceil(OUTLINE_PX / PROBLEM_SCALE) // image px kept free left of and below the circle so the outline is not cut off
+const CIRCLE = { x: 32 + PAD, y: 60 } // the circle's center, in image px (radius 32)
+const BADGE = { x: CIRCLE.x + 30, y: CIRCLE.y - 30, r: 20 } // the alert badge, 20 px on screen
+const IMAGE_SIZE = { w: BADGE.x + BADGE.r + 2, h: 92 + PAD }
+/** Puts the circle (not the whole image with its badge) on the spot. */
+export const PROBLEM_OFFSET: [number, number] = [IMAGE_SIZE.w / 2 - CIRCLE.x, IMAGE_SIZE.h / 2 - CIRCLE.y]
+
+async function drawIcon(Icon: (typeof ICONS)[keyof typeof ICONS] | typeof Warning, color: string, size: number) {
+  const { renderToStaticMarkup } = await import('react-dom/server')
+  const img = new Image()
+  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(renderToStaticMarkup(createElement(Icon, { color, width: size, height: size, weight: 'fill' })))}`
+  await img.decode()
+  return img
+}
 
 async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string) {
-  const { renderToStaticMarkup } = await import('react-dom/server')
-  const svg = renderToStaticMarkup(createElement(Icon, { color: token('--neutral-900'), width: 48, height: 48, weight: 'fill' }))
-  const img = new Image()
-  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
-  await img.decode()
+  const [icon, alert] = await Promise.all([drawIcon(Icon, token('--neutral-900'), 48), drawIcon(Warning, token('--neutral-100'), 24)])
   const c = document.createElement('canvas')
   c.width = IMAGE_SIZE.w
   c.height = IMAGE_SIZE.h
   const g = c.getContext('2d')!
-  g.beginPath() // the tile, with an outline outside it: stroke twice as wide, then paint the fill over the inner half
-  g.roundRect(PAD, 28, 64, 64, 8)
-  g.lineJoin = 'round'
+  g.beginPath() // the circle, with an outline outside it: stroke twice as wide, then paint the fill over the inner half
+  g.arc(CIRCLE.x, CIRCLE.y, 32, 0, Math.PI * 2)
   g.lineWidth = (OUTLINE_PX / PROBLEM_SCALE) * 2
   g.strokeStyle = token('--neutral-900')
   g.stroke()
   g.fillStyle = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token)
   g.fill()
-  g.drawImage(img, PAD + 8, 36, 48, 48)
-  g.beginPath() // the count pill: 32 x 22, fully rounded, a 2 px outline inside
-  g.roundRect(38 + PAD, 0, 64, 44, 22)
+  g.drawImage(icon, CIRCLE.x - 24, CIRCLE.y - 24, 48, 48)
+  g.beginPath() // the alert badge: a round version of the Figma count pill, a 2 px outline inside
+  g.arc(BADGE.x, BADGE.y, BADGE.r, 0, Math.PI * 2)
   g.fillStyle = token('--neutral-700')
   g.fill()
   g.beginPath()
-  g.roundRect(40 + PAD, 2, 60, 40, 20)
+  g.arc(BADGE.x, BADGE.y, BADGE.r - 2, 0, Math.PI * 2)
   g.lineWidth = 4
   g.strokeStyle = token('--neutral-400')
   g.stroke()
+  g.drawImage(alert, BADGE.x - 12, BADGE.y - 12, 24, 24)
   return g.getImageData(0, 0, IMAGE_SIZE.w, IMAGE_SIZE.h)
 }
 

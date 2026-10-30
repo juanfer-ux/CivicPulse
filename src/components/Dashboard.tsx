@@ -18,7 +18,7 @@ import {
   type Locality,
 } from '@/lib/incidents'
 import type { Area } from '@/lib/agent'
-import { PROBLEM_STATUSES, fetchProblemDetail, fetchProblems, type ProblemDetailData, type ProblemRow, type ProblemStatus } from '@/lib/problems'
+import { PROBLEM_STATUSES, fetchLinkedIncidentIds, fetchProblemDetail, fetchProblems, type ProblemDetailData, type ProblemRow, type ProblemStatus } from '@/lib/problems'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
 
 const DAY = 86_400_000
@@ -52,7 +52,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   const [collapsed, setCollapsed] = useState(false) // mobile bottom sheet only
   // Persistent problems (decision 0030). If the database does not have the layer yet, the list stays empty and the map shows incidents exactly as before.
   const [problems, setProblems] = useState<ProblemRow[]>([])
-  const [view, setView] = useState<'problems' | 'incidents'>('problems')
+  const [linked, setLinked] = useState<Set<string>>(() => new Set()) // incidents a problem already stands for: the map hides them
   const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null)
   const [detail, setDetail] = useState<{ id: string; data: ProblemDetailData } | null>(null)
 
@@ -62,6 +62,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
   useEffect(() => {
     fetchProblems().then(setProblems, () => setProblems([]))
+    fetchLinkedIncidentIds().then(setLinked, () => setLinked(new Set()))
   }, [])
   useEffect(() => {
     if (!selectedProblemId) return
@@ -81,11 +82,14 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   }, [highlightIds])
 
   const chatMode = highlightIds.length > 0 // an answer is on the map: the banner shows and everything below it moves down by --answer-banner-h
-  // The Problems view needs problems to show, and gives way to incidents while an agent answer is on the map (its highlights are incidents).
-  const mode: 'problems' | 'incidents' = view === 'problems' && problems.length > 0 && !chatMode ? 'problems' : 'incidents'
+  // One map for both (owner, 2026-10-30): problems are always markers, incidents are dots or pins, and an incident a problem already stands for is not drawn twice.
+  // While an agent answer is on the map only its incidents show (they are incidents, linked or not); without the problems layer in the database it is the incident map as before.
+  const hasProblems = problems.length > 0
+  const showProblems = hasProblems && !chatMode && (!filters.types.length || filters.types.includes('problems'))
+  const showIncidents = !hasProblems || chatMode || !filters.types.length || filters.types.includes('incidents')
   useEffect(() => {
-    if (mode === 'incidents') setSelectedProblemId(null) // eslint-disable-line react-hooks/set-state-in-effect
-  }, [mode])
+    if (!showProblems) setSelectedProblemId(null) // eslint-disable-line react-hooks/set-state-in-effect
+  }, [showProblems])
 
   const localityName = useMemo(() => new Map(data?.localities.map((l) => [l.code, l.name])), [data])
 
@@ -98,11 +102,12 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       (data?.incidents ?? []).filter(
         (i) =>
           (!answerIds || answerIds.has(i.id)) &&
+          (chatMode || !linked.has(i.id)) &&
           (!filters.locality || i.locality_code === Number(filters.locality)) &&
           (!filters.categories.length || filters.categories.includes(i.category)) &&
           (!filters.days || new Date(i.occurred_at).getTime() >= now - filters.days * DAY),
       ),
-    [data, answerIds, filters.locality, filters.categories, filters.days, now],
+    [data, answerIds, chatMode, linked, filters.locality, filters.categories, filters.days, now],
   )
   const filtered = useMemo(
     () => (filters.statuses.length ? beforeStatus.filter((i) => filters.statuses.includes(groupOf(i.status))) : beforeStatus),
@@ -118,7 +123,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   const topLocalities = useMemo(() => {
     // Informational (owner, 2026-10-29): always every incident in the person's scope, never narrowed by the filters, a clicked card or the agent's answer.
     // The last 30 days and the 30 before, counted back from the newest report (the data is a fixed set, not live).
-    const all = mode === 'problems' ? problems.filter((p) => p.last_seen).map((p) => ({ locality_code: p.locality_code, occurred_at: p.last_seen! })) : (data?.incidents ?? [])
+    const all = data?.incidents ?? []
     const DAY = 86_400_000
     const end = Math.max(0, ...all.map((i) => Date.parse(i.occurred_at)))
     const counts = new Map<number, { n: number; recent: number; before: number }>()
@@ -131,7 +136,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       counts.set(i.locality_code, c)
     }
     return [...counts].sort((a, b) => b[1].n - a[1].n).slice(0, 4)
-  }, [data, problems, mode])
+  }, [data])
 
   // Problems view: the same filters, applied to problems. Days means "reported in that window"; a problem has no incident status, it has its own.
   const problemsBeforeStatus = useMemo(
@@ -154,10 +159,12 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
     return counts
   }, [problemsBeforeStatus])
 
-  const selectedProblem = mode === 'problems' ? (problemsFiltered.find((p) => p.id === selectedProblemId) ?? null) : null
+  const selectedProblem = showProblems ? (problemsFiltered.find((p) => p.id === selectedProblemId) ?? null) : null
   const problemDetail = detail && detail.id === selectedProblemId ? detail.data : null
-  // In the Problems view the map holds only the open problem's incidents (the rest stay hidden until you open their problem).
-  const mapIncidents = mode === 'problems' ? (problemDetail?.incidents ?? []) : filtered
+  // The map holds the loose incidents plus, while a problem is open, that problem's own incidents (drawn as tiny dots around its marker).
+  const problemIncidents = selectedProblem ? (problemDetail?.incidents ?? []) : []
+  const problemIncidentIds = useMemo(() => problemIncidents.map((i) => i.id), [problemIncidents])
+  const mapIncidents = useMemo(() => [...(showIncidents ? filtered : []), ...problemIncidents], [showIncidents, filtered, problemIncidents])
   const selected = mapIncidents.find((i) => i.id === selectedId) ?? null
   useEffect(() => onInspect(!!selected || !!selectedProblem), [selected, selectedProblem, onInspect])
   const select = (id: string | null) => {
@@ -180,7 +187,8 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
-        problems={mode === 'problems' ? problemsFiltered : undefined}
+        problems={showProblems ? problemsFiltered : undefined}
+        problemIncidentIds={problemIncidentIds}
         selectedProblemId={selectedProblem?.id ?? null}
         dotStatus={selectedProblem?.status ?? null}
         onSelectProblem={selectProblem}
@@ -205,25 +213,16 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
       {/* Legend (owner, 2026-10-28, kept from the map header): how many incidents the map shows now, bottom left. */}
       {data && (
-        <div className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)]">
-          <p className="pointer-events-none rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200)">
-            {mode === 'problems'
-              ? `Showing ${problemsFiltered.length} ${problemsFiltered.length === 1 ? 'problem' : 'problems'}`
-              : `Showing ${filtered.length} ${filtered.length === 1 ? 'incident' : 'incidents'}`}
-          </p>
-          {problems.length > 0 && !chatMode && (
-            <div role="group" aria-label="Map view" className="flex gap-1 rounded-sm border bg-card/95 p-0.5">
-              {(
-                [
-                  ['problems', 'Problems'],
-                  ['incidents', 'Incidents'],
-                ] as const
-              ).map(([v, text]) => (
-                <Button key={v} size="sm" className="h-6" variant={view === v ? 'secondary' : 'ghost'} aria-pressed={view === v} onClick={() => setView(v)}>
-                  {text}
-                </Button>
-              ))}
-            </div>
+        <div className="pointer-events-none absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)]">
+          {showProblems && (
+            <p className="rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200)">
+              Showing {problemsFiltered.length} {problemsFiltered.length === 1 ? 'problem' : 'problems'}
+            </p>
+          )}
+          {showIncidents && (
+            <p className="rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200)">
+              Showing {filtered.length} {filtered.length === 1 ? 'incident' : 'incidents'}
+            </p>
           )}
         </div>
       )}
@@ -236,7 +235,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
           localities={data.localities}
           categories={data.categories}
           counts={byGroup}
-          problemCounts={mode === 'problems' ? byProblemStatus : undefined}
+          problemCounts={hasProblems ? byProblemStatus : undefined}
           className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+3rem)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+3rem)]'} desk:right-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:mx-auto desk:max-w-[1280px]`}
         />
       )}
@@ -272,7 +271,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         ) : !data ? (
           <p className="col-span-full text-muted-foreground">Loading…</p>
         ) : topLocalities.length ? (
-          topLocalities.map(([code, c]) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={mode === 'problems' ? undefined : trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
+          topLocalities.map(([code, c]) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
                 const on = filters.locality !== String(code)
                 setFilters({ ...filters, locality: on ? String(code) : '' })
                 if (on) onZoomLocality(code) // fly to the locality, wherever the map is now

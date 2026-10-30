@@ -58,6 +58,13 @@ export async function fetchProblems(): Promise<ProblemRow[]> {
   })
 }
 
+/** Ids of the incidents a problem already stands for (confirmed links): the map hides them, the problem represents them. Throws when the layer is not in the database yet. */
+export async function fetchLinkedIncidentIds(): Promise<Set<string>> {
+  const { data, error } = await supabase.from('incident_current_link').select('incident_id').eq('state', 'confirmed')
+  if (error) throw error
+  return new Set((data ?? []).map((r) => r.incident_id as string))
+}
+
 export interface OccurrenceRow {
   occurrence_id: string
   subject_key: string | null

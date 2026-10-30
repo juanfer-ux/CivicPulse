@@ -8,7 +8,7 @@ Static Vite app + Supabase. Nothing runs on Vercel except the build. All data ac
 ## 🗄️ 1. Supabase (once per environment)
 1. Run the migrations in order in the SQL editor: `supabase/migrations/*.sql` ([list](data-model.md#-migrations-run-in-this-order)).
    > 💡 When you copy SQL to the clipboard with `pbcopy`, use `LC_ALL=en_US.UTF-8 pbcopy < file.sql`: without it the accents (á, é, ñ, ·) are pasted as garbage and end up in the database.
-2. Seed, both re-runnable: `supabase/seed/synthetic_incidents.sql` (500 parking incidents) and `supabase/seed/synthetic_illegal_dumping.sql` (150 illegal dumping incidents), each with placeholder media.
+2. Seed, both re-runnable: `supabase/seed/synthetic_incidents.sql` (500 parking incidents) and `supabase/seed/synthetic_illegal_dumping.sql` (150 illegal dumping incidents), each with placeholder media, street-based positions, and safe to re-run once the problems layer exists (they skip the `problems_v1` dataset). Run `supabase/seed/synthetic_problems.sql` after them.
 3. Auth settings: set **Site URL** and **Redirect URLs** to the Vercel address (keep `http://localhost:5173` for local work).
 4. Register in the deployed app, then make the first Super Admin (once):
    ```sql

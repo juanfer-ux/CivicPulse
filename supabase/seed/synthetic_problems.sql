@@ -28,29 +28,29 @@ on conflict (incident_id) do nothing;
 -- ───────── 2. The planted truth ─────────
 drop table if exists pg_temp._prob; drop table if exists pg_temp._occ; drop table if exists pg_temp._iv; drop table if exists pg_temp._rep;
 
--- pk, category, locality, lat, lng, address, subtype, platforms (the first two must have GPS precision)
+-- pk, category, locality, lat, lng (on a real street, snapped to the map's roads), ux, uy (the street's direction, east and north), address, subtype, platforms (the first two must have GPS precision)
 create temp table _prob as select * from (values
-  ('PK1', 'parking', 2, 4.6480, -74.0620, 'Cra 13 #62-40, entrada del edificio Aurora', 'access_ramp', 'salvajes_en_la_via,simur,bogota_te_escucha,civic_pulse,community_channel'),
-  ('PK2', 'parking', 8, 4.6290, -74.1480, 'Av. Boyacá con Cl 42 sur, andén', 'sidewalk', 'salvajes_en_la_via,simur,bogota_te_escucha,civic_pulse,community_channel'),
-  ('PK3', 'parking', 11, 4.7410, -74.0840, 'Cl 138 con Cra 55, esquina', 'intersection', 'simur,salvajes_en_la_via,civic_pulse,bogota_te_escucha'),
-  ('PK4', 'parking', 10, 4.7080, -74.1100, 'Cra 72 con Cl 80, cruce peatonal', 'pedestrian_access', 'salvajes_en_la_via,community_channel,simur,bogota_te_escucha'),
-  ('PK5', 'parking', 13, 4.6400, -74.0900, 'Cl 39 #20-15, garaje del conjunto Alcázar', 'access_ramp', 'simur,salvajes_en_la_via,community_channel,civic_pulse'),
-  ('PK6', 'parking', 13, 4.6410, -74.0900, 'Cl 39 #21-02, entrada del local comercial', 'prohibited_zone', 'salvajes_en_la_via,simur,bogota_te_escucha'),
-  ('PK7', 'parking', 1, 4.6960, -74.0310, 'Cra 7 #120-18, rampa de acceso', 'access_ramp', 'simur,salvajes_en_la_via,bogota_te_escucha'),
-  ('PK8', 'parking', 12, 4.6700, -74.0800, 'Cl 72 #24-30, entrada del colegio', 'pedestrian_access', 'salvajes_en_la_via,simur,community_channel,bogota_te_escucha'),
-  ('PKS1', 'parking', 9, 4.6760, -74.1440, 'Cl 17 #96-22, andén', 'sidewalk', 'simur'),
-  ('PKS2', 'parking', 16, 4.6150, -74.1100, 'Cra 50 #12-40, esquina', 'intersection', 'salvajes_en_la_via'),
-  ('DM1', 'illegal_dumping', 19, 4.5440, -74.1560, 'Cl 69 sur con Cra 18, esquina', 'household_waste', 'community_channel,uaesp,bogota_te_escucha'),
-  ('DM2', 'illegal_dumping', 7, 4.6060, -74.1920, 'Cra 80 #62 sur, lote junto al parque', 'construction_debris', 'community_channel,uaesp,bogota_te_escucha'),
-  ('DM3', 'illegal_dumping', 8, 4.6270, -74.1500, 'Cl 38 sur #78-10, junto al conjunto residencial', 'bulky_items', 'uaesp,community_channel,bogota_te_escucha'),
-  ('DM4', 'illegal_dumping', 10, 4.7050, -74.1140, 'Parque La Serena, costado norte', 'household_waste', 'community_channel,bogota_te_escucha,uaesp'),
-  ('DM5', 'illegal_dumping', 5, 4.4930, -74.1220, 'Lote baldío Cl 90 sur #5-20', 'construction_debris', 'uaesp,community_channel,bogota_te_escucha'),
-  ('DM6', 'illegal_dumping', 5, 4.4940, -74.1220, 'Lote baldío Cl 90 sur #6-44', 'household_waste', 'community_channel,uaesp,bogota_te_escucha'),
-  ('DM7', 'illegal_dumping', 6, 4.5770, -74.1340, 'Cra 52 #48 sur, esquina', 'household_waste', 'community_channel,uaesp,bogota_te_escucha'),
-  ('DM8', 'illegal_dumping', 18, 4.5700, -74.1100, 'Cl 30 sur #20-05, ronda de la quebrada', 'bulky_items', 'uaesp,community_channel,bogota_te_escucha'),
-  ('DMS1', 'illegal_dumping', 4, 4.5560, -74.0860, 'Cra 3 este #20 sur, ladera', 'household_waste', 'community_channel'),
-  ('DMS2', 'illegal_dumping', 15, 4.5930, -74.1010, 'Cl 20 sur #25-10, andén', 'bulky_items', 'uaesp')
-) as t(pk, category, locality, lat, lng, address, subtype, platforms);
+  ('PK1', 'parking', 2, 4.64809, -74.062154, 0.504, 0.864, 'Cra 13 #62-40, entrada del edificio Aurora', 'access_ramp', 'salvajes_en_la_via,simur,bogota_te_escucha,civic_pulse,community_channel'),
+  ('PK2', 'parking', 8, 4.629243, -74.147751, 0.699, -0.715, 'Av. Boyacá con Cl 42 sur, andén', 'sidewalk', 'salvajes_en_la_via,simur,bogota_te_escucha,civic_pulse,community_channel'),
+  ('PK3', 'parking', 11, 4.741043, -74.08421, 0.203, 0.979, 'Cl 138 con Cra 55, esquina', 'intersection', 'simur,salvajes_en_la_via,civic_pulse,bogota_te_escucha'),
+  ('PK4', 'parking', 10, 4.707112, -74.109663, -0.565, -0.825, 'Cra 72 con Cl 80, cruce peatonal', 'pedestrian_access', 'salvajes_en_la_via,community_channel,simur,bogota_te_escucha'),
+  ('PK5', 'parking', 13, 4.640351, -74.089449, 0.539, -0.843, 'Cl 39 #20-15, garaje del conjunto Alcázar', 'access_ramp', 'simur,salvajes_en_la_via,community_channel,civic_pulse'),
+  ('PK6', 'parking', 13, 4.641061, -74.089905, 0.539, -0.843, 'Cl 39 #21-02, entrada del local comercial', 'prohibited_zone', 'salvajes_en_la_via,simur,bogota_te_escucha'),
+  ('PK7', 'parking', 1, 4.695958, -74.030918, 0.456, 0.89, 'Cra 7 #120-18, rampa de acceso', 'access_ramp', 'simur,salvajes_en_la_via,bogota_te_escucha'),
+  ('PK8', 'parking', 12, 4.66987, -74.080108, 0.772, -0.636, 'Cl 72 #24-30, entrada del colegio', 'pedestrian_access', 'salvajes_en_la_via,simur,community_channel,bogota_te_escucha'),
+  ('PKS1', 'parking', 9, 4.676107, -74.143869, 0.635, -0.773, 'Cl 17 #96-22, andén', 'sidewalk', 'simur'),
+  ('PKS2', 'parking', 16, 4.614945, -74.110138, -0.369, 0.929, 'Cra 50 #12-40, esquina', 'intersection', 'salvajes_en_la_via'),
+  ('DM1', 'illegal_dumping', 19, 4.543741, -74.155829, -0.074, 0.997, 'Cl 69 sur con Cra 18, esquina', 'household_waste', 'community_channel,uaesp,bogota_te_escucha'),
+  ('DM2', 'illegal_dumping', 7, 4.605952, -74.192203, -0.979, 0.203, 'Cra 80 #62 sur, lote junto al parque', 'construction_debris', 'community_channel,uaesp,bogota_te_escucha'),
+  ('DM3', 'illegal_dumping', 8, 4.627207, -74.149814, 0.745, -0.667, 'Cl 38 sur #78-10, junto al conjunto residencial', 'bulky_items', 'uaesp,community_channel,bogota_te_escucha'),
+  ('DM4', 'illegal_dumping', 10, 4.704963, -74.113931, 0.474, 0.88, 'Parque La Serena, costado norte', 'household_waste', 'community_channel,bogota_te_escucha,uaesp'),
+  ('DM5', 'illegal_dumping', 5, 4.493014, -74.122132, -0.107, -0.994, 'Lote baldío Cl 90 sur #5-20', 'construction_debris', 'uaesp,community_channel,bogota_te_escucha'),
+  ('DM6', 'illegal_dumping', 5, 4.493826, -74.122044, -0.107, -0.994, 'Lote baldío Cl 90 sur #6-44', 'household_waste', 'community_channel,uaesp,bogota_te_escucha'),
+  ('DM7', 'illegal_dumping', 6, 4.577225, -74.134092, 0.926, 0.377, 'Cra 52 #48 sur, esquina', 'household_waste', 'community_channel,uaesp,bogota_te_escucha'),
+  ('DM8', 'illegal_dumping', 18, 4.570015, -74.110238, 0.063, 0.998, 'Cl 30 sur #20-05, ronda de la quebrada', 'bulky_items', 'uaesp,community_channel,bogota_te_escucha'),
+  ('DMS1', 'illegal_dumping', 4, 4.556743, -74.08574, -0.944, 0.33, 'Cra 3 este #20 sur, ladera', 'household_waste', 'community_channel'),
+  ('DMS2', 'illegal_dumping', 15, 4.593095, -74.100809, -0.662, -0.75, 'Cl 20 sur #25-10, andén', 'bulky_items', 'uaesp')
+) as t(pk, category, locality, lat, lng, ux, uy, address, subtype, platforms);
 
 -- pk, occurrence number, start (days ago), span of the reports (hours), reports, plate, first report shows a different
 -- vehicle/pile, reports over several days (later ones say it is still there), uncertain chunk, and the occurrence it truly belongs to
@@ -131,7 +131,7 @@ with base as (
   select o.pk, o.n, o.truth_n, o.uncertain, o.first_diff, o.multiday, o.plate as occ_plate, o.span_h, o.n_reports, k,
          now() - make_interval(secs => o.days_ago * 86400)
            + make_interval(secs => case when o.n_reports > 1 then (k - 1) * o.span_h * 3600.0 / (o.n_reports - 1) else 0 end) as occurred_at,
-         p.category, p.locality, p.lat, p.lng, p.address, p.subtype, string_to_array(p.platforms, ',') as plats
+         p.category, p.locality, p.lat, p.lng, p.ux, p.uy, p.address, p.subtype, string_to_array(p.platforms, ',') as plats
   from _occ o join _prob p on p.pk = o.pk cross join lateral generate_series(1, o.n_reports) k
 ), ranked as (
   select b.*, row_number() over (partition by b.pk order by b.occurred_at, b.k) as rn,
@@ -150,7 +150,10 @@ select r.id, r.reference, r.category,
        case when r.category = 'parking' then initcap(replace(r.subtype, '_', ' ')) || ' blocked by a parked vehicle'
             else initcap(replace(r.subtype, '_', ' ')) || ' left in public space' end,
        'Synthetic report received through ' || sp.name || ' about ' || r.address || '.',
-       r.locality, r.lat + (hashtext(r.reference) % 21) * 0.000005, r.lng + (hashtext(r.reference || 'x') % 21) * 0.000005,
+       r.locality,
+       -- reports sit ON the street: up to 24 m along it and under 2 m across it (metres, then degrees)
+       r.lat + ((hashtext(r.reference) % 25) * r.uy + (hashtext(r.reference || 'x') % 4) * 0.6 * r.ux) / 111320.0,
+       r.lng + ((hashtext(r.reference) % 25) * r.ux - (hashtext(r.reference || 'x') % 4) * 0.6 * r.uy) / (111320.0 * cos(radians(r.lat))),
        r.address, r.occurred_at,
        r.occurred_at + case r.platform when 'bogota_te_escucha' then interval '27 hours' when 'uaesp' then interval '6 hours'
                                        else interval '10 minutes' end,
@@ -217,6 +220,12 @@ begin
       values (iv, v.outcome, 'Outcome reported by the agency (synthetic)', now() - make_interval(secs => v.days_ago * 86400) + interval '1 day');
     perform public.refresh_problem_status(pid);
   end loop;
+  -- A problem's position is the middle of its confirmed reports (the matcher starts it at the first report), so the marker sits in the middle of them
+  update public.problems p set lat = s.lat, lng = s.lng
+  from (select l.problem_id, avg(m.lat) as lat, avg(m.lng) as lng
+        from public.incident_current_link l join public.incidents m on m.id = l.incident_id
+        where l.state = 'confirmed' group by l.problem_id) s
+  where s.problem_id = p.id and p.dataset = 'problems_v1';
   -- Resolved is an operator's decision, never a result of silence: the two planted "genuinely resolved" problems
   for pid in select distinct l.problem_id from public.incident_links l join public.incidents m on m.id = l.incident_id
              where m.evidence_metadata -> 'seed_truth' ->> 'problem' in ('PK7', 'DM7') and l.problem_id is not null loop

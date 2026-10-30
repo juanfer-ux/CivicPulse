@@ -1,4 +1,4 @@
-import { Car, Clock, DotsThree, Flag, MapPin, SquaresFour, Trash, TrafficSignal, Wheelchair, X } from '@phosphor-icons/react'
+import { Car, Circle, Clock, DotsThree, Flag, MapPin, SquaresFour, Trash, TrafficSignal, Warning, Wheelchair, X } from '@phosphor-icons/react'
 import type { ComponentType } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { ChipMultiSelect } from '@/components/ui/chip-multi-select'
@@ -19,10 +19,13 @@ export interface Filters {
   statuses: Group[]
   /** Status chips of the Problems view (decision 0030); the incident statuses above are untouched. */
   problemStatuses: ProblemStatus[]
+  /** What the map shows: persistent problems, loose incidents, or (empty) both. */
+  types: MapType[]
   days: number
 }
-export const NO_FILTERS: Filters = { locality: '', categories: [], statuses: [], problemStatuses: [], days: 0 }
-export const isFiltered = (f: Filters) => !!(f.locality || f.categories.length || f.statuses.length || f.problemStatuses.length || f.days)
+export type MapType = 'problems' | 'incidents'
+export const NO_FILTERS: Filters = { locality: '', categories: [], statuses: [], problemStatuses: [], types: [], days: 0 }
+export const isFiltered = (f: Filters) => !!(f.locality || f.categories.length || f.statuses.length || f.problemStatuses.length || f.types.length || f.days)
 
 /** One icon per category (map pins use the first two). */
 const CATEGORY_ICON: Record<string, ComponentType> = { parking: Car, illegal_dumping: Trash, damaged_infrastructure: TrafficSignal, accessibility: Wheelchair, other: DotsThree }
@@ -56,32 +59,65 @@ export function FilterBar({
   className?: string
 }) {
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
+  const showProblems = !!problemCounts && (!filters.types.length || filters.types.includes('problems'))
+  const showIncidents = !problemCounts || !filters.types.length || filters.types.includes('incidents')
+  // Switching one off keeps the other on (never an empty map) and drops the statuses chosen for the one that went away, so a hidden filter never keeps narrowing.
+  const toggle = (type: MapType) => {
+    const on = [...(showProblems ? ['problems' as const] : []), ...(showIncidents ? ['incidents' as const] : [])]
+    const next = on.includes(type) ? on.filter((t) => t !== type) : [...on, type]
+    if (!next.length) return
+    set({
+      types: next.length === 2 ? [] : next,
+      ...(next.includes('problems') ? {} : { problemStatuses: [] }),
+      ...(next.includes('incidents') ? {} : { statuses: [] }),
+    })
+  }
   return (
     <div role="group" aria-label="Filters" className={className}>
       {/* The filters share one 8 px gap and scroll sideways when they do not fit; "Clear filters" stays put at the far right. */}
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-1 [scrollbar-width:none]">
+        {/* Two toggles, both on by default (owner, 2026-10-30): what the map shows. At least one stays on, and the Status menu below only lists the statuses of what is on. */}
+        {problemCounts && (
+          <>
+            <Chip pressed={showProblems} icon={<Warning aria-hidden />} onClick={() => toggle('problems')}>
+              Problems
+            </Chip>
+            <Chip pressed={showIncidents} icon={<Circle weight="fill" aria-hidden />} onClick={() => toggle('incidents')}>
+              Incidents
+            </Chip>
+          </>
+        )}
+        {/* One Status chip for both kinds (owner, 2026-10-30): incident statuses and problem statuses are different sets, so the menu lists them in two labeled groups. Values are prefixed `p:` / `i:` only to tell the two apart. */}
         <ChipMultiSelect
           aria-label="Status"
           icon={<Flag aria-hidden />}
           all="All statuses"
           noun="statuses"
-          value={problemCounts ? filters.problemStatuses : filters.statuses}
-          onValueChange={(v) => set(problemCounts ? { problemStatuses: v as ProblemStatus[] } : { statuses: v as Group[] })}
-          options={
-            problemCounts
+          value={[...filters.problemStatuses.map((st) => `p:${st}`), ...filters.statuses.map((g) => `i:${g}`)]}
+          onValueChange={(v) =>
+            set({
+              problemStatuses: v.filter((x) => x.startsWith('p:')).map((x) => x.slice(2) as ProblemStatus),
+              statuses: v.filter((x) => x.startsWith('i:')).map((x) => x.slice(2) as Group),
+            })
+          }
+          options={[
+            ...(showProblems
               ? PROBLEM_STATUSES.map((st) => ({
-                  value: st,
+                  value: `p:${st}`,
+                  group: showIncidents ? 'Problems' : undefined,
                   label: PROBLEM_STATUS[st].label,
                   icon: <span className="block size-2.5 shrink-0 rounded-full" style={{ background: `var(${PROBLEM_STATUS[st].token})` }} aria-hidden />,
                   hint: String(problemCounts[st]),
                 }))
-              : (Object.keys(GROUPS) as Group[]).map((g) => ({
-                  value: g,
-                  label: GROUPS[g].label,
-                  icon: <span className="block size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />,
-                  hint: String(counts[g]),
-                }))
-          }
+              : []),
+            ...(showIncidents ? (Object.keys(GROUPS) as Group[]) : []).map((g) => ({
+              value: `i:${g}`,
+              group: showProblems && showIncidents ? 'Incidents' : undefined,
+              label: GROUPS[g].label,
+              icon: <span className="block size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />,
+              hint: String(counts[g]),
+            })),
+          ]}
         />
         <Select
           chip
