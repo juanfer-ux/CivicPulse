@@ -4,6 +4,7 @@ import { Chip } from '@/components/ui/chip'
 import { ChipMultiSelect } from '@/components/ui/chip-multi-select'
 import { Select } from '@/components/ui/select'
 import { GROUPS, type Category, type Group, type Locality } from '@/lib/incidents'
+import { PROBLEM_STATUS, PROBLEM_STATUSES, type ProblemStatus } from '@/lib/problems'
 
 export const PERIODS = [
   { days: 7, label: 'Last 7 days' },
@@ -16,10 +17,12 @@ export interface Filters {
   locality: string
   categories: string[]
   statuses: Group[]
+  /** Status chips of the Problems view (decision 0030); the incident statuses above are untouched. */
+  problemStatuses: ProblemStatus[]
   days: number
 }
-export const NO_FILTERS: Filters = { locality: '', categories: [], statuses: [], days: 0 }
-export const isFiltered = (f: Filters) => !!(f.locality || f.categories.length || f.statuses.length || f.days)
+export const NO_FILTERS: Filters = { locality: '', categories: [], statuses: [], problemStatuses: [], days: 0 }
+export const isFiltered = (f: Filters) => !!(f.locality || f.categories.length || f.statuses.length || f.problemStatuses.length || f.days)
 
 /** One icon per category (map pins use the first two). */
 const CATEGORY_ICON: Record<string, ComponentType> = { parking: Car, illegal_dumping: Trash, damaged_infrastructure: TrafficSignal, accessibility: Wheelchair, other: DotsThree }
@@ -40,6 +43,7 @@ export function FilterBar({
   localities,
   categories,
   counts,
+  problemCounts,
   className,
 }: {
   filters: Filters
@@ -47,6 +51,8 @@ export function FilterBar({
   localities: Locality[]
   categories: Category[]
   counts: Record<Group, number>
+  /** Set in the Problems view: the status chip then lists the problem statuses, with their counts. */
+  problemCounts?: Record<ProblemStatus, number>
   className?: string
 }) {
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
@@ -59,14 +65,23 @@ export function FilterBar({
           icon={<Flag aria-hidden />}
           all="All statuses"
           noun="statuses"
-          value={filters.statuses}
-          onValueChange={(statuses) => set({ statuses: statuses as Group[] })}
-          options={(Object.keys(GROUPS) as Group[]).map((g) => ({
-            value: g,
-            label: GROUPS[g].label,
-            icon: <span className="block size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />,
-            hint: String(counts[g]),
-          }))}
+          value={problemCounts ? filters.problemStatuses : filters.statuses}
+          onValueChange={(v) => set(problemCounts ? { problemStatuses: v as ProblemStatus[] } : { statuses: v as Group[] })}
+          options={
+            problemCounts
+              ? PROBLEM_STATUSES.map((st) => ({
+                  value: st,
+                  label: PROBLEM_STATUS[st].label,
+                  icon: <span className="block size-2.5 shrink-0 rounded-full" style={{ background: `var(${PROBLEM_STATUS[st].token})` }} aria-hidden />,
+                  hint: String(problemCounts[st]),
+                }))
+              : (Object.keys(GROUPS) as Group[]).map((g) => ({
+                  value: g,
+                  label: GROUPS[g].label,
+                  icon: <span className="block size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />,
+                  hint: String(counts[g]),
+                }))
+          }
         />
         <Select
           chip

@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { CaretDown, CaretUp, ChatCircleDots, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
 import { trendOf } from '@/lib/trend'
 import { MediaGallery } from '@/components/MediaGallery'
+import { ProblemDetail } from '@/components/ProblemDetail'
 import { Badge } from '@/components/ui/badge'
 import { FilterBar, NO_FILTERS, type Filters } from '@/components/FilterBar'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,8 @@ import {
   type Locality,
 } from '@/lib/incidents'
 import type { Area } from '@/lib/agent'
+import { PROBLEM_STATUSES, fetchProblemDetail, fetchProblems, type ProblemDetailData, type ProblemRow, type ProblemStatus } from '@/lib/problems'
+import { useRestoreFocus } from '@/lib/useRestoreFocus'
 
 const DAY = 86_400_000
 
@@ -47,15 +50,42 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   const [filters, setFilters] = useState<Filters>(NO_FILTERS)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState(false) // mobile bottom sheet only
+  // Persistent problems (decision 0030). If the database does not have the layer yet, the list stays empty and the map shows incidents exactly as before.
+  const [problems, setProblems] = useState<ProblemRow[]>([])
+  const [view, setView] = useState<'problems' | 'incidents'>('problems')
+  const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null)
+  const [detail, setDetail] = useState<{ id: string; data: ProblemDetailData } | null>(null)
 
   useEffect(() => {
     fetchDashboardData().then(setData, (e: Error) => setError(e.message))
   }, [])
 
+  useEffect(() => {
+    fetchProblems().then(setProblems, () => setProblems([]))
+  }, [])
+  useEffect(() => {
+    if (!selectedProblemId) return
+    let live = true
+    fetchProblemDetail(selectedProblemId).then(
+      (data) => live && setDetail({ id: selectedProblemId, data }),
+      () => live && setDetail({ id: selectedProblemId, data: { occurrences: [], links: [], incidents: [], sources: {}, interventions: [], events: [] } }),
+    )
+    return () => {
+      live = false
+    }
+  }, [selectedProblemId])
+
   // The conversation takes over the map: when an answer rings incidents, filters are cleared so nothing it points at is hidden.
   useEffect(() => {
     if (highlightIds.length) setFilters(NO_FILTERS) // eslint-disable-line react-hooks/set-state-in-effect
   }, [highlightIds])
+
+  const chatMode = highlightIds.length > 0 // an answer is on the map: the banner shows and everything below it moves down by --answer-banner-h
+  // The Problems view needs problems to show, and gives way to incidents while an agent answer is on the map (its highlights are incidents).
+  const mode: 'problems' | 'incidents' = view === 'problems' && problems.length > 0 && !chatMode ? 'problems' : 'incidents'
+  useEffect(() => {
+    if (mode === 'incidents') setSelectedProblemId(null) // eslint-disable-line react-hooks/set-state-in-effect
+  }, [mode])
 
   const localityName = useMemo(() => new Map(data?.localities.map((l) => [l.code, l.name])), [data])
 
@@ -88,7 +118,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   const topLocalities = useMemo(() => {
     // Informational (owner, 2026-10-29): always every incident in the person's scope, never narrowed by the filters, a clicked card or the agent's answer.
     // The last 30 days and the 30 before, counted back from the newest report (the data is a fixed set, not live).
-    const all = data?.incidents ?? []
+    const all = mode === 'problems' ? problems.filter((p) => p.last_seen).map((p) => ({ locality_code: p.locality_code, occurred_at: p.last_seen! })) : (data?.incidents ?? [])
     const DAY = 86_400_000
     const end = Math.max(0, ...all.map((i) => Date.parse(i.occurred_at)))
     const counts = new Map<number, { n: number; recent: number; before: number }>()
@@ -101,13 +131,43 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       counts.set(i.locality_code, c)
     }
     return [...counts].sort((a, b) => b[1].n - a[1].n).slice(0, 4)
-  }, [data])
+  }, [data, problems, mode])
 
-  const chatMode = highlightIds.length > 0 // an answer is on the map: the banner shows and everything below it moves down by --answer-banner-h
-  const selected = filtered.find((i) => i.id === selectedId) ?? null
-  useEffect(() => onInspect(!!selected), [selected, onInspect])
+  // Problems view: the same filters, applied to problems. Days means "reported in that window"; a problem has no incident status, it has its own.
+  const problemsBeforeStatus = useMemo(
+    () =>
+      problems.filter(
+        (p) =>
+          (!filters.locality || p.locality_code === Number(filters.locality)) &&
+          (!filters.categories.length || filters.categories.includes(p.category)) &&
+          (!filters.days || (!!p.last_seen && Date.parse(p.last_seen) >= now - filters.days * DAY)),
+      ),
+    [problems, filters.locality, filters.categories, filters.days, now],
+  )
+  const problemsFiltered = useMemo(
+    () => (filters.problemStatuses.length ? problemsBeforeStatus.filter((p) => filters.problemStatuses.includes(p.status)) : problemsBeforeStatus),
+    [problemsBeforeStatus, filters.problemStatuses],
+  )
+  const byProblemStatus = useMemo(() => {
+    const counts = Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, 0])) as Record<ProblemStatus, number>
+    for (const p of problemsBeforeStatus) counts[p.status]++
+    return counts
+  }, [problemsBeforeStatus])
+
+  const selectedProblem = mode === 'problems' ? (problemsFiltered.find((p) => p.id === selectedProblemId) ?? null) : null
+  const problemDetail = detail && detail.id === selectedProblemId ? detail.data : null
+  // In the Problems view the map holds only the open problem's incidents (the rest stay hidden until you open their problem).
+  const mapIncidents = mode === 'problems' ? (problemDetail?.incidents ?? []) : filtered
+  const selected = mapIncidents.find((i) => i.id === selectedId) ?? null
+  useEffect(() => onInspect(!!selected || !!selectedProblem), [selected, selectedProblem, onInspect])
   const select = (id: string | null) => {
+    if (!id && !selectedId && selectedProblemId) setSelectedProblemId(null) // a click on empty map (or Escape) closes the incident first, then the problem
     setSelectedId(id)
+    if (id) setCollapsed(false)
+  }
+  const selectProblem = (id: string | null) => {
+    setSelectedProblemId(id)
+    setSelectedId(null)
     if (id) setCollapsed(false)
   }
   const pick = (t: Tab) => {
@@ -117,8 +177,12 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
   return (
     <>
+      <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
-        incidents={filtered}
+        incidents={mapIncidents}
+        problems={mode === 'problems' ? problemsFiltered : undefined}
+        selectedProblemId={selectedProblem?.id ?? null}
+        onSelectProblem={selectProblem}
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
         areas={areas}
@@ -140,19 +204,38 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
       {/* Legend (owner, 2026-10-28, kept from the map header): how many incidents the map shows now, bottom left. */}
       {data && (
-        <p className="pointer-events-none absolute bottom-[4.5rem] left-3 z-10 rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200) desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)]">
-          Showing {filtered.length} {filtered.length === 1 ? 'incident' : 'incidents'}
-        </p>
+        <div className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)]">
+          <p className="pointer-events-none rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200)">
+            {mode === 'problems'
+              ? `Showing ${problemsFiltered.length} ${problemsFiltered.length === 1 ? 'problem' : 'problems'}`
+              : `Showing ${filtered.length} ${filtered.length === 1 ? 'incident' : 'incidents'}`}
+          </p>
+          {problems.length > 0 && !chatMode && (
+            <div role="group" aria-label="Map view" className="flex gap-1 rounded-sm border bg-card/95 p-0.5">
+              {(
+                [
+                  ['problems', 'Problems'],
+                  ['incidents', 'Incidents'],
+                ] as const
+              ).map(([v, text]) => (
+                <Button key={v} size="sm" className="h-6" variant={view === v ? 'secondary' : 'ghost'} aria-pressed={view === v} onClick={() => setView(v)}>
+                  {text}
+                </Button>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {/* Filter chips (Figma: Filter Bar): one row over the map, scrolling sideways when it does not fit; hidden while an incident is open. */}
-      {!selected && data && (
+      {!selected && !selectedProblem && data && (
         <FilterBar
           filters={filters}
           onChange={setFilters}
           localities={data.localities}
           categories={data.categories}
           counts={byGroup}
+          problemCounts={mode === 'problems' ? byProblemStatus : undefined}
           className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+3rem)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+3rem)]'} desk:right-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:mx-auto desk:max-w-[1280px]`}
         />
       )}
@@ -179,14 +262,16 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
       {/* The four localities with most incidents (Figma Stat Card), in a row above the filters; hidden while an incident is open, like the filters (owner, 2026-10-30); a click filters the map to that locality. On phones they sit in the Explore tab, two by two. */}
       <div
-        className={`${selected ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-4 overflow-y-auto desk:absolute desk:right-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:z-10 desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1.5rem)]' : 'desk:top-[calc(var(--section-header-h)+1.5rem)]'}`}
+        role="region"
+        aria-label="Busiest localities"
+        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-4 overflow-y-auto desk:absolute desk:right-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:z-10 desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1.5rem)]' : 'desk:top-[calc(var(--section-header-h)+1.5rem)]'}`}
       >
         {error ? (
           <p className="col-span-full text-incident">{error}</p>
         ) : !data ? (
           <p className="col-span-full text-muted-foreground">Loading…</p>
         ) : topLocalities.length ? (
-          topLocalities.map(([code, c]) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
+          topLocalities.map(([code, c]) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={mode === 'problems' ? undefined : trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
                 const on = filters.locality !== String(code)
                 setFilters({ ...filters, locality: on ? String(code) : '' })
                 if (on) onZoomLocality(code) // fly to the locality, wherever the map is now
@@ -202,60 +287,92 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         {children}
       </div>
       {/* The incident detail (owner, 2026-10-30, test): its own panel on the map, to the right of the agent panel, like one more sidebar. On phones it stays in the bottom sheet. */}
-      {selected && (
-      <Card className={`max-h-[45%] shrink-0 overflow-auto bg-card/95 desk:absolute desk:top-0 desk:bottom-0 desk:left-[calc(var(--agent-w)+var(--panel-gap))] desk:z-20 desk:max-h-none desk:w-[360px] desk:rounded-none desk:border-y-0 desk:border-l-0 desk:border-r desk:border-secondary desk:bg-(--neutral-700)`}>
-        <CardHeader className="flex flex-row items-start justify-between gap-2">
-          <div>
-            <CardTitle>{selected.title}</CardTitle>
-            <p className="text-meta text-muted-foreground">
-              {selected.reference} · {localityName.get(selected.locality_code)}
-            </p>
-          </div>
-          <Button size="icon" variant="ghost" aria-label="Close" onClick={() => setSelectedId(null)}>
-            <X />
-          </Button>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3 text-body-sm">
-          <div className="flex flex-wrap gap-1">
-            <Badge variant="secondary">{label(selected.status)}</Badge>
-            {selected.uncertainty_flags.map((f) => (
-              <Badge key={f} variant="outline">
-                {label(f)}
-              </Badge>
-            ))}
-          </div>
-          <MediaGallery incidentId={selected.id} />
-          <p>{selected.description}</p>
-          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-muted-foreground">
-            <dt>Location</dt>
-            <dd className="text-foreground">{selected.location_description}</dd>
-            <dt>Occurred</dt>
-            <dd className="text-foreground">{new Date(selected.occurred_at).toLocaleString('en-GB')}</dd>
-            <dt>Reported</dt>
-            <dd className="text-foreground">{new Date(selected.reported_at).toLocaleString('en-GB')}</dd>
-            <dt>Category</dt>
-            <dd className="text-foreground">
-              {data?.categories.find((c) => c.code === selected.category)?.name ?? label(selected.category)}
-            </dd>
-            <dt>Vehicle</dt>
-            <dd className="text-foreground">{label(selected.vehicle_type)}</dd>
-            <dt>AI</dt>
-            <dd className="text-foreground">
-              {selected.ai_classification} ({Math.round((selected.ai_confidence ?? 0) * 100)}% confidence)
-            </dd>
-            <dt>Validation</dt>
-            <dd className="text-foreground">{label(selected.validation_status)}</dd>
-            {selected.outcome && (
-              <>
-                <dt>Outcome</dt>
-                <dd className="text-foreground">{selected.outcome}</dd>
-              </>
-            )}
-          </dl>
-        </CardContent>
-      </Card>
+      {selected ? (
+        <IncidentDetail
+          key={selected.id}
+          incident={selected}
+          localityName={localityName.get(selected.locality_code)}
+          categoryName={data?.categories.find((c) => c.code === selected.category)?.name}
+          onClose={() => setSelectedId(null)}
+        />
+      ) : (
+        selectedProblem && (
+          <ProblemDetail
+            key={selectedProblem.id}
+            problem={selectedProblem}
+            detail={problemDetail}
+            localityName={localityName.get(selectedProblem.locality_code)}
+            categoryName={data?.categories.find((c) => c.code === selectedProblem.category)?.name}
+            onSelectIncident={select}
+            onClose={() => selectProblem(null)}
+          />
+        )
       )}
       </div>
     </>
+  )
+}
+
+function IncidentDetail({ incident, localityName, categoryName, onClose }: { incident: Incident; localityName: string | undefined; categoryName: string | undefined; onClose: () => void }) {
+  const panel = useRef<HTMLDivElement>(null)
+  useRestoreFocus(panel)
+  return (
+    <Card
+      ref={panel}
+      tabIndex={-1}
+      role="region"
+      aria-label="Incident details"
+      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-0 desk:bottom-0 desk:left-[calc(var(--agent-w)+var(--panel-gap))] desk:z-20 desk:max-h-none desk:w-[360px] desk:rounded-none desk:border-y-0 desk:border-l-0 desk:border-r desk:border-secondary desk:bg-(--neutral-700)"
+    >
+      <CardHeader className="flex flex-row items-start justify-between gap-2">
+        <div>
+          <CardTitle asChild>
+            <h2>{incident.title}</h2>
+          </CardTitle>
+          <p className="text-meta text-muted-foreground">
+            {incident.reference} · {localityName}
+          </p>
+        </div>
+        <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose}>
+          <X />
+        </Button>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3 text-body-sm">
+        <div className="flex flex-wrap gap-1">
+          <Badge variant="secondary">{label(incident.status)}</Badge>
+          {incident.uncertainty_flags.map((f) => (
+            <Badge key={f} variant="outline">
+              {label(f)}
+            </Badge>
+          ))}
+        </div>
+        <MediaGallery incidentId={incident.id} />
+        <p>{incident.description}</p>
+        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-muted-foreground">
+          <dt>Location</dt>
+          <dd className="text-foreground">{incident.location_description}</dd>
+          <dt>Occurred</dt>
+          <dd className="text-foreground">{new Date(incident.occurred_at).toLocaleString('en-GB')}</dd>
+          <dt>Reported</dt>
+          <dd className="text-foreground">{new Date(incident.reported_at).toLocaleString('en-GB')}</dd>
+          <dt>Category</dt>
+          <dd className="text-foreground">{categoryName ?? label(incident.category)}</dd>
+          <dt>Vehicle</dt>
+          <dd className="text-foreground">{label(incident.vehicle_type)}</dd>
+          <dt>AI</dt>
+          <dd className="text-foreground">
+            {incident.ai_classification} ({Math.round((incident.ai_confidence ?? 0) * 100)}% confidence)
+          </dd>
+          <dt>Validation</dt>
+          <dd className="text-foreground">{label(incident.validation_status)}</dd>
+          {incident.outcome && (
+            <>
+              <dt>Outcome</dt>
+              <dd className="text-foreground">{incident.outcome}</dd>
+            </>
+          )}
+        </dl>
+      </CardContent>
+    </Card>
   )
 }

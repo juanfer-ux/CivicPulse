@@ -4,11 +4,12 @@ import { gsap } from 'gsap'
 import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import { PIN_RISE, addBadges, iconCategory } from '@/lib/markerIcons'
+import { PIN_RISE, PROBLEM_CENTER, addBadges, addProblemMarkers, iconCategory } from '@/lib/markerIcons'
 import { labelPoint } from '@/lib/polygons'
 import { circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
 import { GROUPS, groupOf, label, typeOf, type Incident } from '@/lib/incidents'
+import type { ProblemRow } from '@/lib/problems'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.
 const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
@@ -22,6 +23,9 @@ const fitPadding = (wide: boolean) => (wide ? { top: 268, bottom: 74, left: 40, 
 const BADGE_ZOOM = 14
 /** Zoom the camera flies to when an incident is opened. */
 const INCIDENT_ZOOM = 17
+/** Zoom the camera flies to when a persistent problem is opened (its incidents are all within about 75 m, so the street level shows them apart). */
+const PROBLEM_ZOOM = 17
+const NO_PROBLEMS: ProblemRow[] = []
 const MAX_FLY_ZOOM = 3 // motion comfort (owner, 2026-10-30): never animate more than 3 zoom levels; a farther trip jumps the rest first
 
 /** Paint the land with --map-land (true) or leave it invisible (false). */
@@ -60,17 +64,23 @@ interface Props {
   /** Locality to zoom to (a bar was clicked); n changes on every click. */
   zoomTo?: { code: number; n: number } | null
   onSelect: (id: string | null) => void
+  /** Persistent problems to draw as one marker each (the Problems view); the incidents prop then holds only the open problem's incidents. */
+  problems?: ProblemRow[]
+  selectedProblemId?: string | null
+  onSelectProblem?: (id: string) => void
 }
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
+  const onSelectProblemRef = useRef(onSelectProblem)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
     onSelectRef.current = onSelect
-  }, [onSelect])
+    onSelectProblemRef.current = onSelectProblem
+  }, [onSelect, onSelectProblem])
 
   useEffect(() => {
     if (!WEBGL2) return
@@ -83,6 +93,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       map.resize()
       if (!moved) map.jumpTo({ center: BOGOTA, zoom: START_ZOOM })
       await addBadges(map)
+      await addProblemMarkers(map)
       // Place and street names stay in Spanish (the local names): the CARTO style asks for English first.
       for (const l of map.getStyle().layers) {
         if (l.type === 'symbol' && JSON.stringify(l.layout?.['text-field']).includes('name:en')) map.setLayoutProperty(l.id, 'text-field', ['coalesce', ['get', 'name:es'], ['get', 'name']])
@@ -280,17 +291,40 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
           'circle-stroke-color': token('--map-selected-ring'),
         },
       })
+      // Persistent problems (decision 0030; Figma Problem Marker): one marker per problem, a light disc with the occurrence count over it, a status-colored ring and a category badge. The incidents of the open problem draw with the normal incident layers.
+      map.addSource('problems', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      map.addLayer({
+        id: 'problem-markers',
+        type: 'symbol',
+        source: 'problems',
+        filter: ['!=', ['get', 'id'], ''], // the open problem's marker is hidden so its incidents show where they are
+        layout: {
+          'icon-image': ['concat', 'problem-', ['get', 'category'], '-', ['get', 'status']],
+          'icon-size': 0.5,
+          'icon-allow-overlap': true,
+          'text-field': ['to-string', ['get', 'count']],
+          'text-font': ['Montserrat Medium', 'Open Sans Regular', 'Noto Sans Regular'],
+          'text-size': 14,
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
+        },
+        // The count sits on the disc's center, which is a little up and left of the image's center (the badge takes the corner).
+        paint: { 'text-color': token('--neutral-900'), 'text-translate': [(PROBLEM_CENTER - 48) / 2, (PROBLEM_CENTER - 48) / 2] },
+      })
       // Layer order, top to bottom (owner, 2026-10-28): all the text (the basemap's names, then ours), the dots and pins, the locality highlights (fill, outline, radius), and under them the rest of the basemap. The basemap's text layers sit under our dots by default, so lift them to the top.
-      const ours = new Set(['incident-badges', 'incident-selected-pin', 'answer-areas-name'])
+      const ours = new Set(['incident-badges', 'incident-selected-pin', 'answer-areas-name', 'problem-markers'])
       for (const l of map.getStyle().layers) if (l.type === 'symbol' && !ours.has(l.id)) map.moveLayer(l.id)
       map.moveLayer('answer-areas-name')
+      map.moveLayer('problem-markers')
 
       // A click on an incident selects it; a click anywhere else on the map clears the selection.
       map.on('click', (e) => {
+        const problem = map.queryRenderedFeatures(e.point, { layers: ['problem-markers'] })[0]
+        if (problem) return onSelectProblemRef.current?.(String(problem.properties.id))
         const hit = map.queryRenderedFeatures(e.point, { layers: ['incident-selected-pin', 'incidents', 'incident-badges'] })[0]
         onSelectRef.current(hit ? String(hit.properties.id) : null)
       })
-      for (const layer of ['incident-selected-pin', 'incidents', 'incident-badges']) {
+      for (const layer of ['incident-selected-pin', 'incidents', 'incident-badges', 'problem-markers']) {
         map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'))
         map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''))
       }
@@ -319,6 +353,23 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       })),
     })
   }, [ready, incidents, highlightIds])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    ;(map.getSource('problems') as maplibregl.GeoJSONSource).setData({
+      type: 'FeatureCollection',
+      features: problems.map((p) => ({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
+        properties: { id: p.id, count: p.occurrences_n, category: iconCategory(p.category), status: p.status },
+      })),
+    })
+  }, [ready, problems])
+  useEffect(() => {
+    const map = mapRef.current
+    if (ready && map) map.setFilter('problem-markers', ['!=', ['get', 'id'], selectedProblemId ?? ''])
+  }, [ready, selectedProblemId])
 
   // When an answer arrives the map moves to show all of it (owner, 2026-10-27), clear of the banner, the filters and the summary card.
   useEffect(() => {
@@ -431,13 +482,13 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
   const home = useRef<{ lng: number; lat: number; zoom: number } | null>(null)
   useEffect(() => {
     const map = mapRef.current
-    const target = selectedId ? incidents.find((i) => i.id === selectedId) : null
+    const target = selectedId ? incidents.find((i) => i.id === selectedId) : selectedProblemId ? problems.find((p) => p.id === selectedProblemId) : null
     if (!ready || !map) return
     const from = { lng: map.getCenter().lng, lat: map.getCenter().lat, zoom: map.getZoom() }
     let to: typeof from | null = null
     if (target) {
       home.current ??= { ...from }
-      to = { lng: target.lng, lat: target.lat, zoom: Math.max(from.zoom, INCIDENT_ZOOM) }
+      to = { lng: target.lng, lat: target.lat, zoom: Math.max(from.zoom, selectedId ? INCIDENT_ZOOM : PROBLEM_ZOOM) }
     } else if (home.current) {
       to = home.current
       home.current = null
@@ -464,7 +515,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       tween.kill()
       for (const e of events) box.removeEventListener(e, stop)
     }
-  }, [ready, selectedId]) // eslint-disable-line react-hooks/exhaustive-deps -- only a new selection moves the camera, not a filter change
+  }, [ready, selectedId, selectedProblemId]) // eslint-disable-line react-hooks/exhaustive-deps -- only a new selection moves the camera, not a filter change
 
   // While the agent's answer is shown (owner, 2026-10-26) the incidents that are not part of it are hidden, not toned down.
   // While an incident is selected every other dot or pin is toned down toward the land color (same hue, so its status stays readable), and the focused one draws on top.
@@ -486,7 +537,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
 
   // Wrapper positions the map: maplibre's unlayered CSS overrides Tailwind's `absolute` on the map element itself.
   return (
-    <div className="absolute inset-x-0 top-0 bottom-14 desk:top-(--section-header-h) desk:bottom-0 desk:left-[var(--map-left)] desk:overflow-hidden">
+    <div role="region" aria-label="Incident map" className="absolute inset-x-0 top-0 bottom-14 desk:top-(--section-header-h) desk:bottom-0 desk:left-[var(--map-left)] desk:overflow-hidden">
       <div ref={container} className="size-full" />
     </div>
   )
@@ -494,7 +545,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
 
 function ListFallback({ incidents, selectedId, onSelect }: Pick<Props, 'incidents' | 'selectedId' | 'onSelect'>) {
   return (
-    <div className="absolute inset-y-0 inset-x-0 overflow-y-auto px-4 pb-16 pt-16 desk:left-[calc(var(--map-left)+0.5rem)] desk:right-80 desk:pt-[calc(var(--section-header-h)+1.5rem)] desk:pb-4">
+    <div role="region" aria-label="Incident list" className="absolute inset-y-0 inset-x-0 overflow-y-auto px-4 pb-16 pt-16 desk:left-[calc(var(--map-left)+0.5rem)] desk:right-80 desk:pt-[calc(var(--section-header-h)+1.5rem)] desk:pb-4">
       <p className="mb-3 rounded-md border border-warning/50 p-3 text-body-sm text-muted-foreground">
         The map needs WebGL2, which this browser has turned off. In Chrome: Settings → System → turn on “Use graphical
         acceleration when available”, then relaunch. Until then, here is the list of incidents (newest 100).

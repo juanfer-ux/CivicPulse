@@ -51,6 +51,36 @@ stateDiagram-v2
 - ⬜ **No screen yet** for escalation; the database function works and is tested.
 - 🛑 **Approval never triggers a real-world action.** No ticketing, dispatch or enforcement.
 
+## 🧭 Problem status (4 values)
+> 🟨 *Target, decision [0030](decisions/0030-problems-above-incidents.md); not built yet.* A problem has its **own** lifecycle, independent of its incidents'. The incident statuses above and their four map colors do not change.
+
+```mermaid
+stateDiagram-v2
+  [*] --> active
+  active --> monitoring: intervention recorded
+  monitoring --> active: new occurrence
+  monitoring --> resolved: operator decides
+  active --> resolved: operator decides
+  resolved --> active: new confirmed occurrence (reopened)
+  resolved --> archived: operator
+  active --> archived: operator
+  monitoring --> archived: operator
+```
+| Status | Meaning |
+|---|---|
+| `active` | The problem exists or has an unresolved occurrence |
+| `monitoring` | An intervention took place and the place is being watched |
+| `resolved` | Enough evidence that the underlying problem is solved (set by a person) |
+| `archived` | No longer actively managed, or administratively dropped |
+
+**Rules that always hold**
+1. A confirmed new occurrence on a `resolved` problem reopens it to `active` and writes a `reopened` event. Earlier incidents, interventions and the resolution history stay.
+2. **No new reports never set a problem to `resolved`.** The view only shows a derived "quiet" label.
+3. Closing, rejecting or marking an incident duplicate never changes its problem.
+4. **Recurrence is a metric** (`occurrences − 1`), not a status. It counts occurrences, never reports.
+5. **Report vs occurrence:** many reports of the same event (for example five citizens, one parked car, the same pile of waste) are **one occurrence**. A new occurrence needs evidence: a documented intervention (cleared or partial) between the two, a different vehicle or object, or an explicit sign it is a different pile. A gap of more than 24 hours is only a signal to check; if the evidence is not enough the boundary is marked **uncertain** and the report waits for review instead of inventing a new event.
+6. The problem's own map colors are separate from the incident colors.
+
 ## 🟥 Gaps (as built)
 | | Gap |
 |---|---|

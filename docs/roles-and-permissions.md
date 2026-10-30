@@ -136,6 +136,9 @@ flowchart LR
 | T10 | 🔵 reads another locality | blocked | ✅ |
 | T11 | Agent tools run as a restricted user | scoped like T1 or T2 | ✅ |
 | T12 | Anyone inserts an audit event or a pre-approved recommendation | blocked | ✅ |
+| T14 | 🔵🟢🟣 read problems, occurrences, links, interventions (🟨 problems layer) | scoped like incidents (T1, T2, T3) | ✅ in the test, needs the migration |
+| T15 | Anyone writes a problem or link from the browser, or calls the matcher | blocked | ✅ in the test, needs the migration |
+| T16 | Anyone changes an incident column other than `assigned_to` | blocked | ✅ |
 
 ---
 
@@ -161,7 +164,7 @@ All 12 cases are covered by 26 checks, all passing (2026-10-17).
 | 🟩 | **Escalation:** status `needs_second_approval`; a specialist's escalation is the database function `escalate_recommendation`; once escalated only Locality Admin or Super Admin can decide. |
 | 🟩 | Specializations and categories tables (traffic: parking, environmental: illegal dumping, infrastructure: empty). 150 synthetic dumping incidents. |
 | 🟩 | Agent tools need the `ask_agent` permission and take an optional category. |
-| 🟩 | Permission test: 35 checks (T1 to T13 plus extras), all passing. |
+| 🟩 | Permission test: 47 checks (T1 to T16 plus extras; T14 to T16 are the problems layer and the incident guard), run against a local Postgres copy, not yet in the shared project. |
 | 🟩 | **Users screen** (Super Admin): table, search and filters, side panel for role, active switch, localities and categories. Last-Super-Admin guard and audit trail in the database. |
 | 🟩 | **Create user:** invitation by email with role, zones and categories; set-password screen for the invited person. |
 | 🟩 | **Forgot password?** on the sign-in page. |
@@ -183,6 +186,9 @@ All 12 cases are covered by 26 checks, all passing (2026-10-17).
 
 ---
 
+## 🧩 Problems layer (decision 0030, target)
+No permission is added and no matrix row changes in this version. The new tables (`problems`, `occurrences`, `incident_links`, `interventions` and their children) are **read** with `view_incidents` plus `can_access(locality, category)` on their own scope columns; a link also needs its report in scope. Nobody can write them from the browser (no write policy, no grants), so a Super Admin, Locality Admin and Specialist Operator see exactly the problems whose locality and category they already see on incidents. Operator actions (confirm, reject or move a link, record an intervention, set a status) need new permissions and are a **separate approval**.
+
 ## 📜 11. Decision log
 | Date | Decision | Why |
 |---|---|---|
@@ -199,3 +205,4 @@ All 12 cases are covered by 26 checks, all passing (2026-10-17).
 | 2026-10-17 | Illegal dumping is active with 150 synthetic incidents; the agent is category-aware | Owner's decision, so the second category is visible and testable |
 | 2026-10-17 | Database aligned with this spec; permission test 26/26 | Implementation step 1 |
 | 2026-10-18 | Recommendations screens removed for now; the database rules stay | Owner: not needed yet. See [decision 0009](decisions/0009-recommendations-screens-removed.md) |
+| 2026-10-30 | Problems layer: new tables read with `view_incidents` plus `can_access`, no new permission and no browser writes in the first version | Owner approved the plan; see [decision 0030](decisions/0030-problems-above-incidents.md). Operator actions are a separate approval |

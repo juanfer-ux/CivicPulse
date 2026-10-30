@@ -19,7 +19,7 @@ npm run build    # tsc -b (type-check) then vite build
 
 Run a single test file: `npx vitest run src/lib/agent.test.ts`. Tests live beside the code they cover (`src/lib/*.test.ts`).
 
-After any permission change, also run `supabase/tests/rls_smoke.sql` in the Supabase SQL editor (expect `RESULT PASS 35/35`) — see [docs/testing.md](docs/testing.md).
+After any permission change, also run `supabase/tests/rls_smoke.sql` in the Supabase SQL editor (expect `RESULT PASS 47/47`) — see [docs/testing.md](docs/testing.md).
 
 ## Architecture (big picture)
 

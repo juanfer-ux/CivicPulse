@@ -1,6 +1,6 @@
 # 🗃️ Data model
 
-> **Status:** 🟩 Up to date with the database (2026-10-17). Source: `supabase/migrations/*.sql`. The database is the truth; this page explains it.
+> **Status:** 🟩 Up to date with the database (2026-10-17), except the 🟨 *Problems layer* section, which is the target and is not applied yet. Source: `supabase/migrations/*.sql`. The database is the truth; this page explains it.
 > 🔐 Who may read or write each table is defined in [roles-and-permissions.md](roles-and-permissions.md).
 
 ## 🗺️ How the tables relate
@@ -74,6 +74,42 @@ erDiagram
 6. `20261017010000_roles_alignment.sql`: 3 roles, specializations and categories, permissions as data, category scoping, escalation function, category-aware tools.
 7. `20261018000000_user_management.sql`: `profiles.email`, last-Super-Admin guard, audit events for role and access changes.
 8. `20261018010000_invitation_pending.sql`: `profiles.invitation_pending` and the trigger that clears it when an invitation is accepted.
+9. `20261029000000_restrict_incident_updates.sql`: a trigger that lets only `assigned_to` change on an incident (every other column is read-only after insert, for every role). **Written; check that it was run in the shared project.**
+10. `20261030000000_problems_layer.sql` 🟨 *proposed, not applied*: the problems layer below (new tables, views, access rules; no change to existing tables).
+
+## 🧩 Problems layer 🟨 *target (decision [0030](decisions/0030-problems-above-incidents.md); not applied to the database yet)*
+Three levels: **report** (an `incidents` row) → **occurrence** (one real-world event; many reports can describe it) → **problem** (the persistent situation at a place). `incidents` and everything above stay untouched; the layer only adds tables, so it can be dropped.
+```mermaid
+erDiagram
+  PROBLEMS ||--o{ OCCURRENCES : "has"
+  OCCURRENCES ||--o{ INCIDENT_LINKS : "describes"
+  INCIDENTS ||--o{ INCIDENT_LINKS : "linked by"
+  PROBLEMS ||--o{ INTERVENTIONS : "receives"
+  INTERVENTIONS ||--o{ INTERVENTION_RESULTS : "outcome"
+  PROBLEMS ||--o{ PROBLEM_EVENTS : "history"
+  INCIDENTS ||--|| INCIDENT_SOURCES : "provenance"
+  INCIDENTS ||--o{ INCIDENT_SOURCE_STATUS : "original status"
+  SOURCE_PLATFORMS ||--o{ INCIDENT_SOURCES : "from"
+```
+| Table | Purpose | Key points |
+|---|---|---|
+| `source_platforms` | Where a report came from | `code`, name, `categories` it may carry (a mobility platform cannot carry dumping). All synthetic for now. |
+| `incident_sources` | One row per report: its provenance | platform, `external_ref`, `submitted_at`, original category, description and status, evidence references. `unique(platform, external_ref)`. |
+| `incident_source_status` | Original status over time | Insert-only. |
+| `problems` | A persistent territorial problem | `reference`, `category`, `locality_code`, anchor `lat`/`lng`, `location_description`, `status` (`active`, `monitoring`, `resolved`, `archived`), `merged_into`, `dataset`, `is_synthetic`. No counters: they are derived in views. |
+| `occurrences` | One real-world event | `problem_id`, scope columns, `subject_key` (for example a plate), `ended_at`, `ended_reason` (`intervention` or `operator`). Whether its boundary is uncertain is derived from proposed links. |
+| `incident_links` | Report → occurrence and problem | **Insert-only.** `state` (`proposed`, `confirmed`, `rejected`, `unlinked`), `actor_type` (`rule`, `ai`, `operator`), `score`, `band`, `explanation` (json), `config_version`, `supersedes`. The latest row per report is the current link. |
+| `interventions`, `intervention_results` | Action taken and what happened | Result (`cleared`, `partial`, `no_effect`, `unknown`) is recorded separately and later. Insert-only. |
+| `problem_events` | Timeline | Status changes, reopened, notes. Insert-only. |
+| `occurrence_rules`, `match_config` | Matching settings | Review gap per category, thresholds, weights and a version; nothing is hard-coded in the matching function. |
+
+**Views:** `incident_current_link`, `occurrence_stats` (first and last report, report count, uncertain boundary) and `problem_stats` (`occurrences_n`, `recurrences_n` = occurrences − 1, `reports_n`, `interventions_n`, `occurrences_after_last_intervention`, `last_seen`, `quiet`). **Recurrence is a number, not a status.**
+
+**Access:** the same rule as incidents. A user reads a row when they have `view_incidents` and `can_access(locality, category)` for its problem; a link also needs its report in scope. There are **no write policies and no new permission**: rows come only from the owner-run matching function and seeds, and nothing in the browser can write them.
+
+**Matching** (`match_unlinked()`, owner-only, never a trigger, never updates `incidents`): see [ai-agent.md](ai-agent.md#-matching-is-rules-not-ai) and [incident-lifecycle.md](incident-lifecycle.md#-problem-status-4-values).
+
+**Seed:** `supabase/seed/synthetic_problems.sql` adds **200 new reports** (tag `evidence_metadata->>'dataset' = 'problems_v1'`) with 16 problems' worth of planted truth (48 occurrences, 32 interventions, about three months, both categories). The 650 existing incidents are never changed. The seed does not fill problems or links: the matcher builds them and `supabase/tests/matching_smoke.sql` compares the result with the planted truth.
 
 ## 🎯 Still to build
 | | Item |

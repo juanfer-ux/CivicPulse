@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import { Car, Trash } from '@phosphor-icons/react'
 import { GROUPS, type Group } from '@/lib/incidents'
+import { PROBLEM_STATUS } from '@/lib/problems'
 import { KEEP, mix, token } from '@/lib/tokens'
 
 /** Street-level markers (Waze style): a big colored circle with the category's icon inside. One image per category and status. */
@@ -65,6 +66,49 @@ export async function addBadges(map: { addImage: (id: string, data: ImageData) =
           map.addImage(badgeId(category, group, dim), await badge(Icon, dim ? mix(fill, land, KEEP) : fill, dim ? mix(ink, land, KEEP) : ink, outline, tail)),
         )
       }),
+    ),
+  )
+}
+
+/** Persistent-problem marker (decision 0030; Figma Problem Marker): a light disc with a status-colored ring and a small badge with the category's icon. The occurrence count is drawn over the disc by the layer. One image per category and status. */
+export const problemMarkerId = (category: string, status: string) => `problem-${iconCategory(category)}-${status}`
+const P = 96 // image px; shown at 0.5, so 48 px like Figma
+/** Where the disc's center sits in the image, so the layer can center the count on it. */
+export const PROBLEM_CENTER = 44
+
+async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], ring: string) {
+  const { renderToStaticMarkup } = await import('react-dom/server')
+  const svg = renderToStaticMarkup(createElement(Icon, { color: token('--neutral-100'), width: 24, height: 24, weight: 'fill' }))
+  const img = new Image()
+  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+  await img.decode()
+  const c = document.createElement('canvas')
+  c.width = c.height = P
+  const g = c.getContext('2d')!
+  g.beginPath() // the disc
+  g.arc(PROBLEM_CENTER, PROBLEM_CENTER, 40, 0, Math.PI * 2)
+  g.fillStyle = token('--neutral-100')
+  g.fill()
+  g.beginPath() // the ring sits inside the disc's edge
+  g.arc(PROBLEM_CENTER, PROBLEM_CENTER, 37, 0, Math.PI * 2)
+  g.lineWidth = 6
+  g.strokeStyle = ring
+  g.stroke()
+  g.beginPath() // the category badge, bottom right, with a thin light outline
+  g.arc(76, 76, 20, 0, Math.PI * 2)
+  g.lineWidth = 3
+  g.strokeStyle = token('--neutral-100')
+  g.stroke()
+  g.fillStyle = token('--neutral-900')
+  g.fill()
+  g.drawImage(img, 64, 64, 24, 24)
+  return g.getImageData(0, 0, P, P)
+}
+
+export async function addProblemMarkers(map: { addImage: (id: string, data: ImageData) => void }) {
+  await Promise.all(
+    Object.entries(ICONS).flatMap(([category, Icon]) =>
+      Object.entries(PROBLEM_STATUS).map(async ([status, s]) => map.addImage(problemMarkerId(category, status), await problemMarker(Icon, token(s.token)))),
     ),
   )
 }

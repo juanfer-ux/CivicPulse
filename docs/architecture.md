@@ -37,6 +37,8 @@ flowchart TB
 | 🚀 Production | https://civic-pulse-oct-8.vercel.app | Environment variables set in Vercel, see [deploy.md](deploy.md) |
 | 🗄️ Database | One Supabase project shared by local and production | ⚠️ Local testing writes to the same data as production |
 
+> 🟨 *Target (decision [0030](decisions/0030-problems-above-incidents.md)):* a **problems layer** of new tables sits beside `incidents` (report → occurrence → problem). The browser only reads it; rows come from an owner-run matching function. Nothing server-side is added.
+
 ## 📁 Where things are
 | Path | What |
 |---|---|

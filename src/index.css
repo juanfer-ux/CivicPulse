@@ -211,6 +211,11 @@
   --map-reviewing: var(--orange-400);
   --map-approved: var(--blue-400);
   --map-rejected: var(--red-400);
+  /* Persistent-problem status colors (decision 0030; Figma Map collection): their own set, not the incident status colors. Aliases of palette colors, so no color was added. */
+  --map-problem-active: var(--coral-400);
+  --map-problem-monitoring: var(--amber-400);
+  --map-problem-resolved: var(--indigo-300);
+  --map-problem-archived: var(--neutral-300);
   --map-dot-outline: var(--neutral-700);
   --map-answer-ring: var(--ai-banner);
   --map-answer-radius: var(--indigo-400); /* alias of indigo-400 (owner, 2026-10-28): the edge color of the agent's answer radius fill (radial gradient: clear up to half the radius, indigo-400 at the edge). Figma map/answer-radius */
