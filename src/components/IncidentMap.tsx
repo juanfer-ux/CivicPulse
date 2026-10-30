@@ -22,6 +22,7 @@ const fitPadding = (wide: boolean) => (wide ? { top: 268, bottom: 74, left: 40, 
 const BADGE_ZOOM = 14
 /** Zoom the camera flies to when an incident is opened. */
 const INCIDENT_ZOOM = 17
+const MAX_FLY_ZOOM = 3 // motion comfort (owner, 2026-10-30): never animate more than 3 zoom levels; a farther trip jumps the rest first
 
 /** Paint the land with --map-land (true) or leave it invisible (false). */
 const LAND_ON = false
@@ -443,18 +444,25 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     }
     if (!to) return
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const dz = to.zoom - from.zoom
+    if (Math.abs(dz) > MAX_FLY_ZOOM) {
+      from.zoom = to.zoom - Math.sign(dz) * MAX_FLY_ZOOM
+      map.jumpTo({ zoom: from.zoom })
+    }
     const tween = gsap.to(from, {
       ...to,
-      duration: still ? 0 : 1.4,
-      ease: 'power3.inOut',
+      duration: still ? 0 : 0.5 + 0.4 * (Math.abs(to.zoom - from.zoom) / MAX_FLY_ZOOM), // 0.5 s for a short hop up to 0.9 s for the longest
+      ease: 'power2.out',
       onUpdate: () => map.jumpTo({ center: [from.lng, from.lat], zoom: from.zoom }),
     })
     const stop = () => tween.kill()
-    const events = ['mousedown', 'touchstart', 'wheel'] as const
-    for (const e of events) map.on(e, stop)
+    // On the container, not map.on, so the zoom buttons and the keyboard stop it too (the tween's jumpTo would override them).
+    const box = map.getContainer()
+    const events = ['pointerdown', 'wheel', 'keydown'] as const
+    for (const e of events) box.addEventListener(e, stop, { passive: true })
     return () => {
       tween.kill()
-      for (const e of events) map.off(e, stop)
+      for (const e of events) box.removeEventListener(e, stop)
     }
   }, [ready, selectedId]) // eslint-disable-line react-hooks/exhaustive-deps -- only a new selection moves the camera, not a filter change
 
