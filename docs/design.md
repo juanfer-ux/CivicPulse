@@ -8,6 +8,7 @@
 - **Logo:** ring mark plus wordmark (`src/assets/logo-*.svg`, `src/components/Logo.tsx`).
 - **Font:** Manrope, served from our own site ([decision 0019](decisions/0019-manrope-font.md)).
 - **Theme:** dark only ([decision 0005](decisions/0005-dark-only-figma-tokens.md)).
+- **Pointer cursor (owner, 2026-10-30):** everything you can click shows the pointing hand (buttons, menu items, links, selects, checkbox and radio labels); a disabled button keeps the arrow. One rule in `src/index.css` (`@layer base`), because Tailwind 4 no longer sets it on buttons.
 - **Incident markers:** (rule, owner 2026-10-26: **the selected incident always shows its pin with the category icon, at any zoom**, even fully zoomed out; layer `incident-selected-pin`, its ring wraps the pin's circle.)
 - **Sidebar collapse / expand (test, 2026-10-30):** a quick GSAP tween of the width (0.2 s, `power2.out`, content clipped while it runs; instant with reduced motion); dragging the width does not animate.
 - **Closing an incident (test, 2026-10-30):** reverses it: the camera flies back to where the map was before the first incident was opened, and the sidebar expands again if opening the incident was what collapsed it (a sidebar the owner had collapsed stays collapsed).

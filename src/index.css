@@ -312,6 +312,8 @@
   * { @apply border-border outline-ring/50; letter-spacing: 0.02em; }
   body { @apply bg-background text-foreground; }
   html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; }
+  /* Tailwind 4 stopped giving buttons the pointing hand (owner, 2026-10-30): everything you can click gets it, a disabled one does not. Utilities such as cursor-col-resize still win. */
+  button:not(:disabled), [role='button']:not([aria-disabled='true']), [role='menuitem'], summary, select, a[href], label:has(input[type='checkbox']), label:has(input[type='radio']) { cursor: pointer; }
 }
 
 /* MapLibre's own corner (zoom buttons, attribution) keeps 24 px from the edges like everything else over the map: its default margin is 10 px, so 14 more (owner, 2026-10-28). */
