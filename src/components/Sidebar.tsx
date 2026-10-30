@@ -99,9 +99,17 @@ const read = () => {
   }
 }
 
-function Brand({ collapsed }: { collapsed: boolean }) {
+/** Collapsed, the logo mark is the expand button: on hover or focus it swaps for the panel icon (owner, 2026-10-30). */
+function Brand({ collapsed, onToggle }: { collapsed: boolean; onToggle?: () => void }) {
+  if (collapsed && onToggle)
+    return (
+      <Button variant="ghost" className="group size-11 p-0" aria-label="Expand menu" title="Expand menu" onClick={onToggle}>
+        <img src={mark} alt="" width={30} height={30} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
+        <SidebarSimple className="hidden size-5 shrink-0 -scale-x-100 group-hover:block group-focus-visible:block" />
+      </Button>
+    )
   return (
-    <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-[5.6px]'}`}>
+    <div className="flex items-center gap-[5.6px]">
       <img src={mark} alt="" width={30} height={30} className="shrink-0" />
       {!collapsed && <img src={wordmark} alt="Civic Pulse" width={112} height={9} className="shrink-0" />}
     </div>
@@ -147,7 +155,7 @@ function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: Comp
 }
 
 /** The menu itself, as in Figma Sidebar (2026-10-29): a 70 px header with the logo and the collapse button, the Investigations and Cases groups, and at the bottom the account row. Used by the desktop column and the phone slide-out. */
-function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, toggleItem, onToggle }: Chats & { collapsed: boolean; toggleItem?: React.ReactNode; onToggle?: () => void }) {
+function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, onToggle }: Chats & { collapsed: boolean; onToggle?: () => void }) {
   const { profile, session, signOut } = useAuth()
   const name = shortName(profile?.full_name) || 'Signed in'
   const email = session?.user?.email
@@ -161,7 +169,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col gap-4">
         <div className={`flex h-[70px] shrink-0 items-center border-b ${collapsed ? 'justify-center border-(--neutral-500)' : 'justify-between border-(--neutral-400) px-3'}`}>
-          <Brand collapsed={collapsed} />
+          <Brand collapsed={collapsed} onToggle={onToggle} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
               <SidebarSimple className="size-5 shrink-0" />
@@ -202,7 +210,6 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, to
           </div>
         )}
       </div>
-      {collapsed && <div className="flex justify-center">{toggleItem}</div>}
       <div className={`flex shrink-0 flex-col border-t border-(--neutral-400) py-4 ${collapsed ? 'items-center gap-3' : ''}`}>
         {collapsed ? (
           <>
@@ -288,19 +295,12 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className="relative hidden shrink-0 bg-card desk:block desk:border-r desk:border-secondary">
+      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:block desk:border-r desk:border-secondary ${collapsed ? 'bg-sidebar' : 'bg-card'}`}>
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         <Menu_
           {...props}
           collapsed={collapsed}
           onToggle={toggle}
-          toggleItem={
-            collapsed && (
-              <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Expand menu" title="Expand menu" onClick={toggle}>
-                <SidebarSimple className="size-5 shrink-0 -scale-x-100" />
-              </Button>
-            )
-          }
         />
       </aside>
 
