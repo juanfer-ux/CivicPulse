@@ -1,5 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent } from 'react'
-import { DotOutline, DotsThreeVertical, List, Plus, SidebarSimple, SignOut, X, type IconProps } from '@phosphor-icons/react'
+import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { CaretDown, DotOutline, DotsThreeVertical, List, Plus, SidebarSimple, SignOut, X, type IconProps } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
@@ -117,13 +117,23 @@ function Brand({ collapsed, onToggle }: { collapsed: boolean; onToggle?: () => v
 }
 
 /** The menu behind the hamburger in the account row (Figma 2026-10-29): Sign out. `side` = where the popover opens. */
-function AccountMenu({ onSignOut, side }: { onSignOut: () => void; side: 'above' | 'right' }) {
+function AccountMenu({ onSignOut, side, avatar }: { onSignOut: () => void; side: 'above' | 'right'; avatar?: ReactNode }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="relative" onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
-      <Button variant="ghost" size="icon" aria-label="Account menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        <DotsThreeVertical className={`size-5 ${side === 'above' ? 'text-(--white)' : ''}`} />
-      </Button>
+    <div className={`relative ${avatar ? 'my-1' : ''}`} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
+      {avatar ? (
+        // Collapsed sidebar (owner, 2026-10-30): the profile itself is the button, with a small down chevron badge on its top right so it reads as a menu. No extra height: the area stays as tall as the expanded one.
+        <button type="button" aria-label="Account menu" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="group relative cursor-pointer rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+          {avatar}
+          <span className="absolute -top-1 -right-1 grid size-4 place-items-center rounded-full bg-(--neutral-500) text-(--neutral-100) ring-2 ring-(--neutral-700) group-hover:bg-(--white) group-hover:text-(--neutral-900) group-focus-visible:bg-(--white) group-focus-visible:text-(--neutral-900)">
+            <CaretDown weight="bold" className="size-2.5" aria-hidden />
+          </span>
+        </button>
+      ) : (
+        <Button variant="ghost" size="icon" aria-label="Account menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+          <DotsThreeVertical className={`size-5 ${side === 'above' ? 'text-(--white)' : ''}`} />
+        </Button>
+      )}
       {open && (
         <div className={`absolute z-40 w-40 rounded-sm border bg-card p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
           <Button variant="ghost" className="h-8 w-full justify-start gap-2 px-3 hover:bg-sidebar" onClick={onSignOut}>
@@ -213,8 +223,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
       <div className={`flex shrink-0 flex-col border-t border-(--neutral-400) py-4 ${collapsed ? 'items-center gap-3' : ''}`}>
         {collapsed ? (
           <>
-            <AccountMenu onSignOut={signOut} side="right" />
-            <Avatar name={profile?.full_name || 'Signed in'} size="lg" title={name} />
+            <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} size="lg" title={name} />} />
           </>
         ) : (
           <div className="flex items-center gap-3 py-1 pl-4 pr-5">
@@ -295,7 +304,7 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:block desk:border-r desk:border-secondary ${collapsed ? 'bg-sidebar' : 'bg-(--neutral-700)'}`}>
+      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:block desk:border-r desk:border-secondary bg-(--neutral-700)`}>
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         <Menu_
           {...props}
