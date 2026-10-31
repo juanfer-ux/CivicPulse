@@ -59,9 +59,11 @@ const LOCALITY_FILL = 0.04
 const LOCALITY_FILL_FOCUS = 0.06
 /** How strong the answer radius fill gets at its edge (Figma: 5.9 % on the Fill layer). */
 const ANSWER_FILL_ALPHA = 0.06
-/** Problem radius: its size in meters around the marker, and how strong its fill gets at the edge (a little stronger than the answer's so it shows over the dots). */
+/** Problem radius: its size in meters around the marker. */
 const PROBLEM_RADIUS_M = 60
-const PROBLEM_RADIUS_ALPHA = 0.14
+const PROBLEM_FILL_ALPHA = 0.02 // the radius fill and ring follow the owner's Figma Incident Radius (2026-10-30): fill 2 %, ring 0.5 px at 35 %
+const PROBLEM_RING_ALPHA = 0.35
+const PROBLEM_RING_PX = 0.5
 const PROBLEM_RADIUS_ZOOM = 11 // the radius shows from the start (owner, 2026-10-30; it faded in from zoom 12): the map's minimum zoom
 const PROBLEM_RADIUS_RAMP_ZOOM = 12 // below this it keeps its starting size on screen, and it grows from here
 const PROBLEM_RADIUS_FULL_ZOOM = 14 // and reaches the minimum size on screen here
@@ -293,26 +295,13 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
           const floor = PROBLEM_RADIUS_START_PX + (PROBLEM_RADIUS_MIN_PX - PROBLEM_RADIUS_START_PX) * Math.min(1, Math.max(0, (z - PROBLEM_RADIUS_RAMP_ZOOM) / (PROBLEM_RADIUS_FULL_ZOOM - PROBLEM_RADIUS_RAMP_ZOOM)))
           return [z, Math.max(floor * f, PROBLEM_RADIUS_M * METERS_TO_PX_Z0 * 2 ** z * f)]
         }).flat()] as never
-      BANDS.forEach(([from, to], i) =>
-        map.addLayer(
-          {
-            id: `problem-radius-fill-${i}`,
-            type: 'circle',
-            source: 'problem-radius',
-            minzoom: PROBLEM_RADIUS_ZOOM,
-            paint: {
-              'circle-radius': problemPx((from + to) / 2),
-              'circle-opacity': 0,
-              'circle-stroke-width': problemPx(to - from),
-              'circle-stroke-color': ['get', 'color'],
-              'circle-stroke-opacity': (PROBLEM_RADIUS_ALPHA * (i + 1)) / BANDS.length,
-            },
-          },
-          underLabels,
-        ),
+      // The look is the owner's Figma Incident Radius (2026-10-30): a flat fill at 2 % and a 0.5 px ring at 35 %, in the problem's status color, the same at every zoom.
+      map.addLayer(
+        { id: 'problem-radius-fill', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-color': ['get', 'color'], 'circle-opacity': PROBLEM_FILL_ALPHA } },
+        underLabels,
       )
       map.addLayer(
-        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': ['get', 'color'] } },
+        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-stroke-width': PROBLEM_RING_PX, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': PROBLEM_RING_ALPHA } },
         underLabels,
       )
       // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same 4 % for every locality), with their names in neutral-100. No circles then.
