@@ -302,7 +302,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       </div>
 
       <div
-        className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border-r desk:border-secondary desk:bg-ai desk:p-0`}
+        className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border-r desk:border-input desk:bg-ai desk:p-0`}
       >
         {children}
       </div>
