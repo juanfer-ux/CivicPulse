@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_SIZE, RING_EXTRA } from '@/lib/markerIcons'
+import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_SIZE, RING_EXTRA } from '@/lib/markerSizes'
 
 // The owner's sizes for the incident squares (2026-10-30), by map zoom: 11 and below plain 8 px, 12 plain 10 px,
 // 13 square 24 px with a 12 px icon, 14 and above square 30 px with a 16 px icon. The selected ring is 10 px bigger.

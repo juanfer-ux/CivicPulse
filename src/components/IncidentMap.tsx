@@ -67,10 +67,6 @@ const PROBLEM_RADIUS_RAMP_ZOOM = 12 // below this it keeps its starting size on 
 const PROBLEM_RADIUS_FULL_ZOOM = 14 // and reaches the minimum size on screen here
 const PROBLEM_RADIUS_MIN_PX = 36 // from the full-opacity zoom it never draws smaller than this on screen (the marker is 20 px in radius)
 const PROBLEM_RADIUS_START_PX = 60 // its size on screen up to the ramp zoom (owner, 2026-10-30: bigger at the start, it was 20, then 48), shrinking to the minimum at zoom 14
-// The 1 px ring (owner, 2026-10-30): 10 % opaque when zoomed all the way out, rising to 50 % (the Figma value) at zoom 16, where the radius reaches its real size.
-const PROBLEM_RING_ALPHA_FAR = 0.1
-const PROBLEM_RING_ALPHA_NEAR = 0.5
-const PROBLEM_RING_FULL_ZOOM = 16
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
 /** The map always opens here (owner's choice, 2026-10-26). */
@@ -316,7 +312,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         ),
       )
       map.addLayer(
-        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': ['interpolate', ['linear'], ['zoom'], PROBLEM_RADIUS_ZOOM, PROBLEM_RING_ALPHA_FAR, PROBLEM_RING_FULL_ZOOM, PROBLEM_RING_ALPHA_NEAR] as never } },
+        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': ['get', 'color'] } },
         underLabels,
       )
       // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same 4 % for every locality), with their names in neutral-100. No circles then.

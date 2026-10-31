@@ -2,21 +2,15 @@ import { createElement } from 'react'
 import { Car, Trash, WarningCircle } from '@phosphor-icons/react'
 import { GROUPS, type Group } from '@/lib/incidents'
 import { PROBLEM_STATUS } from '@/lib/problems'
+import { BADGE_STEPS, PROBLEM_SIZE } from '@/lib/markerSizes'
 import { KEEP, mix, token } from '@/lib/tokens'
+
+export { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_SIZE, RING_EXTRA } from '@/lib/markerSizes'
 
 /** Street-level markers (Waze style): a big colored square (owner, 2026-10-30; it was a circle pin) with the category's icon inside, anchored at its center. One image per category and status. */
 export const ICONS = { parking: Car, illegal_dumping: Trash }
 export const iconCategory = (category: string) => (category in ICONS ? category : 'parking')
 export const badgeId = (category: string, group: string, dim = false, step = 0) => `badge-${iconCategory(category)}${dim ? '-dim' : ''}-${group}-${step}`
-/** Square marker sizes by zoom (owner, 2026-10-30), in screen px: step 0 from zoom 13, step 1 from zoom 14. The icon is its own size in each, so each step is its own image. */
-export const BADGE_STEPS = [
-  { square: 24, icon: 12 },
-  { square: 30, icon: 16 },
-]
-/** Plain squares by zoom, in screen px (owner, 2026-10-30): step 0 at zoom 11 and below, step 1 at zoom 12 (up to 13, where the icon squares start). */
-export const PLAIN_PX = [8, 10]
-/** The selected incident's ring is this much bigger than its square marker. */
-export const RING_EXTRA = 10
 
 /** The badge is a square, 64 px including the outline. */
 const SIZE = 64
@@ -104,10 +98,6 @@ export async function addBadges(map: { addImage: (id: string, data: ImageData) =
 }
 
 /** Persistent-problem marker (decision 0030; owner's test 2026-10-30): a circle in the problem's status color with the category icon in it and a 2 px neutral-900 outline, and a small round alert badge (neutral-900, no outline, WarningCircle icon) on its upper right. The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category and status, scaled by zoom. */
-/** The marker is drawn once at its biggest size, in screen px: circle, category icon, badge. */
-export const PROBLEM_SIZE = { circle: 42, icon: 24, badge: 28 }
-/** The circle's size by map zoom (owner, 2026-10-30): the one image is scaled smoothly between these, so there is no jump (the icon and the badge scale with it). 12 and below stays at the first, 14 and above at the last. */
-export const PROBLEM_CIRCLE_BY_ZOOM: [number, number][] = [[12, 28], [13, 32], [14, 42]]
 export const problemMarkerId = (category: string, status: string) => `problem-${iconCategory(category)}-${status}`
 /** The images are drawn at 2x and shown at half size. */
 export const PROBLEM_SCALE = 0.5
