@@ -2,6 +2,7 @@
 
 > **Status:** 🟩 In use. Live at https://civicpulse-bogota.vercel.app (auto-deploys on every push to `main`).
 > How the pieces fit: [architecture.md](architecture.md).
+> The GitHub repository is `juanfer-ux/CivicPulse` (renamed from `CivicPulse-Oct-8` on 2026-10-30; the old address redirects). If a push stops deploying after a rename, reconnect the repo in Vercel: Settings, Git.
 
 Static Vite app + Supabase. Nothing runs on Vercel except the build. All data access goes browser → Supabase with the signed-in user's token, so row-level security is the security boundary ([decision 0003](decisions/0003-database-is-the-security-boundary.md)).
 
