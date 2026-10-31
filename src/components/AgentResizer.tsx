@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 
-export const AGENT_MIN = 424
+export const AGENT_MIN = 500
 export const AGENT_MAX = 800
 /** 543.5 px next to the collapsed sidebar at 1,440 px (Figma). */
 export const AGENT_DEFAULT = 0.395
 
-/** CSS width of the panel: a share of the space next to the sidebar, never under 424 or over 800 px. */
+/** CSS width of the panel: a share of the space next to the sidebar, never under 500 or over 800 px. */
 export const agentWidthCss = (frac: number) => `clamp(${AGENT_MIN}px, ${frac * 100}%, ${AGENT_MAX}px)`
 
 /**
