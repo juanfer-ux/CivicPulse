@@ -104,6 +104,8 @@ export function plan(question: string, localities: Locality[]): Plan | null {
 // ───────── Controlled tools (each maps to one SQL function) ─────────
 async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T[]> {
   const { data, error } = await supabase.rpc(fn, args)
+  // 42501 on a function the signed-in role may run means the request went out as anonymous: the session expired (owner's screenshot, 2026-10-30).
+  if (error?.code === '42501') throw new Error('Your session has expired. Sign out and sign in again to keep asking.')
   if (error) throw new Error(error.message)
   return (data ?? []) as T[]
 }
