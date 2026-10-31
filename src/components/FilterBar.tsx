@@ -36,6 +36,41 @@ const PLANNED: Category[] = [
   { code: 'other', name: 'Others' },
 ]
 
+/** What the map shows (owner, 2026-10-30): problems, incidents or both. Both is `[]`. */
+const typesOn = (filters: Filters, hasProblems: boolean) => ({
+  problems: hasProblems && (!filters.types.length || filters.types.includes('problems')),
+  incidents: !hasProblems || !filters.types.length || filters.types.includes('incidents'),
+})
+
+/**
+ * The two map toggles, merged with the counts (owner, 2026-10-30): "Problems 16" and "Incidents 650", at the bottom left of the map where the legend was.
+ * Both are on by default. Switching one off keeps the other on (never an empty map) and drops the statuses chosen for the one that went away, so a hidden filter never keeps narrowing.
+ */
+export function MapTypeChips({ filters, onChange, problemCount, incidentCount }: { filters: Filters; onChange: (f: Filters) => void; problemCount: number; incidentCount: number }) {
+  const on = typesOn(filters, true)
+  const toggle = (type: MapType) => {
+    const now = [...(on.problems ? ['problems' as const] : []), ...(on.incidents ? ['incidents' as const] : [])]
+    const next = now.includes(type) ? now.filter((t) => t !== type) : [...now, type]
+    if (!next.length) return
+    onChange({
+      ...filters,
+      types: next.length === 2 ? [] : next,
+      ...(next.includes('problems') ? {} : { problemStatuses: [] }),
+      ...(next.includes('incidents') ? {} : { statuses: [] }),
+    })
+  }
+  return (
+    <div role="group" aria-label="What the map shows" className="flex items-center gap-2">
+      <Chip pressed={on.problems} icon={<WarningCircle weight="fill" aria-hidden />} count={problemCount} onClick={() => toggle('problems')}>
+        Problems
+      </Chip>
+      <Chip pressed={on.incidents} icon={<Square weight="fill" aria-hidden />} count={incidentCount} onClick={() => toggle('incidents')}>
+        Incidents
+      </Chip>
+    </div>
+  )
+}
+
 /**
  * The map filters as one row of chips (Figma: Filter Bar). Locality and Period open a menu; categories and
  * statuses are toggles you can combine; the status chips carry their counts (computed with every other filter applied).
@@ -59,34 +94,11 @@ export function FilterBar({
   className?: string
 }) {
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
-  const showProblems = !!problemCounts && (!filters.types.length || filters.types.includes('problems'))
-  const showIncidents = !problemCounts || !filters.types.length || filters.types.includes('incidents')
-  // Switching one off keeps the other on (never an empty map) and drops the statuses chosen for the one that went away, so a hidden filter never keeps narrowing.
-  const toggle = (type: MapType) => {
-    const on = [...(showProblems ? ['problems' as const] : []), ...(showIncidents ? ['incidents' as const] : [])]
-    const next = on.includes(type) ? on.filter((t) => t !== type) : [...on, type]
-    if (!next.length) return
-    set({
-      types: next.length === 2 ? [] : next,
-      ...(next.includes('problems') ? {} : { problemStatuses: [] }),
-      ...(next.includes('incidents') ? {} : { statuses: [] }),
-    })
-  }
+  const { problems: showProblems, incidents: showIncidents } = typesOn(filters, !!problemCounts)
   return (
     <div role="group" aria-label="Filters" className={className}>
       {/* The filters share one 8 px gap and scroll sideways when they do not fit; "Clear filters" stays put at the far right. */}
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-1 [scrollbar-width:none]">
-        {/* Two toggles, both on by default (owner, 2026-10-30): what the map shows. At least one stays on, and the Status menu below only lists the statuses of what is on. */}
-        {problemCounts && (
-          <>
-            <Chip pressed={showProblems} icon={<WarningCircle weight="fill" aria-hidden />} onClick={() => toggle('problems')}>
-              Problems
-            </Chip>
-            <Chip pressed={showIncidents} icon={<Square weight="fill" aria-hidden />} onClick={() => toggle('incidents')}>
-              Incidents
-            </Chip>
-          </>
-        )}
         {/* One Status chip for both kinds (owner, 2026-10-30): incident statuses and problem statuses are different sets, so the menu lists them in two labeled groups. Values are prefixed `p:` / `i:` only to tell the two apart. */}
         <ChipMultiSelect
           aria-label="Status"
@@ -107,7 +119,7 @@ export function FilterBar({
                   group: showIncidents ? 'Problems' : undefined,
                   label: PROBLEM_STATUS[st].label,
                   icon: <span className="block size-2.5 shrink-0 rounded-full" style={{ background: `var(${PROBLEM_STATUS[st].token})` }} aria-hidden />,
-                  hint: String(problemCounts[st]),
+                  hint: String(problemCounts?.[st] ?? 0),
                 }))
               : []),
             ...(showIncidents ? (Object.keys(GROUPS) as Group[]) : []).map((g) => ({

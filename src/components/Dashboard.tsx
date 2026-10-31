@@ -6,7 +6,7 @@ import { trendOf } from '@/lib/trend'
 import { MediaGallery } from '@/components/MediaGallery'
 import { ProblemDetail } from '@/components/ProblemDetail'
 import { Badge } from '@/components/ui/badge'
-import { FilterBar, NO_FILTERS, type Filters } from '@/components/FilterBar'
+import { FilterBar, MapTypeChips, NO_FILTERS, type Filters } from '@/components/FilterBar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -231,16 +231,13 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         </div>
       )}
 
-      {/* Legend (owner, 2026-10-28, kept from the map header): how many incidents the map shows now, bottom left. */}
+      {/* Bottom left (owner, 2026-10-30): the Problems and Incidents toggles with their counts, merged with the old "Showing N" legend. Without the problems layer there is one plain count, as before. */}
       {data && (
-        <div className="pointer-events-none absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)]">
-          {showProblems && (
-            <p className="rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200)">
-              Showing {problemsFiltered.length} {problemsFiltered.length === 1 ? 'problem' : 'problems'}
-            </p>
-          )}
-          {showIncidents && (
-            <p className="rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200)">
+        <div className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)]">
+          {hasProblems ? (
+            <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
+          ) : (
+            <p className="pointer-events-none rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200)">
               Showing {filtered.length} {filtered.length === 1 ? 'incident' : 'incidents'}
             </p>
           )}
