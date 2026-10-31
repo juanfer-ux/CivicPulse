@@ -11,8 +11,12 @@ export const badgeId = (category: string, group: string, dim = false, step = 0) 
 /** Square marker sizes by zoom (owner, 2026-10-30), in screen px: step 0 from zoom 13, step 1 from zoom 14. The icon is its own size in each, so each step is its own image. */
 export const BADGE_STEPS = [
   { square: 24, icon: 12 },
-  { square: 28, icon: 16 },
+  { square: 30, icon: 16 },
 ]
+/** Plain squares by zoom, in screen px (owner, 2026-10-30): step 0 at zoom 11 and below, step 1 at zoom 12 (up to 13, where the icon squares start). */
+export const PLAIN_PX = [8, 10]
+/** The selected incident's ring is this much bigger than its square marker. */
+export const RING_EXTRA = 10
 
 /** The badge is a square, 64 px including the outline. */
 const SIZE = 64

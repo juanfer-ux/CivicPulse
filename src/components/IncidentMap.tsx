@@ -4,7 +4,7 @@ import { gsap } from 'gsap'
 import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import { PROBLEM_OFFSET, PROBLEM_SCALE, addBadges, addDots, addSelectedRing, addProblemMarkers, iconCategory } from '@/lib/markerIcons'
+import { BADGE_STEPS, PLAIN_PX, PROBLEM_OFFSET, RING_EXTRA, PROBLEM_SCALE, addBadges, addDots, addSelectedRing, addProblemMarkers, iconCategory } from '@/lib/markerIcons'
 import { labelPoint } from '@/lib/polygons'
 import { circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
@@ -204,7 +204,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         maxzoom: BADGE_ZOOM,
         layout: {
           'icon-image': ['concat', 'dot-', ['get', 'group']],
-          'icon-size': ['step', ['zoom'], 6 / 24, 12, 12 / 24], // plain squares (owner, 2026-10-30): 6 px across below zoom 12, 12 px from 12 up to 13 (until the markers)
+          'icon-size': ['step', ['zoom'], PLAIN_PX[0] / 24, 12, PLAIN_PX[1] / 24], // plain squares (owner, 2026-10-30): 8 px across below zoom 12, 10 px from 12 up to 13 (until the markers); the image is 24 px
           'icon-allow-overlap': true,
           'icon-ignore-placement': true,
         },
@@ -234,7 +234,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         minzoom: BADGE_ZOOM,
         layout: {
           'icon-image': badgeImage(),
-          'icon-size': ['step', ['zoom'], 24 / 64, 14, 28 / 64], // square markers (owner, 2026-10-30): 24 px from zoom 13, 28 px from 14 up (the image is 64 px)
+          'icon-size': ['step', ['zoom'], BADGE_STEPS[0].square / 64, 14, BADGE_STEPS[1].square / 64], // square markers (owner, 2026-10-30): 24 px from zoom 13, 30 px from 14 up (BADGE_STEPS; the image is 64 px)
           'icon-allow-overlap': true,
         },
       })
@@ -246,7 +246,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         filter: ['==', ['get', 'id'], ''],
         layout: {
           'icon-image': badgeImage(),
-          'icon-size': ['step', ['zoom'], 24 / 64, 14, 28 / 64], // square markers (owner, 2026-10-30): 24 px from zoom 13, 28 px from 14 up (the image is 64 px)
+          'icon-size': ['step', ['zoom'], BADGE_STEPS[0].square / 64, 14, BADGE_STEPS[1].square / 64], // square markers (owner, 2026-10-30): 24 px from zoom 13, 30 px from 14 up (BADGE_STEPS; the image is 64 px)
           'icon-allow-overlap': true,
         },
       })
@@ -358,9 +358,9 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         source: 'incidents',
         filter: ['==', ['get', 'id'], ''],
         layout: {
-          // The selected incident is always a marker (see 'incident-selected-pin'); its ring is a square (owner, 2026-10-30) around it, at any zoom: 10 px bigger than the marker, 34 px across below zoom 14, 38 from 14.
+          // The selected incident is always a marker (see 'incident-selected-pin'); its ring is a square (owner, 2026-10-30) around it, at any zoom: 10 px bigger than the marker, 34 px across below zoom 14, 40 from 14.
           'icon-image': 'selected-ring',
-          'icon-size': ['step', ['zoom'], 34 / 96, 14, 38 / 96],
+          'icon-size': ['step', ['zoom'], (BADGE_STEPS[0].square + RING_EXTRA) / 96, 14, (BADGE_STEPS[1].square + RING_EXTRA) / 96],
           'icon-allow-overlap': true,
         },
       })
