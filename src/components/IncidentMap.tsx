@@ -124,7 +124,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
 
   useEffect(() => {
     if (!WEBGL2) return
-    const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: START_ZOOM, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, attributionControl: { compact: true } })
+    const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: START_ZOOM, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, attributionControl: { compact: true }, canvasContextAttributes: { antialias: true } }) // antialias (owner, 2026-10-30): smooths the edges of lines, outlines and shapes, which looked crackled when zoomed far out
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     // On first entry the container can still be settling its size when the map is created, so once the style has loaded we re-measure it and set the start view again, unless the person has already moved the map.
     let moved = false
