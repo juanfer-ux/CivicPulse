@@ -62,10 +62,11 @@ const ANSWER_FILL_ALPHA = 0.06
 /** Problem radius: its size in meters around the marker, and how strong its fill gets at the edge (a little stronger than the answer's so it shows over the dots). */
 const PROBLEM_RADIUS_M = 60
 const PROBLEM_RADIUS_ALPHA = 0.14
-const PROBLEM_RADIUS_ZOOM = 12 // the radius starts here, small and fully transparent
-const PROBLEM_RADIUS_FULL_ZOOM = 14 // and is fully opaque from here
+const PROBLEM_RADIUS_ZOOM = 11 // the radius shows from the start (owner, 2026-10-30; it faded in from zoom 12): the map's minimum zoom
+const PROBLEM_RADIUS_RAMP_ZOOM = 12 // below this it keeps its starting size on screen, and it grows from here
+const PROBLEM_RADIUS_FULL_ZOOM = 14 // and reaches the minimum size on screen here
 const PROBLEM_RADIUS_MIN_PX = 36 // from the full-opacity zoom it never draws smaller than this on screen (the marker is 20 px in radius)
-const PROBLEM_RADIUS_START_PX = 20 // its size at the start zoom, growing to the minimum at the full-opacity zoom
+const PROBLEM_RADIUS_START_PX = 20 // its size on screen up to the ramp zoom, growing to the minimum at zoom 14
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
 /** The map always opens here (owner's choice, 2026-10-26). */
@@ -285,14 +286,13 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       )
       // Problem radius (owner, 2026-10-30): the same radius look as the agent's answer, one per problem in its status color, so a problem reads as an area and not just a marker. Real meters, under the dots and names.
       map.addSource('problem-radius', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
-      // From zoom 12 (owner, 2026-10-30) it fades in, small and clear (opacity 0), growing and reaching full opacity at zoom 14, then keeps growing to its real size (60 m, about 50 px in radius at zoom 17). Until the real size is bigger it never draws under a minimum on screen, which itself grows from START to MIN px between the two zooms.
+      // From the first zoom (11, owner 2026-10-30; it used to fade in from 12) at full strength: 20 px in radius up to zoom 12, growing to 36 px at zoom 14, then to its real size (60 m, about 50 px in radius at zoom 17). Until the real size is bigger it never draws under that minimum on screen.
       const problemPx = (f: number) =>
-        ['interpolate', ['exponential', 2], ['zoom'], ...Array.from({ length: 11 }, (_, k) => {
+        ['interpolate', ['exponential', 2], ['zoom'], ...Array.from({ length: 12 }, (_, k) => {
           const z = PROBLEM_RADIUS_ZOOM + k
-          const floor = PROBLEM_RADIUS_START_PX + (PROBLEM_RADIUS_MIN_PX - PROBLEM_RADIUS_START_PX) * Math.min(1, (z - PROBLEM_RADIUS_ZOOM) / (PROBLEM_RADIUS_FULL_ZOOM - PROBLEM_RADIUS_ZOOM))
+          const floor = PROBLEM_RADIUS_START_PX + (PROBLEM_RADIUS_MIN_PX - PROBLEM_RADIUS_START_PX) * Math.min(1, Math.max(0, (z - PROBLEM_RADIUS_RAMP_ZOOM) / (PROBLEM_RADIUS_FULL_ZOOM - PROBLEM_RADIUS_RAMP_ZOOM)))
           return [z, Math.max(floor * f, PROBLEM_RADIUS_M * METERS_TO_PX_Z0 * 2 ** z * f)]
         }).flat()] as never
-      const fade = (a: number) => ['interpolate', ['linear'], ['zoom'], PROBLEM_RADIUS_ZOOM, 0, PROBLEM_RADIUS_FULL_ZOOM, a] as never
       BANDS.forEach(([from, to], i) =>
         map.addLayer(
           {
@@ -305,14 +305,14 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
               'circle-opacity': 0,
               'circle-stroke-width': problemPx(to - from),
               'circle-stroke-color': ['get', 'color'],
-              'circle-stroke-opacity': fade((PROBLEM_RADIUS_ALPHA * (i + 1)) / BANDS.length),
+              'circle-stroke-opacity': (PROBLEM_RADIUS_ALPHA * (i + 1)) / BANDS.length,
             },
           },
           underLabels,
         ),
       )
       map.addLayer(
-        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': fade(1) } },
+        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': ['get', 'color']} },
         underLabels,
       )
       // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same 4 % for every locality), with their names in neutral-100. No circles then.
