@@ -2,82 +2,85 @@ import { createElement } from 'react'
 import { Car, Trash, WarningCircle } from '@phosphor-icons/react'
 import { GROUPS, type Group } from '@/lib/incidents'
 import { PROBLEM_STATUS } from '@/lib/problems'
-import { BADGE_STEPS, PROBLEM_SIZE } from '@/lib/markerSizes'
+import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, RING_EXTRA } from '@/lib/markerSizes'
 import { KEEP, mix, token } from '@/lib/tokens'
 
-export { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_SIZE, RING_EXTRA } from '@/lib/markerSizes'
+export { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA } from '@/lib/markerSizes'
 
 /** Street-level markers (Waze style): a big colored square (owner, 2026-10-30; it was a circle pin) with the category's icon inside, anchored at its center. One image per category and status. */
 export const ICONS = { parking: Car, illegal_dumping: Trash }
 export const iconCategory = (category: string) => (category in ICONS ? category : 'parking')
 export const badgeId = (category: string, group: string, dim = false, step = 0) => `badge-${iconCategory(category)}${dim ? '-dim' : ''}-${group}-${step}`
 
-/** The badge is a square, 64 px including the outline. */
-const SIZE = 64
-/** Outline outside the circle, 7.5 % of its diameter (Figma Map Pin: 2.4 px outside a 32 px pin, 2026-10-26). */
-const OUTLINE = 4.2
+/** Every marker image is drawn at twice its size on screen and added with pixelRatio 2 (one image pixel is half a screen pixel), and every size has its own image, so the map never shrinks an image by a fraction: that is what made the outlines look crackled. */
+const PR = 2
+type AddImage = (id: string, data: ImageData, options?: { pixelRatio: number }) => void
+const put = (map: { addImage: AddImage }, id: string, data: ImageData) => map.addImage(id, data, { pixelRatio: PR })
 
-/** The far-zoom marker: a small square in the status color with an outline, 24 px (shown at 8 px at every zoom below 14). One image per status, and a toned-down one. */
-export const dotId = (group: string, dim = false) => `dot${dim ? '-dim' : ''}-${group}`
-export function addDots(map: { addImage: (id: string, data: ImageData) => void }) {
+/** Outline outside a square marker, as a share of its size (7.5 %, Figma Map Pin 2026-10-26: 2.4 px around 32 px). */
+const OUTLINE = 4.2 / 64
+
+/** The far-zoom marker: a plain square in the status color with an outline (a 1/8 border), one image per size (PLAIN_PX), status and a toned-down version. */
+export const dotId = (group: string, dim = false, step = 0) => `dot${dim ? '-dim' : ''}-${group}-${step}`
+export function addDots(map: { addImage: AddImage }) {
   const outline = token('--map-dot-outline')
   const land = token('--map-background')
-  for (const group of Object.keys(GROUPS) as Group[]) {
-    for (const dim of [false, true]) {
-      const c = document.createElement('canvas')
-      c.width = c.height = 24
-      const g = c.getContext('2d')!
-      g.fillStyle = outline
-      g.fillRect(0, 0, 24, 24)
-      g.fillStyle = dim ? mix(token(GROUPS[group].token), land, KEEP) : token(GROUPS[group].token)
-      g.fillRect(3, 3, 18, 18)
-      map.addImage(dotId(group, dim), g.getImageData(0, 0, 24, 24))
+  PLAIN_PX.forEach((size, step) => {
+    const side = size * PR
+    const b = (size / 8) * PR
+    for (const group of Object.keys(GROUPS) as Group[]) {
+      for (const dim of [false, true]) {
+        const c = document.createElement('canvas')
+        c.width = c.height = side
+        const g = c.getContext('2d')!
+        g.fillStyle = outline
+        g.fillRect(0, 0, side, side)
+        g.fillStyle = dim ? mix(token(GROUPS[group].token), land, KEEP) : token(GROUPS[group].token)
+        g.fillRect(b, b, side - 2 * b, side - 2 * b)
+        put(map, dotId(group, dim, step), g.getImageData(0, 0, side, side))
+      }
     }
-  }
+  })
 }
 
-/** The ring around the selected incident (owner, 2026-10-30): an empty square outline, 96 px, about 2 px on screen (1.6 px at zoom 14 to 2.8 px at zoom 18). */
-export function addSelectedRing(map: { addImage: (id: string, data: ImageData) => void }) {
-  const c = document.createElement('canvas')
-  c.width = c.height = 96
-  const g = c.getContext('2d')!
-  g.lineWidth = 4
-  g.strokeStyle = token('--map-selected-ring')
-  g.strokeRect(2, 2, 92, 92)
-  map.addImage('selected-ring', g.getImageData(0, 0, 96, 96))
+/** The ring around the selected incident (owner, 2026-10-30): an empty square outline, 2 px on screen, 10 px bigger than the marker; one image per marker size. */
+export const selectedRingId = (step: number) => `selected-ring-${step}`
+export function addSelectedRing(map: { addImage: AddImage }) {
+  BADGE_STEPS.forEach((st, step) => {
+    const side = (st.square + RING_EXTRA) * PR
+    const lw = 2 * PR
+    const c = document.createElement('canvas')
+    c.width = c.height = side
+    const g = c.getContext('2d')!
+    g.lineWidth = lw
+    g.strokeStyle = token('--map-selected-ring')
+    g.strokeRect(lw / 2, lw / 2, side - lw, side - lw)
+    put(map, selectedRingId(step), g.getImageData(0, 0, side, side))
+  })
 }
 
-/** Softness of the outline only, in image px. Uses canvas filter, so a browser without it just keeps a sharp outline. */
-const OUTLINE_BLUR = 1
-
-
-async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string, iconPx: number) {
-  const { renderToStaticMarkup } = await import('react-dom/server')
-  const svg = renderToStaticMarkup(createElement(Icon, { color: ink, width: iconPx, height: iconPx, weight: 'fill' }))
-  const img = new Image()
-  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
-  await img.decode()
+async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink: string, outline: string, square: number, iconPx: number) {
+  const icon = await drawIcon(Icon, ink, iconPx * PR)
+  const side = square * PR
+  const b = square * OUTLINE * PR
   const c = document.createElement('canvas')
-  c.width = SIZE
-  c.height = SIZE
+  c.width = c.height = side
   const g = c.getContext('2d')!
-  g.beginPath() // the square; the outline sits outside it, so the whole marker fits in SIZE
-  g.rect(OUTLINE, OUTLINE, SIZE - 2 * OUTLINE, SIZE - 2 * OUTLINE)
+  g.beginPath() // the square; the outline sits outside it, so the whole marker fits in the image
+  g.rect(b, b, side - 2 * b, side - 2 * b)
   // Outside outline: stroke twice as wide, then paint the fill over its inner half.
-  g.lineJoin = 'round'
-  g.lineWidth = OUTLINE * 2
+  g.lineJoin = 'miter'
+  g.lineWidth = b * 2
   g.strokeStyle = outline
-  g.filter = `blur(${OUTLINE_BLUR}px)`
   g.stroke()
-  g.filter = 'none'
   g.fillStyle = fill
   g.fill()
-  g.drawImage(img, (SIZE - iconPx) / 2, (SIZE - iconPx) / 2, iconPx, iconPx)
-  return g.getImageData(0, 0, SIZE, SIZE)
+  g.drawImage(icon, (side - iconPx * PR) / 2, (side - iconPx * PR) / 2, iconPx * PR, iconPx * PR)
+  return g.getImageData(0, 0, side, side)
 }
 
 /** Adds every badge to the map. Icon ink is dark, except on Approved (a mid blue) where it is light. */
-export async function addBadges(map: { addImage: (id: string, data: ImageData) => void }) {
+export async function addBadges(map: { addImage: AddImage }) {
   const outline = token('--map-dot-outline')
   await Promise.all(
     Object.entries(ICONS).flatMap(([category, Icon]) =>
@@ -85,30 +88,19 @@ export async function addBadges(map: { addImage: (id: string, data: ImageData) =
         const ink = token(group === 'approved' ? '--neutral-100' : '--neutral-900')
         const fill = token(GROUPS[group].token)
         const land = token('--map-background')
-        // The same pin toned down toward the land color: it keeps its hue, so the status is still readable.
+        // The same marker toned down toward the land color: it keeps its hue, so the status is still readable.
         return BADGE_STEPS.flatMap((st, step) =>
-          [false, true].map(async (dim) =>
-            // the image is 64 px and shown at square / 64, so the icon's pixels in the image are icon * 64 / square
-            map.addImage(badgeId(category, group, dim, step), await badge(Icon, dim ? mix(fill, land, KEEP) : fill, dim ? mix(ink, land, KEEP) : ink, outline, (st.icon * SIZE) / st.square)),
-          ),
+          [false, true].map(async (dim) => put(map, badgeId(category, group, dim, step), await badge(Icon, dim ? mix(fill, land, KEEP) : fill, dim ? mix(ink, land, KEEP) : ink, outline, st.square, st.icon))),
         )
       }),
     ),
   )
 }
 
-/** Persistent-problem marker (decision 0030; owner's test 2026-10-30): a circle in the problem's status color with the category icon in it and a 2 px neutral-900 outline, and a small round alert badge (neutral-900, no outline, WarningCircle icon) on its upper right. The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category and status, scaled by zoom. */
-export const problemMarkerId = (category: string, status: string) => `problem-${iconCategory(category)}-${status}`
-/** The images are drawn at 2x and shown at half size. */
-export const PROBLEM_SCALE = 0.5
+/** Persistent-problem marker (decision 0030; owner's test 2026-10-30): a circle in the problem's status color with the category icon in it and a 2 px neutral-900 outline, and a small round alert badge (neutral-900, no outline, WarningCircle icon) on its upper right. The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category, status and circle size (PROBLEM_CIRCLE_PX), each centered on the circle so the layer needs no offset. */
+export const problemMarkerId = (category: string, status: string, px: number) => `problem-${iconCategory(category)}-${status}-${px}`
 const OUTLINE_PX = 2 // the circle's outline, outside, in screen px: neutral-900
-const PAD = Math.ceil(OUTLINE_PX / PROBLEM_SCALE) // image px kept free left of and below the circle so the outline is not cut off
-const BIG = PROBLEM_SIZE
 const BADGE_AT = 0.5125 // the badge's center sits this share of the circle's diameter right of and above the circle's center
-const CIRCLE = { x: BIG.circle + PAD, y: Math.ceil(BIG.circle * 2 * BADGE_AT + BIG.badge) + 2 } // the circle's center, in image px, the same in every step so one icon offset serves them all
-const IMAGE_SIZE = { w: Math.ceil(CIRCLE.x + BIG.circle * 2 * BADGE_AT + BIG.badge) + 2, h: CIRCLE.y + BIG.circle + PAD }
-/** Puts the circle (not the whole image with its badge) on the spot. */
-export const PROBLEM_OFFSET: [number, number] = [IMAGE_SIZE.w / 2 - CIRCLE.x, IMAGE_SIZE.h / 2 - CIRCLE.y]
 
 async function drawIcon(Icon: (typeof ICONS)[keyof typeof ICONS] | typeof WarningCircle, color: string, size: number, weight: 'fill' | 'bold' = 'fill') {
   const { renderToStaticMarkup } = await import('react-dom/server')
@@ -118,34 +110,41 @@ async function drawIcon(Icon: (typeof ICONS)[keyof typeof ICONS] | typeof Warnin
   return img
 }
 
-async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string, step: typeof PROBLEM_SIZE) {
-  const alertSize = Math.round(step.badge * 0.715) * 2 // the alert icon is about 0.7 of the badge
-  const [icon, alert] = await Promise.all([drawIcon(Icon, token('--neutral-900'), step.icon * 2), drawIcon(WarningCircle, token('--neutral-100'), alertSize)])
+async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string, circle: number) {
+  const f = circle / PROBLEM_SIZE.circle // the icon and the badge scale with the circle
+  const iconPx = PROBLEM_SIZE.icon * f
+  const badgeD = PROBLEM_SIZE.badge * f
+  const alertPx = badgeD * 0.715 // the alert icon is about 0.7 of the badge
+  const off = BADGE_AT * circle
+  const half = Math.ceil(Math.max(circle / 2 + OUTLINE_PX, off + badgeD / 2)) + 1 // screen px from the circle's center to the image edge, on every side
+  const side = half * 2 * PR
+  const [icon, alert] = await Promise.all([drawIcon(Icon, token('--neutral-900'), iconPx * PR), drawIcon(WarningCircle, token('--neutral-100'), alertPx * PR)])
   const c = document.createElement('canvas')
-  c.width = IMAGE_SIZE.w
-  c.height = IMAGE_SIZE.h
+  c.width = c.height = side
   const g = c.getContext('2d')!
+  const mid = side / 2
   g.beginPath() // the circle, with an outline outside it: stroke twice as wide, then paint the fill over the inner half
-  g.arc(CIRCLE.x, CIRCLE.y, step.circle, 0, Math.PI * 2)
-  g.lineWidth = (OUTLINE_PX / PROBLEM_SCALE) * 2
+  g.arc(mid, mid, (circle / 2) * PR, 0, Math.PI * 2)
+  g.lineWidth = OUTLINE_PX * PR * 2
   g.strokeStyle = token('--neutral-900')
   g.stroke()
   g.fillStyle = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token)
   g.fill()
-  g.drawImage(icon, CIRCLE.x - step.icon, CIRCLE.y - step.icon, step.icon * 2, step.icon * 2)
-  const off = step.circle * 2 * BADGE_AT
+  g.drawImage(icon, mid - (iconPx * PR) / 2, mid - (iconPx * PR) / 2, iconPx * PR, iconPx * PR)
+  const bx = mid + off * PR
+  const by = mid - off * PR
   g.beginPath() // the alert badge: a round version of the Figma count pill, no outline
-  g.arc(CIRCLE.x + off, CIRCLE.y - off, step.badge, 0, Math.PI * 2)
+  g.arc(bx, by, (badgeD / 2) * PR, 0, Math.PI * 2)
   g.fillStyle = token('--neutral-900')
   g.fill()
-  g.drawImage(alert, CIRCLE.x + off - alertSize / 2, CIRCLE.y - off - alertSize / 2, alertSize, alertSize)
-  return g.getImageData(0, 0, IMAGE_SIZE.w, IMAGE_SIZE.h)
+  g.drawImage(alert, bx - (alertPx * PR) / 2, by - (alertPx * PR) / 2, alertPx * PR, alertPx * PR)
+  return g.getImageData(0, 0, side, side)
 }
 
-export async function addProblemMarkers(map: { addImage: (id: string, data: ImageData) => void }) {
+export async function addProblemMarkers(map: { addImage: AddImage }) {
   await Promise.all(
     Object.entries(ICONS).flatMap(([category, Icon]) =>
-      Object.keys(PROBLEM_STATUS).map(async (status) => map.addImage(problemMarkerId(category, status), await problemMarker(Icon, status, PROBLEM_SIZE))),
+      Object.keys(PROBLEM_STATUS).flatMap((status) => PROBLEM_CIRCLE_PX.map(async (px) => put(map, problemMarkerId(category, status, px), await problemMarker(Icon, status, px)))),
     ),
   )
 }

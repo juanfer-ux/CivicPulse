@@ -4,7 +4,7 @@ import { gsap } from 'gsap'
 import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_OFFSET, PROBLEM_SIZE, RING_EXTRA, PROBLEM_SCALE, addBadges, addDots, addSelectedRing, addProblemMarkers, iconCategory } from '@/lib/markerIcons'
+import { PROBLEM_CIRCLE_PX, PROBLEM_SWITCH_ZOOMS, addBadges, addDots, addSelectedRing, addProblemMarkers, iconCategory, selectedRingId } from '@/lib/markerIcons'
 import { labelPoint } from '@/lib/polygons'
 import { circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
@@ -32,7 +32,13 @@ const MAX_ZOOM = 18
 /** The map cannot zoom out past this (owner, 2026-10-30: zoom 11): Bogotá and its surroundings, no further. */
 const MIN_ZOOM = 11
 const NO_PROBLEMS: ProblemRow[] = []
-const problemImage = ['concat', 'problem-', ['get', 'category'], '-', ['get', 'status']] as never
+const problemImage = ['step', ['zoom'], ...PROBLEM_CIRCLE_PX.flatMap((px, i) => [...(i ? [PROBLEM_SWITCH_ZOOMS[i - 1]] : []), ['concat', 'problem-', ['get', 'category'], '-', ['get', 'status'], `-${px}`]])] as never
+/** The plain square's image: one per size (step 0 below zoom 12, step 1 from 12); with `focus` (an expression) every incident but the focused one gets the toned-down image. */
+const dotImage = (focus?: unknown[]) => {
+  const id = (step: number, dim: boolean) => ['concat', 'dot-', dim ? 'dim-' : '', ['get', 'group'], `-${step}`]
+  const at = (step: number) => (focus ? ['case', focus, id(step, false), id(step, true)] : id(step, false))
+  return ['step', ['zoom'], at(0), 12, at(1)] as never
+}
 /** The square marker's image by zoom: step 0 below zoom 14, step 1 from 14 (BADGE_STEPS). With `focus` (an expression), every incident but the focused one gets the toned-down image. The zoom step stays at the top of the expression, as MapLibre requires. */
 const badgeImage = (focus?: unknown[]) => {
   const id = (step: number, dim: boolean) => ['concat', 'badge-', ['get', 'icon'], dim ? '-dim-' : '-', ['get', 'group'], `-${step}`]
@@ -210,8 +216,9 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         source: 'incidents',
         maxzoom: BADGE_ZOOM,
         layout: {
-          'icon-image': ['concat', 'dot-', ['get', 'group']],
-          'icon-size': ['step', ['zoom'], PLAIN_PX[0] / 24, 12, PLAIN_PX[1] / 24], // plain squares (owner, 2026-10-30): 8 px across below zoom 12, 10 px from 12 up to 13 (until the markers); the image is 24 px
+          'icon-image': dotImage(),
+          // plain squares (owner, 2026-10-30): 8 px across below zoom 12, 10 px from 12 up to 13 (until the markers). Each size is its own image drawn at that size (PLAIN_PX), so the image is shown as it is, not shrunk.
+          'icon-size': 1,
           'icon-allow-overlap': true,
           'icon-ignore-placement': true,
         },
@@ -241,7 +248,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         minzoom: BADGE_ZOOM,
         layout: {
           'icon-image': badgeImage(),
-          'icon-size': ['step', ['zoom'], BADGE_STEPS[0].square / 64, 14, BADGE_STEPS[1].square / 64], // square markers (owner, 2026-10-30): 24 px from zoom 13, 30 px from 14 up (BADGE_STEPS; the image is 64 px)
+          'icon-size': 1, // square markers (owner, 2026-10-30): 24 px from zoom 13, 30 px from 14 up (BADGE_STEPS); each size is its own image, shown as it is
           'icon-allow-overlap': true,
         },
       })
@@ -253,7 +260,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         filter: ['==', ['get', 'id'], ''],
         layout: {
           'icon-image': badgeImage(),
-          'icon-size': ['step', ['zoom'], BADGE_STEPS[0].square / 64, 14, BADGE_STEPS[1].square / 64], // square markers (owner, 2026-10-30): 24 px from zoom 13, 30 px from 14 up (BADGE_STEPS; the image is 64 px)
+          'icon-size': 1, // square markers (owner, 2026-10-30): 24 px from zoom 13, 30 px from 14 up (BADGE_STEPS); each size is its own image, shown as it is
           'icon-allow-overlap': true,
         },
       })
@@ -352,8 +359,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         filter: ['==', ['get', 'id'], ''],
         layout: {
           // The selected incident is always a marker (see 'incident-selected-pin'); its ring is a square (owner, 2026-10-30) around it, at any zoom: 10 px bigger than the marker, 34 px across below zoom 14, 40 from 14.
-          'icon-image': 'selected-ring',
-          'icon-size': ['step', ['zoom'], (BADGE_STEPS[0].square + RING_EXTRA) / 96, 14, (BADGE_STEPS[1].square + RING_EXTRA) / 96],
+          'icon-image': ['step', ['zoom'], selectedRingId(0), 14, selectedRingId(1)],
+          'icon-size': 1,
           'icon-allow-overlap': true,
         },
       })
@@ -364,10 +371,9 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         type: 'symbol',
         source: 'problems',
         layout: {
-          // One image scaled smoothly by zoom (owner, 2026-10-30): circle 28 px at zoom 12 and below, 32 at 13, 42 from 14 (PROBLEM_CIRCLE_BY_ZOOM), with no jump between them; the icon and the badge scale with the circle.
+          // The circle follows a smooth curve by zoom (28 px at zoom 12 and below, 32 at 13, 42 from 14; PROBLEM_CIRCLE_BY_ZOOM), drawn as one crisp image per 2 px (PROBLEM_CIRCLE_PX) so no image is ever shrunk by a fraction, which made the outlines look crackled (owner, 2026-10-30). Each image is centered on its circle, so no offset is needed.
           'icon-image': problemImage,
-          'icon-size': ['interpolate', ['linear'], ['zoom'], ...PROBLEM_CIRCLE_BY_ZOOM.flatMap(([z, px]) => [z, (PROBLEM_SCALE * px) / PROBLEM_SIZE.circle])] as never,
-          'icon-offset': PROBLEM_OFFSET, // puts the circle, not the whole image with its alert badge, on the spot
+          'icon-size': 1,
           'icon-allow-overlap': true, // a problem is never hidden; where markers overlap, the one with more occurrences draws on top
           'symbol-sort-key': ['get', 'count'],
         },
@@ -605,8 +611,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     map.setFilter('incidents', filter)
     map.setFilter('incident-badges', filter)
     const focus = selectedId ? ['==', ['get', 'id'], selectedId] : null
-    const ownDot = ['concat', 'dot-', ['get', 'group']]
-    map.setLayoutProperty('incidents', 'icon-image', (focus ? ['case', focus, ownDot, ['concat', 'dot-dim-', ['get', 'group']]] : ownDot) as never)
+    map.setLayoutProperty('incidents', 'icon-image', dotImage(focus ?? undefined))
     map.setLayoutProperty('incident-badges', 'icon-image', badgeImage(focus ?? undefined))
     map.setLayoutProperty('incident-badges', 'symbol-sort-key', (focus ? ['case', focus, 1, 0] : 0) as never)
   }, [ready, selectedId, highlightIds])
