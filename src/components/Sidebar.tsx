@@ -29,7 +29,7 @@ const PLACEHOLDERS = [
 const Bullet = (props: IconProps) => <DotOutline {...props} weight="fill" className={`${props.className ?? ""} text-(--neutral-400)`} />
 
 const WIDTH_KEY = 'sidebar-width'
-const SIDEBAR_MIN = 260 // Figma min width of the expanded Sidebar (2026-10-29); it was 266, 262, 240
+const SIDEBAR_MIN = 220 // min width of the expanded Sidebar (owner, 2026-10-30; it was 260, 266, 262, 240)
 const SIDEBAR_MAX = 380 // Figma max width (was 340)
 const SIDEBAR_DEFAULT = 284 // the width drawn in Figma
 const clampWidth = (n: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, n))
