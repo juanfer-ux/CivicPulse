@@ -103,19 +103,17 @@ export async function addBadges(map: { addImage: (id: string, data: ImageData) =
   )
 }
 
-/** Persistent-problem marker (decision 0030; owner's test 2026-10-30): a circle in the problem's status color with the category icon in it and a 2 px neutral-900 outline, and a small round alert badge (neutral-900, no outline, WarningCircle icon) on its upper right. The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category, status and size step. */
-/** Sizes by zoom (owner, 2026-10-30), in screen px: circle, category icon, badge. Step 0 up to zoom 13 (so 12 and below), step 1 from 13 to 14, step 2 from 14. */
-export const PROBLEM_STEPS = [
-  { circle: 28, icon: 16, badge: 20 },
-  { circle: 32, icon: 18, badge: 24 },
-  { circle: 42, icon: 24, badge: 28 },
-]
-export const problemMarkerId = (category: string, status: string, step: number) => `problem-${iconCategory(category)}-${status}-${step}`
+/** Persistent-problem marker (decision 0030; owner's test 2026-10-30): a circle in the problem's status color with the category icon in it and a 2 px neutral-900 outline, and a small round alert badge (neutral-900, no outline, WarningCircle icon) on its upper right. The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category and status, scaled by zoom. */
+/** The marker is drawn once at its biggest size, in screen px: circle, category icon, badge. */
+export const PROBLEM_SIZE = { circle: 42, icon: 24, badge: 28 }
+/** The circle's size by map zoom (owner, 2026-10-30): the one image is scaled smoothly between these, so there is no jump (the icon and the badge scale with it). 12 and below stays at the first, 14 and above at the last. */
+export const PROBLEM_CIRCLE_BY_ZOOM: [number, number][] = [[12, 28], [13, 32], [14, 42]]
+export const problemMarkerId = (category: string, status: string) => `problem-${iconCategory(category)}-${status}`
 /** The images are drawn at 2x and shown at half size. */
 export const PROBLEM_SCALE = 0.5
 const OUTLINE_PX = 2 // the circle's outline, outside, in screen px: neutral-900
 const PAD = Math.ceil(OUTLINE_PX / PROBLEM_SCALE) // image px kept free left of and below the circle so the outline is not cut off
-const BIG = PROBLEM_STEPS[PROBLEM_STEPS.length - 1]
+const BIG = PROBLEM_SIZE
 const BADGE_AT = 0.5125 // the badge's center sits this share of the circle's diameter right of and above the circle's center
 const CIRCLE = { x: BIG.circle + PAD, y: Math.ceil(BIG.circle * 2 * BADGE_AT + BIG.badge) + 2 } // the circle's center, in image px, the same in every step so one icon offset serves them all
 const IMAGE_SIZE = { w: Math.ceil(CIRCLE.x + BIG.circle * 2 * BADGE_AT + BIG.badge) + 2, h: CIRCLE.y + BIG.circle + PAD }
@@ -130,7 +128,7 @@ async function drawIcon(Icon: (typeof ICONS)[keyof typeof ICONS] | typeof Warnin
   return img
 }
 
-async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string, step: (typeof PROBLEM_STEPS)[number]) {
+async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string, step: typeof PROBLEM_SIZE) {
   const alertSize = Math.round(step.badge * 0.715) * 2 // the alert icon is about 0.7 of the badge
   const [icon, alert] = await Promise.all([drawIcon(Icon, token('--neutral-900'), step.icon * 2), drawIcon(WarningCircle, token('--neutral-100'), alertSize)])
   const c = document.createElement('canvas')
@@ -157,9 +155,7 @@ async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: s
 export async function addProblemMarkers(map: { addImage: (id: string, data: ImageData) => void }) {
   await Promise.all(
     Object.entries(ICONS).flatMap(([category, Icon]) =>
-      Object.keys(PROBLEM_STATUS).flatMap((status) =>
-        PROBLEM_STEPS.map(async (step, n) => map.addImage(problemMarkerId(category, status, n), await problemMarker(Icon, status, step))),
-      ),
+      Object.keys(PROBLEM_STATUS).map(async (status) => map.addImage(problemMarkerId(category, status), await problemMarker(Icon, status, PROBLEM_SIZE))),
     ),
   )
 }

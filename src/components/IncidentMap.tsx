@@ -4,7 +4,7 @@ import { gsap } from 'gsap'
 import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import { BADGE_STEPS, PLAIN_PX, PROBLEM_OFFSET, RING_EXTRA, PROBLEM_SCALE, addBadges, addDots, addSelectedRing, addProblemMarkers, iconCategory } from '@/lib/markerIcons'
+import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_OFFSET, PROBLEM_SIZE, RING_EXTRA, PROBLEM_SCALE, addBadges, addDots, addSelectedRing, addProblemMarkers, iconCategory } from '@/lib/markerIcons'
 import { labelPoint } from '@/lib/polygons'
 import { circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
@@ -32,7 +32,7 @@ const MAX_ZOOM = 18
 /** The map cannot zoom out past this (owner, 2026-10-30: zoom 11): Bogotá and its surroundings, no further. */
 const MIN_ZOOM = 11
 const NO_PROBLEMS: ProblemRow[] = []
-const problemImage = (step: number) => ['concat', 'problem-', ['get', 'category'], '-', ['get', 'status'], `-${step}`] as never
+const problemImage = ['concat', 'problem-', ['get', 'category'], '-', ['get', 'status']] as never
 /** The square marker's image by zoom: step 0 below zoom 14, step 1 from 14 (BADGE_STEPS). With `focus` (an expression), every incident but the focused one gets the toned-down image. The zoom step stays at the top of the expression, as MapLibre requires. */
 const badgeImage = (focus?: unknown[]) => {
   const id = (step: number, dim: boolean) => ['concat', 'badge-', ['get', 'icon'], dim ? '-dim-' : '-', ['get', 'group'], `-${step}`]
@@ -371,9 +371,9 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         type: 'symbol',
         source: 'problems',
         layout: {
-          // Three sizes by zoom (owner, 2026-10-30; PROBLEM_STEPS): 12 and below, 13, 14 and above. Each is its own image because the circle, the icon and the badge change by different amounts.
-          'icon-image': ['step', ['zoom'], problemImage(0), 13, problemImage(1), 14, problemImage(2)],
-          'icon-size': PROBLEM_SCALE,
+          // One image scaled smoothly by zoom (owner, 2026-10-30): circle 28 px at zoom 12 and below, 32 at 13, 42 from 14 (PROBLEM_CIRCLE_BY_ZOOM), with no jump between them; the icon and the badge scale with the circle.
+          'icon-image': problemImage,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], ...PROBLEM_CIRCLE_BY_ZOOM.flatMap(([z, px]) => [z, (PROBLEM_SCALE * px) / PROBLEM_SIZE.circle])] as never,
           'icon-offset': PROBLEM_OFFSET, // puts the circle, not the whole image with its alert badge, on the spot
           'icon-allow-overlap': true, // a problem is never hidden; where markers overlap, the one with more occurrences draws on top
           'symbol-sort-key': ['get', 'count'],
