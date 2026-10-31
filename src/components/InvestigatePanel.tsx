@@ -82,7 +82,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </div>
         <form onSubmit={onSubmit} className="mx-auto flex w-full max-w-[664px] items-center gap-2">
           <Input name="q" value={text} onChange={(e) => setText(e.target.value)} placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" />
-          <Button type="submit" size="icon" aria-label="Ask" disabled={busy || !text.trim()}>
+          <Button type="submit" size="icon" aria-label="Ask" className="bg-(--white) hover:bg-(--white)/90" disabled={busy || !text.trim()}>
             <ArrowUp aria-hidden />
           </Button>
         </form>

@@ -4,7 +4,7 @@ import { gsap } from 'gsap'
 import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import { PIN_RISE, PROBLEM_OFFSET, PROBLEM_SCALE, addBadges, addProblemMarkers, iconCategory } from '@/lib/markerIcons'
+import { PROBLEM_OFFSET, PROBLEM_SCALE, addBadges, addDots, addSelectedRing, addProblemMarkers, iconCategory } from '@/lib/markerIcons'
 import { labelPoint } from '@/lib/polygons'
 import { circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
@@ -21,14 +21,25 @@ maplibregl.setWorkerUrl(workerUrl)
 /** Room kept free around an answer when the map zooms to fit it. Desktop: top = answer banner 44 + 24 + Stat Cards 116 + 24 + filters 36 + 24; bottom = the legend (24 + 26) + 24; the sides 40. Phones: the filter bar on top, the bottom sheet under. */
 const fitPadding = (wide: boolean) => (wide ? { top: 268, bottom: 74, left: 40, right: 40 } : { top: 100, bottom: 60, left: 40, right: 40 })
 
-const BADGE_ZOOM = 14
+const BADGE_ZOOM = 13 // from here the plain squares become squares with the category icon (owner, 2026-10-30; was 14)
 /** Zoom the camera flies to when an incident is opened. */
-const INCIDENT_ZOOM = 17
+const INCIDENT_ZOOM = 15
 /** Zoom the camera flies to when a persistent problem is opened: close enough that its incidents (a few tens of metres around the marker) show as separate dots around the marker's tile. */
 const PROBLEM_ZOOM = 18
+const DOTS_ZOOM = 14 // from here every problem's incidents show as dots
 /** The closest the map zooms (owner, 2026-10-30). The basemap has no more detail past zoom 15, so more zoom only stretches it. */
 const MAX_ZOOM = 18
+/** The map cannot zoom out past this (owner, 2026-10-30: zoom 11): Bogotá and its surroundings, no further. */
+const MIN_ZOOM = 11
 const NO_PROBLEMS: ProblemRow[] = []
+const problemImage = (step: number) => ['concat', 'problem-', ['get', 'category'], '-', ['get', 'status'], `-${step}`] as never
+/** The square marker's image by zoom: step 0 below zoom 14, step 1 from 14 (BADGE_STEPS). With `focus` (an expression), every incident but the focused one gets the toned-down image. The zoom step stays at the top of the expression, as MapLibre requires. */
+const badgeImage = (focus?: unknown[]) => {
+  const id = (step: number, dim: boolean) => ['concat', 'badge-', ['get', 'icon'], dim ? '-dim-' : '-', ['get', 'group'], `-${step}`]
+  const at = (step: number) => (focus ? ['case', focus, id(step, false), id(step, true)] : id(step, false))
+  return ['step', ['zoom'], at(0), 14, at(1)] as never
+}
+const NO_DOTS = new Map<string, ProblemStatus>()
 const NO_IDS: string[] = []
 const MAX_FLY_ZOOM = 3 // motion comfort (owner, 2026-10-30): never animate more than 3 zoom levels; a farther trip jumps the rest first
 
@@ -48,6 +59,13 @@ const LOCALITY_FILL = 0.04
 const LOCALITY_FILL_FOCUS = 0.06
 /** How strong the answer radius fill gets at its edge (Figma: 5.9 % on the Fill layer). */
 const ANSWER_FILL_ALPHA = 0.06
+/** Problem radius: its size in meters around the marker, and how strong its fill gets at the edge (a little stronger than the answer's so it shows over the dots). */
+const PROBLEM_RADIUS_M = 60
+const PROBLEM_RADIUS_ALPHA = 0.14
+const PROBLEM_RADIUS_ZOOM = 12 // the radius starts here, small and fully transparent
+const PROBLEM_RADIUS_FULL_ZOOM = 14 // and is fully opaque from here
+const PROBLEM_RADIUS_MIN_PX = 36 // from the full-opacity zoom it never draws smaller than this on screen (the marker is 20 px in radius)
+const PROBLEM_RADIUS_START_PX = 20 // its size at the start zoom, growing to the minimum at the full-opacity zoom
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
 /** The map always opens here (owner's choice, 2026-10-26). */
@@ -72,13 +90,13 @@ interface Props {
   problems?: ProblemRow[]
   selectedProblemId?: string | null
   onSelectProblem?: (id: string) => void
-  /** Set while a problem is open: its incidents then draw as tiny dots in this problem status color (no pins), with the problem's marker in the middle. */
-  dotStatus?: ProblemStatus | null
-  /** Ids of the open problem's incidents among `incidents`: they draw as tiny dots in the problem's color and are kept out of the normal dot and pin layers. */
+  /** Incidents that belong to a problem, with its status: they draw as tiny dots in that status color (no pins) around the problem's marker, always from zoom 14 and at every zoom for the open problem. */
+  dotStatusById?: Map<string, ProblemStatus>
+  /** Ids of the open problem's incidents: their dots show at every zoom. */
   problemIncidentIds?: string[]
 }
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, dotStatus = null, problemIncidentIds = NO_IDS }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
@@ -93,7 +111,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
 
   useEffect(() => {
     if (!WEBGL2) return
-    const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: START_ZOOM, maxZoom: MAX_ZOOM, attributionControl: { compact: true } })
+    const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: START_ZOOM, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, attributionControl: { compact: true } })
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     // On first entry the container can still be settling its size when the map is created, so once the style has loaded we re-measure it and set the start view again, unless the person has already moved the map.
     let moved = false
@@ -102,6 +120,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       map.resize()
       if (!moved) map.jumpTo({ center: BOGOTA, zoom: START_ZOOM })
       await addBadges(map)
+      addDots(map)
+      addSelectedRing(map)
       await addProblemMarkers(map)
       // Place and street names stay in Spanish (the local names): the CARTO style asks for English first.
       for (const l of map.getStyle().layers) {
@@ -179,24 +199,32 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       map.addSource('incidents', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer({
         id: 'incidents',
-        type: 'circle',
+        type: 'symbol',
         source: 'incidents',
         maxzoom: BADGE_ZOOM,
-        paint: {
-          'circle-radius': ['step', ['zoom'], 3, 12, 5], // 6 px across below zoom 12, 10 px from 12 (until the pins)
-          'circle-color': ['get', 'color'],
-          'circle-opacity': 0.85,
-          'circle-stroke-width': 2,
-          'circle-stroke-color': token('--map-dot-outline'),
+        layout: {
+          'icon-image': ['concat', 'dot-', ['get', 'group']],
+          'icon-size': ['step', ['zoom'], 6 / 24, 12, 12 / 24], // plain squares (owner, 2026-10-30): 6 px across below zoom 12, 12 px from 12 up to 13 (until the markers)
+          'icon-allow-overlap': true,
+          'icon-ignore-placement': true,
         },
+        paint: { 'icon-opacity': 0.85 },
       })
-      // The open problem's own incidents (owner, 2026-10-30): tiny dots in the problem's status color at every zoom, around its marker (no pins: a stack of identical pins is harder to read than dots).
+      // The open problem's own incidents (owner, 2026-10-30): small dots in the problem's status color at every zoom, around its marker (no pins: a stack of identical pins is harder to read than dots).
       map.addLayer({
         id: 'problem-incident-dots',
         type: 'circle',
         source: 'incidents',
         filter: ['==', ['get', 'pi'], true],
-        paint: { 'circle-radius': 3.5, 'circle-color': ['get', 'color'], 'circle-stroke-width': 1, 'circle-stroke-color': token('--map-dot-outline') },
+        paint: {
+          'circle-radius': 5,
+          'circle-color': ['get', 'color'],
+          'circle-stroke-width': 1,
+          'circle-stroke-color': token('--map-dot-outline'),
+          // the open problem's dots show at every zoom, the others only from zoom 14
+          'circle-opacity': ['step', ['zoom'], ['case', ['get', 'po'], 1, 0], DOTS_ZOOM, 1],
+          'circle-stroke-opacity': ['step', ['zoom'], ['case', ['get', 'po'], 1, 0], DOTS_ZOOM, 1],
+        },
       })
       // From zoom 14 (owner's choice, 2026-10-26) the dots become big badges with the category's icon, like Waze.
       map.addLayer({
@@ -205,9 +233,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         source: 'incidents',
         minzoom: BADGE_ZOOM,
         layout: {
-          'icon-image': ['concat', 'badge-', ['get', 'icon'], '-', ['get', 'group']],
-          'icon-size': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, 0.4, 15, 0.6, 18, 0.8],
-          'icon-anchor': 'bottom',
+          'icon-image': badgeImage(),
+          'icon-size': ['step', ['zoom'], 24 / 64, 14, 28 / 64], // square markers (owner, 2026-10-30): 24 px from zoom 13, 28 px from 14 up (the image is 64 px)
           'icon-allow-overlap': true,
         },
       })
@@ -218,9 +245,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         source: 'incidents',
         filter: ['==', ['get', 'id'], ''],
         layout: {
-          'icon-image': ['concat', 'badge-', ['get', 'icon'], '-', ['get', 'group']],
-          'icon-size': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, 0.4, 15, 0.6, 18, 0.8],
-          'icon-anchor': 'bottom',
+          'icon-image': badgeImage(),
+          'icon-size': ['step', ['zoom'], 24 / 64, 14, 28 / 64], // square markers (owner, 2026-10-30): 24 px from zoom 13, 28 px from 14 up (the image is 64 px)
           'icon-allow-overlap': true,
         },
       })
@@ -255,6 +281,38 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
           source: 'answer-radius',
           paint: { 'circle-radius': px(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': token('--map-answer-radius-ring') },
         },
+        underLabels,
+      )
+      // Problem radius (owner, 2026-10-30): the same radius look as the agent's answer, one per problem in its status color, so a problem reads as an area and not just a marker. Real meters, under the dots and names.
+      map.addSource('problem-radius', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      // From zoom 12 (owner, 2026-10-30) it fades in, small and clear (opacity 0), growing and reaching full opacity at zoom 14, then keeps growing to its real size (60 m, about 50 px in radius at zoom 17). Until the real size is bigger it never draws under a minimum on screen, which itself grows from START to MIN px between the two zooms.
+      const problemPx = (f: number) =>
+        ['interpolate', ['exponential', 2], ['zoom'], ...Array.from({ length: 11 }, (_, k) => {
+          const z = PROBLEM_RADIUS_ZOOM + k
+          const floor = PROBLEM_RADIUS_START_PX + (PROBLEM_RADIUS_MIN_PX - PROBLEM_RADIUS_START_PX) * Math.min(1, (z - PROBLEM_RADIUS_ZOOM) / (PROBLEM_RADIUS_FULL_ZOOM - PROBLEM_RADIUS_ZOOM))
+          return [z, Math.max(floor * f, PROBLEM_RADIUS_M * METERS_TO_PX_Z0 * 2 ** z * f)]
+        }).flat()] as never
+      const fade = (a: number) => ['interpolate', ['linear'], ['zoom'], PROBLEM_RADIUS_ZOOM, 0, PROBLEM_RADIUS_FULL_ZOOM, a] as never
+      BANDS.forEach(([from, to], i) =>
+        map.addLayer(
+          {
+            id: `problem-radius-fill-${i}`,
+            type: 'circle',
+            source: 'problem-radius',
+            minzoom: PROBLEM_RADIUS_ZOOM,
+            paint: {
+              'circle-radius': problemPx((from + to) / 2),
+              'circle-opacity': 0,
+              'circle-stroke-width': problemPx(to - from),
+              'circle-stroke-color': ['get', 'color'],
+              'circle-stroke-opacity': fade((PROBLEM_RADIUS_ALPHA * (i + 1)) / BANDS.length),
+            },
+          },
+          underLabels,
+        ),
+      )
+      map.addLayer(
+        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': fade(1) } },
         underLabels,
       )
       // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same 4 % for every locality), with their names in neutral-100. No circles then.
@@ -296,16 +354,14 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       )
       map.addLayer({
         id: 'incident-selected',
-        type: 'circle',
+        type: 'symbol',
         source: 'incidents',
         filter: ['==', ['get', 'id'], ''],
-        paint: {
-          // The selected incident is always a pin (see 'incident-selected-pin'), so its ring always wraps the pin's circle, at any zoom.
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, 19, 15, 24, 18, 33],
-          'circle-color': 'rgba(0,0,0,0)',
-          'circle-translate': ['interpolate', ['linear'], ['zoom'], BADGE_ZOOM, ['literal', [0, -0.4 * PIN_RISE]], 15, ['literal', [0, -0.6 * PIN_RISE]], 18, ['literal', [0, -0.8 * PIN_RISE]]],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': token('--map-selected-ring'),
+        layout: {
+          // The selected incident is always a marker (see 'incident-selected-pin'); its ring is a square (owner, 2026-10-30) around it, at any zoom: 10 px bigger than the marker, 34 px across below zoom 14, 38 from 14.
+          'icon-image': 'selected-ring',
+          'icon-size': ['step', ['zoom'], 34 / 96, 14, 38 / 96],
+          'icon-allow-overlap': true,
         },
       })
       // Persistent problems (decision 0030; Figma Problem Marker): one marker per problem, a light disc with the occurrence count over it, a status-colored ring and a category badge. The incidents of the open problem draw with the normal incident layers.
@@ -315,18 +371,18 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         type: 'symbol',
         source: 'problems',
         layout: {
-          'icon-image': ['concat', 'problem-', ['get', 'category'], '-', ['get', 'status']],
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 10, PROBLEM_SCALE * 0.75, 14, PROBLEM_SCALE], // a little smaller when zoomed far out, always a marker
+          // Three sizes by zoom (owner, 2026-10-30; PROBLEM_STEPS): 12 and below, 13, 14 and above. Each is its own image because the circle, the icon and the badge change by different amounts.
+          'icon-image': ['step', ['zoom'], problemImage(0), 13, problemImage(1), 14, problemImage(2)],
+          'icon-size': PROBLEM_SCALE,
           'icon-offset': PROBLEM_OFFSET, // puts the circle, not the whole image with its alert badge, on the spot
           'icon-allow-overlap': true, // a problem is never hidden; where markers overlap, the one with more occurrences draws on top
           'symbol-sort-key': ['get', 'count'],
         },
       })
-      // Layer order, top to bottom (owner, 2026-10-28): all the text (the basemap's names, then ours), the dots and pins, the locality highlights (fill, outline, radius), and under them the rest of the basemap. The basemap's text layers sit under our dots by default, so lift them to the top.
+      // Layer order, top to bottom (owner, 2026-10-30; it was text on top): the problems, the selected incident's ring and pin, the incident markers and dots, then all the text (the basemap's names, then ours), the locality highlights (fill, outline, radius), and under them the rest of the basemap. Nothing draws over an incident or a problem, not even a street name. The basemap's text layers sit under our dots by default, so lift them first, then lift ours over them.
       const ours = new Set(['incident-badges', 'incident-selected-pin', 'answer-areas-name', 'problem-markers'])
       for (const l of map.getStyle().layers) if (l.type === 'symbol' && !ours.has(l.id)) map.moveLayer(l.id)
-      map.moveLayer('answer-areas-name')
-      map.moveLayer('problem-markers')
+      for (const id of ['answer-areas-name', 'problem-incident-dots', 'incidents', 'incident-badges', 'incident-selected-pin', 'incident-selected', 'problem-markers']) map.moveLayer(id)
 
       // A click on an incident selects it; a click anywhere else on the map clears the selection.
       map.on('click', (e) => {
@@ -360,21 +416,21 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     const map = mapRef.current
     if (!ready || !map) return
     const highlight = new Set(highlightIds)
-    const dot = dotStatus ? token(PROBLEM_STATUS[dotStatus].token) : null // the open problem's incidents take the problem's color
     const own = new Set(problemIncidentIds)
     ;(map.getSource('incidents') as maplibregl.GeoJSONSource).setData({
       type: 'FeatureCollection',
       features: incidents.map((i) => {
-        const pi = own.has(i.id) && !!dot
-        const color = pi ? dot! : token(GROUPS[groupOf(i.status)].token)
+        const ps = dotStatusById.get(i.id)
+        const pi = !!ps
+        const color = ps ? token(PROBLEM_STATUS[ps].token) : token(GROUPS[groupOf(i.status)].token)
         return {
           type: 'Feature',
           geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
-          properties: { id: i.id, color, dim: mix(color, token('--map-background'), KEEP), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id), pi },
+          properties: { id: i.id, color, dim: mix(color, token('--map-background'), KEEP), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id), pi, po: own.has(i.id) },
         }
       }),
     })
-  }, [ready, incidents, highlightIds, dotStatus, problemIncidentIds])
+  }, [ready, incidents, highlightIds, dotStatusById, problemIncidentIds])
 
   // Persistent problems: one marker each, whatever the zoom.
   useEffect(() => {
@@ -386,6 +442,14 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
         properties: { id: p.id, count: p.occurrences_n, category: iconCategory(p.category), status: p.status },
+      })),
+    })
+    ;(map.getSource('problem-radius') as maplibregl.GeoJSONSource).setData({
+      type: 'FeatureCollection',
+      features: problems.map((p) => ({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
+        properties: { r: PROBLEM_RADIUS_M, color: token(PROBLEM_STATUS[p.status].token) },
       })),
     })
   }, [ready, problems])
@@ -548,10 +612,9 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     map.setFilter('incidents', filter)
     map.setFilter('incident-badges', filter)
     const focus = selectedId ? ['==', ['get', 'id'], selectedId] : null
-    const own = ['get', 'color']
-    const ownBadge = ['concat', 'badge-', ['get', 'icon'], '-', ['get', 'group']]
-    map.setPaintProperty('incidents', 'circle-color', (focus ? ['case', focus, own, ['get', 'dim']] : own) as never)
-    map.setLayoutProperty('incident-badges', 'icon-image', (focus ? ['case', focus, ownBadge, ['concat', 'badge-', ['get', 'icon'], '-dim-', ['get', 'group']]] : ownBadge) as never)
+    const ownDot = ['concat', 'dot-', ['get', 'group']]
+    map.setLayoutProperty('incidents', 'icon-image', (focus ? ['case', focus, ownDot, ['concat', 'dot-dim-', ['get', 'group']]] : ownDot) as never)
+    map.setLayoutProperty('incident-badges', 'icon-image', badgeImage(focus ?? undefined))
     map.setLayoutProperty('incident-badges', 'symbol-sort-key', (focus ? ['case', focus, 1, 0] : 0) as never)
   }, [ready, selectedId, highlightIds])
 
@@ -591,7 +654,7 @@ function ListFallback({ incidents, selectedId, onSelect }: Pick<Props, 'incident
               aria-pressed={i.id === selectedId}
               className={`flex w-full items-center gap-2 rounded-md border px-3 py-2 text-left text-body-sm hover:bg-accent ${i.id === selectedId ? 'border-ring bg-accent' : 'bg-card/60'}`}
             >
-              <span className="size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[groupOf(i.status)].token})` }} aria-hidden />
+              <span className="size-2.5 shrink-0" style={{ background: `var(${GROUPS[groupOf(i.status)].token})` }} aria-hidden />
               <span className="flex-1">
                 {i.reference} · {label(typeOf(i))}
               </span>

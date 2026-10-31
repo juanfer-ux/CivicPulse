@@ -52,7 +52,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   const [collapsed, setCollapsed] = useState(false) // mobile bottom sheet only
   // Persistent problems (decision 0030). If the database does not have the layer yet, the list stays empty and the map shows incidents exactly as before.
   const [problems, setProblems] = useState<ProblemRow[]>([])
-  const [linked, setLinked] = useState<Set<string>>(() => new Set()) // incidents a problem already stands for: the map hides them
+  const [linked, setLinked] = useState<Map<string, string>>(() => new Map()) // incident -> problem it is confirmed into: the loose layers hide it, the problem's dots show it up close
   const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null)
   const [detail, setDetail] = useState<{ id: string; data: ProblemDetailData } | null>(null)
 
@@ -62,7 +62,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
   useEffect(() => {
     fetchProblems().then(setProblems, () => setProblems([]))
-    fetchLinkedIncidentIds().then(setLinked, () => setLinked(new Set()))
+    fetchLinkedIncidentIds().then(setLinked, () => setLinked(new Map()))
   }, [])
   useEffect(() => {
     if (!selectedProblemId) return
@@ -162,9 +162,29 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   const selectedProblem = showProblems ? (problemsFiltered.find((p) => p.id === selectedProblemId) ?? null) : null
   const problemDetail = detail && detail.id === selectedProblemId ? detail.data : null
   // The map holds the loose incidents plus, while a problem is open, that problem's own incidents (drawn as tiny dots around its marker).
-  const problemIncidents = selectedProblem ? (problemDetail?.incidents ?? []) : []
+  const problemIncidents = useMemo(() => (selectedProblem ? (problemDetail?.incidents ?? []) : []), [selectedProblem, problemDetail])
   const problemIncidentIds = useMemo(() => problemIncidents.map((i) => i.id), [problemIncidents])
-  const mapIncidents = useMemo(() => [...(showIncidents ? filtered : []), ...problemIncidents], [showIncidents, filtered, problemIncidents])
+  // Up close (map zoom 14+) every visible problem's incidents show as dots in its status color, open or not (owner, 2026-10-30).
+  const { dotStatusById, linkedDots } = useMemo(() => {
+    const status = new Map<string, ProblemStatus>()
+    const dots: Incident[] = []
+    if (showProblems) {
+      const byId = new Map(problemsFiltered.map((p) => [p.id, p.status]))
+      for (const i of data?.incidents ?? []) {
+        const st = byId.get(linked.get(i.id) ?? '')
+        if (st) {
+          status.set(i.id, st)
+          dots.push(i)
+        }
+      }
+    }
+    for (const i of problemIncidents) status.set(i.id, selectedProblem!.status)
+    return { dotStatusById: status, linkedDots: dots }
+  }, [showProblems, problemsFiltered, data, linked, problemIncidents, selectedProblem])
+  const mapIncidents = useMemo(() => {
+    const seen = new Set<string>()
+    return [...(showIncidents ? filtered : []), ...linkedDots, ...problemIncidents].filter((i) => !seen.has(i.id) && seen.add(i.id))
+  }, [showIncidents, filtered, linkedDots, problemIncidents])
   const selected = mapIncidents.find((i) => i.id === selectedId) ?? null
   useEffect(() => onInspect(!!selected || !!selectedProblem), [selected, selectedProblem, onInspect])
   const select = (id: string | null) => {
@@ -190,7 +210,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         problems={showProblems ? problemsFiltered : undefined}
         problemIncidentIds={problemIncidentIds}
         selectedProblemId={selectedProblem?.id ?? null}
-        dotStatus={selectedProblem?.status ?? null}
+        dotStatusById={dotStatusById}
         onSelectProblem={selectProblem}
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}

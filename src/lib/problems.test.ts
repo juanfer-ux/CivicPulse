@@ -61,8 +61,8 @@ describe('fetchProblemDetail', () => {
 
 describe('fetchLinkedIncidentIds', () => {
   it('returns the ids of incidents a problem already stands for', async () => {
-    mock.supabase = makeSupabaseMock({ incident_current_link: ok([{ incident_id: 'a' }, { incident_id: 'b' }]) })
+    mock.supabase = makeSupabaseMock({ incident_current_link: ok([{ incident_id: 'a', problem_id: 'p' }, { incident_id: 'b', problem_id: 'p' }]) })
     const { fetchLinkedIncidentIds } = await import('@/lib/problems')
-    expect([...(await fetchLinkedIncidentIds())]).toEqual(['a', 'b'])
+    expect([...(await fetchLinkedIncidentIds())]).toEqual([['a', 'p'], ['b', 'p']])
   })
 })

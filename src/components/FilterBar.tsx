@@ -1,4 +1,4 @@
-import { Car, Circle, Clock, DotsThree, Flag, MapPin, SquaresFour, Trash, TrafficSignal, Warning, Wheelchair, X } from '@phosphor-icons/react'
+import { Car, Clock, DotsThree, Flag, MapPin, Square, SquaresFour, Trash, TrafficSignal, WarningCircle, Wheelchair, X } from '@phosphor-icons/react'
 import type { ComponentType } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { ChipMultiSelect } from '@/components/ui/chip-multi-select'
@@ -79,10 +79,10 @@ export function FilterBar({
         {/* Two toggles, both on by default (owner, 2026-10-30): what the map shows. At least one stays on, and the Status menu below only lists the statuses of what is on. */}
         {problemCounts && (
           <>
-            <Chip pressed={showProblems} icon={<Warning aria-hidden />} onClick={() => toggle('problems')}>
+            <Chip pressed={showProblems} icon={<WarningCircle weight="fill" aria-hidden />} onClick={() => toggle('problems')}>
               Problems
             </Chip>
-            <Chip pressed={showIncidents} icon={<Circle weight="fill" aria-hidden />} onClick={() => toggle('incidents')}>
+            <Chip pressed={showIncidents} icon={<Square weight="fill" aria-hidden />} onClick={() => toggle('incidents')}>
               Incidents
             </Chip>
           </>
@@ -114,7 +114,7 @@ export function FilterBar({
               value: `i:${g}`,
               group: showProblems && showIncidents ? 'Incidents' : undefined,
               label: GROUPS[g].label,
-              icon: <span className="block size-2.5 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />,
+              icon: <span className="block size-2.5 shrink-0" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />,
               hint: String(counts[g]),
             })),
           ]}
