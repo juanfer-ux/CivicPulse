@@ -51,14 +51,14 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
   return (
     <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-0 max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
       {/* On desktop the title row is as tall as the section header, so one line runs across the screen. */}
-      <div className="flex items-center desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:px-6">
+      <div className="flex items-center desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:px-8">
         <CardHeader className="flex w-full flex-row items-center justify-between max-desk:mx-auto max-desk:max-w-[664px]">
           <CardTitle className="flex items-center gap-2 text-label">
             <Sparkle weight="fill" className="size-4" aria-hidden /> Investigate and Ask
           </CardTitle>
         </CardHeader>
       </div>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:p-6">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:p-8">
         <div className="mx-auto flex min-h-0 w-full max-w-[664px] flex-1 flex-col gap-3 overflow-y-auto pr-1 text-body-sm">
           {turns.length === 0 && (
             <div className="flex flex-col gap-2">
