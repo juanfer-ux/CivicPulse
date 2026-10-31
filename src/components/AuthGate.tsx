@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { Suspense, type ReactNode } from 'react'
 import { AuthPage } from '@/components/AuthPage'
 import { SetPassword } from '@/components/SetPassword'
 import { Button } from '@/components/ui/button'
@@ -42,5 +42,15 @@ export function AuthGate({ children }: { children: ReactNode }) {
       </Screen>
     )
   }
-  return children
+  return (
+    <Suspense
+      fallback={
+        <Screen>
+          <p className="text-body-sm text-muted-foreground">Loading…</p>
+        </Screen>
+      }
+    >
+      {children}
+    </Suspense>
+  )
 }

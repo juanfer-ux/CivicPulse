@@ -19,8 +19,13 @@ export function AuthLayout({ children, mobileLogo, footer }: { children: ReactNo
   const [playing, setPlaying] = useState(() => !window.matchMedia(REDUCED_MOTION).matches)
   const toggle = () => (video.current?.paused ? video.current.play() : video.current?.pause())
   // iPhone Low Power Mode blocks autoplay: keep the still and let the button say Play.
+  // The video's `src` is set here, after first paint, rather than in the markup, so the browser
+  // fetches the sign-in form's own CSS/fonts first instead of racing them against a 1.6 MB video
+  // on the one page every visitor loads first.
   useEffect(() => {
-    if (!window.matchMedia(REDUCED_MOTION).matches) video.current?.play().catch(() => setPlaying(false))
+    if (!video.current) return
+    video.current.src = authVideo
+    if (!window.matchMedia(REDUCED_MOTION).matches) video.current.play().catch(() => setPlaying(false))
   }, [])
   const pauseButton = (className: string) => (
     <Button variant="ghost" size="icon" onClick={toggle} aria-label={playing ? 'Pause background animation' : 'Play background animation'} className={cn('absolute text-muted-foreground', className)}>
@@ -30,10 +35,9 @@ export function AuthLayout({ children, mobileLogo, footer }: { children: ReactNo
 
   return (
     <main className={cn('relative isolate flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-4 desk:flex-row desk:gap-0 desk:p-10', mobileLogo ? 'py-10' : 'py-4')}>
-      <img src={authImage} alt="" className="absolute inset-0 -z-20 size-full object-cover object-top" />
+      <img src={authImage} alt="" fetchPriority="high" className="absolute inset-0 -z-20 size-full object-cover object-top" />
       <video
         ref={video}
-        src={authVideo}
         poster={authImage}
         autoPlay={playing}
         loop

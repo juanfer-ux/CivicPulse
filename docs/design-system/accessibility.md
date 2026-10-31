@@ -13,9 +13,15 @@
 | Names | Icon-only buttons and bare selects have an `aria-label` (menu, close, collapse, filters); decorative icons and the ring mark are hidden from screen readers | `Sidebar.tsx`, `Dashboard.tsx`, `UsersAdmin.tsx`, `Logo.tsx` |
 | Current page | The active menu item has `aria-current="page"` | `Sidebar.tsx` |
 | Messages | Save feedback is `role="status"`; form errors are `role="alert"` | `UsersAdmin.tsx`, `AuthPage.tsx`, `SetPassword.tsx` |
-| Dropdown | The zone dropdown exposes `aria-haspopup` and `aria-expanded` and closes on Escape or an outside click | `MultiSelect.tsx` |
-| Phone menu | Closes on Escape, on a backdrop tap or after a choice | `Sidebar.tsx` |
+| Dropdown | The zone dropdown is a `role="group"` of real checkboxes (not a mis-used `listbox`), exposes `aria-haspopup`/`aria-expanded`, closes on Escape (returning focus to the trigger) or an outside click | `MultiSelect.tsx` |
+| Phone menu | Closes on Escape, on a backdrop tap or after a choice; full dialog treatment (`role="dialog"`, `aria-modal`, focus moved in and trapped, returned to the hamburger button on close) since it has a backdrop and is genuinely modal | `Sidebar.tsx` |
 | Not only color | Status is always written (Pending, Active, Off); the map legend names each color | `UsersAdmin.tsx`, `Dashboard.tsx` |
+| Skip link | "Skip to main content" is the first focusable element on every screen | `App.tsx` |
+| Headings | Every screen has one `h1` (Dashboard's is visually hidden, since the screen has no visible title by design) and real `h2`s per panel (Investigate and Ask, Incident details, user panels) | `Dashboard.tsx`, `InvestigatePanel.tsx`, `UsersAdmin.tsx` |
+| Landmarks | Map, incident list fallback, Stat Cards, and the incident detail panel are `role="region"` with a name | `IncidentMap.tsx`, `Dashboard.tsx` |
+| Tables | `<th scope="col">`; rows are `role="button"`, keyboard-reachable and operable (Enter/Space) | `UsersAdmin.tsx` |
+| Side panels | The non-modal panels (user detail, invite, incident detail) move focus in on open and return it to the trigger on close, without trapping Tab (the page behind them stays interactive, matching their actual non-modal behavior); Escape closes the two form panels | `UsersAdmin.tsx`, `Dashboard.tsx`, `src/lib/useRestoreFocus.ts` |
+| Account menu | `aria-haspopup="menu"`, `role="menu"`/`role="menuitem"`, closes on Escape | `Sidebar.tsx` |
 
 ## 🎨 Contrast (checked with the WCAG formula)
 AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface graphics.
@@ -72,12 +78,12 @@ See the weight options on localhost: `/#components` → "Description text · wei
 | Area | What is missing |
 |---|---|
 | **Map** | Incidents are color-only dots on a canvas: not reachable by keyboard and no text alternative beyond the counts. The list fallback only appears when WebGL is off. Needs a decision (always offer a list view?). |
-| **Zone dropdown** | The open list uses `role="listbox"` but holds checkboxes (not options); focus is not returned to the button on close and arrow keys do nothing. Should follow a checkbox-group or dialog pattern. |
-| **Side panels** | Focus does not move into a panel when it opens, and is not returned to the row or button on close. |
-| **Tables** | Check header cells are announced as headers (`scope`) and rows are operable by keyboard (the row click has no key handler today). |
-| **Motion** | The slide-out menu and sidebar width transitions ignore `prefers-reduced-motion`. The Sign in video does follow it (no autoplay) and has a pause button; it never flashes (pulses fade in and out over seconds). |
 | **Zoom and text size** | 200 % zoom and larger system text are untested (a zoomed desktop falls back to the mobile layout, which helps). |
 | **Automated and manual checks** | No axe or Lighthouse run, no screen-reader pass (VoiceOver) yet. |
+
+**Fixed since the last pass (2026-10-29 review):** zone dropdown ARIA pattern, side-panel and mobile-menu focus management, table `scope`/keyboard rows, missing Dashboard headings/landmarks, missing skip link, account menu ARIA — see the "what we already do" table above.
+
+**Corrected:** the previous note that "the sidebar width transition ignores `prefers-reduced-motion`" was stale — `Sidebar.tsx` already checks it before running the GSAP tween. The slide-out menu currently has no animation at all (instant open/close), so reduced motion doesn't apply to it. The Sign in video does follow it (no autoplay) and has a pause button; it never flashes (pulses fade in and out over seconds).
 
 ## ✔️ Before a release
 1. Run an automated check (axe or Lighthouse) on the five screens, desktop and phone.

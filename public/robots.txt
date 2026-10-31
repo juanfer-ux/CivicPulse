@@ -1,0 +1,4 @@
+# Civic Pulse is an internal civic-operations tool behind sign-in; nothing here
+# is meant to be publicly indexed. See also the <meta name="robots"> tag in index.html.
+User-agent: *
+Disallow: /

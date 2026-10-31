@@ -6,6 +6,6 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  test: { environment: 'node' },
+  test: { environment: 'jsdom', setupFiles: ['./src/test/setup.ts'] },
   resolve: { alias: { '@': path.resolve(import.meta.dirname, './src') } },
 })

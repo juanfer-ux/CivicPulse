@@ -53,8 +53,10 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
       {/* On desktop the title row is as tall as the section header, so one line runs across the screen. */}
       <div className="flex items-center desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:px-8">
         <CardHeader className="flex w-full flex-row items-center justify-between max-desk:mx-auto max-desk:max-w-[664px]">
-          <CardTitle className="flex items-center gap-2 text-label">
-            <Sparkle weight="fill" className="size-4" aria-hidden /> Investigate and Ask
+          <CardTitle asChild className="flex items-center gap-2 text-label">
+            <h2>
+              <Sparkle weight="fill" className="size-4" aria-hidden /> Investigate and Ask
+            </h2>
           </CardTitle>
         </CardHeader>
       </div>

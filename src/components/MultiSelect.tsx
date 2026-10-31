@@ -25,17 +25,26 @@ export function MultiSelect<T extends string | number>({
 }) {
   const [open, setOpen] = useState(false)
   const box = useRef<HTMLDivElement>(null)
+  const trigger = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (!open) return
     const close = (e: MouseEvent | KeyboardEvent) => {
-      if (e instanceof KeyboardEvent ? e.key === 'Escape' : !box.current?.contains(e.target as Node)) setOpen(false)
+      if (e instanceof KeyboardEvent) {
+        if (e.key !== 'Escape') return
+        e.stopPropagation() // swallow it: a panel this dropdown sits inside may have its own Escape-to-close
+        setOpen(false)
+        trigger.current?.focus() // Escape returns focus to the trigger; an outside click leaves focus where the user put it
+      } else if (!box.current?.contains(e.target as Node)) {
+        setOpen(false)
+      }
     }
     document.addEventListener('mousedown', close)
-    document.addEventListener('keydown', close)
+    // Capture phase: this dropdown closes on its own Escape before an enclosing panel's Escape handler sees it.
+    document.addEventListener('keydown', close, true)
     return () => {
       document.removeEventListener('mousedown', close)
-      document.removeEventListener('keydown', close)
+      document.removeEventListener('keydown', close, true)
     }
   }, [open])
 
@@ -46,9 +55,10 @@ export function MultiSelect<T extends string | number>({
   return (
     <div ref={box} className="relative">
       <button
+        ref={trigger}
         type="button"
         disabled={disabled}
-        aria-haspopup="listbox"
+        aria-haspopup="true"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
         className={`${controlClass} flex items-center justify-between gap-2 text-left`}
@@ -57,7 +67,9 @@ export function MultiSelect<T extends string | number>({
         <CaretDown aria-hidden className="size-4 shrink-0 text-muted-foreground" />
       </button>
       {open && (
-        <div role="listbox" aria-multiselectable className="absolute inset-x-0 top-full z-30 mt-1 flex max-h-72 flex-col overflow-hidden rounded-sm border bg-popover shadow-lg">
+        // A group of real checkboxes, not a listbox (its options aren't selectable items, they're checked/unchecked):
+        // role="listbox" would misrepresent them to screen readers. Checkboxes are natively keyboard-operable (Tab, Space).
+        <div role="group" aria-label={`Choose ${noun}`} className="absolute inset-x-0 top-full z-30 mt-1 flex max-h-72 flex-col overflow-hidden rounded-sm border bg-popover shadow-lg">
           <div className="flex items-center justify-between border-b px-2 py-1">
             <span className="text-meta text-muted-foreground">
               {selected.length}/{options.length} selected

@@ -2,13 +2,15 @@ import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import { IconContext } from '@phosphor-icons/react'
 import './index.css'
-import App from './App.tsx'
 import { AuthGate } from '@/components/AuthGate'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { Gallery } from '@/components/Gallery'
 import { AuthProvider } from '@/lib/auth'
 
-// Loaded only when opened, so the chart library never weighs on the app itself.
+// The signed-in app (map, GSAP, the rest) only loads once AuthGate actually renders it, so a
+// signed-out visitor's first load — everyone's first load — never pays for it. Same for the two
+// dev-only galleries: loaded only when their hash route is opened.
+const App = lazy(() => import('./App.tsx'))
+const Gallery = lazy(() => import('@/components/Gallery').then((m) => ({ default: m.Gallery })))
 const ChartGallery = lazy(() => import('@/components/ChartGallery').then((m) => ({ default: m.ChartGallery })))
 
 // The gallery has no data, so it skips sign-in: open /#components.
@@ -25,7 +27,9 @@ createRoot(document.getElementById('root')!).render(
             <ChartGallery />
           </Suspense>
         ) : gallery ? (
-          <Gallery />
+          <Suspense fallback={null}>
+            <Gallery />
+          </Suspense>
         ) : (
           <AuthProvider>
             <AuthGate>

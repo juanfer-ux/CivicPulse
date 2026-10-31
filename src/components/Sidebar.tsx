@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
 import { CaretDown, DotOutline, DotsThreeVertical, List, Plus, SidebarSimple, SignOut, X, type IconProps } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
@@ -119,6 +120,12 @@ function Brand({ collapsed, onToggle }: { collapsed: boolean; onToggle?: () => v
 /** The menu behind the hamburger in the account row (Figma 2026-10-29): Sign out. `side` = where the popover opens. */
 function AccountMenu({ onSignOut, side, avatar }: { onSignOut: () => void; side: 'above' | 'right'; avatar?: ReactNode }) {
   const [open, setOpen] = useState(false)
+  useEffect(() => {
+    if (!open) return
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('keydown', esc)
+    return () => document.removeEventListener('keydown', esc)
+  }, [open])
   return (
     <div className={`relative ${avatar ? 'my-1' : ''}`} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
       {avatar ? (
@@ -130,13 +137,13 @@ function AccountMenu({ onSignOut, side, avatar }: { onSignOut: () => void; side:
           </span>
         </button>
       ) : (
-        <Button variant="ghost" size="icon" aria-label="Account menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <Button variant="ghost" size="icon" aria-label="Account menu" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
           <DotsThreeVertical className={`size-5 ${side === 'above' ? 'text-(--white)' : ''}`} />
         </Button>
       )}
       {open && (
-        <div className={`absolute z-40 w-40 rounded-sm border bg-card p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
-          <Button variant="ghost" className="h-8 w-full justify-start gap-2 px-3 hover:bg-sidebar" onClick={onSignOut}>
+        <div role="menu" className={`absolute z-40 w-40 rounded-sm border bg-card p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
+          <Button role="menuitem" variant="ghost" className="h-8 w-full justify-start gap-2 px-3 hover:bg-sidebar" onClick={onSignOut}>
             <SignOut className="size-5 shrink-0" /> Sign out
           </Button>
         </div>
@@ -321,17 +328,25 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
         <MobileBrand />
         <span className="size-(--control-icon)" aria-hidden /> {/* Figma keeps an invisible second button so the logo stays centered. */}
       </header>
-      {open && (
-        <div className="fixed inset-0 z-40 desk:hidden">
-          <button aria-label="Close menu" className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
-          <aside className="relative h-full w-64 border-r bg-card">
-            <Button size="icon" variant="ghost" className="absolute right-2 top-2" aria-label="Close menu" onClick={() => setOpen(false)}>
-              <X className="size-5" />
-            </Button>
-            <Menu_ {...phone} collapsed={false} />
-          </aside>
-        </div>
-      )}
+      {open && <MobileMenu phone={phone} onClose={() => setOpen(false)} />}
     </>
+  )
+}
+
+/** The slide-in mobile menu: a true modal overlay (it has a backdrop), so it gets the full dialog treatment. */
+function MobileMenu({ phone, onClose }: { phone: Chats; onClose: () => void }) {
+  const panel = useRef<HTMLElement>(null)
+  useRestoreFocus(panel)
+  useFocusTrap(panel)
+  return (
+    <div className="fixed inset-0 z-40 desk:hidden">
+      <button aria-label="Close menu" className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <aside ref={panel} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Menu" className="relative h-full w-64 border-r bg-card outline-none">
+        <Button size="icon" variant="ghost" className="absolute right-2 top-2" aria-label="Close menu" onClick={onClose}>
+          <X className="size-5" />
+        </Button>
+        <Menu_ {...phone} collapsed={false} />
+      </aside>
+    </div>
   )
 }

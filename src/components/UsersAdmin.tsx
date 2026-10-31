@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { SectionHeader } from '@/components/SectionHeader'
 import { RoleBadge } from '@/components/ui/role-badge'
 import { Badge } from '@/components/ui/badge'
@@ -8,6 +8,7 @@ import { Select } from '@/components/ui/select'
 import { MultiSelect } from '@/components/MultiSelect'
 import { Input } from '@/components/ui/input'
 import { useAuth, type AppRole } from '@/lib/auth'
+import { useRestoreFocus } from '@/lib/useRestoreFocus'
 import {
   ROLES,
   ROLE_LABELS,
@@ -121,7 +122,7 @@ export function UsersAdmin() {
               <thead className="text-meta text-muted-foreground max-desk:hidden">
                 <tr className="border-b">
                   {['Name', 'Email', 'Role', 'Status', 'Categories'].map((h) => (
-                    <th key={h} className="px-3 py-2 text-meta font-medium">
+                    <th key={h} scope="col" className="px-3 py-2 text-meta font-medium">
                       {h}
                     </th>
                   ))}
@@ -130,14 +131,23 @@ export function UsersAdmin() {
               <tbody className="max-desk:flex max-desk:flex-col max-desk:gap-2">
                 {rows.map((u) => {
                   const status = statusOf(u)
+                  const openRow = () => {
+                    setCreating(false)
+                    setOpenId(u.id)
+                  }
                   return (
                     <tr
                       key={u.id}
-                      onClick={() => {
-                        setCreating(false)
-                        setOpenId(u.id)
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`Open ${u.full_name || u.email || 'user'}`}
+                      onClick={openRow}
+                      onKeyDown={(e) => {
+                        if (e.key !== 'Enter' && e.key !== ' ') return
+                        e.preventDefault()
+                        openRow()
                       }}
-                      className={`cursor-pointer border-b hover:bg-muted/50 max-desk:grid max-desk:grid-cols-2 max-desk:gap-1 max-desk:rounded-lg max-desk:border max-desk:bg-card max-desk:p-3 ${openId === u.id ? 'bg-muted' : ''}`}
+                      className={`cursor-pointer border-b outline-none hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring max-desk:grid max-desk:grid-cols-2 max-desk:gap-1 max-desk:rounded-lg max-desk:border max-desk:bg-card max-desk:p-3 ${openId === u.id ? 'bg-muted' : ''}`}
                     >
                       <td className="truncate px-3 py-5 font-medium max-desk:col-span-2 max-desk:p-0">{u.full_name || 'No name'}</td>
                       <td className="truncate px-3 py-5 text-muted-foreground max-desk:col-span-2 max-desk:p-0">{u.email}</td>
@@ -190,6 +200,13 @@ function UserPanel({
 }) {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [busy, setBusy] = useState(false)
+  const panel = useRef<HTMLElement>(null)
+  useRestoreFocus(panel)
+  useEffect(() => {
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    document.addEventListener('keydown', esc)
+    return () => document.removeEventListener('keydown', esc)
+  }, [onClose])
 
   /** Runs one save; shows the result in words. The database has the final say (RLS, last-Super-Admin guard). */
   const save = async (job: () => Promise<void>, change: Partial<UserRow>, done: string) => {
@@ -227,7 +244,7 @@ function UserPanel({
             : `Can see ${localities(user.localities.length)}, ${user.role === 'specialist_operator' ? names.join(' + ') : 'all categories'}.`
 
   return (
-    <aside className={ASIDE}>
+    <aside ref={panel} tabIndex={-1} aria-label="User details" className={`${ASIDE} outline-none`}>
       <div className="flex h-full flex-col gap-4 overflow-y-auto p-6">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
@@ -320,6 +337,13 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const set = (change: Partial<InviteForm>) => setForm((f) => ({ ...f, ...change }))
+  const panel = useRef<HTMLElement>(null)
+  useRestoreFocus(panel)
+  useEffect(() => {
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    document.addEventListener('keydown', esc)
+    return () => document.removeEventListener('keydown', esc)
+  }, [onClose])
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
@@ -339,7 +363,7 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
   const specialty = specialtyOf({ role: form.role || null, categories: form.categories }, data).join(', ')
 
   return (
-    <aside className={ASIDE}>
+    <aside ref={panel} tabIndex={-1} aria-label="Create user" className={`${ASIDE} outline-none`}>
       <form onSubmit={submit} className="flex h-full flex-col gap-4 overflow-y-auto p-6">
         <div className="flex items-start justify-between gap-2">
           <div>

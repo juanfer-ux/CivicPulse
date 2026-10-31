@@ -25,3 +25,6 @@ dist-ssr
 
 # Local design drafts (videos, source pictures): large, kept out of the public repo
 images/
+
+# Supabase CLI link data (project ref): local only
+supabase/.temp/
