@@ -66,7 +66,11 @@ const PROBLEM_RADIUS_ZOOM = 11 // the radius shows from the start (owner, 2026-1
 const PROBLEM_RADIUS_RAMP_ZOOM = 12 // below this it keeps its starting size on screen, and it grows from here
 const PROBLEM_RADIUS_FULL_ZOOM = 14 // and reaches the minimum size on screen here
 const PROBLEM_RADIUS_MIN_PX = 36 // from the full-opacity zoom it never draws smaller than this on screen (the marker is 20 px in radius)
-const PROBLEM_RADIUS_START_PX = 48 // its size on screen up to the ramp zoom (owner, 2026-10-30: bigger at the start, it was 20), shrinking to the minimum at zoom 14
+const PROBLEM_RADIUS_START_PX = 60 // its size on screen up to the ramp zoom (owner, 2026-10-30: bigger at the start, it was 20, then 48), shrinking to the minimum at zoom 14
+// The 1 px ring (owner, 2026-10-30): 10 % opaque when zoomed all the way out, rising to 50 % (the Figma value) at zoom 16, where the radius reaches its real size.
+const PROBLEM_RING_ALPHA_FAR = 0.1
+const PROBLEM_RING_ALPHA_NEAR = 0.5
+const PROBLEM_RING_FULL_ZOOM = 16
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
 /** The map always opens here (owner's choice, 2026-10-26). */
@@ -286,7 +290,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       )
       // Problem radius (owner, 2026-10-30): the same radius look as the agent's answer, one per problem in its status color, so a problem reads as an area and not just a marker. Real meters, under the dots and names.
       map.addSource('problem-radius', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
-      // From the first zoom (11, owner 2026-10-30; it used to fade in from 12) at full strength: 48 px in radius up to zoom 12, shrinking to 36 px at zoom 14, then to its real size (60 m, about 50 px in radius at zoom 17). Until the real size is bigger it never draws under that minimum on screen.
+      // From the first zoom (11, owner 2026-10-30; it used to fade in from 12) at full strength: 60 px in radius up to zoom 12, shrinking to 36 px at zoom 14, then to its real size (60 m, about 50 px in radius at zoom 17). Until the real size is bigger it never draws under that minimum on screen.
       const problemPx = (f: number) =>
         ['interpolate', ['exponential', 2], ['zoom'], ...Array.from({ length: 12 }, (_, k) => {
           const z = PROBLEM_RADIUS_ZOOM + k
@@ -312,7 +316,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         ),
       )
       map.addLayer(
-        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': ['get', 'color']} },
+        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': ['interpolate', ['linear'], ['zoom'], PROBLEM_RADIUS_ZOOM, PROBLEM_RING_ALPHA_FAR, PROBLEM_RING_FULL_ZOOM, PROBLEM_RING_ALPHA_NEAR] as never } },
         underLabels,
       )
       // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same 4 % for every locality), with their names in neutral-100. No circles then.
