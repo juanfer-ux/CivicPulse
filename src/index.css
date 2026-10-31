@@ -321,6 +321,9 @@
   button:not(:disabled), [role='button']:not([aria-disabled='true']), [role='menuitem'], [role='option'], [role='tab'], [role='checkbox'], [role='switch'], summary, select, a[href], label:has(input[type='checkbox']), label:has(input[type='radio']) { cursor: pointer; }
   /* Every part of a clickable thing, not only its box (owner, 2026-10-30: the hand dropped out over some letters and icons in Chrome and was missing in Safari): the text, icons and spans inside get the hand explicitly instead of inheriting it. */
   button:not(:disabled) *, [role='button']:not([aria-disabled='true']) *, [role='menuitem'] *, [role='option'] *, [role='tab'] *, [role='checkbox'] *, [role='switch'] *, summary *, a[href] * { cursor: pointer; }
+  /* A hit layer on top of every clickable thing (owner, 2026-10-30: the hand still dropped out over some pixels): an invisible ::after that covers the whole element, over its text, icons and padding, so every pixel of it is the clickable thing itself and takes its hand. Utilities such as `absolute` still win over the `relative`. MapLibre's own controls are left alone. */
+  button:not(:disabled):not(.maplibregl-ctrl *), [role='button']:not([aria-disabled='true']), [role='menuitem'], [role='option'], [role='tab'], summary { position: relative; }
+  button:not(:disabled):not(.maplibregl-ctrl *)::after, [role='button']:not([aria-disabled='true'])::after, [role='menuitem']::after, [role='option']::after, [role='tab']::after, summary::after { content: ''; position: absolute; inset: 0; cursor: pointer; }
 }
 
 /* MapLibre's own corner (zoom buttons, attribution) keeps 24 px from the edges like everything else over the map: its default margin is 10 px, so 14 more (owner, 2026-10-28). */
