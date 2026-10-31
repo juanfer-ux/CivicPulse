@@ -40,6 +40,7 @@ The app is **static**: nothing runs server-side except the build. The browser ta
 Rules:
 - If code and a document disagree, say so and ask the owner. Do not silently pick one.
 - Run `supabase/tests/rls_smoke.sql` after any permission change.
+- Modules that tests import stay import-free of Supabase/env (CI has no `.env`); see [docs/testing.md](docs/testing.md).
 - The repository is public: never put keys, passwords, emails or private links in code or docs.
 - Every screen must also have a mobile version (about 390x844); see docs/design.md.
 - Coding follows the **ponytail** rule (the `ponytail` plugin, level `full`, is on in every session). Climb the ladder and stop at the first rung that holds: does it need to exist, is it already in this codebase, standard library, native platform feature, an installed dependency, one line, and only then the minimum new code. No new dependency for what a few lines can do, no abstraction with one user, no speculative extras. Non-trivial logic leaves one small runnable check. Never lazy about input validation, security, data-loss handling, accessibility or anything explicitly asked for. Say "stop ponytail" to turn it off.

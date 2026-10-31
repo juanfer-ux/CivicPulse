@@ -9,6 +9,8 @@ npm run lint     # code checks
 npm run build    # type-check, then bundle
 ```
 
+> **CI has no `.env`.** A module that tests import must not pull in Supabase or anything that needs env vars (keep pure constants in an import-free file, like `src/lib/markerSizes.ts`). Check by running the tests in a copy without `.env*`. `tsc -b` also type-checks test files, so never commit one whose types or packages the build lacks.
+
 ## 🧪 What each kind of test covers
 | | Kind | Where | Covers |
 |---|---|---|---|
