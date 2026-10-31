@@ -295,7 +295,7 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:block desk:border-r desk:border-secondary ${collapsed ? 'bg-sidebar' : 'bg-card'}`}>
+      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:block desk:border-r desk:border-secondary ${collapsed ? 'bg-sidebar' : 'bg-(--neutral-700)'}`}>
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         <Menu_
           {...props}
