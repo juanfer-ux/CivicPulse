@@ -23,7 +23,6 @@ import { PROBLEM_STATUSES, type ProblemStatus } from '@/lib/statusColors'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
 import { useHeld, useSlide } from '@/lib/useSlide'
 
-const SHOW_MAP_TYPE_CHIPS = false // the Problems and Incidents toggle chips are hidden for now (owner, 2026-11-01); both layers stay on
 const SIDEBAR_DELAY_MS = 1000 // how long the sidebar waits before collapsing or expanding when an incident or problem opens or closes
 
 const DAY = 86_400_000
@@ -265,7 +264,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       {data && (
         <div className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:transition-[left] desk:duration-300">
           {hasProblems ? (
-            SHOW_MAP_TYPE_CHIPS && <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
+            !selected && !selectedProblem && <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
           ) : (
             <p className="pointer-events-none rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200)">
               Showing {filtered.length} {filtered.length === 1 ? 'incident' : 'incidents'}
