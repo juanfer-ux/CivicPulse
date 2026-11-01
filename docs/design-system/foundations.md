@@ -33,7 +33,7 @@ Each class sets size, line height and weight together, so a component never need
 - Figma also has `meta-medium` (12 / 16, 500) for table headers; the code uses `text-meta` plus `font-medium`.
 - ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes; without that, the class merger dropped `text-label` from colored buttons (test in `utils.test.ts`).
 
-## 🎨 Colors (dark theme): 25 in total
+## 🎨 Colors (dark theme): 57 in total
 Every other token name (`primary`, `muted`, `accent`, `border`…) is only an alias of one of these 16, because shadcn components expect those names ([decision 0015](../decisions/0015-thirteen-color-palette.md)). Add a color only if none of these can do the job.
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
@@ -57,12 +57,44 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 17 | `indigo-300` | `#9593FF` | `--map-locality-line` (map only, 2026-10-30) | New (2026-10-28) |
 | 18 | `indigo-200` | `#C1C0FF` | `--map-locality-line-focus` (map only, 2026-10-30) | New (2026-10-28) |
 | 19 | `indigo-100` | `#E7E6FF` | none | Lightest agent indigo. New (2026-10-28), not used on screen yet |
-| 20 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
-| 21 | `amber-400` | `#D0AC6B` | `warning` | Warning border (map list fallback), end of the AI gradient |
-| 22 | `coral-400` | `#E58C7D` | `incident` | Invalid fields, **all error text** |
-| 23 | `orange-400` | `#FF9F50` | none (map only, `--map-reviewing`) | Reviewing dots (added 2026-10-26, [decision 0024](../decisions/0024-sixteen-colors-map-statuses.md)) |
-| 24 | `blue-400` | `#495C8B` | none (map only, `--map-approved`) | Approved dots (same decision) |
-| 25 | `yellow-400` | `#FFEE6C` | none (map only, `--map-pending`) | Pending dots (same decision) |
+| 20 | `red-900` | `#270D0E` | none | Red scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 21 | `red-800` | `#4B2122` | none | Red scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 22 | `red-700` | `#743537` | none | Red scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 23 | `red-600` | `#9E4C4F` | none | Red scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 24 | `red-500` | `#C7686A` | none | Red scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 25 | `red-400` | `#EE8688` | `destructive` | Fill of dangerous buttons and badges |
+| 26 | `red-300` | `#F7A7A7` | none | Red scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 27 | `red-200` | `#FBC8C8` | none | Red scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 28 | `red-100` | `#FEE9E8` | none | Red scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 29 | `orange-900` | `#270F00` | none | Orange scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 30 | `orange-800` | `#4D2702` | none | Orange scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 31 | `orange-700` | `#7A4002` | none | Orange scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 32 | `orange-600` | `#A75C13` | none | Orange scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 33 | `orange-500` | `#D47C2F` | none | Orange scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 34 | `orange-400` | `#FF9F50` | none (map only, `--map-reviewing`) | Reviewing dots (added 2026-10-26, [decision 0024](../decisions/0024-sixteen-colors-map-statuses.md)) |
+| 35 | `orange-300` | `#FFBA86` | none | Orange scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 36 | `orange-200` | `#FED3B3` | none | Orange scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 37 | `orange-100` | `#FFEADC` | none | Orange scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 38 | `blue-900` | `#101623` | none | Blue scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 39 | `blue-800` | `#1A2236` | none | Blue scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 40 | `blue-700` | `#24304D` | none | Blue scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 41 | `blue-600` | `#2F3E63` | none | Blue scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 42 | `blue-500` | `#3B4C78` | none | Blue scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 43 | `blue-400` | `#495C8B` | none (map only, `--map-approved`) | Approved dots (same decision) |
+| 44 | `blue-300` | `#7B8BB0` | none | Blue scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 45 | `blue-200` | `#B1BCD4` | none | Blue scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 46 | `blue-100` | `#E9EEFA` | none | Blue scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 47 | `yellow-900` | `#1A1600` | none | Yellow scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 48 | `yellow-800` | `#423B00` | none | Yellow scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 49 | `yellow-700` | `#6E6301` | none | Yellow scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 50 | `yellow-600` | `#9D8F19` | none | Yellow scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 51 | `yellow-500` | `#CDBD40` | none | Yellow scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 52 | `yellow-400` | `#FFEE6C` | none (map only, `--map-pending`) | Pending dots (same decision) |
+| 53 | `yellow-300` | `#FFF398` | none | Yellow scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 54 | `yellow-200` | `#FEF7C3` | none | Yellow scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 55 | `yellow-100` | `#FEFBE4` | none | Yellow scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
+| 56 | `amber-400` | `#D0AC6B` | `warning` | Warning border (map list fallback), end of the AI gradient |
+| 57 | `coral-400` | `#E58C7D` | `incident` | Invalid fields, **all error text** |
 
 Names say what a color is (family and lightness: neutrals are always 100–900 and listed 900 first; higher number = darker), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 16.
 
@@ -73,7 +105,7 @@ Names say what a color is (family and lightness: neutrals are always 100–900 a
 - **Map colors** (Figma `Map` collection, 2026-10-25): the map reads its own tokens, each an alias of a base color: the four statuses `--map-pending` (yellow-400), `--map-reviewing` (orange-400), `--map-approved` (blue-400), `--map-rejected` (red-400), `--map-dot-outline` (neutral-700), `--map-answer-ring` (`--ai-banner`), `--map-selected-ring` (neutral-100), `--map-roads` (`#363644`, minor and secondary streets, CARTO's is #414758) and `--map-main-roads` (`#2B2B36`, primary roads, CARTO's is #535666), both map-only colors outside the palette (owner 2026-10-26), outline and line tokens, all map-only and starting at CARTO's own colors so you set them in the Figma sheet (sizes stay CARTO's and are written next to each swatch): `--map-road-outlines` (about 1 px each side from zoom 14), `--map-road-outlines-minor` (`#1A1A1A`, tunnels, minor roads, bridges), `--map-building-outlines` (`#0E0E0E`, 1 px), `--map-label-halo` (`#222222`, 1 px; before it CARTO used #222, #111 and #181818), `--map-paths` (`#262626`), `--map-boundary-county` (`#222222`), `--map-boundary-country` (`#2C353C`), `--map-rail` (`#1A1A1A`) and `--map-airport` (`#111111`); and `--map-buildings` (`#3F4550`, building tops, they fade in over the land from zoom 13 to 16 so in between they look like a blend, map-only), `--map-road-outlines` (`#363644`, the thin outline under roads, CARTO's is #232323, map-only), `--map-boundary` (`#32323E`, state borders, CARTO's is #676772, map-only), `--map-water` (`#2C353C`, rivers and lakes, CARTO's own color made a token) and `--map-waterway` (`#21303B`, the thin river lines, CARTO's is `#3F5A6D`; owner 2026-10-27, both map-only and outside the palette), `--screen-gradient` (the background of the whole screen, owner 2026-10-30: a circular radial gradient (a true circle on every screen shape, radius = the screen's diagonal) with three colors: `neutral-400` exactly at the screen's 0, 0 (top left corner; it was `neutral-300` until 2026-10-30), `neutral-700` at 50 % of the way, and `neutral-800` at the opposite corner (bottom right), Figma paint style `screen_background`; it was the map's own backdrop, neutral-700 to neutral-900, and the map now has no background of its own: it is transparent and shows the screen's gradient through; what shows behind the map while the land is off; owner 2026-10-26; Figma paint style `map_background`; CSS cannot reproduce Figma's slight tilt) and `--map-background` (its start color, neutral-800, which dimmed pins blend toward), `--map-land` (OFF for now: the land layers are hidden, as if invisible, and the page color shows through; `LAND_ON` in `IncidentMap.tsx` turns it back on, with the Figma color `#19191F`, a map-only color outside the palette: land, parks and the map background, overriding CARTO's #0E0E0E; owner 2026-10-26). Recolor the map by re-pointing these; the UI (warning badges, error text, focus rings) is untouched. Dots show four statuses: 🟨 Pending, 🟧 Reviewing, 🟦 Approved, 🟥 Rejected (`GROUPS` and `groupOf` in `src/lib/incidents.ts`; the nine database states are grouped as listed in [incident-lifecycle.md](../incident-lifecycle.md#-incident-status-9-values)). The other basemap (CARTO Dark Matter) colors are listed in the Figma sheet `Map colors` but are not tokens.
 - **Problem status colors** (Figma `Map` collection, 2026-10-30, decision [0030](../decisions/0030-problems-above-incidents.md)): their own set, separate from the four incident statuses above, each an alias of a base color so no color was added: `map/problem-active` → coral-400, `map/problem-monitoring` → amber-400, `map/problem-resolved` → indigo-300, `map/problem-archived` → neutral-300 (code: `--map-problem-*` in `src/index.css`). Owner to confirm the choice.
 - **Gradient** `--ai-gradient` (Figma paint style `ai_gradient`): `ai-border`, `incident`, `warning`, top to bottom at 10 %, 64 %, 105 %. Built from three of the 16, so not a new color. Used on the border of the Agent Panel (`gradient-border` utility in `src/index.css`).
-- In Figma the **Colors** collection holds exactly these 25 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 16`). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
+- In Figma the **Colors** collection holds exactly these 57 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 57`, in sections: Surfaces, Borders and fills, Text, Status and danger, Agent, then one section each for Indigo, Red, Orange, Blue and Yellow, 900 down to 100). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
 
 ### Borders
 Every border and divider in one place. Width is always `--border-width` (0.5 px). A border that is the only thing marking a control must keep **3:1 contrast** against what is next to it (WCAG 1.4.11); decorative dividers need not.

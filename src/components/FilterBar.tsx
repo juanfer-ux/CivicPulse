@@ -61,7 +61,7 @@ export function MapTypeChips({ filters, onChange, problemCount, incidentCount }:
   }
   return (
     <div role="group" aria-label="What the map shows" className="flex items-center gap-2">
-      <Chip pressed={on.problems} icon={<WarningCircle weight="fill" aria-hidden />} count={problemCount} onClick={() => toggle('problems')}>
+      <Chip pressed={on.problems} icon={<WarningCircle weight="fill" className="size-[18px]!" aria-hidden />} count={problemCount} onClick={() => toggle('problems')}>
         Problems
       </Chip>
       <Chip pressed={on.incidents} icon={<Square weight="fill" aria-hidden />} count={incidentCount} onClick={() => toggle('incidents')}>

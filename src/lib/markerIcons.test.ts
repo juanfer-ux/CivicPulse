@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA, zoomForCircle } from '@/lib/markerSizes'
+import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA, problemSizes, zoomForCircle } from '@/lib/markerSizes'
 
 // The owner's sizes for the incident squares (2026-10-30), by map zoom: 11 and below plain 8 px, 12 plain 10 px,
 // 13 square 24 px with a 12 px icon, 14 and above square 30 px with a 16 px icon. The selected ring is 10 px bigger.
@@ -15,7 +15,7 @@ describe('problem marker sizes', () => {
   it('the image is the biggest size', () => expect(PROBLEM_SIZE.circle).toBe(Math.max(...PROBLEM_CIRCLE_BY_ZOOM.map(([, px]) => px))))
 })
 
-// Each problem circle size is its own crisp image (an image shrunk by a fraction looks crackled): the images are 2 px apart and take over halfway.
+// Each problem circle size is its own crisp image (an image shrunk by a fraction looks crackled): the images are half a base pixel apart and take over halfway.
 describe('problem marker images', () => {
   it('sizes run from the smallest to the biggest circle', () => {
     expect(PROBLEM_CIRCLE_PX[0]).toBe(PROBLEM_CIRCLE_BY_ZOOM[0][1])
@@ -29,5 +29,17 @@ describe('problem marker images', () => {
   })
   it('the curve gives 28, 32 and 42 at zoom 12, 13 and 14', () => {
     expect([zoomForCircle(28), zoomForCircle(32), zoomForCircle(42)]).toEqual([12, 13, 14])
+  })
+})
+
+// The owner's option F (2026-11-01): the sizes are set in px at the farthest zoom and every closer step scales them in proportion.
+describe('problem marker sizes (option F)', () => {
+  const far = problemSizes(PROBLEM_CIRCLE_PX[0])
+  const full = problemSizes(PROBLEM_SIZE.circle)
+  it('farthest zoom', () => expect([far.circle, far.iconPx, far.badgeD]).toEqual([38, 18, 26]))
+  it('full size is 1.5 times: circle 57, icon 27, triangle 39, triangle outline 4', () => expect([full.circle, full.iconPx, full.badgeD, full.alertOutline]).toEqual([57, 27, 39, 4]))
+  it('the circle grows by at most 1 px from one image to the next', () => {
+    const circles = PROBLEM_CIRCLE_PX.map((px) => problemSizes(px).circle)
+    circles.slice(1).forEach((c, i) => expect(c - circles[i]).toBeLessThanOrEqual(1))
   })
 })

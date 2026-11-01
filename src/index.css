@@ -160,7 +160,7 @@
   --panel-gap: 0px; /* no space between the sidebar, the agent panel and the map on desktop: they touch and a right-side line divides them (owner, 2026-10-30, branch flush-dividers) */
   --agent-header-h: 70px; /* height of the Investigate and Ask title row (a line runs across the screen with the map header when it is shown) */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
-  /* The whole palette is these 24 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
+  /* The whole palette is these 57 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
   --white: #ECECEE; /* new in Figma (2026-10-29), brighter than neutral-100; not used on screen yet */
   --neutral-900: #0E0E10;
@@ -172,7 +172,7 @@
   --neutral-300: #737381;
   --neutral-200: #A9A9B2; /* secondary text */
   --neutral-100: #C1C1C8;
-  /* Colored */
+  /* Colored: indigo, red, orange, blue and yellow as 100–900 scales (the 400s are the original colors; the other steps were made around them on 2026-10-31), then the single amber and coral */
   --indigo-900: #10112A;
   --indigo-800: #191B44;
   --indigo-700: #272A68;
@@ -182,14 +182,46 @@
   --indigo-300: #9593FF;
   --indigo-200: #C1C0FF;
   --indigo-100: #E7E6FF;
+  --red-900: #270D0E;
+  --red-800: #4B2122;
+  --red-700: #743537;
+  --red-600: #9E4C4F;
+  --red-500: #C7686A;
   --red-400: #EE8688;
+  --red-300: #F7A7A7;
+  --red-200: #FBC8C8;
+  --red-100: #FEE9E8;
+  --orange-900: #270F00;
+  --orange-800: #4D2702;
+  --orange-700: #7A4002;
+  --orange-600: #A75C13;
+  --orange-500: #D47C2F;
+  --orange-400: #FF9F50;
+  --orange-300: #FFBA86;
+  --orange-200: #FED3B3;
+  --orange-100: #FFEADC;
+  --blue-900: #101623;
+  --blue-800: #1A2236;
+  --blue-700: #24304D;
+  --blue-600: #2F3E63;
+  --blue-500: #3B4C78;
+  --blue-400: #495C8B;
+  --blue-300: #7B8BB0;
+  --blue-200: #B1BCD4;
+  --blue-100: #E9EEFA;
+  --yellow-900: #1A1600;
+  --yellow-800: #423B00;
+  --yellow-700: #6E6301;
+  --yellow-600: #9D8F19;
+  --yellow-500: #CDBD40;
+  --yellow-400: #FFEE6C;
+  --yellow-300: #FFF398;
+  --yellow-200: #FEF7C3;
+  --yellow-100: #FEFBE4;
   --amber-400: #D0AC6B;
   --coral-400: #E58C7D;
-  --orange-400: #FF9F50;
-  --blue-400: #495C8B;
-  --yellow-400: #FFEE6C;
 
-  /* Usage names the components use, each pointing at one of the 24 colors. */
+  /* Usage names the components use, each pointing at one of the 57 colors. */
   --background: var(--neutral-700);
   --card: var(--neutral-600);
   --sidebar: var(--neutral-900);

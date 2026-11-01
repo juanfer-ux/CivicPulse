@@ -47,7 +47,7 @@ const badgeImage = (focus?: unknown[]) => {
 }
 const NO_DOTS = new Map<string, ProblemStatus>()
 const NO_IDS: string[] = []
-const MAX_FLY_ZOOM = 3 // motion comfort (owner, 2026-10-30): never animate more than 3 zoom levels; a farther trip jumps the rest first
+const MAX_FLY_ZOOM = 3 // motion comfort: the fly's length is scaled by the zoom distance in units of this many levels (owner, 2026-10-30: it was also the most animated, a farther trip jumping the rest first; 2026-10-31: the whole trip is animated)
 
 /** Paint the land with --map-land (true) or leave it invisible (false). */
 const LAND_ON = false
@@ -73,6 +73,7 @@ const PROBLEM_FILL_ALPHA_NEAR = 0.035 // ...and from zoom 16 up (owner, 2026-10-
 const PROBLEM_RING_ALPHA_NEAR = 0.5
 const PROBLEM_ALPHA_ZOOM: [number, number] = [14, 16] // fill, ring opacity and ring weight change evenly from zoom 14 to 16 (owner, 2026-10-30: progressive, no jump)
 const PROBLEM_RING_PX = 1
+const PROBLEM_RING_BLUR = 0.01 // the ring's circle-blur (owner, 2026-11-01), relative to its radius (1 = fully soft): about 0.4 px at the smallest ring and 1 px at a 100 px radius; softens the edge a little
 const PROBLEM_RADIUS_ZOOM = 11 // the radius shows from the start (owner, 2026-10-30; it faded in from zoom 12): the map's minimum zoom
 const PROBLEM_RADIUS_RAMP_ZOOM = 12 // below this it keeps its starting size on screen, and it grows from here
 const PROBLEM_RADIUS_FULL_ZOOM = 14 // and reaches the minimum size on screen here
@@ -311,7 +312,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         underLabels,
       )
       map.addLayer(
-        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-stroke-width': PROBLEM_RING_PX, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': ['interpolate', ['linear'], ['zoom'], PROBLEM_ALPHA_ZOOM[0], PROBLEM_RING_ALPHA, PROBLEM_ALPHA_ZOOM[1], PROBLEM_RING_ALPHA_NEAR] as never } },
+        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-blur': PROBLEM_RING_BLUR, 'circle-stroke-width': PROBLEM_RING_PX, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': ['interpolate', ['linear'], ['zoom'], PROBLEM_ALPHA_ZOOM[0], PROBLEM_RING_ALPHA, PROBLEM_ALPHA_ZOOM[1], PROBLEM_RING_ALPHA_NEAR] as never } },
         underLabels,
       )
       // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same 4 % for every locality), with their names in neutral-100. No circles then.
@@ -576,16 +577,19 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     }
     if (!to) return
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const dz = to.zoom - from.zoom
-    if (Math.abs(dz) > MAX_FLY_ZOOM) {
-      from.zoom = to.zoom - Math.sign(dz) * MAX_FLY_ZOOM
-      map.jumpTo({ zoom: from.zoom })
-    }
-    const tween = gsap.to(from, {
-      ...to,
-      duration: still ? 0 : 0.5 + 0.4 * (Math.abs(to.zoom - from.zoom) / MAX_FLY_ZOOM), // 0.5 s for a short hop up to 0.9 s for the longest
+    const dz = to.zoom - from.zoom // the whole trip is animated, however far (owner, 2026-10-31: the instant jump to 3 levels short felt like starting from somewhere else)
+    const start = { ...from }
+    // The center moves with the zoom's own growth (2^zoom), so the target keeps drifting steadily toward the middle of the screen instead of swinging outward first.
+    const share = (p: number) => (Math.abs(dz) < 1e-6 ? p : (2 ** (dz * p) - 1) / (2 ** dz - 1))
+    const progress = { p: 0 }
+    const tween = gsap.to(progress, {
+      p: 1,
+      duration: still ? 0 : Math.min(1.2, 0.5 + 0.4 * (Math.abs(dz) / MAX_FLY_ZOOM)), // 0.5 s for a short hop up to 1.2 s for the longest
       ease: 'sine.inOut', // peak speed 5 zoom levels/s and a soft start; power2.out peaked at 10 and started at full speed
-      onUpdate: () => map.jumpTo({ center: [from.lng, from.lat], zoom: from.zoom }),
+      onUpdate: () => {
+        const u = share(progress.p)
+        map.jumpTo({ center: [start.lng + (to.lng - start.lng) * u, start.lat + (to.lat - start.lat) * u], zoom: start.zoom + dz * progress.p })
+      },
     })
     const stop = () => tween.kill()
     // On the container, not map.on, so the zoom buttons and the keyboard stop it too (the tween's jumpTo would override them).

@@ -1,11 +1,11 @@
 import { createElement } from 'react'
-import { Car, Trash, WarningCircle } from '@phosphor-icons/react'
+import { Car, Trash } from '@phosphor-icons/react'
 import { GROUPS, type Group } from '@/lib/incidents'
 import { PROBLEM_STATUS } from '@/lib/problems'
-import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, RING_EXTRA } from '@/lib/markerSizes'
+import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_PX, PROBLEM_FAR, RING_EXTRA, problemSizes } from '@/lib/markerSizes'
 import { KEEP, mix, token } from '@/lib/tokens'
 
-export { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA } from '@/lib/markerSizes'
+export { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA, problemSizes } from '@/lib/markerSizes'
 
 /** Street-level markers (Waze style): a big colored square (owner, 2026-10-30; it was a circle pin) with the category's icon inside, anchored at its center. One image per category and status. */
 export const ICONS = { parking: Car, illegal_dumping: Trash }
@@ -97,47 +97,56 @@ export async function addBadges(map: { addImage: AddImage }) {
   )
 }
 
-/** Persistent-problem marker (decision 0030; owner's test 2026-10-30): a circle in the problem's status color with the category icon in it and a 2 px neutral-900 outline, and a small round alert badge (neutral-900, no outline, WarningCircle icon) on its upper right. The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category, status and circle size (PROBLEM_CIRCLE_PX), each centered on the circle so the layer needs no offset. */
+/** Persistent-problem marker (decision 0030; the owner's option F, 2026-11-01): a neutral-700 circle with a 1 px outline in the problem's status color (softened by 2 px of blur), the category icon in neutral-100 inside, and on its upper right a warning triangle in the status color with a 4 px neutral-900 outline. The sizes are in PROBLEM_FAR (markerSizes.ts), set at the farthest zoom and scaled in proportion for each image size (PROBLEM_CIRCLE_PX). The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category, status and size, each centered on the circle so the layer needs no offset. */
 export const problemMarkerId = (category: string, status: string, px: number) => `problem-${iconCategory(category)}-${status}-${px}`
-const OUTLINE_PX = 2 // the circle's outline, outside, in screen px: neutral-900
-const BADGE_AT = 0.5125 // the badge's center sits this share of the circle's diameter right of and above the circle's center
 
-async function drawIcon(Icon: (typeof ICONS)[keyof typeof ICONS] | typeof WarningCircle, color: string, size: number, weight: 'fill' | 'bold' = 'fill') {
+async function drawIcon(Icon: (typeof ICONS)[keyof typeof ICONS], color: string, size: number) {
   const { renderToStaticMarkup } = await import('react-dom/server')
   const img = new Image()
-  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(renderToStaticMarkup(createElement(Icon, { color, width: size, height: size, weight })))}`
+  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(renderToStaticMarkup(createElement(Icon, { color, width: size, height: size, weight: 'fill' })))}`
   await img.decode()
   return img
 }
 
-async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string, circle: number) {
-  const f = circle / PROBLEM_SIZE.circle // the icon and the badge scale with the circle
-  const iconPx = PROBLEM_SIZE.icon * f
-  const badgeD = PROBLEM_SIZE.badge * f
-  const alertPx = badgeD * 0.715 // the alert icon is about 0.7 of the badge
-  const off = BADGE_AT * circle
-  const half = Math.ceil(Math.max(circle / 2 + OUTLINE_PX, off + badgeD / 2)) + 1 // screen px from the circle's center to the image edge, on every side
+/** Phosphor's Warning (fill) in two parts: the triangle and the exclamation mark (cut out of it). */
+const TRI_BODY = new Path2D('M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09Z')
+const TRI_MARK = new Path2D('M120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z')
+
+async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string, size: number) {
+  const { circle, iconPx, badgeD, alertOutline, up } = problemSizes(size)
+  const statusColor = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token)
+  const off = (circle / 2 + PROBLEM_FAR.badgeGap) / Math.SQRT2 // the triangle's center, on the diagonal from the circle's edge...
+  const half = Math.ceil(Math.max(circle / 2 + PROBLEM_FAR.outline + PROBLEM_FAR.outlineBlur, off + up + badgeD / 2 + alertOutline)) + 1 // screen px from the circle's center to the image edge, on every side
   const side = half * 2 * PR
-  const [icon, alert] = await Promise.all([drawIcon(Icon, token('--neutral-900'), iconPx * PR), drawIcon(WarningCircle, token('--neutral-100'), alertPx * PR)])
+  const icon = await drawIcon(Icon, token('--neutral-100'), iconPx * PR)
   const c = document.createElement('canvas')
   c.width = c.height = side
   const g = c.getContext('2d')!
   const mid = side / 2
-  g.beginPath() // the circle, with an outline outside it: stroke twice as wide, then paint the fill over the inner half
+  g.beginPath() // the circle, with its outline outside it: stroke twice as wide (with a soft edge), then paint the fill over the inner half
   g.arc(mid, mid, (circle / 2) * PR, 0, Math.PI * 2)
-  g.lineWidth = OUTLINE_PX * PR * 2
-  g.strokeStyle = token('--neutral-900')
+  g.lineWidth = PROBLEM_FAR.outline * PR * 2
+  g.strokeStyle = statusColor
+  g.shadowColor = statusColor
+  g.shadowBlur = PROBLEM_FAR.outlineBlur * PR
   g.stroke()
-  g.fillStyle = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token)
+  g.shadowBlur = 0
+  g.fillStyle = token('--neutral-700')
   g.fill()
   g.drawImage(icon, mid - (iconPx * PR) / 2, mid - (iconPx * PR) / 2, iconPx * PR, iconPx * PR)
-  const bx = mid + off * PR
-  const by = mid - off * PR
-  g.beginPath() // the alert badge: a round version of the Figma count pill, no outline
-  g.arc(bx, by, (badgeD / 2) * PR, 0, Math.PI * 2)
+  // the warning triangle: ...and a little higher, so it overlaps the circle less vertically
+  g.save()
+  g.translate(mid + off * PR - (badgeD * PR) / 2, mid - (off + up) * PR - (badgeD * PR) / 2)
+  g.scale((badgeD * PR) / 256, (badgeD * PR) / 256)
+  g.lineJoin = 'round'
+  g.lineWidth = (2 * alertOutline * 256) / badgeD
+  g.strokeStyle = token('--neutral-900')
+  g.stroke(TRI_BODY) // outline outside: stroke twice as wide, then the fill covers the inner half
+  g.fillStyle = statusColor
+  g.fill(TRI_BODY)
   g.fillStyle = token('--neutral-900')
-  g.fill()
-  g.drawImage(alert, bx - (alertPx * PR) / 2, by - (alertPx * PR) / 2, alertPx * PR, alertPx * PR)
+  g.fill(TRI_MARK)
+  g.restore()
   return g.getImageData(0, 0, side, side)
 }
 

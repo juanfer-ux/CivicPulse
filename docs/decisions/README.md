@@ -37,6 +37,8 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0029](0029-icons-bold.md) | Phosphor icons are the bold weight | ✅ Accepted |
 | [0030](0030-problems-above-incidents.md) | Persistent problems sit above incidents (report, occurrence, problem) | 🟨 Proposed |
 | [0031](0031-map-drawn-at-2x-with-antialiasing.md) | The map is drawn at 2x with antialiasing; one crisp image per marker size | ✅ Accepted |
+| [0032](0032-problem-marker-option-f.md) | The problem marker is option F (neutral circle, status outline, warning triangle) | ✅ Accepted |
+| [0033](0033-color-scales-red-orange-blue-yellow.md) | Red, orange, blue and yellow get 100–900 scales (57 colors) | ✅ Accepted |
 
 ## ✍️ Template
 ```

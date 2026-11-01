@@ -21,6 +21,8 @@ import type { Area } from '@/lib/agent'
 import { PROBLEM_STATUSES, fetchLinkedIncidentIds, fetchProblemDetail, fetchProblems, type ProblemDetailData, type ProblemRow, type ProblemStatus } from '@/lib/problems'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
 
+const SIDEBAR_DELAY_MS = 1000 // how long the sidebar waits before collapsing or expanding when an incident or problem opens or closes
+
 const DAY = 86_400_000
 
 type Data = { incidents: Incident[]; localities: Locality[]; categories: Category[] }
@@ -186,7 +188,12 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
     return [...(showIncidents ? filtered : []), ...linkedDots, ...problemIncidents].filter((i) => !seen.has(i.id) && seen.add(i.id))
   }, [showIncidents, filtered, linkedDots, problemIncidents])
   const selected = mapIncidents.find((i) => i.id === selectedId) ?? null
-  useEffect(() => onInspect(!!selected || !!selectedProblem), [selected, selectedProblem, onInspect])
+  // The sidebar collapses (and expands) a moment after the camera starts moving, so the map does not change width at the very first frame of the flight (owner, 2026-10-31).
+  const open = !!selected || !!selectedProblem
+  useEffect(() => {
+    const t = setTimeout(() => onInspect(open), SIDEBAR_DELAY_MS)
+    return () => clearTimeout(t)
+  }, [open, onInspect])
   const select = (id: string | null) => {
     if (!id && !selectedId && selectedProblemId) setSelectedProblemId(null) // a click on empty map (or Escape) closes the incident first, then the problem
     setSelectedId(id)
