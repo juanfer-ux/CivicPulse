@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Problem circle: explorations</title>
+<style>
+  :root { --neutral-900:#0E0E10; --neutral-700:#18181B; --neutral-400:#3C3C44; --neutral-200:#A9A9B2; --neutral-100:#C1C1C8; --coral-400:#E58C7D; }
+  body { margin:0; min-height:100vh; background:radial-gradient(circle farthest-corner at 0% 0%, var(--neutral-400) 0%, var(--neutral-700) 50%, #111113 100%); color:var(--neutral-100); font:14px/1.4 system-ui, sans-serif; }
+  header { padding:24px 32px 0; } h1 { margin:0 0 4px; font-size:18px; } p { margin:0; color:var(--neutral-200); }
+  .row { display:flex; gap:48px; padding:32px; overflow-x:auto; }
+  figure { margin:0; flex:none; text-align:center; } figcaption { margin-top:8px; color:var(--neutral-200); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Problem circle: explorations</h1>
+  <p>Active status, shown at map zoom 17 (radius 100 px, fill 3.5 %, ring 1 px at 50 %). Two copies: A is the current look, F is the exploration; change one entry in <code>VARIANTS</code> at the bottom to try an idea on that copy only.</p>
+</header>
+<main class="row" id="row"></main>
+<script>
+// Same values as the map (src/lib/markerSizes.ts and IncidentMap.tsx). Phosphor "fill" paths for Car and WarningCircle.
+const CAR = 'M240,104H229.2L201.42,41.5A16,16,0,0,0,186.8,32H69.2a16,16,0,0,0-14.62,9.5L26.8,104H16a8,8,0,0,0,0,16h8v80a16,16,0,0,0,16,16H64a16,16,0,0,0,16-16v-8h96v8a16,16,0,0,0,16,16h24a16,16,0,0,0,16-16V120h8a8,8,0,0,0,0-16ZM80,152H56a8,8,0,0,1,0-16H80a8,8,0,0,1,0,16Zm120,0H176a8,8,0,0,1,0-16h24a8,8,0,0,1,0,16ZM44.31,104,69.2,48H186.8l24.89,56Z'
+const ALERT = 'M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm-8,56a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm8,104a12,12,0,1,1,12-12A12,12,0,0,1,128,184Z'
+
+const TRIANGLE = 'M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z'
+
+const TRI_BODY = 'M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09Z'
+const TRI_MARK = 'M120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z'
+
+const DEFAULTS = {
+  color: '#E58C7D',   // --coral-400, status Active
+  radius: 100,        // radius ring, px
+  fillAlpha: 0.035, ringAlpha: 0.5, ringPx: 1,
+  circleFill: null,   // problem circle fill; null = the status color
+  iconColor: '#0E0E10', // category icon color
+  badgeUp: 0,         // extra px the badge sits higher than the diagonal position
+  alertOutline: null, // with a TRIANGLE badge: no disc, the triangle gets a neutral-900 outline this wide (px, outside it)
+  alertShape: ALERT,  // the badge's icon path (the warning circle; TRIANGLE = the warning triangle)
+  alertColor: '#C1C1C8', // alert icon inside the badge (neutral-100)
+  outlineBlur: 0,     // px of soft edge on the circle's outline
+  corner: null,       // null = round marker; a number = rounded square with that corner radius, px
+  circle: 42,         // problem circle diameter, px
+  outlineColor: '#0E0E10', // neutral-900
+  outline: 2,         // neutral-900 outline outside the circle
+  icon: 24,           // category icon (dark)
+  badge: 28,          // alert badge diameter
+  badgeGap: null,     // when set: the badge center sits this many px outside the circle's edge, on the diagonal (overrides badgeAt)
+  badgeAt: 0.5125,    // badge center, share of the circle diameter right of and above the center
+}
+
+function problem(o) {
+  const half = o.radius + 16, size = half * 2, c = half
+  const off = o.badgeGap == null ? o.badgeAt * o.circle : (o.circle / 2 + o.badgeGap) / Math.SQRT2, alertPx = o.badge * 0.715
+  const icon = (d, px, x, y, fill) => `<svg x="${x - px / 2}" y="${y - px / 2}" width="${px}" height="${px}" viewBox="0 0 256 256"><path d="${d}" fill="${fill}"/></svg>`
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="Problem circle with radius">
+    <defs><filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${o.outlineBlur / 2}"/></filter></defs>
+    <circle cx="${c}" cy="${c}" r="${o.radius}" fill="${o.color}" fill-opacity="${o.fillAlpha}"/>
+    <circle cx="${c}" cy="${c}" r="${o.radius}" fill="none" stroke="${o.color}" stroke-opacity="${o.ringAlpha}" stroke-width="${o.ringPx}"/>
+    ${o.corner == null
+      ? `${o.outlineBlur ? `<circle cx="${c}" cy="${c}" r="${o.circle / 2 + o.outline / 2}" fill="none" stroke="${o.outlineColor}" stroke-width="${o.outline}" filter="url(#soft)"/>` : ''}<circle cx="${c}" cy="${c}" r="${o.circle / 2 + o.outline / 2}" fill="${o.circleFill || o.color}" stroke="${o.outlineColor}" stroke-width="${o.outline}"/>`
+      : `<rect x="${c - (o.circle + o.outline) / 2}" y="${c - (o.circle + o.outline) / 2}" width="${o.circle + o.outline}" height="${o.circle + o.outline}" rx="${o.corner + o.outline / 2}" fill="${o.circleFill || o.color}" stroke="${o.outlineColor}" stroke-width="${o.outline}"/>`}
+    ${icon(CAR, o.icon, c, c, o.iconColor)}
+    ${o.alertOutline == null ? `<circle cx="${c + off}" cy="${c - off - o.badgeUp}" r="${o.badge / 2}" fill="#0E0E10"/>
+    ${icon(o.alertShape, alertPx, c + off, c - off - o.badgeUp, o.alertColor)}` : `<svg x="${c + off - o.badge / 2}" y="${c - off - o.badgeUp - o.badge / 2}" width="${o.badge}" height="${o.badge}" viewBox="0 0 256 256" overflow="visible">
+      <path d="${TRI_BODY}" fill="${o.alertColor}" stroke="#0E0E10" stroke-width="${2 * o.alertOutline * 256 / o.badge}" stroke-linejoin="round" paint-order="stroke"/>
+      <path d="${TRI_MARK}" fill="#0E0E10"/>
+    </svg>`}
+  </svg>`
+}
+
+// Four copies. Today they are identical; override a field to explore, e.g. { circle: 56 } or { radius: 140, ringPx: 2 }.
+const VARIANTS = [
+  { name: 'A: current colors, F\'s sizes and badge position, 1 px status outline, 2 px blur', circle: 57, outline: 1, outlineColor: '#E58C7D', outlineBlur: 2, icon: 27, badge: 39, badgeGap: 6 },
+  { name: 'F: neutral-700 circle (57 px), icon 27 px (neutral-100), 1 px status-colored circle outline, warning triangle 39 px with a 4 px outline, 4.5 px higher, 6 px outside the edge', alertOutline: 4, badgeUp: 4.5, circleFill: '#18181B', iconColor: '#C1C1C8', alertColor: '#E58C7D', circle: 57, badgeGap: 6, icon: 27, outline: 1, outlineColor: '#E58C7D', outlineBlur: 2, badge: 39 }, // radius ring and fill keep the status color,
+]
+
+document.getElementById('row').innerHTML = VARIANTS.map(({ name, ...over }) => `<figure>${problem({ ...DEFAULTS, ...over })}<figcaption>${name}</figcaption></figure>`).join('')
+</script>
+</body>
+</html>
