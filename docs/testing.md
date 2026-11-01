@@ -11,7 +11,7 @@ npm run build    # type-check, then bundle
 
 > **Timeouts are generous on purpose.** Each test may take 20 s and each wait (`findBy…`, `waitFor`) 5 s (`vite.config.ts`, `src/test/setup.ts`). The defaults (5 s and 1 s) failed on a busy machine: the invite-user test timed out in every run when 8 test runs shared 4 CPUs. Passing fast is unchanged; the limit only matters when the machine is slow.
 
-> **CI has no `.env`.** A module that tests import must not pull in Supabase or anything that needs env vars (keep pure constants in an import-free file, like `src/lib/markerSizes.ts`). Check by running the tests in a copy without `.env*`. `tsc -b` also type-checks test files, so never commit one whose types or packages the build lacks.
+> **CI has no `.env`.** A module that tests import must not pull in Supabase or anything that needs env vars (keep pure constants in an import-free file, like `src/lib/markerSizes.ts` for marker sizes and `src/lib/statusColors.ts` for the incident and problem status labels and color tokens; `markerIcons.ts` imports only those, so a marker test page runs without a `.env`). Check by running the tests in a copy without `.env*`. `tsc -b` also type-checks test files, so never commit one whose types or packages the build lacks.
 
 ## 🧪 What each kind of test covers
 | | Kind | Where | Covers |

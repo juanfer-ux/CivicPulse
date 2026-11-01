@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import type { Group } from '@/lib/statusColors'
 
 export type IncidentStatus =
   | 'received'
@@ -61,15 +62,6 @@ export interface Category {
   code: string
   name: string
 }
-
-/** Status groups and the color token each one uses (CSS variable name; the map resolves it with token() because MapLibre needs a literal color). */
-export const GROUPS = {
-  pending: { label: 'Pending', token: '--map-pending' },
-  reviewing: { label: 'Reviewing', token: '--map-reviewing' },
-  approved: { label: 'Approved', token: '--map-approved' },
-  rejected: { label: 'Rejected', token: '--map-rejected' },
-} as const
-export type Group = keyof typeof GROUPS
 
 /** The four statuses people see (map dots, counts); the nine database states stay as they are. */
 export function groupOf(status: IncidentStatus): Group {

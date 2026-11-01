@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { label, type Incident } from '@/lib/incidents'
-import { PROBLEM_STATUS, type ProblemDetailData, type ProblemRow } from '@/lib/problems'
+import { type ProblemDetailData, type ProblemRow } from '@/lib/problems'
+import { PROBLEM_STATUS } from '@/lib/statusColors'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
 
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })

@@ -1,7 +1,6 @@
 import { createElement } from 'react'
 import { Car, Trash } from '@phosphor-icons/react'
-import { GROUPS, type Group } from '@/lib/incidents'
-import { PROBLEM_STATUS } from '@/lib/problems'
+import { GROUPS, PROBLEM_STATUS, type Group } from '@/lib/statusColors'
 import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_PX, PROBLEM_FAR, RING_EXTRA, problemSizes } from '@/lib/markerSizes'
 import { KEEP, mix, token } from '@/lib/tokens'
 

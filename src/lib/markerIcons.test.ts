@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA, problemSizes, zoomForCircle } from '@/lib/markerSizes'
 
 // The owner's sizes for the incident squares (2026-10-30), by map zoom: 11 and below plain 8 px, 12 plain 10 px,
@@ -41,5 +41,14 @@ describe('problem marker sizes (option F)', () => {
   it('the circle grows by at most 1 px from one image to the next', () => {
     const circles = PROBLEM_CIRCLE_PX.map((px) => problemSizes(px).circle)
     circles.slice(1).forEach((c, i) => expect(c - circles[i]).toBeLessThanOrEqual(1))
+  })
+})
+
+// The marker code must load with no Supabase and no .env (CI and marker test pages have none): importing it unmocked throws if a Supabase import creeps back in.
+describe('marker code needs no Supabase', () => {
+  it('loads markerIcons without a mock', async () => {
+    vi.stubGlobal('Path2D', class {}) // jsdom has no Path2D; the module only needs the name to exist when it loads
+    const m = await import('@/lib/markerIcons')
+    expect(m.problemMarkerId('parking', 'active', 28)).toBe('problem-parking-active-28')
   })
 })

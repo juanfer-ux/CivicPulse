@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { label } from '@/lib/incidents'
-import { PROBLEM_STATUS, type ProblemRow } from '@/lib/problems'
+import { type ProblemRow } from '@/lib/problems'
+import { PROBLEM_STATUS } from '@/lib/statusColors'
 
 const date = (iso: string, year: boolean) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(year ? { year: 'numeric' } : {}) })
 

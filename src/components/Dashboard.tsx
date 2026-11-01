@@ -18,7 +18,8 @@ import {
   type Locality,
 } from '@/lib/incidents'
 import type { Area } from '@/lib/agent'
-import { PROBLEM_STATUSES, fetchLinkedIncidentIds, fetchProblemDetail, fetchProblems, type ProblemDetailData, type ProblemRow, type ProblemStatus } from '@/lib/problems'
+import { fetchLinkedIncidentIds, fetchProblemDetail, fetchProblems, type ProblemDetailData, type ProblemRow } from '@/lib/problems'
+import { PROBLEM_STATUSES, type ProblemStatus } from '@/lib/statusColors'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
 
 const SIDEBAR_DELAY_MS = 1000 // how long the sidebar waits before collapsing or expanding when an incident or problem opens or closes

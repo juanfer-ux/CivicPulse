@@ -1,16 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import type { Incident } from '@/lib/incidents'
-
-/** Lifecycle of a persistent problem (decision 0030): its own, separate from the incident statuses. */
-export type ProblemStatus = 'active' | 'monitoring' | 'resolved' | 'archived'
-export const PROBLEM_STATUSES: ProblemStatus[] = ['active', 'monitoring', 'resolved', 'archived']
-/** Label and color token (CSS variable) of each problem status. */
-export const PROBLEM_STATUS: Record<ProblemStatus, { label: string; token: string }> = {
-  active: { label: 'Active', token: '--map-problem-active' },
-  monitoring: { label: 'Monitoring', token: '--map-problem-monitoring' },
-  resolved: { label: 'Resolved', token: '--map-problem-resolved' },
-  archived: { label: 'Archived', token: '--map-problem-archived' },
-}
+import type { ProblemStatus } from '@/lib/statusColors'
 
 /** A persistent problem with its derived numbers. Recurrence counts OCCURRENCES, never reports (`reports_n` is intensity only). */
 export interface ProblemRow {
