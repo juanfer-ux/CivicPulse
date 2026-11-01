@@ -13,7 +13,6 @@ For a new session (local or cloud) that has no memory of the earlier chats. Upda
 ## 🟥 Open items
 - **Cursor:** the owner says the flicker in Chrome is fixed (2026-11-01); the hand in Safari over the markers is not checked yet.
 - **Mobile:** the markers, the Status menu (44 px rows) and the taps are checked on a test page at 390×844; the real screen (bottom sheet, chips, camera flights) still needs a look on a phone, signed in.
-- **Figma variable order:** the plugin cannot reorder variables, so in the variables panel the four 400s (`red-400`, `orange-400`, `blue-400`, `yellow-400`) sit before the new steps. In Figma's Variables panel, drag each 400 down between its 500 and its 300 (the palette page is already in order).
 - Not decided yet: the Stat Cards for problems; the operator-actions phase needs permissions approved by the owner first.
 
 ## 🧭 How we work (the owner's rules)
