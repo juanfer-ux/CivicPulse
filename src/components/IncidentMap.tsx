@@ -8,8 +8,9 @@ import { PROBLEM_CIRCLE_PX, PROBLEM_SWITCH_ZOOMS, addBadges, addDots, addSelecte
 import { labelPoint } from '@/lib/polygons'
 import { circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
-import { GROUPS, groupOf, label, typeOf, type Incident } from '@/lib/incidents'
-import { PROBLEM_STATUS, type ProblemRow, type ProblemStatus } from '@/lib/problems'
+import { groupOf, label, typeOf, type Incident } from '@/lib/incidents'
+import { type ProblemRow } from '@/lib/problems'
+import { GROUPS, PROBLEM_STATUS, type ProblemStatus } from '@/lib/statusColors'
 import { ProblemHoverCard } from '@/components/ProblemHoverCard'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.

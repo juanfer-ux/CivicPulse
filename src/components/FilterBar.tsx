@@ -3,8 +3,8 @@ import type { ComponentType } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { ChipMultiSelect } from '@/components/ui/chip-multi-select'
 import { Select } from '@/components/ui/select'
-import { GROUPS, type Category, type Group, type Locality } from '@/lib/incidents'
-import { PROBLEM_STATUS, PROBLEM_STATUSES, type ProblemStatus } from '@/lib/problems'
+import { type Category, type Locality } from '@/lib/incidents'
+import { GROUPS, PROBLEM_STATUS, PROBLEM_STATUSES, type Group, type ProblemStatus } from '@/lib/statusColors'
 
 export const PERIODS = [
   { days: 7, label: 'Last 7 days' },

@@ -7,7 +7,8 @@ vi.mock('@/lib/supabase', () => ({
     return mock.supabase
   },
 }))
-const { PROBLEM_STATUS, PROBLEM_STATUSES, fetchProblemDetail, fetchProblems } = await import('@/lib/problems')
+import { PROBLEM_STATUS, PROBLEM_STATUSES } from '@/lib/statusColors'
+const { fetchProblemDetail, fetchProblems } = await import('@/lib/problems')
 
 const ok = (data: unknown) => ({ data, error: null })
 
