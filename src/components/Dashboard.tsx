@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { CaretDown, CaretUp, ChatCircleDots, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
@@ -227,8 +227,11 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   }
 
   const item = shown.value
+  // The map no longer shrinks for the side panel (that left a gap beside the agent panel while the panel slid in or out): it stays under the panel and the camera keeps the target centered in the part that shows (padLeft). The controls over the map follow the panel with a short slide of their own.
+  const panelOpen = !!current
+  const desk = window.matchMedia('(min-width: 90rem)').matches
   return (
-    <>
+    <div className="contents" style={{ '--map-base': 'calc(var(--agent-w) + var(--panel-gap))', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${panelOpen ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -238,6 +241,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         dotStatusById={dotStatusById}
         onSelectProblem={selectProblem}
         onFlightEnd={onFlightEnd}
+        padLeft={desk && (selected || selectedProblem) ? 360 : 0}
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
         areas={areas}
@@ -259,7 +263,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
       {/* Bottom left (owner, 2026-10-30): the Problems and Incidents toggles with their counts, merged with the old "Showing N" legend. Without the problems layer there is one plain count, as before. */}
       {data && (
-        <div className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)]">
+        <div className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:transition-[left] desk:duration-300">
           {hasProblems ? (
             SHOW_MAP_TYPE_CHIPS && <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
           ) : (
@@ -279,7 +283,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
           categories={data.categories}
           counts={byGroup}
           problemCounts={hasProblems ? byProblemStatus : undefined}
-          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+3rem)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+3rem)]'} desk:right-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:mx-auto desk:max-w-[1280px]`}
+          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+3rem)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+3rem)]'} desk:right-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:transition-[left] desk:duration-300 desk:mx-auto desk:max-w-[1280px]`}
         />
       )}
 
@@ -356,7 +360,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         )
       )}
       </div>
-    </>
+    </div>
   )
 }
 

@@ -62,7 +62,7 @@ export default function App() {
   const zoomArea = (code: number) => setZoomTo((z) => ({ code, n: (z?.n ?? 0) + 1 }))
   const [tab, setTab] = useState<Tab>('explore')
   const [agentWidth, setAgentWidth] = useAgentWidth()
-  const [inspecting, setInspecting] = useState(false) // an incident is open: its 360 px panel sits between the agent panel and the map, which gets narrower
+  const [inspecting, setInspecting] = useState(false) // an incident or problem is open: the sidebar collapses (the 360 px panel overlays the map, which keeps its size; see Dashboard)
 
   return (
     <div className="flex h-svh overflow-hidden bg-(image:--screen-gradient)">

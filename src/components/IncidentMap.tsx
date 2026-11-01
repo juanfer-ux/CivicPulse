@@ -106,18 +106,21 @@ interface Props {
   onSelectProblem?: (id: string) => void
   /** Fires when a camera flight to a selection ends (or a touch stops it): the problem panel waits for it before it slides in. */
   onFlightEnd?: () => void
+  /** Pixels at the map's left edge that a side panel covers (the map no longer shrinks for the panel): the camera keeps the target centered in the part that shows. */
+  padLeft?: number
   /** Incidents that belong to a problem, with its status: they draw as tiny dots in that status color (no pins) around the problem's marker, always from zoom 14 and at every zoom for the open problem. */
   dotStatusById?: Map<string, ProblemStatus>
   /** Ids of the open problem's incidents: their dots show at every zoom. */
   problemIncidentIds?: string[]
 }
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, onFlightEnd, padLeft = 0, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
   const onSelectProblemRef = useRef(onSelectProblem)
   const onFlightEndRef = useRef(onFlightEnd)
+  const padLeftRef = useRef(padLeft)
   const [ready, setReady] = useState(false)
   const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null)
 
@@ -125,7 +128,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     onSelectRef.current = onSelect
     onSelectProblemRef.current = onSelectProblem
     onFlightEndRef.current = onFlightEnd
-  }, [onSelect, onSelectProblem, onFlightEnd])
+    padLeftRef.current = padLeft
+  }, [onSelect, onSelectProblem, onFlightEnd, padLeft])
 
   useEffect(() => {
     if (!WEBGL2) return
@@ -580,7 +584,13 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       to = home.current
       home.current = null
     }
-    if (!to) return
+    const pad = (left: number) => ({ left, top: 0, right: 0, bottom: 0 })
+    const padFrom = map.getPadding().left ?? 0
+    const padTo = target ? padLeftRef.current : 0 // the panel opens with a selection and closes with it
+    if (!to) {
+      if (padFrom !== padTo) map.easeTo({ padding: pad(padTo), duration: 300 })
+      return
+    }
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const dz = to.zoom - from.zoom // the whole trip is animated, however far (owner, 2026-10-31: the instant jump to 3 levels short felt like starting from somewhere else)
     const start = { ...from }
@@ -594,7 +604,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       ease: 'sine.inOut', // peak speed 5 zoom levels/s and a soft start; power2.out peaked at 10 and started at full speed
       onUpdate: () => {
         const u = share(progress.p)
-        map.jumpTo({ center: [start.lng + (to.lng - start.lng) * u, start.lat + (to.lat - start.lat) * u], zoom: start.zoom + dz * progress.p })
+        map.jumpTo({ center: [start.lng + (to.lng - start.lng) * u, start.lat + (to.lat - start.lat) * u], zoom: start.zoom + dz * progress.p, padding: pad(padFrom + (padTo - padFrom) * progress.p) })
       },
     })
     const stop = () => {
@@ -634,7 +644,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
 
   // Wrapper positions the map: maplibre's unlayered CSS overrides Tailwind's `absolute` on the map element itself.
   return (
-    <div role="region" aria-label="Incident map" className="absolute inset-x-0 top-0 bottom-14 desk:top-(--section-header-h) desk:bottom-0 desk:left-[var(--map-left)] desk:overflow-hidden">
+    <div role="region" aria-label="Incident map" className="absolute inset-x-0 top-0 bottom-14 desk:top-(--section-header-h) desk:bottom-0 desk:left-[var(--map-base)] desk:overflow-hidden">
       <div ref={container} className="size-full" />
       {hover && problems.some((p) => p.id === hover.id) && (
         <ProblemHoverCard
