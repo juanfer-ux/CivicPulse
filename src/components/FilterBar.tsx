@@ -1,4 +1,4 @@
-import { Car, Clock, DotsThree, Flag, MapPin, Square, SquaresFour, Trash, TrafficSignal, WarningCircle, Wheelchair, X } from '@phosphor-icons/react'
+import { Car, Circle, Clock, DotsThree, Flag, MapPin, SquaresFour, Trash, TrafficSignal, Warning, Wheelchair, X } from '@phosphor-icons/react'
 import type { ComponentType } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { ChipMultiSelect } from '@/components/ui/chip-multi-select'
@@ -61,10 +61,10 @@ export function MapTypeChips({ filters, onChange, problemCount, incidentCount }:
   }
   return (
     <div role="group" aria-label="What the map shows" className="flex items-center gap-2">
-      <Chip pressed={on.problems} icon={<WarningCircle weight="fill" className="size-[18px]!" aria-hidden />} count={problemCount} onClick={() => toggle('problems')}>
+      <Chip pressed={on.problems} icon={<Warning weight="fill" className="size-[18px]!" aria-hidden />} count={problemCount} onClick={() => toggle('problems')}>
         Problems
       </Chip>
-      <Chip pressed={on.incidents} icon={<Square weight="fill" aria-hidden />} count={incidentCount} onClick={() => toggle('incidents')}>
+      <Chip pressed={on.incidents} icon={<Circle weight="fill" aria-hidden />} count={incidentCount} onClick={() => toggle('incidents')}>
         Incidents
       </Chip>
     </div>
@@ -118,7 +118,7 @@ export function FilterBar({
                   value: `p:${st}`,
                   group: showIncidents ? 'Problems' : undefined,
                   label: PROBLEM_STATUS[st].label,
-                  icon: <span className="block size-2.5 shrink-0 rounded-full" style={{ background: `var(${PROBLEM_STATUS[st].token})` }} aria-hidden />,
+                  icon: <Warning weight="fill" className="size-4 shrink-0" style={{ color: `var(${PROBLEM_STATUS[st].token})` }} aria-hidden />,
                   hint: String(problemCounts?.[st] ?? 0),
                 }))
               : []),
@@ -126,7 +126,7 @@ export function FilterBar({
               value: `i:${g}`,
               group: showProblems && showIncidents ? 'Incidents' : undefined,
               label: GROUPS[g].label,
-              icon: <span className="block size-2.5 shrink-0" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />,
+              icon: <span className="block size-3 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />,
               hint: String(counts[g]),
             })),
           ]}

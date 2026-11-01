@@ -104,24 +104,28 @@ interface Props {
   problems?: ProblemRow[]
   selectedProblemId?: string | null
   onSelectProblem?: (id: string) => void
+  /** Fires when a camera flight to a selection ends (or a touch stops it): the problem panel waits for it before it slides in. */
+  onFlightEnd?: () => void
   /** Incidents that belong to a problem, with its status: they draw as tiny dots in that status color (no pins) around the problem's marker, always from zoom 14 and at every zoom for the open problem. */
   dotStatusById?: Map<string, ProblemStatus>
   /** Ids of the open problem's incidents: their dots show at every zoom. */
   problemIncidentIds?: string[]
 }
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
   const onSelectProblemRef = useRef(onSelectProblem)
+  const onFlightEndRef = useRef(onFlightEnd)
   const [ready, setReady] = useState(false)
   const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null)
 
   useEffect(() => {
     onSelectRef.current = onSelect
     onSelectProblemRef.current = onSelectProblem
-  }, [onSelect, onSelectProblem])
+    onFlightEndRef.current = onFlightEnd
+  }, [onSelect, onSelectProblem, onFlightEnd])
 
   useEffect(() => {
     if (!WEBGL2) return
@@ -585,6 +589,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     const progress = { p: 0 }
     const tween = gsap.to(progress, {
       p: 1,
+      onComplete: () => onFlightEndRef.current?.(),
       duration: still ? 0 : Math.min(1.2, 0.5 + 0.4 * (Math.abs(dz) / MAX_FLY_ZOOM)), // 0.5 s for a short hop up to 1.2 s for the longest
       ease: 'sine.inOut', // peak speed 5 zoom levels/s and a soft start; power2.out peaked at 10 and started at full speed
       onUpdate: () => {
@@ -592,7 +597,12 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         map.jumpTo({ center: [start.lng + (to.lng - start.lng) * u, start.lat + (to.lat - start.lat) * u], zoom: start.zoom + dz * progress.p })
       },
     })
-    const stop = () => tween.kill()
+    const stop = () => {
+      if (tween.isActive()) {
+        tween.kill()
+        onFlightEndRef.current?.()
+      }
+    }
     // On the container, not map.on, so the zoom buttons and the keyboard stop it too (the tween's jumpTo would override them).
     const box = map.getContainer()
     const events = ['pointerdown', 'wheel', 'keydown'] as const
@@ -656,7 +666,7 @@ function ListFallback({ incidents, selectedId, onSelect }: Pick<Props, 'incident
               aria-pressed={i.id === selectedId}
               className={`flex w-full items-center gap-2 rounded-md border px-3 py-2 text-left text-body-sm hover:bg-accent ${i.id === selectedId ? 'border-ring bg-accent' : 'bg-card/60'}`}
             >
-              <span className="size-2.5 shrink-0" style={{ background: `var(${GROUPS[groupOf(i.status)].token})` }} aria-hidden />
+              <span className="size-3 shrink-0 rounded-full" style={{ background: `var(${GROUPS[groupOf(i.status)].token})` }} aria-hidden />
               <span className="flex-1">
                 {i.reference} · {label(typeOf(i))}
               </span>

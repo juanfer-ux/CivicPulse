@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { Warning } from '@phosphor-icons/react'
 import { label } from '@/lib/incidents'
 import { type ProblemRow } from '@/lib/problems'
 import { PROBLEM_STATUS } from '@/lib/statusColors'
@@ -17,7 +18,7 @@ export function ProblemHoverCard({ problem, className = '', style }: { problem: 
     <div role="tooltip" style={style} className={`pointer-events-none w-64 rounded-sm border border-(--neutral-400) bg-(--neutral-700) p-3 text-body-sm shadow-lg ${className}`}>
       <p className="line-clamp-2 text-body-strong text-foreground">{problem.location_description}</p>
       <p className="mt-0.5 flex items-center gap-1.5 text-meta text-muted-foreground">
-        <span className="block size-2 rounded-full" style={{ background: `var(${status.token})` }} aria-hidden />
+        <Warning weight="fill" className="size-4 shrink-0" style={{ color: `var(${status.token})` }} aria-hidden />
         {status.label} · {label(problem.category)}
       </p>
       <p className="mt-2 text-foreground">

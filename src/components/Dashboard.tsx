@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { CaretDown, CaretUp, ChatCircleDots, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
@@ -22,6 +22,7 @@ import { fetchLinkedIncidentIds, fetchProblemDetail, fetchProblems, type Problem
 import { PROBLEM_STATUSES, type ProblemStatus } from '@/lib/statusColors'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
 
+const SHOW_MAP_TYPE_CHIPS = false // the Problems and Incidents toggle chips are hidden for now (owner, 2026-11-01); both layers stay on
 const SIDEBAR_DELAY_MS = 1000 // how long the sidebar waits before collapsing or expanding when an incident or problem opens or closes
 
 const DAY = 86_400_000
@@ -189,19 +190,30 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
     return [...(showIncidents ? filtered : []), ...linkedDots, ...problemIncidents].filter((i) => !seen.has(i.id) && seen.add(i.id))
   }, [showIncidents, filtered, linkedDots, problemIncidents])
   const selected = mapIncidents.find((i) => i.id === selectedId) ?? null
-  // The sidebar collapses (and expands) a moment after the camera starts moving, so the map does not change width at the very first frame of the flight (owner, 2026-10-31).
-  const open = !!selected || !!selectedProblem
+  // The problem panel waits until the camera has finished flying to the problem, then slides in from under the agent panel (owner, 2026-11-01). The sidebar collapses at the same moment; for an incident, or when closing, it still changes SIDEBAR_DELAY_MS after the camera starts, so the map does not change width in the first frames of the flight.
+  const [shownProblemId, setShownProblemId] = useState<string | null>(null)
+  const selectedProblemIdNow = useRef<string | null>(null)
   useEffect(() => {
-    const t = setTimeout(() => onInspect(open), SIDEBAR_DELAY_MS)
+    selectedProblemIdNow.current = selectedProblemId
+  }, [selectedProblemId])
+  const onFlightEnd = useCallback(() => setShownProblemId(selectedProblemIdNow.current), [])
+  const panelProblem = selectedProblem && selectedProblem.id === shownProblemId ? selectedProblem : null
+  const open = !!selected || !!panelProblem
+  useEffect(() => {
+    const t = setTimeout(() => onInspect(open), open && !selected ? 0 : SIDEBAR_DELAY_MS)
     return () => clearTimeout(t)
-  }, [open, onInspect])
+  }, [open, selected, onInspect])
   const select = (id: string | null) => {
-    if (!id && !selectedId && selectedProblemId) setSelectedProblemId(null) // a click on empty map (or Escape) closes the incident first, then the problem
+    if (!id && !selectedId && selectedProblemId) {
+      setSelectedProblemId(null) // a click on empty map (or Escape) closes the incident first, then the problem
+      setShownProblemId(null)
+    }
     setSelectedId(id)
     if (id) setCollapsed(false)
   }
   const selectProblem = (id: string | null) => {
     setSelectedProblemId(id)
+    setShownProblemId(null) // the panel waits for the camera again
     setSelectedId(null)
     if (id) setCollapsed(false)
   }
@@ -220,6 +232,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         selectedProblemId={selectedProblem?.id ?? null}
         dotStatusById={dotStatusById}
         onSelectProblem={selectProblem}
+        onFlightEnd={onFlightEnd}
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
         areas={areas}
@@ -243,7 +256,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       {data && (
         <div className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)]">
           {hasProblems ? (
-            <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
+            SHOW_MAP_TYPE_CHIPS && <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
           ) : (
             <p className="pointer-events-none rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200)">
               Showing {filtered.length} {filtered.length === 1 ? 'incident' : 'incidents'}
@@ -307,7 +320,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       </div>
 
       <div
-        className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:flex desk:w-(--agent-w) desk:flex-none desk:border-r desk:border-input desk:bg-ai desk:p-0`}
+        className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:border-r desk:border-input desk:bg-ai desk:p-0`}
       >
         {children}
       </div>
@@ -321,13 +334,13 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
           onClose={() => setSelectedId(null)}
         />
       ) : (
-        selectedProblem && (
+        panelProblem && (
           <ProblemDetail
-            key={selectedProblem.id}
-            problem={selectedProblem}
+            key={panelProblem.id}
+            problem={panelProblem}
             detail={problemDetail}
-            localityName={localityName.get(selectedProblem.locality_code)}
-            categoryName={data?.categories.find((c) => c.code === selectedProblem.category)?.name}
+            localityName={localityName.get(panelProblem.locality_code)}
+            categoryName={data?.categories.find((c) => c.code === panelProblem.category)?.name}
             onSelectIncident={select}
             onClose={() => selectProblem(null)}
           />

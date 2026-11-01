@@ -1,5 +1,6 @@
-import { useRef } from 'react'
-import { X } from '@phosphor-icons/react'
+import { useEffect, useRef } from 'react'
+import { gsap } from 'gsap'
+import { Warning, X } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -38,6 +39,16 @@ export function ProblemDetail({
 }) {
   const panel = useRef<HTMLDivElement>(null)
   useRestoreFocus(panel)
+  // On desktop the panel slides out from under the agent panel to the right (owner, 2026-11-01); on phones it sits in the bottom sheet, so no slide.
+  useEffect(() => {
+    const el = panel.current
+    if (!el || getComputedStyle(el).position !== 'absolute' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const tween = gsap.fromTo(el, { xPercent: -100 }, { xPercent: 0, duration: 0.35, ease: 'power2.out' })
+    return () => {
+      tween.kill()
+      gsap.set(el, { clearProps: 'transform' }) // dev StrictMode runs this effect twice: leave no half-slid state
+    }
+  }, [])
   const status = PROBLEM_STATUS[problem.status]
   const incidents = new Map<string, Incident>((detail?.incidents ?? []).map((i) => [i.id, i]))
   const occN = new Map((detail?.occurrences ?? []).map((o, i) => [o.occurrence_id, i + 1]))
@@ -90,7 +101,7 @@ export function ProblemDetail({
       <CardContent className="flex flex-col gap-4 text-body-sm">
         <div className="flex flex-wrap items-center gap-1">
           <Badge variant="secondary" className="gap-1.5">
-            <span className="block size-2 rounded-full" style={{ background: `var(${status.token})` }} aria-hidden />
+            <Warning weight="fill" className="size-4 shrink-0" style={{ color: `var(${status.token})` }} aria-hidden />
             {status.label}
           </Badge>
           <Badge variant="outline">{categoryName ?? label(problem.category)}</Badge>

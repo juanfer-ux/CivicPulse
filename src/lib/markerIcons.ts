@@ -19,7 +19,7 @@ const put = (map: { addImage: AddImage }, id: string, data: ImageData) => map.ad
 /** Outline outside a square marker, as a share of its size (7.5 %, Figma Map Pin 2026-10-26: 2.4 px around 32 px). */
 const OUTLINE = 4.2 / 64
 
-/** The far-zoom marker: a plain square in the status color with an outline (a 1/8 border), one image per size (PLAIN_PX), status and a toned-down version. */
+/** The far-zoom marker: a plain circle (it was a square until 2026-11-01) in the status color with an outline (a 1/8 border), one image per size (PLAIN_PX), status and a toned-down version. */
 export const dotId = (group: string, dim = false, step = 0) => `dot${dim ? '-dim' : ''}-${group}-${step}`
 export function addDots(map: { addImage: AddImage }) {
   const outline = token('--map-dot-outline')
@@ -33,16 +33,20 @@ export function addDots(map: { addImage: AddImage }) {
         c.width = c.height = side
         const g = c.getContext('2d')!
         g.fillStyle = outline
-        g.fillRect(0, 0, side, side)
+        g.beginPath()
+        g.arc(side / 2, side / 2, side / 2, 0, Math.PI * 2)
+        g.fill()
         g.fillStyle = dim ? mix(token(GROUPS[group].token), land, KEEP) : token(GROUPS[group].token)
-        g.fillRect(b, b, side - 2 * b, side - 2 * b)
+        g.beginPath()
+        g.arc(side / 2, side / 2, side / 2 - b, 0, Math.PI * 2)
+        g.fill()
         put(map, dotId(group, dim, step), g.getImageData(0, 0, side, side))
       }
     }
   })
 }
 
-/** The ring around the selected incident (owner, 2026-10-30): an empty square outline, 2 px on screen, 10 px bigger than the marker; one image per marker size. */
+/** The ring around the selected incident (owner, 2026-10-30): an empty circle outline (a square until 2026-11-01), 2 px on screen, 10 px bigger than the marker; one image per marker size. */
 export const selectedRingId = (step: number) => `selected-ring-${step}`
 export function addSelectedRing(map: { addImage: AddImage }) {
   BADGE_STEPS.forEach((st, step) => {
@@ -53,7 +57,9 @@ export function addSelectedRing(map: { addImage: AddImage }) {
     const g = c.getContext('2d')!
     g.lineWidth = lw
     g.strokeStyle = token('--map-selected-ring')
-    g.strokeRect(lw / 2, lw / 2, side - lw, side - lw)
+    g.beginPath()
+    g.arc(side / 2, side / 2, (side - lw) / 2, 0, Math.PI * 2)
+    g.stroke()
     put(map, selectedRingId(step), g.getImageData(0, 0, side, side))
   })
 }
@@ -65,10 +71,9 @@ async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink
   const c = document.createElement('canvas')
   c.width = c.height = side
   const g = c.getContext('2d')!
-  g.beginPath() // the square; the outline sits outside it, so the whole marker fits in the image
-  g.rect(b, b, side - 2 * b, side - 2 * b)
+  g.beginPath() // the circle (it was a square until 2026-11-01); the outline sits outside it, so the whole marker fits in the image
+  g.arc(side / 2, side / 2, side / 2 - b, 0, Math.PI * 2)
   // Outside outline: stroke twice as wide, then paint the fill over its inner half.
-  g.lineJoin = 'miter'
   g.lineWidth = b * 2
   g.strokeStyle = outline
   g.stroke()
