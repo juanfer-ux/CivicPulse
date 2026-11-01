@@ -21,6 +21,7 @@ import type { Area } from '@/lib/agent'
 import { fetchLinkedIncidentIds, fetchProblemDetail, fetchProblems, type ProblemDetailData, type ProblemRow } from '@/lib/problems'
 import { PROBLEM_STATUSES, type ProblemStatus } from '@/lib/statusColors'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
+import { useHeld, useSlide } from '@/lib/useSlide'
 
 const SHOW_MAP_TYPE_CHIPS = false // the Problems and Incidents toggle chips are hidden for now (owner, 2026-11-01); both layers stay on
 const SIDEBAR_DELAY_MS = 1000 // how long the sidebar waits before collapsing or expanding when an incident or problem opens or closes
@@ -199,6 +200,9 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   const onFlightEnd = useCallback(() => setShownProblemId(selectedProblemIdNow.current), [])
   const panelProblem = selectedProblem && selectedProblem.id === shownProblemId ? selectedProblem : null
   const open = !!selected || !!panelProblem
+  // The open side panel (incident or problem) stays on screen while it slides back under the agent panel after it closes (owner, 2026-11-01).
+  const current = useMemo(() => (selected ? { kind: 'incident' as const, incident: selected } : panelProblem ? { kind: 'problem' as const, problem: panelProblem, detail: problemDetail } : null), [selected, panelProblem, problemDetail])
+  const shown = useHeld(current, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 350)
   useEffect(() => {
     const t = setTimeout(() => onInspect(open), open && !selected ? 0 : SIDEBAR_DELAY_MS)
     return () => clearTimeout(t)
@@ -222,6 +226,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
     setCollapsed(false)
   }
 
+  const item = shown.value
   return (
     <>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
@@ -325,24 +330,28 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         {children}
       </div>
       {/* The incident detail (owner, 2026-10-30, test): its own panel on the map, to the right of the agent panel, like one more sidebar. On phones it stays in the bottom sheet. */}
-      {selected ? (
+      {item?.kind === 'incident' ? (
         <IncidentDetail
-          key={selected.id}
-          incident={selected}
-          localityName={localityName.get(selected.locality_code)}
-          categoryName={data?.categories.find((c) => c.code === selected.category)?.name}
+          key={item.incident.id}
+          incident={item.incident}
+          localityName={localityName.get(item.incident.locality_code)}
+          categoryName={data?.categories.find((c) => c.code === item.incident.category)?.name}
           onClose={() => setSelectedId(null)}
+          slide={shown.slide}
+          leaving={shown.leaving}
         />
       ) : (
-        panelProblem && (
+        item && (
           <ProblemDetail
-            key={panelProblem.id}
-            problem={panelProblem}
-            detail={problemDetail}
-            localityName={localityName.get(panelProblem.locality_code)}
-            categoryName={data?.categories.find((c) => c.code === panelProblem.category)?.name}
+            key={item.problem.id}
+            problem={item.problem}
+            detail={item.detail}
+            localityName={localityName.get(item.problem.locality_code)}
+            categoryName={data?.categories.find((c) => c.code === item.problem.category)?.name}
             onSelectIncident={select}
             onClose={() => selectProblem(null)}
+            slide={shown.slide}
+            leaving={shown.leaving}
           />
         )
       )}
@@ -351,9 +360,10 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   )
 }
 
-function IncidentDetail({ incident, localityName, categoryName, onClose }: { incident: Incident; localityName: string | undefined; categoryName: string | undefined; onClose: () => void }) {
+function IncidentDetail({ incident, localityName, categoryName, onClose, slide, leaving }: { incident: Incident; localityName: string | undefined; categoryName: string | undefined; onClose: () => void; slide: boolean; leaving: boolean }) {
   const panel = useRef<HTMLDivElement>(null)
   useRestoreFocus(panel)
+  useSlide(panel, slide, leaving)
   return (
     <Card
       ref={panel}

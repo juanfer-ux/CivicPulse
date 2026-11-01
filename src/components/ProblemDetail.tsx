@@ -1,5 +1,4 @@
-import { useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
+import { useRef } from 'react'
 import { Warning, X } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -8,6 +7,7 @@ import { label, type Incident } from '@/lib/incidents'
 import { type ProblemDetailData, type ProblemRow } from '@/lib/problems'
 import { PROBLEM_STATUS } from '@/lib/statusColors'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
+import { useSlide } from '@/lib/useSlide'
 
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 const time = (iso: string) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
@@ -29,6 +29,8 @@ export function ProblemDetail({
   categoryName,
   onSelectIncident,
   onClose,
+  slide,
+  leaving,
 }: {
   problem: ProblemRow
   detail: ProblemDetailData | null
@@ -36,19 +38,12 @@ export function ProblemDetail({
   categoryName: string | undefined
   onSelectIncident: (id: string) => void
   onClose: () => void
+  slide: boolean
+  leaving: boolean
 }) {
   const panel = useRef<HTMLDivElement>(null)
   useRestoreFocus(panel)
-  // On desktop the panel slides out from under the agent panel to the right (owner, 2026-11-01); on phones it sits in the bottom sheet, so no slide.
-  useEffect(() => {
-    const el = panel.current
-    if (!el || getComputedStyle(el).position !== 'absolute' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const tween = gsap.fromTo(el, { xPercent: -100 }, { xPercent: 0, duration: 0.35, ease: 'power2.out' })
-    return () => {
-      tween.kill()
-      gsap.set(el, { clearProps: 'transform' }) // dev StrictMode runs this effect twice: leave no half-slid state
-    }
-  }, [])
+  useSlide(panel, slide, leaving)
   const status = PROBLEM_STATUS[problem.status]
   const incidents = new Map<string, Incident>((detail?.incidents ?? []).map((i) => [i.id, i]))
   const occN = new Map((detail?.occurrences ?? []).map((o, i) => [o.occurrence_id, i + 1]))
