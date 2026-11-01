@@ -42,6 +42,9 @@ const typesOn = (filters: Filters, hasProblems: boolean) => ({
   incidents: !hasProblems || !filters.types.length || filters.types.includes('incidents'),
 })
 
+/** A 1 px neutral-800 outline around a chip icon (owner, 2026-11-01): a 2 px stroke in screen pixels (whatever the icon's size) drawn under the fill, so only its outer 1 px shows. */
+const ICON_OUTLINE = 'overflow-visible stroke-(--neutral-800) stroke-2 [paint-order:stroke] [&_path]:[vector-effect:non-scaling-stroke]'
+
 /**
  * The two map toggles, merged with the counts (owner, 2026-10-30): "Problems 16" and "Incidents 650", at the bottom left of the map where the legend was.
  * Both are on by default. Switching one off keeps the other on (never an empty map) and drops the statuses chosen for the one that went away, so a hidden filter never keeps narrowing.
@@ -61,10 +64,10 @@ export function MapTypeChips({ filters, onChange, problemCount, incidentCount }:
   }
   return (
     <div role="group" aria-label="What the map shows" className="flex items-center gap-2">
-      <Chip pressed={on.problems} icon={<Warning weight="fill" className="size-[18px]!" aria-hidden />} count={problemCount} onClick={() => toggle('problems')}>
+      <Chip pressed={on.problems} icon={<Warning weight="fill" className={`size-[18px]! ${ICON_OUTLINE}`} aria-hidden />} count={problemCount} onClick={() => toggle('problems')}>
         Problems
       </Chip>
-      <Chip pressed={on.incidents} icon={<Circle weight="fill" aria-hidden />} count={incidentCount} onClick={() => toggle('incidents')}>
+      <Chip pressed={on.incidents} icon={<Circle weight="fill" className={ICON_OUTLINE} aria-hidden />} count={incidentCount} onClick={() => toggle('incidents')}>
         Incidents
       </Chip>
     </div>
