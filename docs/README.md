@@ -17,6 +17,7 @@ Start here. Every topic has **one** document; other documents link to it instead
 | 🧪 | [testing.md](testing.md) | What is tested and how do I run it? | 🟨 Draft |
 | 🎨 | [design.md](design.md) | Brand, mobile rule, Figma workflow (index) | 🟨 Draft |
 | 🧩 | [design-system/](design-system/README.md) | The detailed design spec: foundations, components and patterns, accessibility | 🟩 In use |
+| 🤝 | [handoff.md](handoff.md) | Where did we stop, what is open, how do we work? (for a new session) | 🟩 In use |
 | 📜 | [decisions/](decisions/README.md) | Why did we choose X? (short numbered records) | 🟩 Started |
 
 ## 🧭 Which one do I read?

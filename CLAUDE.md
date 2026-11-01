@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Civic Operations Agent prototype for synthetic parking/dumping incidents in Bogotá. All incident data is synthetic — see [README.md](README.md) for setup and current status.
 
-Documentation index: [docs/README.md](docs/README.md). Each topic has one document; read the relevant one before changing that area, and update it first.
+**New session? Read [docs/handoff.md](docs/handoff.md) first** (where we stopped, open items, how we work). Documentation index: [docs/README.md](docs/README.md). Each topic has one document; read the relevant one before changing that area, and update it first.
 
 ## Commands
 
