@@ -211,10 +211,15 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       setSelectedProblemId(null) // a click on empty map (or Escape) closes the incident first, then the problem
       setShownProblemId(null)
     }
+    if (id && id === selectedId) return // a second click on the open incident does nothing (owner, 2026-11-01)
     setSelectedId(id)
     if (id) setCollapsed(false)
   }
   const selectProblem = (id: string | null) => {
+    if (id && id === selectedProblemId) {
+      setSelectedId(null) // a second click on the open problem does nothing, except to come back to it from one of its incidents (its panel is still there)
+      return
+    }
     setSelectedProblemId(id)
     setShownProblemId(null) // the panel waits for the camera again
     setSelectedId(null)
