@@ -126,7 +126,7 @@ export function FilterBar({
               value: `i:${g}`,
               group: showProblems && showIncidents ? 'Incidents' : undefined,
               label: GROUPS[g].label,
-              icon: <span className="block size-3 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].token})` }} aria-hidden />,
+              icon: <span className="block size-3 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].swatch})` }} aria-hidden />,
               hint: String(counts[g]),
             })),
           ]}
