@@ -13,4 +13,4 @@ Indigo already had a 100–900 scale (decision 0028). The owner asked for the sa
 ## Consequences
 - ✅ Every hue has room for borders, fills and text steps when needed.
 - 🟨 The new steps are not used on screen yet.
-- 🟨 In Figma the variables panel lists the new steps after the 400s, because the plugin cannot reorder variables; the palette page is in the right order.
+- ✅ In Figma every scale runs 900 down to 100 in one block (checked 2026-11-01). The plugin cannot reorder variables, so the four 400s were dragged into place by hand in the Variables panel.

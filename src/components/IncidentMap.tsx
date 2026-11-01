@@ -688,7 +688,7 @@ function ListFallback({ incidents, selectedId, onSelect }: Pick<Props, 'incident
               aria-pressed={i.id === selectedId}
               className={`flex w-full items-center gap-2 rounded-md border px-3 py-2 text-left text-body-sm hover:bg-accent ${i.id === selectedId ? 'border-ring bg-accent' : 'bg-card/60'}`}
             >
-              <span className="size-3 shrink-0 rounded-full" style={{ background: `var(${GROUPS[groupOf(i.status)].token})` }} aria-hidden />
+              <span className="size-3 shrink-0 rounded-full" style={{ background: `var(${GROUPS[groupOf(i.status)].swatch})` }} aria-hidden />
               <span className="flex-1">
                 {i.reference} · {label(typeOf(i))}
               </span>

@@ -55,7 +55,7 @@ export function ChipMultiSelect({
                     key={o.value}
                     value={o.value}
                     disabled={o.disabled}
-                    className="flex h-9 cursor-default items-center gap-2 rounded-sm px-2 text-foreground outline-none select-none data-disabled:opacity-50 data-highlighted:bg-secondary"
+                    className="flex h-(--control-default) cursor-default items-center gap-2 rounded-sm px-2 text-foreground outline-none select-none data-disabled:opacity-50 data-highlighted:bg-secondary"
                   >
                     <span className="grid size-4 shrink-0 place-items-center rounded-xs border border-input bg-card">
                       <BaseSelect.ItemIndicator>
