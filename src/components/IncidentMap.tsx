@@ -4,12 +4,13 @@ import { gsap } from 'gsap'
 import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
+import { hitsProblemMarker } from '@/lib/markerSizes'
 import { PROBLEM_CIRCLE_PX, PROBLEM_SWITCH_ZOOMS, addBadges, addDots, addSelectedRing, addProblemMarkers, iconCategory, selectedRingId } from '@/lib/markerIcons'
 import { labelPoint } from '@/lib/polygons'
 import { circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
 import { groupOf, label, typeOf, type Incident } from '@/lib/incidents'
-import { type ProblemRow } from '@/lib/problems'
+import type { ProblemRow } from '@/lib/problems'
 import { GROUPS, PROBLEM_STATUS, type ProblemStatus } from '@/lib/statusColors'
 import { ProblemHoverCard } from '@/components/ProblemHoverCard'
 
@@ -394,9 +395,20 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
 
       // A click on an incident selects it; a click anywhere else on the map clears the selection.
       map.on('click', (e) => {
-        const problem = map.queryRenderedFeatures(e.point, { layers: ['problem-markers'] })[0]
+        // A problem counts only if the tap is on its visible circle or triangle, not in the empty corners of its image; a finger also gets a small box (12 px) around the tap to find the nearest incident (owner, 2026-11-01).
+        const size = PROBLEM_CIRCLE_PX[PROBLEM_SWITCH_ZOOMS.filter((w) => map.getZoom() >= w).length]
+        const problem = map.queryRenderedFeatures(e.point, { layers: ['problem-markers'] }).find((f) => {
+          const at = map.project((f.geometry as unknown as { coordinates: [number, number] }).coordinates)
+          return hitsProblemMarker(e.point.x - at.x, e.point.y - at.y, size)
+        })
         if (problem) return onSelectProblemRef.current?.(String(problem.properties.id))
-        const hit = map.queryRenderedFeatures(e.point, { layers: ['incident-selected-pin', 'incidents', 'incident-badges', 'problem-incident-dots'] })[0]
+        const pad = window.matchMedia('(pointer: coarse)').matches ? 12 : 0
+        const box: [[number, number], [number, number]] = [[e.point.x - pad, e.point.y - pad], [e.point.x + pad, e.point.y + pad]]
+        const dist = (f: maplibregl.MapGeoJSONFeature) => {
+          const at = map.project((f.geometry as unknown as { coordinates: [number, number] }).coordinates)
+          return Math.hypot(e.point.x - at.x, e.point.y - at.y)
+        }
+        const hit = map.queryRenderedFeatures(box, { layers: ['incident-selected-pin', 'incidents', 'incident-badges', 'problem-incident-dots'] }).sort((a, b) => dist(a) - dist(b))[0]
         onSelectRef.current(hit ? String(hit.properties.id) : null)
       })
       for (const layer of ['incident-selected-pin', 'incidents', 'incident-badges', 'problem-incident-dots', 'problem-markers']) {

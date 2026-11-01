@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA, problemSizes, zoomForCircle } from '@/lib/markerSizes'
+import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA, hitsProblemMarker, problemSizes, zoomForCircle } from '@/lib/markerSizes'
 
 // The owner's sizes for the incident squares (2026-10-30), by map zoom: 11 and below plain 8 px, 12 plain 10 px,
 // 13 square 24 px with a 12 px icon, 14 and above square 30 px with a 16 px icon. The selected ring is 10 px bigger.
@@ -50,5 +50,18 @@ describe('marker code needs no Supabase', () => {
     vi.stubGlobal('Path2D', class {}) // jsdom has no Path2D; the module only needs the name to exist when it loads
     const m = await import('@/lib/markerIcons')
     expect(m.problemMarkerId('parking', 'active', 28)).toBe('problem-parking-active-28')
+  })
+})
+
+// A tap counts as a problem only on its visible shape (so an incident beside it can still be tapped).
+describe('problem marker tap area', () => {
+  const size = PROBLEM_SIZE.circle // 57 px circle, triangle 39 px
+  it('the circle and the triangle count', () => {
+    expect(hitsProblemMarker(0, 0, size)).toBe(true)
+    expect(hitsProblemMarker(24, -34, size)).toBe(true)
+  })
+  it('the empty corners of the image do not', () => {
+    expect(hitsProblemMarker(-50, -50, size)).toBe(false)
+    expect(hitsProblemMarker(50, 50, size)).toBe(false)
   })
 })

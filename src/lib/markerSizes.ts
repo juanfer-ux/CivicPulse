@@ -36,3 +36,12 @@ export function problemSizes(size: number) {
   const half2 = (n: number) => Math.round(n * 2) / 2
   return { circle: Math.round(PROBLEM_FAR.circle * k), iconPx: half2(PROBLEM_FAR.icon * k), badgeD: half2(PROBLEM_FAR.badge * k), alertOutline: half2(PROBLEM_FAR.alertOutline * k), up: PROBLEM_FAR.triangleUp * k }
 }
+
+/** Is a tap at (dx, dy) screen px from a problem's point on its visible marker (the circle with its outline, or the warning triangle), and not just in the empty corners of its image? Taps outside it fall through to the incident next to it (owner, 2026-11-01). `size` is the image size at the current zoom. */
+export function hitsProblemMarker(dx: number, dy: number, size: number): boolean {
+  const { circle, badgeD, alertOutline, up } = problemSizes(size)
+  if (Math.hypot(dx, dy) <= circle / 2 + PROBLEM_FAR.outline + 2) return true
+  const off = (circle / 2 + PROBLEM_FAR.badgeGap) / Math.SQRT2
+  const half = badgeD / 2 + alertOutline
+  return Math.abs(dx - off) <= half && Math.abs(dy + off + up) <= half
+}

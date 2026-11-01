@@ -3,7 +3,7 @@ import type { ComponentType } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { ChipMultiSelect } from '@/components/ui/chip-multi-select'
 import { Select } from '@/components/ui/select'
-import { type Category, type Locality } from '@/lib/incidents'
+import type { Category, Locality } from '@/lib/incidents'
 import { GROUPS, PROBLEM_STATUS, PROBLEM_STATUSES, type Group, type ProblemStatus } from '@/lib/statusColors'
 
 export const PERIODS = [
