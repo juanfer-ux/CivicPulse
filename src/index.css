@@ -160,7 +160,7 @@
   --panel-gap: 0px; /* no space between the sidebar, the agent panel and the map on desktop: they touch and a right-side line divides them (owner, 2026-10-30, branch flush-dividers) */
   --agent-header-h: 70px; /* height of the Investigate and Ask title row (a line runs across the screen with the map header when it is shown) */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
-  /* The whole palette is these 57 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
+  /* The whole palette is these 55 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
   --white: #ECECEE; /* new in Figma (2026-10-29), brighter than neutral-100; not used on screen yet */
   --neutral-900: #0E0E10;
@@ -172,7 +172,7 @@
   --neutral-300: #737381;
   --neutral-200: #A9A9B2; /* secondary text */
   --neutral-100: #C1C1C8;
-  /* Colored: indigo, red, orange, blue and yellow as 100–900 scales (the 400s are the original colors; the other steps were made around them on 2026-10-31), then the single amber and coral */
+  /* Colored: indigo, red, orange, blue and yellow as 100–900 scales (the 400s are the original colors; the other steps were made around them on 2026-10-31) */
   --indigo-900: #10112A;
   --indigo-800: #191B44;
   --indigo-700: #272A68;
@@ -218,10 +218,8 @@
   --yellow-300: #FFF398;
   --yellow-200: #FEF7C3;
   --yellow-100: #FEFBE4;
-  --amber-400: #D0AC6B;
-  --coral-400: #E58C7D;
 
-  /* Usage names the components use, each pointing at one of the 57 colors. */
+  /* Usage names the components use, each pointing at one of the 55 colors. */
   --background: var(--neutral-700);
   --card: var(--neutral-600);
   --sidebar: var(--neutral-900);
@@ -235,8 +233,8 @@
   --answer-banner-h: 44px; /* conversation banner height (Figma Answer Banner, owner 2026-10-28; was 38); the filters and the stats card move down by this much while it shows */
   --ai-banner: var(--indigo-700); /* conversation banner background and the answer rings on the map, light text on it. Figma indigo-700 (map/banner is its alias) */
   --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
-  --warning: var(--amber-400);
-  --incident: var(--coral-400); /* incidents, invalid fields and ALL error text */
+  --warning: var(--yellow-300);
+  --incident: var(--red-300); /* incidents, invalid fields and ALL error text */
 
   /* Map colors (Figma Map collection, each an alias of a base color): the map reads these, not the UI names above, so it can be recolored without touching badges, errors or focus rings. */
   --map-pending: var(--yellow-400);
@@ -244,8 +242,8 @@
   --map-approved: var(--blue-400);
   --map-rejected: var(--red-400);
   /* Persistent-problem status colors (decision 0030; Figma Map collection): their own set, not the incident status colors. Aliases of palette colors, so no color was added. */
-  --map-problem-active: var(--coral-400);
-  --map-problem-monitoring: var(--amber-400);
+  --map-problem-active: var(--red-300); /* owner, 2026-11-01: every problem status uses a 300 step */
+  --map-problem-monitoring: var(--yellow-300);
   --map-problem-resolved: var(--indigo-300);
   --map-problem-archived: var(--neutral-300);
   --map-dot-outline: var(--neutral-700);
