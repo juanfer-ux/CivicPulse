@@ -12,7 +12,6 @@ For a new session (local or cloud) that has no memory of the earlier chats. Upda
 ## 🟥 Open items
 - **Cursor:** the pointer flickers in Chrome and the hand is missing in Safari over the markers. The CSS is correct everywhere tested; a screen recording would help.
 - **Mobile:** check the recent map changes at about 390×844.
-- **Tests:** two tests are flaky and need a longer timeout.
 - **Figma variable order:** the Figma plugin cannot reorder variables, so in the variables panel the new color steps sit after the 400s (the palette page is in the right order).
 - Not decided yet: the Stat Cards for problems; the operator-actions phase needs permissions approved by the owner first.
 
