@@ -1,5 +1,5 @@
 # 0034: The primary button gets its own color, #22C9A0
-**Status:** Accepted   **Date:** 2026-11-02
+**Status:** Replaced by [0035](0035-brand-primary-and-secondary.md) (the same day)   **Date:** 2026-11-02
 
 ## Context
 The primary button was filled with `neutral-100` (`#C1C1C8`), the same color as normal text, so it could not change without changing the text. The owner wants a color that belongs to the primary button alone. The first pick, `#36E2B8`, was too bright, so it became `#1FD6A9`, and then `#22C9A0`, all on the same day.
