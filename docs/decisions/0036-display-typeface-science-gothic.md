@@ -3,7 +3,7 @@
 
 ## Context
 The owner added and changed text styles in Figma (2026-11-02). Compared with the docs and the code (22 styles in Figma):
-- **display** is now a different typeface, **Science Gothic Regular**, in three sizes (64 / 60 at -7 %, 32 / 42 at -6 %, 24 / 32 at -4 %). Figma names all three just `display`.
+- **display** is now a different typeface, **Science Gothic**, in three sizes (Regular at first, **Light** (300) after the owner's second pass the same day) (64 / 60 at -7 %, 32 / 42 at -6 %, 24 / 32 at -4 %). Figma names all three just `display`.
 - **stat** has tracking **-2 %** (it was -4 %).
 - New styles: **label-regular** (14 / 22, Regular), **caption-strong** (12.5 / 16, SemiBold). **meta-medium** is now 13 / 21 Medium (it was documented as 12 / 16, 500).
 - Letter-spacing in Figma: `body-sm-medium` 4 % (was 2 %), `caption` and `caption-strong` 2.4 %, `label` 2.2 %.
@@ -14,7 +14,7 @@ The owner added and changed text styles in Figma (2026-11-02). Compared with the
 - Code names for the three display styles, by size: `display-lg` (64), `display` (32), `display-sm` (24).
 - New tokens `label-regular`, `meta-medium`, `caption-strong`, and the letter-spacing values above, as in Figma. `cn()` knows the new names and treats `font-heading` and `font-display` as alternatives.
 - Applied where Figma uses them: the Sign in headline (`display-lg`, it was a literal Manrope ExtraLight 64 / 68), the Auth Card titles (`display-sm`, they were `stat`), table headers and suggested questions (`meta-medium`, they were `text-meta font-medium` and `button-sm`), the default Badge (`caption-strong`).
-- The Figma weight names map as before: Regular 300, Medium 360, SemiBold 400, Bold 450 for Manrope; Science Gothic uses its real Regular 400.
+- The Figma weight names map as before: Regular 300, Medium 360, SemiBold 400, Bold 450 for Manrope; Science Gothic uses its real weight: Light 300 for the display styles.
 
 ## Consequences
 - ✅ Code and docs match the 22 Figma text styles; each style was measured in a browser (desktop and phone).

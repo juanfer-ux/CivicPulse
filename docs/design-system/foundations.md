@@ -12,9 +12,9 @@ Each class sets size, line height and weight together, so a component never need
 
 | Style | Desktop | Mobile | Weight | Use | Class |
 |---|---|---|---|---|---|
-| display-lg | 64 / 60 (spacing -7 %) | 64 / 60 | 400 (Science Gothic Regular) | The Sign in headline on desktop (it was a literal Manrope ExtraLight 64 / 68) | `font-display text-display-lg` |
-| display | 32 / 42 (spacing -6 %) | 32 / 42 | 400 (Science Gothic Regular) | Not used by a screen yet | `font-display text-display` |
-| display-sm | 24 / 32 (spacing -4 %) | 24 / 32 | 400 (Science Gothic Regular) | Auth Card titles (Sign in, Set up your account; they were `stat`) | `font-display text-display-sm` |
+| display-lg | 64 / 60 (spacing -7 %) | 64 / 60 | 300 (Science Gothic Light) | The Sign in headline on desktop (it was a literal Manrope ExtraLight 64 / 68) | `font-display text-display-lg` |
+| display | 32 / 42 (spacing -6 %) | 32 / 42 | 300 (Science Gothic Light) | Not used by a screen yet | `font-display text-display` |
+| display-sm | 24 / 32 (spacing -4 %) | 24 / 32 | 300 (Science Gothic Light) | Auth Card titles (Sign in, Set up your account; they were `stat`) | `font-display text-display-sm` |
 | stat | 32 / 32 (spacing -2 %) | 32 / 32 | 450 (Figma Bold) | Counts in stat cards and the Side Panel title; spacing was -4 % until 2026-11-02 | `text-stat` |
 | heading | 20 / 28 | 20 / 28 | 400 | Page title | `text-heading` |
 | title | 18 / 28 | 18 / 28 | 400 | Panel and section titles | `text-title` |
