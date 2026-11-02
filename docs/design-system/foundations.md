@@ -8,11 +8,11 @@
 **Science Gothic** (Google Fonts, OFL-1.1) is the display typeface, for the `display-*` styles only (owner's Figma text styles, 2026-11-02; [decision 0036](../decisions/0036-display-typeface-science-gothic.md)). It is served the same way, by `@fontsource-variable/science-gothic` (weight axis only; the files load only when a display style is on the page). Code: `--font-display`, used with a display style as `font-display text-display-sm`.
 
 ## 🔠 Text styles
-Each class sets size, line height and weight together, so a component never needs its own `font-medium`. Letter-spacing is one universal **0.02em** on every element; these styles keep their own, as in Figma: the display styles (-7 %, -6 %, -4 %), `stat` (-2 %), `label`, `button`, `button-sm`, `body` and `body-sm` (2.2 %), `body-sm-medium` (4 %), `caption` and `caption-strong` (2.4 %) and the small uppercase labels (18 %). Text on a light fill (main button, default badge, dangerous button) uses the `sidebar` color.
+Each class sets size, line height and weight together, so a component never needs its own `font-medium`. Letter-spacing is one universal **0.02em** on every element; these styles keep their own, as in Figma: the display styles (-8 %, -6 %, -4 %), `stat` (-2 %), `label`, `button`, `button-sm`, `body` and `body-sm` (2.2 %), `body-sm-medium` (4 %), `caption` and `caption-strong` (2.4 %) and the small uppercase labels (18 %). Text on a light fill (main button, default badge, dangerous button) uses the `sidebar` color.
 
 | Style | Desktop | Mobile | Weight | Use | Class |
 |---|---|---|---|---|---|
-| display-lg | 64 / 60 (spacing -7 %) | 64 / 60 | 200 (Science Gothic ExtraLight) | The Sign in headline on desktop (it was a literal Manrope ExtraLight 64 / 68) | `font-display text-display-lg` |
+| display-lg | 64 / 60 (spacing -8 %) | 64 / 60 | 200 (Science Gothic ExtraLight) | The Sign in headline on desktop (it was a literal Manrope ExtraLight 64 / 68) | `font-display text-display-lg` |
 | display | 32 / 42 (spacing -6 %) | 32 / 42 | 300 (Science Gothic Light) | Not used by a screen yet | `font-display text-display` |
 | display-sm | 24 / 32 (spacing -4 %) | 24 / 32 | 300 (Science Gothic Light) | Auth Card titles (Sign in, Set up your account; they were `stat`) | `font-display text-display-sm` |
 | stat | 32 / 32 (spacing -2 %) | 32 / 32 | 450 (Figma Bold) | Counts in stat cards and the Side Panel title; spacing was -4 % until 2026-11-02 | `text-stat` |
