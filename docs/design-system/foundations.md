@@ -12,7 +12,7 @@ Each class sets size, line height and weight together, so a component never need
 
 | Style | Desktop | Mobile | Weight | Use | Class |
 |---|---|---|---|---|---|
-| display-lg | 64 / 60 (spacing -7 %) | 64 / 60 | 300 (Science Gothic Light) | The Sign in headline on desktop (it was a literal Manrope ExtraLight 64 / 68) | `font-display text-display-lg` |
+| display-lg | 64 / 60 (spacing -7 %) | 64 / 60 | 200 (Science Gothic ExtraLight) | The Sign in headline on desktop (it was a literal Manrope ExtraLight 64 / 68) | `font-display text-display-lg` |
 | display | 32 / 42 (spacing -6 %) | 32 / 42 | 300 (Science Gothic Light) | Not used by a screen yet | `font-display text-display` |
 | display-sm | 24 / 32 (spacing -4 %) | 24 / 32 | 300 (Science Gothic Light) | Auth Card titles (Sign in, Set up your account; they were `stat`) | `font-display text-display-sm` |
 | stat | 32 / 32 (spacing -2 %) | 32 / 32 | 450 (Figma Bold) | Counts in stat cards and the Side Panel title; spacing was -4 % until 2026-11-02 | `text-stat` |
@@ -37,7 +37,7 @@ Each class sets size, line height and weight together, so a component never need
 
 - **Desktop = 1,440 px and wider; Mobile = anything narrower** (the `desk` breakpoint). The sizes come from Figma's Device collection and switch through CSS variables in `src/index.css` (`--fs-body`, `--lh-body`…); class names do not change.
 - **Weights** (Manrope is a variable font, so any number from 200 to 800 works; the owner chose these on 2026-10-23 by looking at the result): **Regular 300** for reading text, typed text, placeholders and secondary text; **Medium 360** for anything that labels something (field names, menu items, subtitles, badges, captions); **SemiBold 400** for headings, numbers, titles and button text.
-- Figma names all three display styles just `display` (64, 32 and 24); here they are `display-lg`, `display` and `display-sm`, by size. ⚠️ Renaming them in Figma the same way would remove the ambiguity.
+- The three display styles are named `display-lg` (64), `display` (32) and `display-sm` (24) in both Figma and code (renamed in Figma 2026-11-02, owner's yes).
 - ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes; without that, the class merger dropped `text-label` from colored buttons (test in `utils.test.ts`).
 
 ## 🎨 Colors (dark theme): 57 in total

@@ -17,7 +17,7 @@
   /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is one universal 0.02em on every element (about 0.26 px at 13 px), small enough not to blur; Figma's fixed 0.2 and 0.3 px did blur letters on screens without a Retina display. Weights are ours: 550 headings and numbers, 450 actions and labels, 380 reading text (Manrope variable). */
   /* Display (Figma display, 2026-11-02): Science Gothic Light (it was Regular until the owner changed it, 2026-11-02) in three sizes, used with `font-display`. Figma names all three "display"; here they are display-lg (64), display (32, not used by a screen yet) and display-sm (24). */
   --text-display-lg: 64px;
-  --text-display-lg--font-weight: 300;
+  --text-display-lg--font-weight: 200;
   --text-display-lg--line-height: 60px;
   --text-display-lg--letter-spacing: -0.07em;
   --text-display: 32px;

@@ -105,14 +105,14 @@ function Brand({ collapsed, onToggle }: { collapsed: boolean; onToggle?: () => v
   if (collapsed && onToggle)
     return (
       <Button variant="ghost" className="group size-11 p-0" aria-label="Expand menu" title="Expand menu" onClick={onToggle}>
-        <img src={mark} alt="" width={30} height={30} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
+        <img src={mark} alt="" width={34} height={34} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
         <SidebarSimple className="hidden size-5 shrink-0 -scale-x-100 group-hover:block group-focus-visible:block" />
       </Button>
     )
   return (
-    <div className="flex items-center gap-[5.6px]">
-      <img src={mark} alt="" width={30} height={30} className="shrink-0" />
-      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={112} height={9} className="shrink-0" />}
+    <div className="flex items-center gap-[6.4px]">
+      <img src={mark} alt="" width={34} height={34} className="shrink-0" />
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={125.7} height={9.6} className="shrink-0" />}
     </div>
   )
 }
