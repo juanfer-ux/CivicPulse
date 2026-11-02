@@ -39,7 +39,8 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0031](0031-map-drawn-at-2x-with-antialiasing.md) | The map is drawn at 2x with antialiasing; one crisp image per marker size | ✅ Accepted |
 | [0032](0032-problem-marker-option-f.md) | The problem marker is option F (neutral circle, status outline, warning triangle) | ✅ Accepted |
 | [0033](0033-color-scales-red-orange-blue-yellow.md) | Red, orange, blue and yellow get 100–900 scales (57 colors) | ✅ Accepted |
-| [0034](0034-primary-button-color.md) | The primary button gets its own color, `#22C9A0`, with a white 50 % hover state layer | ✅ Accepted |
+| [0034](0034-primary-button-color.md) | The primary button gets its own color (a mint, tried the same day) | ⚪ Replaced by 0035 |
+| [0035](0035-brand-primary-and-secondary.md) | Brand primary `#E3E3E7` (the primary button) and brand secondary `#87DBC7` (its hover) | ✅ Accepted |
 
 ## ✍️ Template
 ```
