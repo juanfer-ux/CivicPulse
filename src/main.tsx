@@ -12,17 +12,23 @@ import { AuthProvider } from '@/lib/auth'
 const App = lazy(() => import('./App.tsx'))
 const Gallery = lazy(() => import('@/components/Gallery').then((m) => ({ default: m.Gallery })))
 const ChartGallery = lazy(() => import('@/components/ChartGallery').then((m) => ({ default: m.ChartGallery })))
+const TimelineGallery = lazy(() => import('@/components/TimelineGallery').then((m) => ({ default: m.TimelineGallery })))
 
 // The gallery has no data, so it skips sign-in: open /#components.
 const gallery = location.hash === '#components'
 const charts = location.hash === '#charts' // chart options for the agent's answers
+const timeline = location.hash === '#timeline' // ways to show a problem's history as a timeline
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     {/* Every Phosphor icon is the bold weight (owner, 2026-10-30) unless it asks for another (fill on the map badges, the buttons' sparkle and the bullet). */}
     <IconContext.Provider value={{ weight: 'bold' }}>
       <ErrorBoundary>
-        {charts ? (
+        {timeline ? (
+          <Suspense fallback={null}>
+            <TimelineGallery />
+          </Suspense>
+        ) : charts ? (
           <Suspense fallback={null}>
             <ChartGallery />
           </Suspense>

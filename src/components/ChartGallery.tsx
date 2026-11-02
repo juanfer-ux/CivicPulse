@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, ReferenceLine, Scatter, ScatterChart, XAxis, YAxis, ZAxis } from 'recharts'
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts'
 import { Bars } from '@/components/InvestigatePanel'
 import { StatCard } from '@/components/ui/stat-card'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
@@ -27,26 +27,10 @@ const PERIOD = [
   { label: 'Last 30 days', value: 19 },
 ]
 
-/** A problem's history (the Figma sample: PR-00088, 3 occurrences and 2 tows). t is a timestamp, so the time axis is to scale. */
-const at = (d: string) => Date.parse(d)
-const OCCURRENCES = [
-  { t: at('2026-08-12'), reports: 5, text: 'Occurrence 1 · 12 Aug · 5 reports' },
-  { t: at('2026-09-08'), reports: 4, text: 'Occurrence 2 · 8 Sept · 4 reports' },
-  { t: at('2026-10-12'), reports: 3, text: 'Occurrence 3 · 12 Oct · 3 reports' },
-]
-const INTERVENTIONS = [
-  { t: at('2026-08-16'), text: '16 Aug · Tow · Cleared' },
-  { t: at('2026-09-12'), text: '12 Sept · Tow · Cleared' },
-]
-const TIMELINE = { domain: [at('2026-08-01'), at('2026-10-31')] as [number, number], ticks: [at('2026-08-01'), at('2026-09-01'), at('2026-10-01')] }
-const month = (t: number) => new Date(t).toLocaleDateString('en-GB', { month: 'short' })
-const LANES = { 1: 'Occurrences', 0: 'Tows' } as Record<number, string>
-const tipBox = 'rounded-sm border border-input bg-(--neutral-700) px-2 py-1 text-meta text-foreground shadow-lg'
-
 const config = { value: { label: 'Incidents', color: 'var(--indigo-400)' } } satisfies ChartConfig
 const tick = { fill: 'var(--neutral-200)', fontSize: 12 }
 
-function Option({ name, note, children }: { name: string; note: string; children: ReactNode }) {
+export function Option({ name, note, children }: { name: string; note: string; children: ReactNode }) {
   return (
     <div className="flex min-w-0 flex-col gap-2 rounded-sm border border-input bg-ai p-4">
       <div>
@@ -58,7 +42,7 @@ function Option({ name, note, children }: { name: string; note: string; children
   )
 }
 
-function Row({ title, children }: { title: string; children: ReactNode }) {
+export function Row({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
       <h2 className="text-title">{title}</h2>
@@ -191,48 +175,9 @@ export function ChartGallery() {
         </Option>
       </Row>
 
-      <Row title="4 · Problem history: when it came back and what was done (PR-00088: 3 occurrences, 2 tows)">
-        <Option name="Current" note="The log in the Problem Panel. Complete, but you read every line to see the rhythm.">
-          <ul className="flex flex-col gap-1 text-meta text-muted-foreground">
-            <li className="text-body-sm-medium text-foreground">Occurrence 1 · 12 Aug · 5 reports</li>
-            <li>PRK-0021 SIMUR · 12 Aug, 17:18</li>
-            <li className="rounded-sm border border-(--neutral-400) p-2">16 Aug · Tow · Secretaría Distrital de Movilidad</li>
-            <li className="text-body-sm-medium text-foreground">Occurrence 2 · 8 Sept · 4 reports</li>
-            <li>PRK-0063 SIMUR · 8 Sept, 22:18</li>
-            <li className="rounded-sm border border-(--neutral-400) p-2">12 Sept · Tow · Secretaría Distrital de Movilidad</li>
-            <li className="text-body-sm-medium text-foreground">Occurrence 3 · 12 Oct · 3 reports</li>
-          </ul>
-        </Option>
-        <Option name="shadcn Chart · two lanes" note="A real timeline: a lane for occurrences (dot size = reports) and a lane for tows. You see the tow, then the return.">
-          <ChartContainer config={config} className="h-[170px] w-full">
-            <ScatterChart margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
-              <CartesianGrid horizontal={false} stroke="var(--neutral-500)" />
-              <XAxis type="number" dataKey="t" domain={TIMELINE.domain} ticks={TIMELINE.ticks} tickFormatter={month} tickLine={false} axisLine={false} tick={tick} />
-              <YAxis type="number" dataKey="lane" domain={[-0.6, 1.6]} ticks={[0, 1]} tickFormatter={(v: number) => LANES[v]} tickLine={false} axisLine={false} width={84} tick={tick} />
-              <ZAxis type="number" dataKey="size" domain={[0, 5]} range={[20, 420]} />
-              <ChartTooltip cursor={false} content={({ active, payload }) => (active && payload?.length ? <div className={tipBox}>{(payload[0].payload as { text: string }).text}</div> : null)} />
-              <Scatter data={OCCURRENCES.map((o) => ({ ...o, lane: 1, size: o.reports }))} fill="var(--map-problem-active)" />
-              <Scatter data={INTERVENTIONS.map((v) => ({ ...v, lane: 0, size: 3 }))} fill="var(--blue-300)" shape="diamond" />
-            </ScatterChart>
-          </ChartContainer>
-        </Option>
-        <Option name="shadcn Chart · columns and tow lines" note="One column per occurrence (height = reports) on a time axis to scale; each tow is a dashed line, so a column after a line reads as a return.">
-          <ChartContainer config={{ reports: { label: 'Reports', color: 'var(--map-problem-active)' } }} className="h-[170px] w-full">
-            <BarChart data={OCCURRENCES} margin={{ top: 22, right: 16, left: 16 }}>
-              <CartesianGrid vertical={false} stroke="var(--neutral-500)" />
-              <XAxis type="number" dataKey="t" domain={TIMELINE.domain} ticks={TIMELINE.ticks} tickFormatter={month} tickLine={false} axisLine={false} tick={tick} />
-              <YAxis hide domain={[0, 6]} />
-              <ChartTooltip cursor={false} content={({ active, payload }) => (active && payload?.length ? <div className={tipBox}>{(payload[0].payload as { text: string }).text}</div> : null)} />
-              {INTERVENTIONS.map((v) => (
-                <ReferenceLine key={v.t} x={v.t} stroke="var(--blue-300)" strokeDasharray="3 3" label={{ value: 'Tow', position: 'top', fill: 'var(--blue-300)', fontSize: 11 }} />
-              ))}
-              <Bar dataKey="reports" fill="var(--color-reports)" radius={4} barSize={16}>
-                <LabelList dataKey="reports" position="top" fill="var(--neutral-100)" fontSize={12} />
-              </Bar>
-            </BarChart>
-          </ChartContainer>
-        </Option>
-      </Row>
+      <p className="text-body-sm text-muted-foreground">
+        The Problem Panel's history as a timeline has its own page with more options: open <code>/#timeline</code>.
+      </p>
     </main>
   )
 }
