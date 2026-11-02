@@ -234,8 +234,9 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   // The map no longer shrinks for the side panel (that left a gap beside the agent panel while the panel slid in or out): it stays under the panel and the camera keeps the target centered in the part that shows (padLeft). The controls over the map follow the panel with a short slide of their own.
   const panelOpen = !!current
   const desk = window.matchMedia('(min-width: 90rem)').matches
+  const panelW = item?.kind === 'problem' ? 400 : 360 // the Problem Panel is 400 px wide, the Incident Panel 360 (Figma, 2026-11-02)
   return (
-    <div className="contents" style={{ '--map-base': 'calc(var(--agent-w) + var(--panel-gap))', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${panelOpen ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
+    <div className="contents" style={{ '--map-base': 'calc(var(--agent-w) + var(--panel-gap))', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${panelOpen ? ` + ${panelW}px + var(--panel-gap)` : ''})` } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -245,7 +246,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         dotStatusById={dotStatusById}
         onSelectProblem={selectProblem}
         onFlightEnd={onFlightEnd}
-        padLeft={desk && (selected || selectedProblem) ? 360 : 0}
+        padLeft={desk ? (selected ? 360 : selectedProblem ? 400 : 0) : 0}
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
         areas={areas}

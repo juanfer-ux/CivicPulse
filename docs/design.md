@@ -39,7 +39,7 @@ The switch is at **1,440 px** (owner's decision): any narrower window, including
 3. Check at **1,440** and **390** by **measuring** (heights, radius, text size), not only by eye.
 
 ## 🖼️ Component gallery
-The four Stat Card states, then chart options for the agent's answers (the current bars next to shadcn Chart, a BarList and a metric tile, on the same data): open `/#charts` (no sign-in; loaded only when opened).
+The four Stat Card states, then chart options for the agent's answers (the current bars next to shadcn Chart, a BarList and a metric tile, on the same data), and a **test of the Problem Panel's history as a timeline chart** (owner's idea, 2026-11-02; row 4: today's log next to a two-lane timeline and columns with tow lines, all shadcn Chart; nothing in the app uses it yet): open `/#charts` (no sign-in; loaded only when opened).
 
 Open `/#components` (no sign-in) to see real components on their own, with their measured height and text style. Resize under 1,440 px for the phone sizes. Code: `src/components/Gallery.tsx`. It only has the Button so far; add a component by adding a section there.
 
