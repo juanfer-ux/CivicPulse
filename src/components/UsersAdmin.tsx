@@ -245,10 +245,10 @@ function UserPanel({
 
   return (
     <aside ref={panel} tabIndex={-1} aria-label="User details" className={`${ASIDE} outline-none`}>
-      <div className="flex h-full flex-col gap-4 overflow-y-auto p-6">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h2 className="truncate text-title">{user.full_name || 'No name'}</h2>
+      <div className="flex h-full flex-col gap-4 overflow-y-auto p-8">
+        <div className="mb-6 flex items-start justify-between gap-2">
+          <div className="flex min-w-0 flex-col gap-3">
+            <h2 className="truncate text-stat">{user.full_name || 'No name'}</h2>
             <p className="truncate text-body-sm text-muted-foreground">{user.email}</p>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
@@ -260,7 +260,7 @@ function UserPanel({
         {user.role === 'specialist_operator' && <p className="text-body-sm">Specialty: {specialtyOf(user, data).join(', ') || 'none yet'}</p>}
         {isMe && <p className="text-meta text-muted-foreground">This is you: your own role and status are locked so you cannot lock yourself out.</p>}
 
-        <label className="flex flex-col gap-1 text-label">
+        <label className="flex flex-col gap-1.5 text-label">
           Role
           <Select
             aria-label="Role"
@@ -288,7 +288,7 @@ function UserPanel({
         </label>
 
         {user.role !== 'super_admin' && (
-          <div className="flex flex-col gap-1 text-body-sm">
+          <div className="flex flex-col gap-1.5 text-label">
             Localities
             <MultiSelect
               noun="localities"
@@ -364,10 +364,10 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
 
   return (
     <aside ref={panel} tabIndex={-1} aria-label="Create user" className={`${ASIDE} outline-none`}>
-      <form onSubmit={submit} className="flex h-full flex-col gap-4 overflow-y-auto p-6">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <h2 className="text-title">Create user</h2>
+      <form onSubmit={submit} className="flex h-full flex-col gap-4 overflow-y-auto p-8">
+        <div className="mb-4 flex items-start justify-between gap-2">
+          <div className="flex flex-col gap-3">
+            <h2 className="text-stat">Create user</h2>
             <p className="text-body-sm text-muted-foreground">They get an email to set their own password.</p>
           </div>
           <Button type="button" variant="ghost" size="sm" onClick={onClose}>
@@ -375,15 +375,15 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
           </Button>
         </div>
 
-        <label className="flex flex-col gap-1 text-label">
+        <label className="flex flex-col gap-1.5 text-label">
           Name
           <Input value={form.full_name} onChange={(e) => set({ full_name: e.target.value })} placeholder="Full name" autoComplete="off" />
         </label>
-        <label className="flex flex-col gap-1 text-label">
+        <label className="flex flex-col gap-1.5 text-label">
           Email
           <Input type="email" value={form.email} onChange={(e) => set({ email: e.target.value })} placeholder="name@example.com" autoComplete="off" />
         </label>
-        <label className="flex flex-col gap-1 text-label">
+        <label className="flex flex-col gap-1.5 text-label">
           Role
           <Select aria-label="Role" value={form.role} onValueChange={(v) => set({ role: v as AppRole | '' })} options={[{ value: '', label: 'Choose a role' }, ...ROLE_OPTIONS]} />
         </label>
@@ -391,7 +391,7 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
         {form.role === 'super_admin' && <p className="rounded-lg bg-muted/50 p-3 text-body-sm">Super Admins see everything and manage users, so no zone is needed.</p>}
 
         {(form.role === 'locality_admin' || form.role === 'specialist_operator') && (
-          <div className="flex flex-col gap-1 text-body-sm">
+          <div className="flex flex-col gap-1.5 text-label">
             Zone{form.role === 'locality_admin' ? ' to administer' : 's'}
             <MultiSelect
               noun="zones"
