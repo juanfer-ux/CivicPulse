@@ -5,7 +5,9 @@ import { extendTailwindMerge } from 'tailwind-merge'
 const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
-      'font-size': [{ text: ['display', 'stat', 'heading', 'title', 'subtitle', 'label', 'button', 'button-sm', 'body', 'body-medium', 'body-strong', 'body-sm', 'body-sm-medium', 'body-sm-strong', 'meta', 'caption', 'section-label'] }],
+      'font-size': [{ text: ['display-lg', 'display', 'display-sm', 'stat', 'heading', 'title', 'subtitle', 'label', 'label-regular', 'button', 'button-sm', 'body', 'body-medium', 'body-strong', 'body-sm', 'body-sm-medium', 'body-sm-strong', 'meta', 'meta-medium', 'caption', 'caption-strong', 'section-label'] }],
+      // `font-display` (Science Gothic) replaces `font-heading` on a card title that asks for a display style.
+      'font-family': [{ font: ['heading', 'display'] }],
     },
   },
 })

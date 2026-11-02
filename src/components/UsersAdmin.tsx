@@ -122,7 +122,7 @@ export function UsersAdmin() {
               <thead className="text-meta text-muted-foreground max-desk:hidden">
                 <tr className="border-b">
                   {['Name', 'Email', 'Role', 'Status', 'Categories'].map((h) => (
-                    <th key={h} scope="col" className="px-3 py-2 text-meta font-medium">
+                    <th key={h} scope="col" className="px-3 py-2 text-meta-medium">
                       {h}
                     </th>
                   ))}

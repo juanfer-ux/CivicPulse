@@ -41,6 +41,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0033](0033-color-scales-red-orange-blue-yellow.md) | Red, orange, blue and yellow get 100–900 scales (57 colors) | ✅ Accepted |
 | [0034](0034-primary-button-color.md) | The primary button gets its own color (a mint, tried the same day) | ⚪ Replaced by 0035 |
 | [0035](0035-brand-primary-and-secondary.md) | Brand primary `#E3E3E7` (the primary button) and brand secondary `#87DBC7` (its hover) | ✅ Accepted |
+| [0036](0036-display-typeface-science-gothic.md) | Display styles use Science Gothic; text styles brought in line with Figma | ✅ Accepted |
 
 ## ✍️ Template
 ```
