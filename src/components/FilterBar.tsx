@@ -42,8 +42,8 @@ const typesOn = (filters: Filters, hasProblems: boolean) => ({
   incidents: !hasProblems || !filters.types.length || filters.types.includes('incidents'),
 })
 
-/** A 1 px neutral-800 outline around a chip icon (owner, 2026-11-01): a 2 px stroke in screen pixels (whatever the icon's size) drawn under the fill, so only its outer 1 px shows. */
-const ICON_OUTLINE = 'overflow-visible stroke-(--neutral-800) stroke-2 [paint-order:stroke] [&_path]:[vector-effect:non-scaling-stroke]'
+/** A 2 px neutral-900 outline around a chip icon (owner, 2026-11-01; it was 1 px and neutral-800): a 4 px stroke in screen pixels (whatever the icon's size) drawn under the fill, so only its outer 2 px shows. */
+const ICON_OUTLINE = 'overflow-visible stroke-(--neutral-900) stroke-4 [paint-order:stroke] [&_path]:[vector-effect:non-scaling-stroke]'
 
 /**
  * The two map toggles, merged with the counts (owner, 2026-10-30): "Problems 16" and "Incidents 650", at the bottom left of the map where the legend was.
