@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ProblemStatusPill } from '@/components/ProblemStatusPill'
+import { ProblemTimeline } from '@/components/ProblemTimeline'
 import { label, type Incident } from '@/lib/incidents'
 import type { ProblemDetailData, ProblemRow } from '@/lib/problems'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
@@ -120,46 +121,51 @@ export function ProblemDetail({
         <section aria-label="History" className="flex flex-col gap-3 bg-(--neutral-700) p-3">
           <h3 className="text-section-label uppercase text-(--neutral-200)">History</h3>
           {!detail && <p className="text-meta text-muted-foreground">Loading…</p>}
-          {detail && steps.length === 0 && <p className="text-meta text-muted-foreground">No history yet.</p>}
-          <ol className="flex flex-col gap-3">
-            {steps.map((st) => {
-              if (st.kind === 'event') {
-                return (
-                  <li key={`e-${st.at}`} className="text-meta text-muted-foreground">
-                    {day(new Date(st.at).toISOString())} · {st.text}
-                  </li>
-                )
-              }
-              if (st.kind === 'intervention') {
-                const v = detail!.interventions.find((x) => x.id === st.id)!
-                return (
-                  <li key={v.id} className="flex flex-col gap-0.5 rounded-sm border-[0.5px] border-(--neutral-400) p-2">
-                    <p className="text-body-sm-medium text-foreground">
-                      {day(v.performed_at)} · {label(v.action_type)} · {v.agency}
-                    </p>
-                    <p className="text-meta text-muted-foreground">{v.description}</p>
-                    <p className="text-meta text-muted-foreground">Outcome: {v.outcome ? label(v.outcome) : 'Not recorded yet'}</p>
-                  </li>
-                )
-              }
-              const o = detail!.occurrences.find((x) => x.occurrence_id === st.id)!
-              const rows = detail!.links.filter((l) => l.occurrence_id === o.occurrence_id)
-              return (
-                <li key={o.occurrence_id} className="flex flex-col gap-1">
-                  <p className="flex flex-wrap items-center gap-2 text-body-sm-medium text-foreground">
-                    Occurrence {occN.get(o.occurrence_id)} · {day(o.first_report_at!)} · {o.reports_n} {o.reports_n === 1 ? 'report' : 'reports'}
-                    {o.boundary_uncertain && <Badge variant="outline">Boundary uncertain</Badge>}
-                  </p>
-                  <ul className="flex flex-col">{rows.map((l) => report(l.incident_id, l.state === 'proposed'))}</ul>
-                </li>
-              )
-            })}
-          </ol>
-          {unplaced.length > 0 && (
-            <div>
-              <p className="text-body-sm-medium text-foreground">Waiting for review</p>
-              <ul className="mt-1 flex flex-col">{unplaced.map((l) => report(l.incident_id, true))}</ul>
-            </div>
+          {detail && <ProblemTimeline detail={detail} status={problem.status} onSelectIncident={onSelectIncident} />}
+          {detail && steps.length > 0 && (
+            <details className="group">
+              <summary className="cursor-pointer text-meta text-muted-foreground hover:text-foreground">Show as a list</summary>
+              <ol className="mt-3 flex flex-col gap-3">
+                {steps.map((st) => {
+                  if (st.kind === 'event') {
+                    return (
+                      <li key={`e-${st.at}`} className="text-meta text-muted-foreground">
+                        {day(new Date(st.at).toISOString())} · {st.text}
+                      </li>
+                    )
+                  }
+                  if (st.kind === 'intervention') {
+                    const v = detail!.interventions.find((x) => x.id === st.id)!
+                    return (
+                      <li key={v.id} className="flex flex-col gap-0.5 rounded-sm border-[0.5px] border-(--neutral-400) p-2">
+                        <p className="text-body-sm-medium text-foreground">
+                          {day(v.performed_at)} · {label(v.action_type)} · {v.agency}
+                        </p>
+                        <p className="text-meta text-muted-foreground">{v.description}</p>
+                        <p className="text-meta text-muted-foreground">Outcome: {v.outcome ? label(v.outcome) : 'Not recorded yet'}</p>
+                      </li>
+                    )
+                  }
+                  const o = detail!.occurrences.find((x) => x.occurrence_id === st.id)!
+                  const rows = detail!.links.filter((l) => l.occurrence_id === o.occurrence_id)
+                  return (
+                    <li key={o.occurrence_id} className="flex flex-col gap-1">
+                      <p className="flex flex-wrap items-center gap-2 text-body-sm-medium text-foreground">
+                        Occurrence {occN.get(o.occurrence_id)} · {day(o.first_report_at!)} · {o.reports_n} {o.reports_n === 1 ? 'report' : 'reports'}
+                        {o.boundary_uncertain && <Badge variant="outline">Boundary uncertain</Badge>}
+                      </p>
+                      <ul className="flex flex-col">{rows.map((l) => report(l.incident_id, l.state === 'proposed'))}</ul>
+                    </li>
+                  )
+                })}
+              </ol>
+              {unplaced.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-body-sm-medium text-foreground">Waiting for review</p>
+                  <ul className="mt-1 flex flex-col">{unplaced.map((l) => report(l.incident_id, true))}</ul>
+                </div>
+              )}
+            </details>
           )}
         </section>
       </div>
