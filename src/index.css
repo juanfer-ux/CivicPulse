@@ -160,7 +160,7 @@
   --panel-gap: 0px; /* no space between the sidebar, the agent panel and the map on desktop: they touch and a right-side line divides them (owner, 2026-10-30, branch flush-dividers) */
   --agent-header-h: 70px; /* height of the Investigate and Ask title row (a line runs across the screen with the map header when it is shown) */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
-  /* The whole palette is these 55 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
+  /* The whole palette is these 56 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
   --white: #ECECEE; /* new in Figma (2026-10-29), brighter than neutral-100; not used on screen yet */
   --neutral-900: #0E0E10;
@@ -218,8 +218,10 @@
   --yellow-300: #FFF398;
   --yellow-200: #FEF7C3;
   --yellow-100: #FEFBE4;
+  /* The primary button's background and nothing else (owner, 2026-11-02; Figma primary-button; first 36E2B8, then 1FD6A9, both too bright). Not an alias of another color. */
+  --primary-button: #22C9A0;
 
-  /* Usage names the components use, each pointing at one of the 55 colors. */
+  /* Usage names the components use, each pointing at one of the 56 colors. */
   --background: var(--neutral-700);
   --card: var(--neutral-600);
   --sidebar: var(--neutral-900);
@@ -278,6 +280,7 @@
   --popover: var(--card);
   --primary: var(--foreground);
   --primary-foreground: var(--sidebar); /* text on a light fill is the sidebar color */
+  --primary-button-hover: color-mix(in srgb, var(--white) 50%, var(--primary-button)); /* Figma hover of the primary button: a white state layer at 50 % over its fill (owner, 2026-11-02). Derived, not a palette color. */
   --secondary-foreground: var(--foreground);
   --muted: var(--secondary);
   --accent: var(--secondary);
