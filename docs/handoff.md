@@ -14,6 +14,7 @@ For a new session (local or cloud) that has no memory of the earlier chats. Upda
 - **Cursor:** the owner says the flicker in Chrome is fixed (2026-11-01); the hand in Safari over the markers is not checked yet.
 - **Mobile:** the markers, the Status menu (44 px rows) and the taps are checked on a test page at 390×844; the real screen (bottom sheet, chips, camera flights) still needs a look on a phone, signed in.
 - **Brand colors:** done in Figma and code (2026-11-02): `brand-primary` `#E3E3E7` is the primary button's background and `brand-secondary` `#87DBC7` its hover; decision [0035](decisions/0035-brand-primary-and-secondary.md).
+- **Text styles** (2026-11-02): the 22 Figma styles are in the docs and the code (decision [0036](decisions/0036-display-typeface-science-gothic.md)); Science Gothic is the display font. In Figma the three `display` styles share one name, and the Foundations Typography sheet is out of date.
 - Not decided yet: the Stat Cards for problems; the operator-actions phase needs permissions approved by the owner first.
 
 ## 🧭 How we work (the owner's rules)

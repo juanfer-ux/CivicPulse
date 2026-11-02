@@ -57,7 +57,7 @@ export function AuthLayout({ children, mobileLogo, footer }: { children: ReactNo
       <section className="relative hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-0.5 desk:order-1 desk:flex">
         <Logo compact />
         <div className="flex max-w-[640px] flex-col gap-10 px-2.5 py-6">
-          <p className="text-[64px] leading-[68px] font-extralight tracking-[-0.014em] text-foreground">{HEADLINE}</p>
+          <p className="font-display text-display-lg text-foreground">{HEADLINE}</p>
           <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
         </div>
         {pauseButton('right-0.5 bottom-0.5')}
