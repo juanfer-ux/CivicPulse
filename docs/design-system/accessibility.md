@@ -32,7 +32,9 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 | `foreground` on `card` `#1F1F23` | 9.2 | Text in cards and inputs |
 | `muted-foreground` `#A9A9B2` on page / on card | 7.6 / 7.0 | Supporting text |
 | `incident` `#E58C7D` on card | 6.9 | **All error text** |
-| `sidebar` on `primary` `#C1C1C8` | 10.8 | Text on the main button (rule: text on a light fill uses the `sidebar` color) |
+| `sidebar` on `primary-button` `#22C9A0` | 9.1 | Text on the primary button (owner, 2026-11-02; white text on a mint this light would fail, so the label stays dark `sidebar`/`neutral-900`) |
+| `sidebar` on the primary button's hover `#87DBC7` | 11.9 | Hover = a white state layer at 50 % over the fill (`--primary-button-hover`) |
+| `sidebar` on `primary` `#C1C1C8` | 10.8 | Text on a `primary` fill (the default Badge; the primary button has its own color now) (rule: text on a light fill uses the `sidebar` color) |
 | `sidebar` on `destructive` `#EE8688` | 7.7 | Dangerous buttons and badges now use dark `sidebar` text (light text on it was 1.7 and failed 4.5) |
 | `yellow-400` `#FFEE6C` on page / on card | 14.9 / 14.5 | Pending dots |
 | `orange-400` `#FF9F50` on page / on card | 8.7 / 8.4 | Reviewing dots |
