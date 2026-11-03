@@ -49,6 +49,9 @@ Rules:
 - Components live on the five family pages (Actions & inputs, Data display, Navigation & layout, Map & agent, Auth & brand), grouped under the separator page `——— Components ———` (index in [docs/design-system/README.md](docs/design-system/README.md)); frames are laid out in one horizontal row.
 - **Every component family page has the background `#3D3D43`** (the pages between the `——— Components ———` separator and Screens), existing and any new one. When creating a components page, set it right away.
 
+## Figma text styles (every project)
+- **Keep style families together, in order.** The text styles list is grouped by family, biggest to smallest, and each variant sits right next to its base: `title`, `title-regular`, `subtitle`, `subtitle-regular`, `label`, `label-regular`, `meta`, `meta-medium`, `caption`, `caption-strong`. When creating a style, put it next to its family right away (`figma.moveLocalTextStyleAfter(style, base)`), never leave it at the end of the list. Re-check the order after every style change, in Figma and in the docs table.
+
 ## Color rules (every project)
 - Neutrals are always `neutral-100` … `neutral-900`, 900 = darkest. Never 950, 850 or other in-between steps.
 - Color variables are always ordered from the biggest to the smallest (neutral-900, 800, 700 … 100, then accents). On every color change, re-check this order in code, docs and Figma (`collection.variableIds`).
