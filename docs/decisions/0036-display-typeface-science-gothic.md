@@ -14,7 +14,7 @@ The owner added and changed text styles in Figma (2026-11-02). Compared with the
 - Code names for the three display styles, by size: `display-lg` (64), `display` (32), `display-sm` (24).
 - New tokens `label-regular`, `meta-medium`, `caption-strong`, and the letter-spacing values above, as in Figma. `cn()` knows the new names and treats `font-heading` and `font-display` as alternatives.
 - Applied where Figma uses them: the Sign in headline (`display-lg`, it was a literal Manrope ExtraLight 64 / 68), the Auth Card titles (`display-sm`, they were `stat`), table headers and suggested questions (`meta-medium`, they were `text-meta font-medium` and `button-sm`), the default Badge (`caption-strong`).
-- The Figma weight names map as before: Regular 300, Medium 360, SemiBold 400, Bold 450 for Manrope; Science Gothic uses its real weights: ExtraLight 200 for display-lg, Light 300 for display and display-sm.
+- The Figma weight names map as before: Regular 300, Medium 360, SemiBold 400, Bold 450 for Manrope (changed to 400 / 500 / 600 / 700 on 2026-11-03, [decision 0037](0037-manrope-weights-400-700.md)); Science Gothic uses its real weights: ExtraLight 200 for display-lg, Light 300 for display and display-sm.
 
 ## Consequences
 - ✅ Code and docs match the 22 Figma text styles; each style was measured in a browser (desktop and phone).

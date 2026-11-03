@@ -7,6 +7,8 @@
 
 **Science Gothic** (Google Fonts, OFL-1.1) is the display typeface, for the `display-*` styles only (owner's Figma text styles, 2026-11-02; [decision 0036](../decisions/0036-display-typeface-science-gothic.md)). It is served the same way, by `@fontsource-variable/science-gothic` (weight axis only; the files load only when a display style is on the page). Code: `--font-display`, used with a display style as `font-display text-display-sm`.
 
+**Smoothing** (owner, 2026-11-03): `html` sets `-webkit-font-smoothing: antialiased` and `-moz-osx-font-smoothing: grayscale`, so macOS draws the strokes at their true weight instead of the heavier, glowing default for light text on dark. It has no effect on Windows or Linux, and a headless Linux browser cannot show the difference, so it was checked on the code only.
+
 ## 🔠 Text styles
 Each class sets size, line height and weight together, so a component never needs its own `font-medium`. Letter-spacing is one universal **0.02em** on every element; these styles keep their own, as in Figma: the display styles (-8 %, -6 %, -4 %), `stat` (-2 %), `label`, `button`, `button-sm`, `body` and `body-sm` (2.2 %), `body-sm-medium` (4 %), `caption` and `caption-strong` (2.4 %) and the small uppercase labels (18 %). Text on a light fill (main button, default badge, dangerous button) uses the `sidebar` color.
 
@@ -15,28 +17,28 @@ Each class sets size, line height and weight together, so a component never need
 | display-lg | 64 / 60 (spacing -8 %) | 64 / 60 | 200 (Science Gothic ExtraLight) | The Sign in headline on desktop (it was a literal Manrope ExtraLight 64 / 68) | `font-display text-display-lg` |
 | display | 32 / 42 (spacing -6 %) | 32 / 42 | 300 (Science Gothic Light) | Not used by a screen yet | `font-display text-display` |
 | display-sm | 24 / 32 (spacing -4 %) | 24 / 32 | 300 (Science Gothic Light) | Auth Card titles (Sign in, Set up your account; they were `stat`) | `font-display text-display-sm` |
-| stat | 32 / 32 (spacing -2 %) | 32 / 32 | 450 (Figma Bold) | Counts in stat cards and the Side Panel title; spacing was -4 % until 2026-11-02 | `text-stat` |
-| heading | 20 / 28 | 20 / 28 | 400 | Page title | `text-heading` |
-| title | 18 / 28 | 18 / 28 | 400 | Panel and section titles | `text-title` |
-| subtitle | 16 / 24 | 16 / 24 | 360 | Card titles | `text-subtitle` |
-| label | 14 / 22 (spacing 2.2 %) | **16 / 24** | 400 (Figma SemiBold since 2026-10-29; was 360) | Buttons, field names, menu items, tabs | `text-label` |
-| label-regular | 14 / 22 | **16 / 24** | 300 (Figma Regular) | Trend text and inline labels (new 2026-11-02; no screen uses it yet) | `text-label-regular` |
-| button | 14 / 20 (spacing 2.2%) | **16 / 24** | 400 | Text in Button (default, lg, icon-lg) | `text-button` |
-| button-sm | 13.5 / 24 (spacing 2.2%) | **16 / 24** | 400 | Text in small Button | `text-button-sm` |
-| body | 14 / 22 (spacing 2.2%) | **16 / 24** | 300 | Default paragraph text (new; not used by a screen yet) | `text-body` |
-| body-medium | 14 / 22 (spacing 2%) | **16 / 24** | 360 | Default body, medium | `text-body-medium` |
-| body-strong | 14 / 22 (spacing 2%) | **16 / 24** | 400 | Default body, strong | `text-body-strong` |
-| body-sm | 13.5 / 22 (spacing 2.2%) | **16 / 24** | 300 | Paragraphs, inputs, table cells (this was `body` until 2026-10-23) | `text-body-sm` |
-| body-sm-medium | 13.5 / 22 (spacing 4 %) | **16 / 24** | 360 | Small body, medium (spacing was 2 % until 2026-11-02) | `text-body-sm-medium` |
-| body-sm-strong | 13.5 / 22 (spacing 2%) | **16 / 24** | 400 | Small body, strong | `text-body-sm-strong` |
-| meta | 13 / 21 | **14 / 20** | 300 | Secondary info | `text-meta` |
-| meta-medium | 13 / 21 | **14 / 20** | 360 (Figma Medium) | Table headers and the agent's suggested questions (Figma 2026-11-02; it was documented as 12 / 16, 500 and the code used `text-meta` plus `font-medium`) | `text-meta-medium` |
-| caption | 12.5 / 16 (spacing 2.4 %) | **12 / 16** | 360 | Small tags | `text-caption` |
-| caption-strong | 12.5 / 16 (spacing 2.4 %) | **12 / 16** | 400 (Figma SemiBold) | Badge labels (new 2026-11-02) | `text-caption-strong` |
-| section-label | 11 / 16 (spacing 18 %) | 11 / 16 | 450 (Figma Bold) | Uppercase title above a group of sidebar items (Investigations); color `neutral-200`, like the plus buttons beside it (new 2026-10-28) | `text-section-label` + `uppercase` |
+| stat | 32 / 32 (spacing -2 %) | 32 / 32 | 700 (Figma Bold) | Counts in stat cards and the Side Panel title; spacing was -4 % until 2026-11-02 | `text-stat` |
+| heading | 20 / 28 | 20 / 28 | 600 | Page title | `text-heading` |
+| title | 18 / 28 | 18 / 28 | 600 | Panel and section titles | `text-title` |
+| subtitle | 16 / 24 | 16 / 24 | 500 | Card titles | `text-subtitle` |
+| label | 14 / 22 (spacing 2.2 %) | **16 / 24** | 600 (Figma SemiBold since 2026-10-29; was 360) | Buttons, field names, menu items, tabs | `text-label` |
+| label-regular | 14 / 22 | **16 / 24** | 400 (Figma Regular) | Trend text and inline labels (new 2026-11-02; no screen uses it yet) | `text-label-regular` |
+| button | 14 / 20 (spacing 2.2%) | **16 / 24** | 600 | Text in Button (default, lg, icon-lg) | `text-button` |
+| button-sm | 13.5 / 24 (spacing 2.2%) | **16 / 24** | 600 | Text in small Button | `text-button-sm` |
+| body | 14 / 22 (spacing 2.2%) | **16 / 24** | 400 | Default paragraph text (new; not used by a screen yet) | `text-body` |
+| body-medium | 14 / 22 (spacing 2%) | **16 / 24** | 500 | Default body, medium | `text-body-medium` |
+| body-strong | 14 / 22 (spacing 2%) | **16 / 24** | 600 | Default body, strong | `text-body-strong` |
+| body-sm | 13.5 / 22 (spacing 2.2%) | **16 / 24** | 400 | Paragraphs, inputs, table cells (this was `body` until 2026-10-23) | `text-body-sm` |
+| body-sm-medium | 13.5 / 22 (spacing 4 %) | **16 / 24** | 500 | Small body, medium (spacing was 2 % until 2026-11-02) | `text-body-sm-medium` |
+| body-sm-strong | 13.5 / 22 (spacing 2%) | **16 / 24** | 600 | Small body, strong | `text-body-sm-strong` |
+| meta | 13 / 21 | **14 / 20** | 400 | Secondary info | `text-meta` |
+| meta-medium | 13 / 21 | **14 / 20** | 500 (Figma Medium) | Table headers and the agent's suggested questions (Figma 2026-11-02; it was documented as 12 / 16, 500 and the code used `text-meta` plus `font-medium`) | `text-meta-medium` |
+| caption | 12.5 / 16 (spacing 2.4 %) | **12 / 16** | 500 | Small tags | `text-caption` |
+| caption-strong | 12.5 / 16 (spacing 2.4 %) | **12 / 16** | 600 (Figma SemiBold) | Badge labels (new 2026-11-02) | `text-caption-strong` |
+| section-label | 11 / 16 (spacing 18 %) | 11 / 16 | 700 (Figma Bold) | Uppercase title above a group of sidebar items (Investigations); color `neutral-200`, like the plus buttons beside it (new 2026-10-28) | `text-section-label` + `uppercase` |
 
 - **Desktop = 1,440 px and wider; Mobile = anything narrower** (the `desk` breakpoint). The sizes come from Figma's Device collection and switch through CSS variables in `src/index.css` (`--fs-body`, `--lh-body`…); class names do not change.
-- **Weights** (Manrope is a variable font, so any number from 200 to 800 works; the owner chose these on 2026-10-23 by looking at the result): **Regular 300** for reading text, typed text, placeholders and secondary text; **Medium 360** for anything that labels something (field names, menu items, subtitles, badges, captions); **SemiBold 400** for headings, numbers, titles and button text.
+- **Weights** (Manrope is a variable font, so any number from 200 to 800 works; the owner chose lowered values on 2026-10-23 (300 / 360 / 400 / 450) because Manrope glowed on dark screens; since grayscale font smoothing went in, on 2026-11-03 he set the usual Figma-name numbers: Regular 400, Medium 500, SemiBold 600, Bold 700): **Regular 400** for reading text, typed text, placeholders and secondary text; **Medium 500** for anything that labels something (field names, menu items, subtitles, badges, captions); **SemiBold 600** for headings, numbers, titles and button text.
 - The three display styles are named `display-lg` (64), `display` (32) and `display-sm` (24) in both Figma and code (renamed in Figma 2026-11-02, owner's yes).
 - ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes; without that, the class merger dropped `text-label` from colored buttons (test in `utils.test.ts`).
 
