@@ -378,7 +378,8 @@
   /* Letter-spacing in em on every element, not inherited from the root: an inherited em would turn into one fixed pixel value (0.16 px) for all sizes. */
   * { @apply border-border outline-ring/50; letter-spacing: 0.02em; }
   body { @apply bg-background text-foreground; }
-  html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; }
+  /* Grayscale smoothing (owner, 2026-11-03: every font looked bolder than Figma): macOS draws light text on dark heavier and with a glow unless this is on. No effect on Windows or Linux. */
+  html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
   /* Tailwind 4 stopped giving buttons the pointing hand (owner, 2026-10-30): everything you can click gets it, a disabled one does not. Utilities such as cursor-col-resize still win. */
   button:not(:disabled), [role='button']:not([aria-disabled='true']), [role='menuitem'], [role='option'], [role='tab'], [role='checkbox'], [role='switch'], summary, select, a[href], label:has(input[type='checkbox']), label:has(input[type='radio']) { cursor: pointer; }
   /* Every part of a clickable thing, not only its box (owner, 2026-10-30: the hand dropped out over some letters and icons in Chrome and was missing in Safari): the text, icons and spans inside get the hand explicitly instead of inheriting it. */

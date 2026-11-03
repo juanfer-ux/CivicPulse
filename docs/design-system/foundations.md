@@ -7,6 +7,8 @@
 
 **Science Gothic** (Google Fonts, OFL-1.1) is the display typeface, for the `display-*` styles only (owner's Figma text styles, 2026-11-02; [decision 0036](../decisions/0036-display-typeface-science-gothic.md)). It is served the same way, by `@fontsource-variable/science-gothic` (weight axis only; the files load only when a display style is on the page). Code: `--font-display`, used with a display style as `font-display text-display-sm`.
 
+**Smoothing** (owner, 2026-11-03): `html` sets `-webkit-font-smoothing: antialiased` and `-moz-osx-font-smoothing: grayscale`, so macOS draws the strokes at their true weight instead of the heavier, glowing default for light text on dark. It has no effect on Windows or Linux, and a headless Linux browser cannot show the difference, so it was checked on the code only.
+
 ## 🔠 Text styles
 Each class sets size, line height and weight together, so a component never needs its own `font-medium`. Letter-spacing is one universal **0.02em** on every element; these styles keep their own, as in Figma: the display styles (-8 %, -6 %, -4 %), `stat` (-2 %), `label`, `button`, `button-sm`, `body` and `body-sm` (2.2 %), `body-sm-medium` (4 %), `caption` and `caption-strong` (2.4 %) and the small uppercase labels (18 %). Text on a light fill (main button, default badge, dangerous button) uses the `sidebar` color.
 
