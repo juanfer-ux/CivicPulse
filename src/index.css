@@ -29,75 +29,75 @@
   --text-display-sm--line-height: 32px;
   --text-display-sm--letter-spacing: -0.04em;
   --text-stat: 32px; /* Figma stat: Bold 32 / 32, tracking -2 % (it was -4 % until 2026-11-02); the number in a Stat Card */
-  --text-stat--font-weight: 450;
+  --text-stat--font-weight: 700;
   --text-stat--line-height: 32px;
   --text-stat--letter-spacing: -0.02em;
   --text-heading: 20px;
-  --text-heading--font-weight: 400;
+  --text-heading--font-weight: 600;
   --text-heading--line-height: 28px;
   --text-title: 18px;
-  --text-title--font-weight: 400;
+  --text-title--font-weight: 600;
   --text-title--line-height: 28px;
   --text-subtitle: 16px;
-  --text-subtitle--font-weight: 360;
+  --text-subtitle--font-weight: 500;
   --text-subtitle--line-height: 24px;
   --text-label: var(--fs-label);
-  --text-label--font-weight: 400; /* Figma label is SemiBold since 2026-10-29 (was Medium, 360) */
+  --text-label--font-weight: 600; /* Figma label is SemiBold since 2026-10-29 (was Medium, 360) */
   --text-label--line-height: var(--lh-label);
   --text-label--letter-spacing: 0.022em;
   /* Figma label-regular (new, 2026-11-02): the label size in Regular, for trend text and inline labels. */
   --text-label-regular: var(--fs-label);
-  --text-label-regular--font-weight: 300;
+  --text-label-regular--font-weight: 400;
   --text-label-regular--line-height: var(--lh-label);
   /* Button text (Figma: button and button-sm): same size as label, and one step down for small buttons. */
   --text-button: var(--fs-label);
-  --text-button--font-weight: 400;
+  --text-button--font-weight: 600;
   --text-button--line-height: var(--lh-button);
   --text-button--letter-spacing: 0.022em;
   --text-button-sm: var(--fs-body-sm);
-  --text-button-sm--font-weight: 400;
+  --text-button-sm--font-weight: 600;
   --text-button-sm--line-height: 24px;
   --text-button-sm--letter-spacing: 0.022em;
   --text-body-sm: var(--fs-body-sm);
-  --text-body-sm--font-weight: 300;
+  --text-body-sm--font-weight: 400;
   --text-body-sm--line-height: var(--lh-body-sm);
   --text-body-sm--letter-spacing: 0.022em;
   --text-body-sm-medium: var(--fs-body-sm);
-  --text-body-sm-medium--font-weight: 360;
+  --text-body-sm-medium--font-weight: 500;
   --text-body-sm-medium--line-height: var(--lh-body-sm);
   --text-body-sm-medium--letter-spacing: 0.04em; /* Figma: 4 % (it was 2 %) */
   --text-body-sm-strong: var(--fs-body-sm);
-  --text-body-sm-strong--font-weight: 400;
+  --text-body-sm-strong--font-weight: 600;
   --text-body-sm-strong--line-height: var(--lh-body-sm);
   /* Default body is 14 px on desktop (Figma: body, body-medium, body-strong); body-sm is the 13 px one used so far. */
   --text-body: var(--fs-body);
-  --text-body--font-weight: 300;
+  --text-body--font-weight: 400;
   --text-body--line-height: var(--lh-body);
   --text-body--letter-spacing: 0.022em;
   --text-body-medium: var(--fs-body);
-  --text-body-medium--font-weight: 360;
+  --text-body-medium--font-weight: 500;
   --text-body-medium--line-height: var(--lh-body);
   --text-body-strong: var(--fs-body);
-  --text-body-strong--font-weight: 400;
+  --text-body-strong--font-weight: 600;
   --text-body-strong--line-height: var(--lh-body);
   --text-meta: var(--fs-meta);
-  --text-meta--font-weight: 300;
+  --text-meta--font-weight: 400;
   --text-meta--line-height: var(--lh-meta);
   /* Figma meta-medium (2026-11-02): the meta size in Medium, for table headers and the agent's suggested questions (it was documented as 12 / 16, 500). */
   --text-meta-medium: var(--fs-meta);
-  --text-meta-medium--font-weight: 360;
+  --text-meta-medium--font-weight: 500;
   --text-meta-medium--line-height: var(--lh-meta);
   --text-caption: var(--fs-caption);
-  --text-caption--font-weight: 360;
+  --text-caption--font-weight: 500;
   --text-caption--line-height: 16px;
   --text-caption--letter-spacing: 0.024em; /* Figma: 2.4 % */
   /* Figma caption-strong (new, 2026-11-02): the caption size in SemiBold, for Badge and chip labels. */
   --text-caption-strong: var(--fs-caption);
-  --text-caption-strong--font-weight: 400;
+  --text-caption-strong--font-weight: 600;
   --text-caption-strong--line-height: 16px;
   --text-caption-strong--letter-spacing: 0.024em;
   --text-section-label: 11px; /* the small uppercase title above a group of sidebar items (Figma section-label, 2026-10-28): Bold 11 / 16, spacing 18 %; the same on every screen size */
-  --text-section-label--font-weight: 450;
+  --text-section-label--font-weight: 700;
   --text-section-label--line-height: 16px;
   --text-section-label--letter-spacing: 0.18em;
 }
@@ -144,10 +144,10 @@
   --font-sans: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --font-display: 'Science Gothic Variable', 'Science Gothic', var(--font-sans);
-  /* Manrope glows on dark backgrounds, so the weights sit a little below the usual 400 / 500 / 600 (it is a variable font). */
-  --font-weight-normal: 300;
-  --font-weight-medium: 360;
-  --font-weight-semibold: 400;
+  /* The usual 400 / 500 / 600 / 700 (owner, 2026-11-03: with grayscale smoothing on, the lowered 300 / 360 / 400 / 450 are no longer needed). */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
   --radius-xs: 2px;
   --radius-sm: calc(var(--radius) - 4px);

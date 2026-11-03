@@ -140,7 +140,7 @@ export function Gallery() {
             <div className="text-body-sm text-muted-foreground">Welcome to the Operations Agent Platform</div>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-meta text-muted-foreground">Proposed: Medium (360), sturdier strokes at 13.5 px</span>
+            <span className="text-meta text-muted-foreground">Proposed: Medium (500), sturdier strokes at 13.5 px</span>
             <div className="text-body-sm-medium text-muted-foreground">Welcome to the Operations Agent Platform</div>
           </div>
         </div>
