@@ -20,7 +20,9 @@ Each class sets size, line height and weight together, so a component never need
 | stat | 32 / 32 (spacing -2 %) | 32 / 32 | 700 (Figma Bold) | Counts in stat cards and the Side Panel title; spacing was -4 % until 2026-11-02 | `text-stat` |
 | heading | 20 / 28 | 20 / 28 | 600 | Page title | `text-heading` |
 | title | 18 / 28 | 18 / 28 | 600 | Panel and section titles | `text-title` |
+| title-regular | 18 / 28 | 18 / 28 | 400 (Figma Regular) | Same as `title` in the regular weight (new 2026-11-03; no screen uses it yet) | `text-title-regular` |
 | subtitle | 16 / 24 | 16 / 24 | 500 | Card titles | `text-subtitle` |
+| subtitle-regular | 16 / 24 | 16 / 24 | 400 (Figma Regular) | Same as `subtitle` in the regular weight (new 2026-11-03; no screen uses it yet) | `text-subtitle-regular` |
 | label | 14 / 22 (spacing 2.2 %) | **16 / 24** | 600 (Figma SemiBold since 2026-10-29; was 360) | Buttons, field names, menu items, tabs | `text-label` |
 | label-regular | 14 / 22 | **16 / 24** | 400 (Figma Regular) | Trend text and inline labels (new 2026-11-02; no screen uses it yet) | `text-label-regular` |
 | button | 14 / 20 (spacing 2.2%) | **16 / 24** | 600 | Text in Button (default, lg, icon-lg) | `text-button` |

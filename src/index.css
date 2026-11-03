@@ -38,9 +38,15 @@
   --text-title: 18px;
   --text-title--font-weight: 600;
   --text-title--line-height: 28px;
+  --text-title-regular: 18px;
+  --text-title-regular--font-weight: 400;
+  --text-title-regular--line-height: 28px;
   --text-subtitle: 16px;
   --text-subtitle--font-weight: 500;
   --text-subtitle--line-height: 24px;
+  --text-subtitle-regular: 16px;
+  --text-subtitle-regular--font-weight: 400;
+  --text-subtitle-regular--line-height: 24px;
   --text-label: var(--fs-label);
   --text-label--font-weight: 600; /* Figma label is SemiBold since 2026-10-29 (was Medium, 360) */
   --text-label--line-height: var(--lh-label);
