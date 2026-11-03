@@ -37,7 +37,7 @@ export function SetPassword({ onDone }: { onDone: () => void }) {
       <CardContent>
         <form onSubmit={onSubmit} className="flex flex-col gap-16">
           <CardHeader className="gap-2 px-0">
-            <CardTitle asChild className="font-display text-display-sm">
+            <CardTitle asChild className="font-display text-display">
               <h1>Set up your account</h1>
             </CardTitle>
             <CardDescription>Choose the password you will use to sign in.</CardDescription>

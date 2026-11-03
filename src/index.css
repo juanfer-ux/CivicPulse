@@ -7,7 +7,9 @@
 
 /* Manrope (Google Fonts, open licence), served from our own site by the fontsource package. Variable font (weights 200 to 800). */
 @import "@fontsource-variable/manrope";
-/* Science Gothic (Google Fonts, OFL), same route: the display headlines (Figma display styles, owner 2026-11-02). Variable font, weight axis only. */
+/* Michroma (Google Fonts, OFL), same route: the display-lg and display styles (owner's Figma, 2026-11-03). One weight, Regular. */
+@import "@fontsource/michroma";
+/* Science Gothic (Google Fonts, OFL): the display-sm style only, which no screen uses since 2026-11-03. Variable font, weight axis only. */
 @import "@fontsource-variable/science-gothic";
 
 /* The desktop layout (sidebar, floating panels) starts here; narrower windows get the mobile layout. */
@@ -15,15 +17,15 @@
   --breakpoint-desk: 90rem; /* 1440 px */
 
   /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is one universal 0.02em on every element (about 0.26 px at 13 px), small enough not to blur; Figma's fixed 0.2 and 0.3 px did blur letters on screens without a Retina display. Weights are ours: 550 headings and numbers, 450 actions and labels, 380 reading text (Manrope variable). */
-  /* Display (Figma display, 2026-11-02): Science Gothic Light (it was Regular until the owner changed it, 2026-11-02) in three sizes, used with `font-display`. Figma names all three "display"; here they are display-lg (64), display (32, not used by a screen yet) and display-sm (24). */
-  --text-display-lg: 64px;
-  --text-display-lg--font-weight: 200;
-  --text-display-lg--line-height: 60px;
-  --text-display-lg--letter-spacing: -0.08em;
-  --text-display: 32px;
-  --text-display--font-weight: 300;
+  /* Display (Figma, 2026-11-03): display-lg (48) and display (20) are Michroma Regular, used with `font-display`; display-sm (24) stays Science Gothic Light, used with `font-display-alt`, and no screen uses it now. */
+  --text-display-lg: 48px;
+  --text-display-lg--font-weight: 400;
+  --text-display-lg--line-height: 56px;
+  --text-display-lg--letter-spacing: 0;
+  --text-display: 20px;
+  --text-display--font-weight: 400;
   --text-display--line-height: 42px;
-  --text-display--letter-spacing: -0.06em;
+  --text-display--letter-spacing: 0.02em;
   --text-display-sm: 24px;
   --text-display-sm--font-weight: 300;
   --text-display-sm--line-height: 32px;
@@ -149,7 +151,8 @@
 @theme inline {
   --font-sans: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
-  --font-display: 'Science Gothic Variable', 'Science Gothic', var(--font-sans);
+  --font-display: 'Michroma', var(--font-sans);
+  --font-display-alt: 'Science Gothic Variable', 'Science Gothic', var(--font-sans);
   /* The usual 400 / 500 / 600 / 700 (owner, 2026-11-03: with grayscale smoothing on, the lowered 300 / 360 / 400 / 450 are no longer needed). */
   --font-weight-normal: 400;
   --font-weight-medium: 500;

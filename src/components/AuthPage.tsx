@@ -60,7 +60,7 @@ export function AuthPage() {
         <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-12">
           <div className="flex flex-col gap-12">
             <CardHeader className="gap-2 px-0">
-              <CardTitle asChild className="font-display text-display-sm">
+              <CardTitle asChild className="font-display text-display text-(--brand-primary)">
                 <h1>{signup ? 'Create account' : 'Sign in'}</h1>
               </CardTitle>
               <CardDescription>
