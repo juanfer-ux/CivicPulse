@@ -17,6 +17,8 @@ describe('cn', () => {
     expect(cn('text-caption-strong', 'text-foreground')).toBe('text-caption-strong text-foreground')
     expect(cn('text-display-sm', 'text-foreground')).toBe('text-display-sm text-foreground')
     expect(cn('text-meta', 'text-meta-medium')).toBe('text-meta-medium')
+    expect(cn('text-title-regular', 'text-foreground')).toBe('text-title-regular text-foreground')
+    expect(cn('text-subtitle', 'text-subtitle-regular')).toBe('text-subtitle-regular')
   })
   it('lets the display font replace the heading font on a card title', () => {
     expect(cn('font-heading text-subtitle', 'font-display text-display-sm')).toBe('font-display text-display-sm')
