@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
 /** Value proposition next to the card on desktop (Figma Auth_Image container). The picture is the looping src/assets/auth-aura.mp4 over its own first frame, src/assets/auth-aura-still.jpg (shown before it loads and for reduced motion), at every screen width: re-export the still when the video changes (decision 0021). */
-const HEADLINE = 'Street incidents, turned into decisions.'
+const HEADLINE = 'Street incidents,\nturned into decisions.'
 const SUBTITLE = 'AI agents connect scattered incidents into patterns and recommend an intervention, with the evidence behind it.'
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)'
 
@@ -57,8 +57,8 @@ export function AuthLayout({ children, mobileLogo, footer }: { children: ReactNo
       <section className="relative hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-0.5 desk:order-1 desk:flex">
         <Logo />
         <div className="flex max-w-[740px] flex-col gap-8 px-2.5 py-8">
-          <p className="font-display text-display-lg text-(--brand-primary)">{HEADLINE}</p>
-          <p className="text-title font-medium text-muted-foreground">{SUBTITLE}</p>
+          <p className="whitespace-pre-line font-display text-display-lg text-foreground">{HEADLINE}</p>
+          <p className="text-title-regular text-muted-foreground">{SUBTITLE}</p>
         </div>
         {pauseButton('right-0.5 bottom-0.5')}
       </section>
