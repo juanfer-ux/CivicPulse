@@ -16,13 +16,13 @@ export function ProblemHoverCard({ problem, className = '', style }: { problem: 
   const sameYear = !!problem.first_seen && !!problem.last_seen && new Date(problem.first_seen).getFullYear() === new Date(problem.last_seen).getFullYear()
   return (
     <div role="tooltip" style={style} className={`pointer-events-none w-64 rounded-sm border border-(--neutral-400) bg-(--neutral-700) p-3 text-body-sm shadow-lg ${className}`}>
-      <p className="line-clamp-2 text-body-strong text-foreground">{problem.location_description}</p>
-      <p className="mt-0.5 flex items-center gap-1.5 text-meta text-muted-foreground">
+      <p className="line-clamp-2 text-title text-foreground">{problem.location_description}</p>
+      <p className="mt-0.5 flex items-center gap-1.5 text-body-sm-medium text-muted-foreground">
         <Warning weight="fill" className="size-4 shrink-0" style={{ color: `var(${status.token})` }} aria-hidden />
         {status.label} · {label(problem.category)}
       </p>
       <p className="mt-2 text-foreground">
-        <span className="text-body-strong">{problem.occurrences_n}</span> {problem.occurrences_n === 1 ? 'occurrence' : 'occurrences'}
+        {problem.occurrences_n} {problem.occurrences_n === 1 ? 'occurrence' : 'occurrences'}
         {problem.first_seen && problem.last_seen && (
           <span className="text-muted-foreground">
             {' '}
