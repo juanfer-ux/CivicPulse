@@ -52,7 +52,7 @@ export function AuthLayout({ children, mobileLogo, footer }: { children: ReactNo
       {/* The form comes first in the page order (keyboard and screen readers reach it first); `order` puts the picture column back on the left on desktop. */}
       <div className={cn('flex w-full max-w-[640px] flex-col items-center rounded-xl py-6 desk:order-2 desk:min-w-[450px] desk:flex-1 desk:self-stretch desk:bg-background/25 desk:px-4 desk:py-8 desk:backdrop-blur-[12px]', mobileLogo && 'max-desk:flex-1')}>
         <Card className="w-full max-w-[460px] flex-1 justify-center gap-0 border-0 bg-transparent">{children}</Card>
-        {footer && <p className="hidden text-center text-caption text-closed desk:block">{footer}</p>}
+        {footer && <p className="hidden text-center text-caption-medium text-closed desk:block">{footer}</p>}
       </div>
       <section className="relative hidden min-w-[850px] flex-1 flex-col justify-between self-stretch p-0.5 desk:order-1 desk:flex">
         <Logo />

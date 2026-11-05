@@ -35,6 +35,7 @@ describe('Sidebar — creating investigations and cases', () => {
     const onNewCase = vi.fn()
     render(<Sidebar {...baseProps} onNewCase={onNewCase} />)
 
+    await user.click(screen.getByRole('tab', { name: 'Cases' })) // the Explore | Cases toggle
     await user.click(screen.getByRole('button', { name: 'New case' }))
     expect(onNewCase).toHaveBeenCalledTimes(1)
   })
@@ -48,9 +49,23 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(onPick).toHaveBeenCalledWith(2)
   })
 
-  it('shows an empty state when there are no cases yet', () => {
+  it('the Cases tab lists the cases with their reference and locality', async () => {
+    const user = userEvent.setup()
     render(<Sidebar {...baseProps} cases={[]} />)
-    expect(screen.getByText('No cases yet.')).toBeInTheDocument()
+
+    expect(screen.queryByText('PR-00088 · Engativá')).not.toBeInTheDocument() // Explore is the default view
+    await user.click(screen.getByRole('tab', { name: 'Cases' }))
+    expect(screen.getByRole('tab', { name: 'Cases' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByText('PR-00088 · Engativá')).toBeInTheDocument()
+  })
+
+  it('the sort button flips the label between New and Old', async () => {
+    const user = userEvent.setup()
+    render(<Sidebar {...baseProps} />)
+
+    expect(screen.getByText('New')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Sorted newest first/ }))
+    expect(screen.getByText('Old')).toBeInTheDocument()
   })
 })
 
