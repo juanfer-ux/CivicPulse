@@ -4,14 +4,14 @@ For a new session (local or cloud) that has no memory of the earlier chats. Upda
 
 ## 📍 Where we stopped
 - **Problem marker is done** (the owner's option F): neutral-700 circle, 1 px status-colored outline, neutral-100 icon, warning triangle with a 4 px outline; sizes set at the farthest zoom and scaled in proportion. Spec: [design-system/components.md](design-system/components.md) (Problem Marker), decision [0032](decisions/0032-problem-marker-option-f.md).
-- **2026-11-01 map shapes:** incidents are circles now (they were squares; same sizes). Problem statuses show the warning triangle (16 px) instead of a dot; incident statuses show a round 12 px swatch. The Problems and Incidents toggle chips are hidden while an incident or problem panel is open and come back when it closes. The problem panel waits until the camera has finished flying, then slides out from under the Investigate and Ask panel.
+- **2026-11-01 map shapes:** incidents are circles now (they were squares; same sizes). Problem statuses show the warning triangle (16 px) instead of a dot; incident statuses show a round 12 px swatch. The Problems and Incidents toggle chips are hidden while an incident or problem panel is open and come back when it closes. The problem panel waits until the camera has finished flying, then appears as a floating card (no slide since 2026-11-05).
 - **Camera and sidebar:** clicking an incident or problem flies the whole trip with no jump, and the sidebar collapses or expands 1 s later ([design.md](design.md)).
 - **Colors:** red, orange, blue and yellow have 100–900 scales like indigo, the 400s unchanged; 57 colors in total (amber-400 and coral-400 were removed: errors and the Active problem status use red-300, warnings and Monitoring use yellow-300) ([decision 0033](decisions/0033-color-scales-red-orange-blue-yellow.md)). They are in `src/index.css`, the docs and Figma, but **not used on screen yet**.
 - **Map smoothness:** the map is drawn at 2x with antialiasing; antialiasing has no level to set ([decision 0031](decisions/0031-map-drawn-at-2x-with-antialiasing.md)).
 - A page that compares the old and new marker side by side is in `explorations/problem-circle-gallery.html`.
 
 ## 🟥 Open items
-- **Floating cards (2026-11-05):** the Problem Panel and the Incident Panel float over the map's top-left corner (no slide-out; the camera flight stays) and the problem's history is a card across the bottom (occurrences 40 %, timeline 60 %). Figma has them on Screens → Map · Problem selected and Map · Incident selected (Desktop 1440), and the card as a component on Map & agent. Not done in Figma: the phone screens (Map · Problem selected · Mobile still has no card), and the Problem Panel there carries a placeholder Button the code does not have (ask the owner). Needs a signed-in look on desktop and phone.
+- **Floating cards (2026-11-05):** the Problem Panel and the Incident Panel float over the map's top-left corner (no slide-out; the camera flight stays) and the problem's history is a card across the bottom (occurrences 40 %, timeline 60 %). Figma has them on Screens → Map · Problem selected and Map · Incident selected (Desktop 1440), and the card as a component on Map & agent. Also 2026-11-05 in Figma: the old Map Marker and Map Pin frames are deleted, the 540 square incident dots on the map screens and the Incident Ring are round now, and the Map & agent frames are re-packed in one row (100 px gaps). Not done in Figma: the phone screens (Map · Problem selected · Mobile still has no card), and the Problem Panel there carries a placeholder Button the code does not have (ask the owner). Needs a signed-in look on desktop and phone.
 - **Cursor:** the owner says the flicker in Chrome is fixed (2026-11-01); the hand in Safari over the markers is not checked yet.
 - **Mobile:** the markers, the Status menu (44 px rows) and the taps are checked on a test page at 390×844; the real screen (bottom sheet, chips, camera flights) still needs a look on a phone, signed in.
 - **Brand colors:** done in Figma and code (2026-11-02): `brand-primary` `#E3E3E7` is the primary button's background and `brand-secondary` `#87DBC7` its hover; decision [0035](decisions/0035-brand-primary-and-secondary.md).
@@ -19,12 +19,14 @@ For a new session (local or cloud) that has no memory of the earlier chats. Upda
 - **Sign in sizes** (2026-11-02): the Sign in desktop frame in Figma is applied in the code (48 px logo with a 13.24 px gap, as of 2026-11-03 (one Logo component in Figma), 740 px value-prop block, 32 px panel padding, 48 px card spacing). The `Set up your account · Desktop 1440` frame may still show older block and padding sizes (not re-checked after the logo change); the code uses the Sign in numbers for both. The footer is English like Figma (owner: Figma wins, 2026-11-02).
 - Not decided yet: the Stat Cards for problems; the operator-actions phase needs permissions approved by the owner first.
 
+- **Vercel Git builds are slow and can run out of order** (2026-11-05): after a merge check which commit production is on (the deployment list shows the SHA); a queued build of an older commit can replace a newer one. A manual production deploy of `main` fixes it.
+
 ## 🧭 How we work (the owner's rules)
 - **Figma is the source of truth.** A change goes to code, `docs/` and Figma together; if they disagree, ask the owner.
 - **Short answers, fewer elements and colors.** Delete before adding.
 - **Neutrals are `neutral-100` to `neutral-900`** (900 darkest); color variables are ordered biggest to smallest.
 - **Every screen also has a mobile version** (about 390×844).
-- **Commit and push only when the owner asks.** Commits end with the co-author line. Never commit the owner's unrelated changes (check `git status` first).
+- **Test on localhost first; commit, push, open or merge PRs and deploy only when the owner says so in that message** (2026-11-05). Commits end with the co-author line. Never commit the owner's unrelated changes (check `git status` first).
 - **The repository is public:** no keys, passwords, emails or private links. Never type the owner's password into a sign-in form; they sign in themselves.
 - **Ponytail coding rule** (see `CLAUDE.md`): the least code that works.
 
