@@ -408,3 +408,13 @@
 
 /* MapLibre's own corner (zoom buttons, attribution) keeps 24 px from the edges like everything else over the map: its default margin is 10 px, so 14 more (owner, 2026-10-28). */
 .maplibregl-map .maplibregl-ctrl-bottom-right { padding: 0 14px 14px 0; }
+/* While a problem is open the history card covers the bottom of the map (24 px margin + the card's fixed 360 px), so the zoom buttons and the attribution button ride above it (owner, 2026-11-05). */
+.maplibregl-map .maplibregl-ctrl-bottom-right { transition: bottom 0.3s; }
+@media (min-width: 90rem) { [data-history] .maplibregl-map .maplibregl-ctrl-bottom-right { bottom: 384px; } }
+
+/* Native scrollbars everywhere match the ScrollArea (owner, 2026-11-05, style G): a 10 px grab area with a round 4 px thumb (6 px on hover, via the transparent border), neutral-300 (neutral-200 on hover), always visible, no track. Chrome and Safari use the pseudo-elements; the standard properties only where those do not exist (Firefox), because Chrome ignores the pseudo-elements once the standard ones are set. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--neutral-300); background-clip: padding-box; border: 3px solid transparent; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--neutral-200); background-clip: padding-box; border-width: 2px; }
+@supports not selector(::-webkit-scrollbar) { * { scrollbar-width: thin; scrollbar-color: var(--neutral-300) transparent; } }
