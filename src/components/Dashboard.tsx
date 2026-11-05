@@ -234,7 +234,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   const item = shown.value
   // Both detail panels float over the map (owner, 2026-11-05), so the map and the controls over it never move for them.
   return (
-    <div className="contents" style={{ '--map-base': 'calc(var(--agent-w) + var(--panel-gap))', '--map-left': 'calc(var(--agent-w) + var(--panel-gap))' } as CSSProperties}>
+    <div className="contents" data-history={item?.kind === 'problem' && !shown.leaving ? '' : undefined} style={{ '--map-base': 'calc(var(--agent-w) + var(--panel-gap))', '--map-left': 'calc(var(--agent-w) + var(--panel-gap))' } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}

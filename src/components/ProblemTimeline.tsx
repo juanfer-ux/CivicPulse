@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { CartesianGrid, Scatter, ScatterChart, XAxis, YAxis, ZAxis } from 'recharts'
-import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { ChartContainer, ChartTooltip, type ChartConfig } from '@/components/ui/chart'
 import { label } from '@/lib/incidents'
 import type { ProblemDetailData } from '@/lib/problems'
@@ -13,10 +13,10 @@ type ShapeProps = { cx?: number; cy?: number; size?: number; payload?: TimelineP
 
 /**
  * A problem's whole history as one chart (owner, 2026-11-02): a time axis to scale with a lane for the occurrences (dot size = reports), one for the reports
- * themselves, one for the interventions and one for events. Hover tells what a mark is; a click on a report opens it, a click on anything else shows it under the chart.
+ * themselves, one for the interventions and one for events. Hover tells what a mark is; a click on a report opens it, a click on anything else asks the occurrences history to scroll to it.
  * With many occurrences the chart gets wider and the box scrolls sideways.
  */
-export function ProblemTimeline({ detail, status, onSelectIncident }: { detail: ProblemDetailData; status: ProblemStatus; onSelectIncident: (id: string) => void }) {
+export function ProblemTimeline({ detail, status, onSelectIncident, onPick }: { detail: ProblemDetailData; status: ProblemStatus; onSelectIncident: (id: string) => void; onPick?: (id: string) => void }) {
   const tl = useMemo(() => buildTimeline(detail, label), [detail])
   const [pick, setPick] = useState<string | null>(null)
   const scroller = useRef<HTMLDivElement>(null)
@@ -33,7 +33,10 @@ export function ProblemTimeline({ detail, status, onSelectIncident }: { detail: 
   const hit = (d: unknown) => {
     const p = ((d as { payload?: TimelinePoint }).payload ?? d) as TimelinePoint
     if (p.incidentId) onSelectIncident(p.incidentId)
-    else setPick(p.id)
+    else {
+      setPick(p.id)
+      onPick?.(p.id) // the occurrences history scrolls to it
+    }
   }
   /** A round mark: filled, hollow when the report only needs review, with a ring when it belongs to the selected occurrence. */
   const dot = (fill: string) => (props: ShapeProps) => {
@@ -45,8 +48,6 @@ export function ProblemTimeline({ detail, status, onSelectIncident }: { detail: 
   }
 
   if (!tl.points.length) return <p className="text-meta text-muted-foreground">No history yet.</p>
-  const intervention = sel?.interventionId ? detail.interventions.find((v) => v.id === sel.interventionId) : undefined
-  const uncertain = !!occurrenceId && detail.occurrences.find((o) => o.occurrence_id === occurrenceId)?.boundary_uncertain
 
   return (
     <div className="flex flex-col gap-3">
@@ -61,7 +62,7 @@ export function ProblemTimeline({ detail, status, onSelectIncident }: { detail: 
           </li>
         ))}
       </ul>
-      <div ref={scroller} className="overflow-x-auto" role="img" aria-label={`History chart: ${inLane('occurrence').length} occurrences, ${inLane('report').length} reports, ${inLane('intervention').length} interventions. The same history is in the list below.`}>
+      <ScrollArea viewportRef={scroller} horizontal role="img" aria-label={`History chart: ${inLane('occurrence').length} occurrences, ${inLane('report').length} reports, ${inLane('intervention').length} interventions. The same history is in the list below.`}>
         <div style={{ minWidth: tl.minWidth }}>
           <ChartContainer config={config} className="w-full" style={{ height: tl.lanes.length * LANE_PX + 32 }}>
             <ScatterChart margin={{ top: 8, right: 24, bottom: 0, left: 20 }}>
@@ -78,35 +79,8 @@ export function ProblemTimeline({ detail, status, onSelectIncident }: { detail: 
             </ScatterChart>
           </ChartContainer>
         </div>
-      </div>
+      </ScrollArea>
 
-      {sel && (
-        <div aria-live="polite" className="flex flex-col gap-1">
-          <p className="flex flex-wrap items-center gap-2 text-body-sm-medium text-foreground">
-            {intervention ? sel.text.split(' · ').slice(0, 3).join(' · ') : sel.text}
-            {uncertain && sel.lane === 'occurrence' && <Badge variant="outline">Boundary uncertain</Badge>}
-          </p>
-          {intervention && (
-            <>
-              <p className="text-meta text-muted-foreground">{intervention.description}</p>
-              <p className="text-meta text-muted-foreground">Outcome: {intervention.outcome ? label(intervention.outcome) : 'Not recorded yet'}</p>
-            </>
-          )}
-          {sel.lane === 'occurrence' && (
-            <ul className="flex flex-col">
-              {inLane('report')
-                .filter((p) => p.occurrenceId === sel.occurrenceId)
-                .map((p) => (
-                  <li key={p.id}>
-                    <button type="button" onClick={() => onSelectIncident(p.incidentId!)} className="w-full rounded-sm py-0.5 text-left text-meta text-muted-foreground hover:bg-sidebar focus-visible:bg-sidebar">
-                      {p.text}
-                    </button>
-                  </li>
-                ))}
-            </ul>
-          )}
-        </div>
-      )}
     </div>
   )
 }
