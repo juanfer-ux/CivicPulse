@@ -164,7 +164,7 @@ function MobileBrand() {
 
 function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: ComponentType<IconProps>; label: string; active?: boolean; collapsed: boolean; onClick: () => void }) {
   return (
-    <Button variant="ghost" className={`hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-8 gap-0 justify-start pl-0 pr-5'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
+    <Button variant="ghost" className={`text-body-sm-medium hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-8 gap-0 justify-start pl-0 pr-5'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
       <Icon className="size-5 shrink-0" />
       {!collapsed && <span className="truncate">{label}</span>}
     </Button>

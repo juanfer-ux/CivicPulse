@@ -61,7 +61,7 @@ export function ProblemDetail({
     if (!i) return null
     return (
       <li key={id}>
-        <button type="button" onClick={() => onSelectIncident(id)} className="flex w-full flex-wrap items-center gap-x-2 gap-y-0.5 rounded-sm px-2 py-1 text-left hover:bg-sidebar focus-visible:bg-sidebar">
+        <button type="button" onClick={() => onSelectIncident(id)} className="flex w-full text-meta flex-wrap items-center gap-x-2 gap-y-0.5 rounded-sm px-2 py-1 text-left hover:bg-sidebar focus-visible:bg-sidebar">
           <span className="text-foreground">{i.reference}</span>
           <span className="text-muted-foreground">
             {detail?.sources[id] ?? 'Unknown source'} · {time(i.occurred_at)}
@@ -103,7 +103,7 @@ export function ProblemDetail({
           {problem.quiet && problem.status !== 'resolved' && <Badge variant="outline">Quiet for 30+ days</Badge>}
           {problem.uncertain_n > 0 && <Badge variant="outline">Boundary uncertain</Badge>}
         </div>
-        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-muted-foreground">
+        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-muted-foreground [&>dd]:text-body-sm-strong [&>dt]:text-body-sm-medium">
           <dt>Location</dt>
           <dd className="text-foreground">{problem.location_description}</dd>
           <dt>Occurrences</dt>
@@ -141,11 +141,11 @@ export function ProblemDetail({
                 const v = detail!.interventions.find((x) => x.id === st.id)!
                 return (
                   <li key={v.id} className="rounded-sm border border-(--neutral-400) p-2">
-                    <p className="text-foreground">
+                    <p className="text-body-sm-medium text-foreground">
                       {day(v.performed_at)} · {label(v.action_type)} · {v.agency}
                     </p>
-                    <p className="text-muted-foreground">{v.description}</p>
-                    <p className="text-muted-foreground">
+                    <p className="text-meta text-muted-foreground">{v.description}</p>
+                    <p className="text-meta text-muted-foreground">
                       Outcome: <span className="text-foreground">{v.outcome ? label(v.outcome) : 'Not recorded yet'}</span>
                     </p>
                   </li>
@@ -155,7 +155,7 @@ export function ProblemDetail({
               const rows = detail!.links.filter((l) => l.occurrence_id === o.occurrence_id)
               return (
                 <li key={o.occurrence_id}>
-                  <p className="flex flex-wrap items-center gap-2 text-foreground">
+                  <p className="flex flex-wrap items-center gap-2 text-body-sm-medium text-foreground">
                     Occurrence {occN.get(o.occurrence_id)} · {day(o.first_report_at!)}
                     <span className="text-muted-foreground">
                       {o.reports_n} {o.reports_n === 1 ? 'report' : 'reports'}

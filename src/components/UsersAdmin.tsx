@@ -149,7 +149,7 @@ export function UsersAdmin() {
                       }}
                       className={`cursor-pointer border-b outline-none hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring max-desk:grid max-desk:grid-cols-2 max-desk:gap-1 max-desk:rounded-lg max-desk:border max-desk:bg-card max-desk:p-3 ${openId === u.id ? 'bg-muted' : ''}`}
                     >
-                      <td className="truncate px-3 py-5 font-medium max-desk:col-span-2 max-desk:p-0">{u.full_name || 'No name'}</td>
+                      <td className="truncate px-3 py-5 text-body-sm-medium max-desk:col-span-2 max-desk:p-0">{u.full_name || 'No name'}</td>
                       <td className="truncate px-3 py-5 text-muted-foreground max-desk:col-span-2 max-desk:p-0">{u.email}</td>
                       <td className="px-3 py-5 max-desk:p-0"><RoleBadge role={u.role} /></td>
                       <td className="px-3 py-5 max-desk:p-0">
