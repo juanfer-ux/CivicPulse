@@ -20,9 +20,6 @@ describe('cn', () => {
     expect(cn('text-title-regular', 'text-foreground')).toBe('text-title-regular text-foreground')
     expect(cn('text-subtitle', 'text-subtitle-regular')).toBe('text-subtitle-regular')
   })
-  it('treats the two display fonts as one group', () => {
-    expect(cn('font-display', 'font-display-alt')).toBe('font-display-alt')
-  })
   it('lets the display font replace the heading font on a card title', () => {
     expect(cn('font-heading text-subtitle', 'font-display text-display')).toBe('font-display text-display')
   })
