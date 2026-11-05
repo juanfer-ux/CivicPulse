@@ -41,7 +41,7 @@ The switch is at **1,440 px** (owner's decision): any narrower window, including
 ## 🖼️ Component gallery
 The four Stat Card states, then chart options for the agent's answers (the current bars next to shadcn Chart, a BarList and a metric tile, on the same data): open `/#charts` (no sign-in; loaded only when opened).
 
-Open `/#components` (no sign-in) to see real components on their own, with their measured height and text style. Resize under 1,440 px for the phone sizes. Code: `src/components/Gallery.tsx`. It only has the Button so far; add a component by adding a section there.
+Open `/#components` (no sign-in) to see real components on their own, with their measured height and text style. `/#fonts` (no sign-in, temporary, 2026-11-05) compares Manrope with Atkinson Hyperlegible Next, Roboto Flex and Public Sans on the same product text, with sliders for weight offset, Roboto Flex grade and smoothing; delete it (and the unused font packages) once a font is picked. Resize under 1,440 px for the phone sizes. Code: `src/components/Gallery.tsx`. It only has the Button so far; add a component by adding a section there.
 
 ## 🟥 Gaps
 Listed in the [design system README](design-system/README.md#-gaps-and-decisions); accessibility gaps in [accessibility.md](design-system/accessibility.md).
