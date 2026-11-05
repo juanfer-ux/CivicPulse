@@ -73,11 +73,11 @@
   --text-body-sm: var(--fs-body-sm);
   --text-body-sm--font-weight: 400;
   --text-body-sm--line-height: var(--lh-body-sm);
-  --text-body-sm--letter-spacing: 0.022em;
+  --text-body-sm--letter-spacing: 0.02em;
   --text-body-sm-medium: var(--fs-body-sm);
   --text-body-sm-medium--font-weight: 500;
   --text-body-sm-medium--line-height: var(--lh-body-sm);
-  --text-body-sm-medium--letter-spacing: 0.04em; /* Figma: 4 % (it was 2 %) */
+  --text-body-sm-medium--letter-spacing: 0.02em; /* Figma 2026-11-05: 2 % (it was 4 %) */
   --text-body-sm-strong: var(--fs-body-sm);
   --text-body-sm-strong--font-weight: 600;
   --text-body-sm-strong--line-height: var(--lh-body-sm);
