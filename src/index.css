@@ -35,18 +35,23 @@
   --text-heading: 20px;
   --text-heading--font-weight: 600;
   --text-heading--line-height: 28px;
+  --text-heading--letter-spacing: 0.02em;
   --text-title: 18px;
   --text-title--font-weight: 600;
   --text-title--line-height: 28px;
+  --text-title--letter-spacing: 0.02em;
   --text-title-regular: 18px;
   --text-title-regular--font-weight: 400;
   --text-title-regular--line-height: 28px;
+  --text-title-regular--letter-spacing: 0.02em;
   --text-subtitle: 16px;
   --text-subtitle--font-weight: 500;
   --text-subtitle--line-height: 24px;
+  --text-subtitle--letter-spacing: 0.02em;
   --text-subtitle-regular: 16px;
   --text-subtitle-regular--font-weight: 400;
   --text-subtitle-regular--line-height: 24px;
+  --text-subtitle-regular--letter-spacing: 0.02em;
   --text-label: var(--fs-label);
   --text-label--font-weight: 600; /* Figma label is SemiBold since 2026-10-29 (was Medium, 360) */
   --text-label--line-height: var(--lh-label);
@@ -55,6 +60,7 @@
   --text-label-regular: var(--fs-label);
   --text-label-regular--font-weight: 400;
   --text-label-regular--line-height: var(--lh-label);
+  --text-label-regular--letter-spacing: 0.02em;
   /* Button text (Figma: button and button-sm): same size as label, and one step down for small buttons. */
   --text-button: var(--fs-label);
   --text-button--font-weight: 600;
@@ -75,6 +81,7 @@
   --text-body-sm-strong: var(--fs-body-sm);
   --text-body-sm-strong--font-weight: 600;
   --text-body-sm-strong--line-height: var(--lh-body-sm);
+  --text-body-sm-strong--letter-spacing: 0.02em;
   /* Default body is 14 px on desktop (Figma: body, body-medium, body-strong); body-sm is the 13 px one used so far. */
   --text-body: var(--fs-body);
   --text-body--font-weight: 400;
@@ -83,16 +90,20 @@
   --text-body-medium: var(--fs-body);
   --text-body-medium--font-weight: 500;
   --text-body-medium--line-height: var(--lh-body);
+  --text-body-medium--letter-spacing: 0.02em;
   --text-body-strong: var(--fs-body);
   --text-body-strong--font-weight: 600;
   --text-body-strong--line-height: var(--lh-body);
+  --text-body-strong--letter-spacing: 0.02em;
   --text-meta: var(--fs-meta);
   --text-meta--font-weight: 400;
   --text-meta--line-height: var(--lh-meta);
+  --text-meta--letter-spacing: 0.02em;
   /* Figma meta-medium (2026-11-02): the meta size in Medium, for table headers and the agent's suggested questions (it was documented as 12 / 16, 500). */
   --text-meta-medium: var(--fs-meta);
   --text-meta-medium--font-weight: 500;
   --text-meta-medium--line-height: var(--lh-meta);
+  --text-meta-medium--letter-spacing: 0.02em;
   --text-caption: var(--fs-caption);
   --text-caption--font-weight: 500;
   --text-caption--line-height: 16px;
@@ -383,11 +394,12 @@
 .maplibregl-map .maplibregl-ctrl-group button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M0 5h10' stroke='%23A9A9B2' stroke-width='2'/%3E%3C/svg%3E"); }
 
 @layer base {
-  /* Letter-spacing in em on every element, not inherited from the root: an inherited em would turn into one fixed pixel value (0.16 px) for all sizes. */
-  * { @apply border-border outline-ring/50; letter-spacing: 0.02em; }
+  * { @apply border-border outline-ring/50; }
+  /* Letter-spacing is set once on the root and inherited (owner, 2026-11-05: spacing differed from Figma). It used to be `* { letter-spacing: 0.02em }`, which reset every nested element to 2 % and threw away the spacing of its text style (a sidebar row label lost its 4 %, a nested stat number went from -2 % to +2 %). Each text style sets its own spacing on its element, and children inherit that value in pixels; text with no style gets 0.02em of the root size, about 0.32 px. */
+  html { letter-spacing: 0.02em; }
   body { @apply bg-background text-foreground; }
-  /* Grayscale smoothing (owner, 2026-11-03: every font looked bolder than Figma): macOS draws light text on dark heavier and with a glow unless this is on. No effect on Windows or Linux. */
-  html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  /* Font smoothing is the browser default again (owner, 2026-11-05): grayscale smoothing (`antialiased`, 2026-11-03) thinned the strokes and the text looked soft. Trial; the weights are 400 / 500 / 600 / 700 now, so the old glow may be acceptable. */
+  html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; }
   /* Tailwind 4 stopped giving buttons the pointing hand (owner, 2026-10-30): everything you can click gets it, a disabled one does not. Utilities such as cursor-col-resize still win. */
   button:not(:disabled), [role='button']:not([aria-disabled='true']), [role='menuitem'], [role='option'], [role='tab'], [role='checkbox'], [role='switch'], summary, select, a[href], label:has(input[type='checkbox']), label:has(input[type='radio']) { cursor: pointer; }
   /* Every part of a clickable thing, not only its box (owner, 2026-10-30: the hand dropped out over some letters and icons in Chrome and was missing in Safari): the text, icons and spans inside get the hand explicitly instead of inheriting it. */

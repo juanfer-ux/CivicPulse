@@ -10,3 +10,5 @@ Figma name to code weight for Manrope: Regular 400, Medium 500, SemiBold 600, Bo
 
 ## Consequences
 Code and Figma use the same numbers, so no translation table is needed. Every Manrope text style got heavier on the page; if it feels too heavy on a Retina Mac, change the numbers in `index.css` only (one place).
+
+**Update 2026-11-05:** the grayscale smoothing mentioned above was removed again (text looked soft); the weights stay 400 / 500 / 600 / 700.
