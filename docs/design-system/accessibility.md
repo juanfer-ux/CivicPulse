@@ -72,7 +72,7 @@ Method: keyboard walk, computed styles and the real page in a browser, contrast 
 **Open: needs a design decision (owner)**
 | Issue | WCAG | Evidence | Option |
 |---|---|---|---|
-| Thin body text: description at weight 300, 13.5 px | advisory | Passes contrast | Heavier weight or 14 px and up |
+| Thin body text: description at 13 px (it was weight 300 at 13.5 until the 2026-11-03 weights) | advisory | Passes contrast | Heavier weight or 14 px and up |
 
 See the weight options on localhost: `/#components` → "Description text · weight decision" (delete that section once decided).
 

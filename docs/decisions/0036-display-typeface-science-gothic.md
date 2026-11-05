@@ -1,6 +1,6 @@
 # 0036: Display styles use Science Gothic; text styles brought in line with Figma
 
-> Partly replaced by [0038](0038-display-typeface-michroma.md) (2026-11-03): `display-lg` and `display` are Michroma now; `display-sm` stays Science Gothic.
+> Partly replaced by [0038](0038-display-typeface-michroma.md) (2026-11-03): all three display styles are Michroma now and Science Gothic was removed (2026-11-05).
 **Status:** Accepted   **Date:** 2026-11-02
 
 ## Context

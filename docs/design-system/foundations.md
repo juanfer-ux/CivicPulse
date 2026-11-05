@@ -5,7 +5,7 @@
 ## 🔤 Typeface
 **Manrope** (Google Fonts), served from our own site by `@fontsource-variable/manrope`, so nothing is requested from Google ([decision 0019](../decisions/0019-manrope-font.md)). Variable font, weights 200 to 800. Font smoothing is the browser default (`antialiased` was removed on 2026-10-23, the owner's choice after comparing), with `text-rendering: optimizeLegibility` and a universal letter-spacing of 0.02em. Code: `--font-sans` and the base layer in `src/index.css`.
 
-**Michroma** (Google Fonts, OFL-1.1) is the display typeface for `display-lg` and `display` (owner's Figma, 2026-11-03; [decision 0038](../decisions/0038-display-typeface-michroma.md)). Served the same way, by `@fontsource/michroma` (one weight, Regular 400). Code: `--font-display`, used as `font-display text-display`. **Science Gothic** (OFL-1.1, `@fontsource-variable/science-gothic`, weight axis only) stays for `display-sm` only, which no screen uses since 2026-11-03: `font-display-alt text-display-sm` ([decision 0036](../decisions/0036-display-typeface-science-gothic.md)).
+**Michroma** (Google Fonts, OFL-1.1) is the display typeface for all three `display-*` styles (owner's Figma, 2026-11-03 and 2026-11-05; [decision 0038](../decisions/0038-display-typeface-michroma.md)). Served from our own site by `@fontsource/michroma` (one weight, Regular 400). Code: `--font-display`, used as `font-display text-display`. Science Gothic, the display font before, is no longer used or installed ([decision 0036](../decisions/0036-display-typeface-science-gothic.md)).
 
 **Smoothing** (owner, 2026-11-03): `html` sets `-webkit-font-smoothing: antialiased` and `-moz-osx-font-smoothing: grayscale`, so macOS draws the strokes at their true weight instead of the heavier, glowing default for light text on dark. It has no effect on Windows or Linux, and a headless Linux browser cannot show the difference, so it was checked on the code only.
 
@@ -16,7 +16,7 @@ Each class sets size, line height and weight together, so a component never need
 |---|---|---|---|---|---|
 | display-lg | 48 / 56 (spacing 0) | 48 / 56 | 400 (Michroma Regular) | The Sign in headline on desktop (Science Gothic ExtraLight 64 / 60 until 2026-11-03) | `font-display text-display-lg` |
 | display | 20 / 42 (spacing +2 %) | 20 / 42 | 400 (Michroma Regular) | Auth Card titles (Sign in, Set up your account; Science Gothic Light 32 / 42 until 2026-11-03, and `display-sm` before) | `font-display text-display` |
-| display-sm | 24 / 32 (spacing -4 %) | 24 / 32 | 300 (Science Gothic Light) | Not used by a screen since 2026-11-03 (it was the Auth Card title; Science Gothic) | `font-display-alt text-display-sm` |
+| display-sm | 20 / 32 (spacing +2 %) | 20 / 32 | 400 (Michroma Regular) | Not used by a screen yet (Science Gothic Light 24 / 32 until 2026-11-05) | `font-display text-display-sm` |
 | stat | 32 / 32 (spacing -2 %) | 32 / 32 | 700 (Figma Bold) | Counts in stat cards and the Side Panel title; spacing was -4 % until 2026-11-02 | `text-stat` |
 | heading | 20 / 28 | 20 / 28 | 600 | Page title | `text-heading` |
 | title | 18 / 28 | 18 / 28 | 600 | Panel and section titles | `text-title` |
@@ -30,9 +30,9 @@ Each class sets size, line height and weight together, so a component never need
 | body | 14 / 22 (spacing 2.2%) | **16 / 24** | 400 | Default paragraph text (new; not used by a screen yet) | `text-body` |
 | body-medium | 14 / 22 (spacing 2%) | **16 / 24** | 500 | Default body, medium | `text-body-medium` |
 | body-strong | 14 / 22 (spacing 2%) | **16 / 24** | 600 | Default body, strong | `text-body-strong` |
-| body-sm | 13.5 / 22 (spacing 2.2%) | **16 / 24** | 400 | Paragraphs, inputs, table cells (this was `body` until 2026-10-23) | `text-body-sm` |
-| body-sm-medium | 13.5 / 22 (spacing 4 %) | **16 / 24** | 500 | Small body, medium (spacing was 2 % until 2026-11-02) | `text-body-sm-medium` |
-| body-sm-strong | 13.5 / 22 (spacing 2%) | **16 / 24** | 600 | Small body, strong | `text-body-sm-strong` |
+| body-sm | 13 / 22 (spacing 2.2%) | **16 / 24** | 400 | Paragraphs, inputs, table cells (this was `body` until 2026-10-23; 13 px since 2026-11-05, it was the fractional 13.5) | `text-body-sm` |
+| body-sm-medium | 13 / 22 (spacing 4 %) | **16 / 24** | 500 | Small body, medium (spacing was 2 % until 2026-11-02) | `text-body-sm-medium` |
+| body-sm-strong | 13 / 22 (spacing 2%) | **16 / 24** | 600 | Small body, strong | `text-body-sm-strong` |
 | meta | 13 / 21 | **14 / 20** | 400 | Secondary info | `text-meta` |
 | meta-medium | 13 / 21 | **14 / 20** | 500 (Figma Medium) | Table headers and the agent's suggested questions (Figma 2026-11-02; it was documented as 12 / 16, 500 and the code used `text-meta` plus `font-medium`) | `text-meta-medium` |
 | caption | 12.5 / 16 (spacing 2.4 %) | **12 / 16** | 500 | Small tags | `text-caption` |
@@ -41,7 +41,7 @@ Each class sets size, line height and weight together, so a component never need
 
 - **Desktop = 1,440 px and wider; Mobile = anything narrower** (the `desk` breakpoint). The sizes come from Figma's Device collection and switch through CSS variables in `src/index.css` (`--fs-body`, `--lh-body`…); class names do not change.
 - **Weights** (Manrope is a variable font, so any number from 200 to 800 works; the owner chose lowered values on 2026-10-23 (300 / 360 / 400 / 450) because Manrope glowed on dark screens; since grayscale font smoothing went in, on 2026-11-03 he set the usual Figma-name numbers: Regular 400, Medium 500, SemiBold 600, Bold 700): **Regular 400** for reading text, typed text, placeholders and secondary text; **Medium 500** for anything that labels something (field names, menu items, subtitles, badges, captions); **SemiBold 600** for headings, numbers, titles and button text.
-- The three display styles are named `display-lg` (48), `display` (20) and `display-sm` (24) in both Figma and code (renamed in Figma 2026-11-02, owner's yes).
+- The three display styles are named `display-lg` (48), `display` (20) and `display-sm` (20, line 32) in both Figma and code (renamed in Figma 2026-11-02, owner's yes).
 - ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes; without that, the class merger dropped `text-label` from colored buttons (test in `utils.test.ts`).
 
 ## 🎨 Colors (dark theme): 57 in total
