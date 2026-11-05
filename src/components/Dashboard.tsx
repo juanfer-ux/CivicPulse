@@ -233,7 +233,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
   const item = shown.value
   // The map no longer shrinks for the side panel (that left a gap beside the agent panel while the panel slid in or out): it stays under the panel and the camera keeps the target centered in the part that shows (padLeft). The controls over the map follow the panel with a short slide of their own.
-  const panelOpen = !!current
+  const panelOpen = item?.kind === 'incident' // only the incident panel is a side panel now; the problem panel and history float over the map
   const desk = window.matchMedia('(min-width: 90rem)').matches
   const panelW = item?.kind === 'problem' ? 400 : 360 // the Problem Panel is 400 px wide, the Incident Panel 360 (Figma, 2026-11-02)
   return (
@@ -247,7 +247,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         dotStatusById={dotStatusById}
         onSelectProblem={selectProblem}
         onFlightEnd={onFlightEnd}
-        padLeft={desk ? (selected ? 360 : selectedProblem ? 400 : 0) : 0}
+        padLeft={desk && selected ? 360 : 0}
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
         areas={areas}
@@ -359,8 +359,6 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
               localityName={localityName.get(item.problem.locality_code)}
               categoryName={data?.categories.find((c) => c.code === item.problem.category)?.name}
               onClose={() => selectProblem(null)}
-              slide={shown.slide}
-              leaving={shown.leaving}
             />
             {!shown.leaving && <ProblemTimelineCard key={`h-${item.problem.id}`} problem={item.problem} detail={item.detail} onSelectIncident={select} />}
           </>

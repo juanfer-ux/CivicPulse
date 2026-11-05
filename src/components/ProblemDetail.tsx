@@ -6,39 +6,33 @@ import { ProblemStatusPill } from '@/components/ProblemStatusPill'
 import { label } from '@/lib/incidents'
 import type { ProblemRow } from '@/lib/problems'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
-import { useSlide } from '@/lib/useSlide'
 
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 
 /**
  * The persistent problem (decision 0030): its status and the facts: occurrences, recurrence, reports, interventions, last reported. Its history
- * lives in its own floating card at the bottom of the map (ProblemTimelineCard). It is 400 px wide (the incident panel is 360), per the Figma Problem Panel.
+ * lives in its own floating card at the bottom of the map (ProblemTimelineCard). It is a 400 px floating card in the map's top-left corner (owner, 2026-11-05: no longer a side panel).
  */
 export function ProblemDetail({
   problem,
   localityName,
   categoryName,
   onClose,
-  slide,
-  leaving,
 }: {
   problem: ProblemRow
   localityName: string | undefined
   categoryName: string | undefined
   onClose: () => void
-  slide: boolean
-  leaving: boolean
 }) {
   const panel = useRef<HTMLDivElement>(null)
   useRestoreFocus(panel)
-  useSlide(panel, slide, leaving)
   return (
     <Card
       ref={panel}
       tabIndex={-1}
       role="region"
       aria-label="Problem details"
-      className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-0 desk:bottom-0 desk:left-[calc(var(--agent-w)+var(--panel-gap))] desk:z-20 desk:max-h-none desk:w-[400px] desk:rounded-none desk:border-y-0 desk:border-l-0 desk:border-r desk:border-secondary desk:bg-(--neutral-800)"
+      className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-6 desk:left-[calc(var(--map-base)+1.5rem)] desk:z-20 desk:max-h-[calc(100%-3rem)] desk:w-[400px] desk:bg-(--neutral-800)"
     >
       <div className="flex flex-col gap-4 px-4 py-6">
         <header className="flex items-start justify-between gap-2">

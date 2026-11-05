@@ -13,9 +13,8 @@ type Step =
   | { at: number; kind: 'event'; text: string }
 
 /**
- * A problem's history as its own floating card at the bottom of the map (owner, 2026-11-05), apart from the Problem Panel: the lanes timeline on the left,
- * and on the right one vertical list (its own scroll) of occurrences with their reports, interventions and events, oldest first. On phones it sits in the
- * bottom sheet with the list under the timeline.
+ * A problem's history as its own floating card at the bottom of the map (owner, 2026-11-05), apart from the Problem Panel: the vertical occurrences list on the left (its own scroll: occurrences with
+ * their reports, interventions and events, oldest first) and the lanes timeline on the right, taking the rest of the map's width. On phones it sits in the bottom sheet.
  */
 export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { problem: ProblemRow; detail: ProblemDetailData | null; onSelectIncident: (id: string) => void }) {
   const incidents = new Map<string, Incident>((detail?.incidents ?? []).map((i) => [i.id, i]))
@@ -49,14 +48,9 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { pro
     <Card
       role="region"
       aria-label="Problem history"
-      className="max-h-[45%] shrink-0 gap-0 overflow-hidden bg-card/95 py-0 desk:absolute desk:right-16 desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:z-20 desk:max-h-[40svh] desk:flex-row"
+      className="max-h-[45%] shrink-0 gap-0 overflow-hidden bg-card/95 py-0 desk:absolute desk:right-6 desk:bottom-6 desk:left-[calc(var(--map-base)+1.5rem)] desk:z-20 desk:max-h-[40svh] desk:flex-row"
     >
-      <section aria-label="Timeline" className="flex min-w-0 flex-col gap-3 overflow-auto p-4 desk:flex-1">
-        <h3 className="text-section-label uppercase text-(--neutral-200)">Timeline · {problem.reference}</h3>
-        {!detail && <p className="text-muted-foreground">Loading…</p>}
-        {detail && <ProblemTimeline detail={detail} status={problem.status} onSelectIncident={onSelectIncident} />}
-      </section>
-      <section aria-label="Occurrences history" className="flex flex-col gap-3 overflow-y-auto border-t p-4 desk:w-[340px] desk:shrink-0 desk:border-t-0 desk:border-l">
+      <section aria-label="Occurrences history" className="flex flex-col gap-3 overflow-y-auto p-4 desk:w-[340px] desk:shrink-0 desk:border-t-0 desk:border-r max-desk:border-b">
         <h3 className="text-section-label uppercase text-(--neutral-200)">Occurrences history</h3>
         {detail && steps.length === 0 && <p className="text-muted-foreground">No history yet.</p>}
         <ol className="flex flex-col gap-3">
@@ -99,6 +93,11 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { pro
             <ul className="mt-1 flex flex-col">{unplaced.map((l) => report(l.incident_id, true))}</ul>
           </div>
         )}
+      </section>
+      <section aria-label="Timeline" className="flex min-w-0 flex-col gap-3 overflow-auto p-4 max-desk:border-t desk:flex-1">
+        <h3 className="text-section-label uppercase text-(--neutral-200)">Timeline · {problem.reference}</h3>
+        {!detail && <p className="text-muted-foreground">Loading…</p>}
+        {detail && <ProblemTimeline detail={detail} status={problem.status} onSelectIncident={onSelectIncident} />}
       </section>
     </Card>
   )
