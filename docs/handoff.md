@@ -1,6 +1,6 @@
 # 🤝 Handoff: where we are and how we work
 
-For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-01. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
+For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-05. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
 - **Problem marker is done** (the owner's option F): neutral-700 circle, 1 px status-colored outline, neutral-100 icon, warning triangle with a 4 px outline; sizes set at the farthest zoom and scaled in proportion. Spec: [design-system/components.md](design-system/components.md) (Problem Marker), decision [0032](decisions/0032-problem-marker-option-f.md).
@@ -11,7 +11,7 @@ For a new session (local or cloud) that has no memory of the earlier chats. Upda
 - A page that compares the old and new marker side by side is in `explorations/problem-circle-gallery.html`.
 
 ## 🟥 Open items
-- **Timeline card** (2026-11-05, PR #6): the problem's history moved out of the Problem Panel into a floating card at the bottom of the map (lanes timeline left, scrolling occurrences list right). Needs a signed-in look on desktop and phone, and a Figma frame.
+- **Floating cards (2026-11-05):** the Problem Panel and the Incident Panel float over the map's top-left corner (no slide-out; the camera flight stays) and the problem's history is a card across the bottom (occurrences 40 %, timeline 60 %). Figma still shows the old side panels and has no timeline card: draw them. Needs a signed-in look on desktop and phone.
 - **Cursor:** the owner says the flicker in Chrome is fixed (2026-11-01); the hand in Safari over the markers is not checked yet.
 - **Mobile:** the markers, the Status menu (44 px rows) and the taps are checked on a test page at 390×844; the real screen (bottom sheet, chips, camera flights) still needs a look on a phone, signed in.
 - **Brand colors:** done in Figma and code (2026-11-02): `brand-primary` `#E3E3E7` is the primary button's background and `brand-secondary` `#87DBC7` its hover; decision [0035](decisions/0035-brand-primary-and-secondary.md).
