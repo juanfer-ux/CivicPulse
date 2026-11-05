@@ -5,6 +5,7 @@ import { StatCard } from '@/components/ui/stat-card'
 import { trendOf } from '@/lib/trend'
 import { MediaGallery } from '@/components/MediaGallery'
 import { ProblemDetail } from '@/components/ProblemDetail'
+import { ProblemTimelineCard } from '@/components/ProblemTimelineCard'
 import { Badge } from '@/components/ui/badge'
 import { FilterBar, MapTypeChips, NO_FILTERS, type Filters } from '@/components/FilterBar'
 import { Button } from '@/components/ui/button'
@@ -351,17 +352,18 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         />
       ) : (
         item && (
-          <ProblemDetail
-            key={item.problem.id}
-            problem={item.problem}
-            detail={item.detail}
-            localityName={localityName.get(item.problem.locality_code)}
-            categoryName={data?.categories.find((c) => c.code === item.problem.category)?.name}
-            onSelectIncident={select}
-            onClose={() => selectProblem(null)}
-            slide={shown.slide}
-            leaving={shown.leaving}
-          />
+          <>
+            <ProblemDetail
+              key={item.problem.id}
+              problem={item.problem}
+              localityName={localityName.get(item.problem.locality_code)}
+              categoryName={data?.categories.find((c) => c.code === item.problem.category)?.name}
+              onClose={() => selectProblem(null)}
+              slide={shown.slide}
+              leaving={shown.leaving}
+            />
+            {!shown.leaving && <ProblemTimelineCard key={`h-${item.problem.id}`} problem={item.problem} detail={item.detail} onSelectIncident={select} />}
+          </>
         )
       )}
       </div>
