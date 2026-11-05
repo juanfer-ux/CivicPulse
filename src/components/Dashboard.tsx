@@ -5,6 +5,7 @@ import { StatCard } from '@/components/ui/stat-card'
 import { trendOf } from '@/lib/trend'
 import { MediaGallery } from '@/components/MediaGallery'
 import { ProblemDetail } from '@/components/ProblemDetail'
+import { ProblemTimelineCard } from '@/components/ProblemTimelineCard'
 import { Badge } from '@/components/ui/badge'
 import { FilterBar, MapTypeChips, NO_FILTERS, type Filters } from '@/components/FilterBar'
 import { Button } from '@/components/ui/button'
@@ -232,10 +233,11 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
   const item = shown.value
   // The map no longer shrinks for the side panel (that left a gap beside the agent panel while the panel slid in or out): it stays under the panel and the camera keeps the target centered in the part that shows (padLeft). The controls over the map follow the panel with a short slide of their own.
-  const panelOpen = !!current
+  const panelOpen = item?.kind === 'incident' // only the incident panel is a side panel now; the problem panel and history float over the map
   const desk = window.matchMedia('(min-width: 90rem)').matches
+  const panelW = item?.kind === 'problem' ? 400 : 360 // the Problem Panel is 400 px wide, the Incident Panel 360 (Figma, 2026-11-02)
   return (
-    <div className="contents" style={{ '--map-base': 'calc(var(--agent-w) + var(--panel-gap))', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${panelOpen ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
+    <div className="contents" style={{ '--map-base': 'calc(var(--agent-w) + var(--panel-gap))', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${panelOpen ? ` + ${panelW}px + var(--panel-gap)` : ''})` } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -245,7 +247,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         dotStatusById={dotStatusById}
         onSelectProblem={selectProblem}
         onFlightEnd={onFlightEnd}
-        padLeft={desk && (selected || selectedProblem) ? 360 : 0}
+        padLeft={desk && selected ? 360 : 0}
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
         areas={areas}
@@ -350,17 +352,16 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         />
       ) : (
         item && (
-          <ProblemDetail
-            key={item.problem.id}
-            problem={item.problem}
-            detail={item.detail}
-            localityName={localityName.get(item.problem.locality_code)}
-            categoryName={data?.categories.find((c) => c.code === item.problem.category)?.name}
-            onSelectIncident={select}
-            onClose={() => selectProblem(null)}
-            slide={shown.slide}
-            leaving={shown.leaving}
-          />
+          <>
+            <ProblemDetail
+              key={item.problem.id}
+              problem={item.problem}
+              localityName={localityName.get(item.problem.locality_code)}
+              categoryName={data?.categories.find((c) => c.code === item.problem.category)?.name}
+              onClose={() => selectProblem(null)}
+            />
+            {!shown.leaving && <ProblemTimelineCard key={`h-${item.problem.id}`} problem={item.problem} detail={item.detail} onSelectIncident={select} />}
+          </>
         )
       )}
       </div>

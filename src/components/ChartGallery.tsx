@@ -30,7 +30,7 @@ const PERIOD = [
 const config = { value: { label: 'Incidents', color: 'var(--indigo-400)' } } satisfies ChartConfig
 const tick = { fill: 'var(--neutral-200)', fontSize: 12 }
 
-function Option({ name, note, children }: { name: string; note: string; children: ReactNode }) {
+export function Option({ name, note, children }: { name: string; note: string; children: ReactNode }) {
   return (
     <div className="flex min-w-0 flex-col gap-2 rounded-sm border border-input bg-ai p-4">
       <div>
@@ -42,7 +42,7 @@ function Option({ name, note, children }: { name: string; note: string; children
   )
 }
 
-function Row({ title, children }: { title: string; children: ReactNode }) {
+export function Row({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
       <h2 className="text-title">{title}</h2>
@@ -174,6 +174,10 @@ export function ChartGallery() {
           </ChartContainer>
         </Option>
       </Row>
+
+      <p className="text-body-sm text-muted-foreground">
+        The Problem Panel's history as a timeline has its own page with more options: open <code>/#timeline</code>.
+      </p>
     </main>
   )
 }

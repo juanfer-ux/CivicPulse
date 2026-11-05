@@ -41,6 +41,8 @@ The switch is at **1,440 px** (owner's decision): any narrower window, including
 ## 🖼️ Component gallery
 The four Stat Card states, then chart options for the agent's answers (the current bars next to shadcn Chart, a BarList and a metric tile, on the same data): open `/#charts` (no sign-in; loaded only when opened).
 
+**Timeline options** (owner's idea, 2026-11-02): open `/#timeline` (same rules) for the Problem Panel's history shown **six ways with shadcn Chart** on the same data: A lanes (what the panel uses now, `ProblemTimeline.tsx`), B columns with tow lines, C reports per week (area), D reports so far (line), E reports by source (stacked columns), F occurrence spans (Gantt-style). A switch changes the sample between the Figma example (3 occurrences) and a busy history (14 occurrences over 9 months). Nothing in the app uses this page; it is for choosing. Code: `TimelineGallery.tsx`.
+
 Open `/#components` (no sign-in) to see real components on their own, with their measured height and text style. Resize under 1,440 px for the phone sizes. Code: `src/components/Gallery.tsx`. It only has the Button so far; add a component by adding a section there.
 
 ## 🟥 Gaps
