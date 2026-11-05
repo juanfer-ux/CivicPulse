@@ -54,19 +54,19 @@ export function AuthPage() {
   }
 
   return (
-    <AuthLayout mobileLogo footer="© 2026 Secretaría Distrital de Movilidad. Todos los derechos reservados.">
-      {/* Figma Auth Card (sign in): one centered block; header, fields and actions 40 px apart, buttons 12 px. */}
+    <AuthLayout mobileLogo footer="© 2026 District Secretariat of Mobility. All rights reserved.">
+      {/* Figma Auth Card (sign in): one centered block; header, fields and actions 48 px apart (owner, 2026-11-02; it was 40), buttons 12 px. */}
       <CardContent>
-        <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-10">
-          <div className="flex flex-col gap-10">
+        <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-12">
+          <div className="flex flex-col gap-12">
             <CardHeader className="gap-2 px-0">
-              <CardTitle asChild className="text-stat">
+              <CardTitle asChild className="font-display text-display text-(--brand-primary)">
                 <h1>{signup ? 'Create account' : 'Sign in'}</h1>
               </CardTitle>
               <CardDescription>
                 {signup
                   ? 'New accounts have no access until a Super Admin assigns a role.'
-                  : 'Welcome to the Civic Ops. Agent Platform'}
+                  : 'Welcome to the Operations Agent Platform'}
               </CardDescription>
             </CardHeader>
             <div className="flex flex-col gap-4">

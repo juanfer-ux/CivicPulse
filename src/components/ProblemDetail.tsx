@@ -99,7 +99,7 @@ export function ProblemDetail({
           {problem.quiet && problem.status !== 'resolved' && <Badge variant="outline">Quiet for 30+ days</Badge>}
           {problem.uncertain_n > 0 && <Badge variant="outline">Boundary uncertain</Badge>}
         </div>
-        <dl className="grid grid-cols-[6rem_1fr] gap-x-3 gap-y-2 text-meta">
+        <dl className="grid grid-cols-[6rem_1fr] gap-x-3 gap-y-2 text-muted-foreground [&>dd]:text-body-sm-strong [&>dt]:text-body-sm-medium">
           <dt className="text-muted-foreground">Occurrences</dt>
           <dd className="text-foreground">{problem.occurrences_n}</dd>
           <dt className="text-muted-foreground">Recurrence</dt>
@@ -120,7 +120,7 @@ export function ProblemDetail({
 
         <section aria-label="History" className="flex flex-col gap-3 bg-(--neutral-700) p-3">
           <h3 className="text-section-label uppercase text-(--neutral-200)">History</h3>
-          {!detail && <p className="text-meta text-muted-foreground">Loading…</p>}
+          {!detail && <p className="text-muted-foreground">Loading…</p>}
           {detail && <ProblemTimeline detail={detail} status={problem.status} onSelectIncident={onSelectIncident} />}
           {detail && steps.length > 0 && (
             <details className="group">
@@ -129,7 +129,7 @@ export function ProblemDetail({
                 {steps.map((st) => {
                   if (st.kind === 'event') {
                     return (
-                      <li key={`e-${st.at}`} className="text-meta text-muted-foreground">
+                      <li key={`e-${st.at}`} className="text-muted-foreground">
                         {day(new Date(st.at).toISOString())} · {st.text}
                       </li>
                     )

@@ -137,11 +137,11 @@ export function Gallery() {
         <div className="flex w-[460px] max-w-full flex-col gap-3 rounded-xl border bg-card p-4">
           <div className="flex flex-col gap-1">
             <span className="text-meta text-muted-foreground">Now: Regular (300), what the app uses</span>
-            <div className="text-body-sm text-muted-foreground">Welcome to the Civic Ops. Agent Platform</div>
+            <div className="text-body-sm text-muted-foreground">Welcome to the Operations Agent Platform</div>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-meta text-muted-foreground">Proposed: Medium (360), sturdier strokes at 13.5 px</span>
-            <div className="text-body-sm-medium text-muted-foreground">Welcome to the Civic Ops. Agent Platform</div>
+            <span className="text-meta text-muted-foreground">Proposed: Medium (500), sturdier strokes at 13.5 px</span>
+            <div className="text-body-sm-medium text-muted-foreground">Welcome to the Operations Agent Platform</div>
           </div>
         </div>
       </Section>

@@ -17,7 +17,7 @@ const badgeVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-5 gap-1 px-2 text-caption [&>svg]:size-3",
+        default: "h-5 gap-1 px-2 text-caption-strong [&>svg]:size-3",
         lg: "h-[30px] gap-2 px-3 text-meta [&>svg]:size-3.5",
       },
     },
