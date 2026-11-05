@@ -11,7 +11,7 @@ For a new session (local or cloud) that has no memory of the earlier chats. Upda
 - A page that compares the old and new marker side by side is in `explorations/problem-circle-gallery.html`.
 
 ## 🟥 Open items
-- **Floating cards (2026-11-05):** the Problem Panel and the Incident Panel float over the map's top-left corner (no slide-out; the camera flight stays) and the problem's history is a card across the bottom (occurrences 40 %, timeline 60 %). Figma still shows the old side panels and has no timeline card: draw them. Needs a signed-in look on desktop and phone.
+- **Floating cards (2026-11-05):** the Problem Panel and the Incident Panel float over the map's top-left corner (no slide-out; the camera flight stays) and the problem's history is a card across the bottom (occurrences 40 %, timeline 60 %). Figma has them on Screens → Map · Problem selected and Map · Incident selected (Desktop 1440), and the card as a component on Map & agent. Not done in Figma: the phone screens (Map · Problem selected · Mobile still has no card), and the Problem Panel there carries a placeholder Button the code does not have (ask the owner). Needs a signed-in look on desktop and phone.
 - **Cursor:** the owner says the flicker in Chrome is fixed (2026-11-01); the hand in Safari over the markers is not checked yet.
 - **Mobile:** the markers, the Status menu (44 px rows) and the taps are checked on a test page at 390×844; the real screen (bottom sheet, chips, camera flights) still needs a look on a phone, signed in.
 - **Brand colors:** done in Figma and code (2026-11-02): `brand-primary` `#E3E3E7` is the primary button's background and `brand-secondary` `#87DBC7` its hover; decision [0035](decisions/0035-brand-primary-and-secondary.md).
