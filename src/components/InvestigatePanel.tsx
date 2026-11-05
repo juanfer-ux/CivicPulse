@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { ArrowUp, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -61,7 +62,9 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </CardHeader>
       </div>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:p-8">
-        <div className="mx-auto flex min-h-0 w-full max-w-[664px] flex-1 flex-col gap-3 overflow-y-auto pr-1 text-body-sm">
+        {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
+        <ScrollArea className="min-h-0 flex-1 desk:-mx-8" viewportClassName="[&>div]:!block">
+        <div className="mx-auto flex w-full max-w-[664px] flex-col gap-3 text-body-sm desk:max-w-[728px] desk:px-8">
           {turns.length === 0 && (
             <div className="flex flex-col gap-2">
               <p className="text-subtitle text-muted-foreground">Try one of these, or ask your own:</p>
@@ -82,6 +85,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           ))}
           <div ref={end} />
         </div>
+        </ScrollArea>
         <form onSubmit={onSubmit} className="mx-auto flex w-full max-w-[664px] items-center gap-2">
           <Input name="q" value={text} onChange={(e) => setText(e.target.value)} placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" />
           <Button type="submit" size="icon" aria-label="Ask" className="bg-(--white) hover:bg-(--white)/90" disabled={busy || !text.trim()}>

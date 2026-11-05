@@ -47,7 +47,7 @@ Rules:
 
 ## Scrollbars (every scrolling area in the platform)
 - One style, **G** (owner, 2026-11-05): a 10 px grab area with a round **4 px thumb that grows to 6 px on hover**, `neutral-300` (`neutral-200` on hover), **always visible**, no track. Never a different color, width or radius, and never hidden, in any panel, card, list or menu.
-- New scrolling areas use the shadcn `ScrollArea` (`src/components/ui/scroll-area.tsx`, G is its default; use `viewportRef` for scroll code and `horizontal` for sideways). A plain native `overflow-*` area is allowed because `index.css` gives every native scrollbar the same look, but then check it in Chrome and Safari.
+- New scrolling areas use the shadcn `ScrollArea` (`src/components/ui/scroll-area.tsx`, G is its default; use `viewportRef` for scroll code and `horizontal` for sideways). **The scrollbar always sits on the edge of its container (the panel or card), never inside a narrower centered column: make the scroll area full width and center the content inside it.** A plain native `overflow-*` area is allowed because `index.css` gives every native scrollbar the same look, but then check it in Chrome and Safari.
 - Styles and the reasons: [docs/design.md](docs/design.md) (Scrollbars) and the gallery at `/#scroll`. If you change the style, change `ScrollArea`, the CSS rule in `index.css`, the docs and the gallery together.
 
 ## Figma component pages (this project)
