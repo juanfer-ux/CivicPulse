@@ -1,12 +1,13 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
-import { CaretDown, DotOutline, DotsThreeVertical, List, Plus, SidebarSimple, SignOut, X, type IconProps } from '@phosphor-icons/react'
+import { CaretDown, DotOutline, DotsThreeVertical, Folder, List, Plus, SidebarSimple, SignOut, SortAscending, Sparkle, Warning, X, type IconProps } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth'
+import { PROBLEM_STATUS, type ProblemStatus } from '@/lib/statusColors'
 import { shortName } from '@/lib/utils'
 
 type Chat = { id: number; title: string }
@@ -25,6 +26,32 @@ const PLACEHOLDERS = [
   'Where to inspect tomorrow',
   'Debris on main roads',
 ]
+
+/** A case row (Figma Sidebar Item Cases, 2026-11-05): the warning icon in the case's own color (its problem's status), the location, and "reference · locality" under it. Examples like the investigations' PLACEHOLDERS: they open nothing yet. */
+type CaseRow = { id: number; title: string; status: ProblemStatus; reference?: string; locality?: string }
+const PLACEHOLDER_CASES: CaseRow[] = [
+  { id: -1, title: 'Parque La Serena, costado norte', status: 'active', reference: 'PR-00088', locality: 'Engativá' },
+  { id: -2, title: 'Cl 39 #20-15, garaje del conjunto Alcázar', status: 'active', reference: 'PR-00089', locality: 'Teusaquillo' },
+  { id: -3, title: 'Av. Boyacá con Cl 72', status: 'monitoring', reference: 'PR-00090', locality: 'Engativá' },
+  { id: -4, title: 'Cra 13 #62-40, entrada del edificio Aurora', status: 'resolved', reference: 'PR-00091', locality: 'Chapinero' },
+  { id: -5, title: 'Cl 72 #24-30, entrada del colegio', status: 'archived', reference: 'PR-00092', locality: 'Barrios Unidos' },
+  { id: -6, title: 'Cra 72 con Cl 80', status: 'active', reference: 'PR-00093', locality: 'Engativá' },
+]
+
+function CaseItem({ c, active, onClick }: { c: CaseRow; active: boolean; onClick: () => void }) {
+  const sub = [c.reference, c.locality].filter(Boolean).join(' · ') || 'Not linked to a problem yet'
+  return (
+    <Button variant="ghost" className={`h-[50px] items-start justify-start gap-2 pt-[3px] pb-[5px] pl-[5px] pr-[19px] hover:bg-sidebar ${active ? 'bg-sidebar' : ''}`} title={`${c.title} (${PROBLEM_STATUS[c.status].label})`} aria-current={active || undefined} onClick={onClick}>
+      <span className="flex h-10 w-4 shrink-0 items-start pt-1">
+        <Warning weight="fill" className="size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />
+      </span>
+      <span className="flex h-10 min-w-0 flex-col justify-center gap-0.5 text-left">
+        <span className="truncate text-body-sm text-(--neutral-100)">{c.title}</span>
+        <span className="truncate text-caption text-(--neutral-200)">{sub}</span>
+      </span>
+    </Button>
+  )
+}
 
 /** The tiny bullet that marks a conversation or a case in a list (Figma icon/bullet): Phosphor DotOutline, fill weight, always solid, `neutral-300`. */
 const Bullet = (props: IconProps) => <DotOutline {...props} weight="fill" className={`${props.className ?? ""} text-(--neutral-400)`} />
@@ -164,7 +191,7 @@ function MobileBrand() {
 
 function NavItem({ icon: Icon, label, active, collapsed, onClick }: { icon: ComponentType<IconProps>; label: string; active?: boolean; collapsed: boolean; onClick: () => void }) {
   return (
-    <Button variant="ghost" className={`text-body-sm-medium hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-8 gap-0 justify-start pl-0 pr-5'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
+    <Button variant="ghost" className={`text-body-sm-medium hover:bg-sidebar ${active ? 'bg-sidebar' : ''} ${collapsed ? 'h-11 w-10 gap-2 px-2 justify-center' : 'h-[30px] gap-2 justify-start py-[3px] pl-[3px] pr-[19px]'}`} title={collapsed ? label : undefined} aria-current={active ? 'page' : undefined} onClick={onClick}>
       <Icon className="size-5 shrink-0" />
       {!collapsed && <span className="truncate">{label}</span>}
     </Button>
@@ -177,6 +204,9 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
   const name = shortName(profile?.full_name) || 'Signed in'
   const email = session?.user?.email
   const title = 'flex h-8 items-center text-section-label uppercase text-(--neutral-200)'
+  const [view, setView] = useState<'explore' | 'cases'>('explore') // the Explore | Cases toggle (owner, 2026-11-05)
+  const [newest, setNewest] = useState(true) // the sort button: newest first, or oldest first
+  const [caseId, setCaseId] = useState<number | null>(null)
   const plus = (label: string, onClick: () => void) => (
     <Button size="icon" variant="ghost" className="size-8" aria-label={label} title={label} onClick={onClick}>
       <Plus className="size-4 text-(--white)" />
@@ -194,37 +224,50 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
           )}
         </div>
         {!collapsed && (
-          <div className="flex min-h-0 flex-col gap-8 overflow-y-auto px-2.5 py-4">
-            <nav className="flex flex-col gap-4">
-              <div className="flex items-center justify-between pl-2.5 pr-1.5">
-                <p className={title}>Investigations</p>
-                {plus('New investigation', onNew)}
+          <>
+            {/* Explore | Cases toggle (Figma Sheet Tabs in the sidebar: 32 px, 4 px radius, 1 px neutral-400 outline, 4 px between the two). */}
+            <div role="tablist" aria-label="Menu view" className="mx-4 mt-1 flex h-8 shrink-0 gap-1 rounded-sm border border-(--neutral-400) bg-(--neutral-800)">
+              {(
+                [
+                  ['explore', 'Explore', Sparkle],
+                  ['cases', 'Cases', Folder],
+                ] as const
+              ).map(([v, text, Icon]) => (
+                <Button key={v} role="tab" aria-selected={view === v} size="sm" variant={view === v ? 'secondary' : 'ghost'} className="h-full flex-1 gap-1.5 px-3" onClick={() => setView(v)}>
+                  <Icon weight={v === 'explore' ? 'fill' : 'bold'} className="size-4 shrink-0" aria-hidden />
+                  {text}
+                </Button>
+              ))}
+            </div>
+            <section className="flex min-h-0 flex-col gap-4 overflow-y-auto px-1.5 pt-5 pb-4">
+              {/* The label shows the sort order; the sort button flips it, the plus adds one (same place in Explore and Cases). */}
+              <div className="flex items-center gap-2.5 pl-2.5 pr-1.5">
+                <p className={`${title} flex-1`}>{newest ? 'New' : 'Old'}</p>
+                  <Button size="icon" variant="ghost" className="size-8" aria-label={newest ? 'Sorted newest first. Show oldest first' : 'Sorted oldest first. Show newest first'} title={newest ? 'Newest first' : 'Oldest first'} onClick={() => setNewest((n) => !n)}>
+                    <SortAscending className="size-4 text-(--white)" />
+                  </Button>
+                  {view === 'explore' ? plus('New investigation', onNew) : plus('New case', onNewCase)}
               </div>
-              <div className="flex flex-col gap-0.5">
-                {chats.map((c) => (
-                  <NavItem key={c.id} icon={Bullet} label={c.title} active={c.id === activeId} collapsed={false} onClick={() => onPick(c.id)} />
-                ))}
-                {PLACEHOLDERS.map((t) => (
-                  <NavItem key={t} icon={Bullet} label={t} collapsed={false} onClick={() => {}} />
-                ))}
-              </div>
-            </nav>
-            <section className="flex flex-col gap-4">
-              <div className="flex items-center justify-between pl-2.5 pr-1.5">
-                <p className={title}>Cases</p>
-                {plus('New case', onNewCase)}
-              </div>
-              {cases.length ? (
+              {view === 'explore' ? (
                 <div className="flex flex-col gap-0.5">
-                  {cases.map((c) => (
-                    <NavItem key={c.id} icon={Bullet} label={c.title} collapsed={false} onClick={() => {}} />
-                  ))}
+                  {(() => {
+                    const rows = [
+                      ...chats.map((c) => ({ key: c.id, node: <NavItem key={c.id} icon={Bullet} label={c.title} active={c.id === activeId} collapsed={false} onClick={() => onPick(c.id)} /> })),
+                      ...PLACEHOLDERS.map((t) => ({ key: t, node: <NavItem key={t} icon={Bullet} label={t} collapsed={false} onClick={() => {}} /> })),
+                    ]
+                    return (newest ? rows : [...rows].reverse()).map((r) => r.node)
+                  })()}
                 </div>
               ) : (
-                <p className="pl-2.5 text-meta text-muted-foreground">No cases yet.</p>
+                <div className="flex flex-col gap-2.5 px-1">
+                  {(() => {
+                    const rows: CaseRow[] = [...cases.map((c) => ({ id: c.id, title: c.title, status: 'active' as const })), ...PLACEHOLDER_CASES]
+                    return (newest ? rows : [...rows].reverse()).map((c) => <CaseItem key={c.id} c={c} active={c.id === caseId} onClick={() => setCaseId(c.id)} />)
+                  })()}
+                </div>
               )}
             </section>
-          </div>
+          </>
         )}
       </div>
       <div className={`flex shrink-0 flex-col border-t border-(--neutral-400) py-4 ${collapsed ? 'items-center gap-3' : ''}`}>
@@ -237,7 +280,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
             <Avatar name={profile?.full_name || 'Signed in'} size="lg" />
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <p className="truncate text-body-strong text-(--neutral-100)">{name}</p>
-              {email && <p className="truncate text-caption text-(--neutral-200)">{email}</p>}
+              {email && <p className="truncate text-caption-medium text-(--neutral-200)">{email}</p>}
             </div>
             <AccountMenu onSignOut={signOut} side="above" />
           </div>

@@ -104,11 +104,16 @@
   --text-meta-medium--font-weight: 500;
   --text-meta-medium--line-height: var(--lh-meta);
   --text-meta-medium--letter-spacing: 0.02em;
+  /* Figma caption family (2026-11-05): the same 12 / 16 size in three weights, named like body and meta: caption (Regular), caption-medium (Medium; it was called caption until 2026-11-05) and caption-strong (SemiBold). */
   --text-caption: var(--fs-caption);
-  --text-caption--font-weight: 500;
+  --text-caption--font-weight: 400;
   --text-caption--line-height: 16px;
   --text-caption--letter-spacing: 0.024em; /* Figma: 2.4 % */
-  /* Figma caption-strong (new, 2026-11-02): the caption size in SemiBold, for Badge and chip labels. */
+  --text-caption-medium: var(--fs-caption);
+  --text-caption-medium--font-weight: 500;
+  --text-caption-medium--line-height: 16px;
+  --text-caption-medium--letter-spacing: 0.024em;
+  /* Figma caption-strong (2026-11-02): the caption size in SemiBold, for Badge and chip labels. */
   --text-caption-strong: var(--fs-caption);
   --text-caption-strong--font-weight: 600;
   --text-caption-strong--line-height: 16px;

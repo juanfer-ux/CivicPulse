@@ -49,7 +49,7 @@ export function MediaGallery({ incidentId }: { incidentId: string }) {
             title={m?.is_placeholder === false ? 'File stored' : 'Placeholder: no file yet'}
           >
             {m?.kind === 'video' ? <VideoCamera className="size-5" aria-hidden /> : <Image className="size-5" aria-hidden />}
-            <span className="absolute bottom-1 left-1.5 text-caption">
+            <span className="absolute bottom-1 left-1.5 text-caption-medium">
               {m?.kind === 'video'
                 ? `Video${m.duration_seconds ? ` ${clock(m.duration_seconds)}` : ''}`
                 : m
