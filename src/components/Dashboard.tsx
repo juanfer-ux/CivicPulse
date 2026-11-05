@@ -22,7 +22,7 @@ import type { Area } from '@/lib/agent'
 import { fetchLinkedIncidentIds, fetchProblemDetail, fetchProblems, type ProblemDetailData, type ProblemRow } from '@/lib/problems'
 import { PROBLEM_STATUSES, type ProblemStatus } from '@/lib/statusColors'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
-import { useHeld, useSlide } from '@/lib/useSlide'
+import { useHeld } from '@/lib/useSlide'
 
 const SIDEBAR_DELAY_MS = 1000 // how long the sidebar waits before collapsing or expanding when an incident or problem opens or closes
 
@@ -232,12 +232,9 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   }
 
   const item = shown.value
-  // The map no longer shrinks for the side panel (that left a gap beside the agent panel while the panel slid in or out): it stays under the panel and the camera keeps the target centered in the part that shows (padLeft). The controls over the map follow the panel with a short slide of their own.
-  const panelOpen = item?.kind === 'incident' // only the incident panel is a side panel now; the problem panel and history float over the map
-  const desk = window.matchMedia('(min-width: 90rem)').matches
-  const panelW = item?.kind === 'problem' ? 400 : 360 // the Problem Panel is 400 px wide, the Incident Panel 360 (Figma, 2026-11-02)
+  // Both detail panels float over the map (owner, 2026-11-05), so the map and the controls over it never move for them.
   return (
-    <div className="contents" style={{ '--map-base': 'calc(var(--agent-w) + var(--panel-gap))', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${panelOpen ? ` + ${panelW}px + var(--panel-gap)` : ''})` } as CSSProperties}>
+    <div className="contents" style={{ '--map-base': 'calc(var(--agent-w) + var(--panel-gap))', '--map-left': 'calc(var(--agent-w) + var(--panel-gap))' } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -247,7 +244,6 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         dotStatusById={dotStatusById}
         onSelectProblem={selectProblem}
         onFlightEnd={onFlightEnd}
-        padLeft={desk && selected ? 360 : 0}
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
         areas={areas}
@@ -347,8 +343,6 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
           localityName={localityName.get(item.incident.locality_code)}
           categoryName={data?.categories.find((c) => c.code === item.incident.category)?.name}
           onClose={() => setSelectedId(null)}
-          slide={shown.slide}
-          leaving={shown.leaving}
         />
       ) : (
         item && (
@@ -369,17 +363,16 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   )
 }
 
-function IncidentDetail({ incident, localityName, categoryName, onClose, slide, leaving }: { incident: Incident; localityName: string | undefined; categoryName: string | undefined; onClose: () => void; slide: boolean; leaving: boolean }) {
+function IncidentDetail({ incident, localityName, categoryName, onClose }: { incident: Incident; localityName: string | undefined; categoryName: string | undefined; onClose: () => void }) {
   const panel = useRef<HTMLDivElement>(null)
   useRestoreFocus(panel)
-  useSlide(panel, slide, leaving)
   return (
     <Card
       ref={panel}
       tabIndex={-1}
       role="region"
       aria-label="Incident details"
-      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-0 desk:bottom-0 desk:left-[calc(var(--agent-w)+var(--panel-gap))] desk:z-20 desk:max-h-none desk:w-[360px] desk:rounded-none desk:border-y-0 desk:border-l-0 desk:border-r desk:border-secondary desk:bg-(--neutral-700)"
+      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-6 desk:left-[calc(var(--map-base)+1.5rem)] desk:z-20 desk:max-h-[calc(100%-3rem)] desk:w-[360px] desk:bg-(--neutral-700)"
     >
       <CardHeader className="flex flex-row items-start justify-between gap-2">
         <div>
