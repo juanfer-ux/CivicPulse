@@ -398,8 +398,8 @@
   /* Letter-spacing is set once on the root and inherited (owner, 2026-11-05: spacing differed from Figma). It used to be `* { letter-spacing: 0.02em }`, which reset every nested element to 2 % and threw away the spacing of its text style (a sidebar row label lost its 4 %, a nested stat number went from -2 % to +2 %). Each text style sets its own spacing on its element, and children inherit that value in pixels; text with no style gets 0.02em of the root size, about 0.32 px. */
   html { letter-spacing: 0.02em; }
   body { @apply bg-background text-foreground; }
-  /* Font smoothing is the browser default again (owner, 2026-11-05): grayscale smoothing (`antialiased`, 2026-11-03) thinned the strokes and the text looked soft. Trial; the weights are 400 / 500 / 600 / 700 now, so the old glow may be acceptable. */
-  html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; }
+  /* Grayscale smoothing (owner, 2026-11-03; tried the browser default on 2026-11-05 and it was much bolder, so it is back): macOS draws light text on dark heavier and with a glow unless this is on. No effect on Windows or Linux. */
+  html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
   /* Tailwind 4 stopped giving buttons the pointing hand (owner, 2026-10-30): everything you can click gets it, a disabled one does not. Utilities such as cursor-col-resize still win. */
   button:not(:disabled), [role='button']:not([aria-disabled='true']), [role='menuitem'], [role='option'], [role='tab'], [role='checkbox'], [role='switch'], summary, select, a[href], label:has(input[type='checkbox']), label:has(input[type='radio']) { cursor: pointer; }
   /* Every part of a clickable thing, not only its box (owner, 2026-10-30: the hand dropped out over some letters and icons in Chrome and was missing in Safari): the text, icons and spans inside get the hand explicitly instead of inheriting it. */
