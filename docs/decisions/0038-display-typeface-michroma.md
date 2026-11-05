@@ -8,7 +8,7 @@ The owner changed the display styles in Figma: `display-lg` is now Michroma Regu
 ## Decision
 - Michroma (Google Fonts, OFL-1.1) comes from `@fontsource/michroma`, one weight (400). `--font-display` is Michroma; `--font-display-alt` is Science Gothic, for `display-sm` only.
 - Sign in: headline `foreground` (was `brand-primary`) in two lines as in Figma, subtitle `title-regular` (was `title` at 500), card title `display` in `brand-primary` (Set up your account: `foreground`).
-- Logo: 50.8 px mark with a 14 px gap and a 207.4 x 15.75 wordmark on desktop, 43.5 / 12 / 177.8 x 13.5 on phones; rings, disc and wordmark `brand-primary`, star `neutral-700`. The lockup mark art is cropped to the ring (`logo-mark-lockup.svg`).
+- Logo: 48 px mark with a 13.24 px gap and a 196.1 x 14.9 wordmark on desktop, 43.5 / 12 / 177.8 x 13.5 on phones; rings, disc and wordmark `brand-primary`, star `neutral-700`. One logo component in Figma and one mark file in code (`logo-mark.svg`, cropped to the ring), used at every size, the sidebar and the phone top bar included.
 
 ## Consequences
 One more font file loads on the auth screens (Michroma is wide, so long titles take more room). Science Gothic stays installed for a style nothing uses; remove it when Figma drops `display-sm`.

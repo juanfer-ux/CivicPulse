@@ -105,14 +105,14 @@ function Brand({ collapsed, onToggle }: { collapsed: boolean; onToggle?: () => v
   if (collapsed && onToggle)
     return (
       <Button variant="ghost" className="group size-11 p-0" aria-label="Expand menu" title="Expand menu" onClick={onToggle}>
-        <img src={mark} alt="" width={34} height={34} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
+        <img src={mark} alt="" width={30.8} height={30.8} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
         <SidebarSimple className="hidden size-5 shrink-0 -scale-x-100 group-hover:block group-focus-visible:block" />
       </Button>
     )
   return (
-    <div className="flex items-center gap-[6.4px]">
-      <img src={mark} alt="" width={34} height={34} className="shrink-0" />
-      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={125.7} height={9.6} className="shrink-0" />}
+    <div className={`flex items-center gap-[6.4px] ${collapsed ? '' : 'pl-[5.85px]'}`}>
+      <img src={mark} alt="" width={30.8} height={30.8} className="shrink-0" />
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={125.9} height={9.56} className="shrink-0" />}
     </div>
   )
 }
@@ -152,11 +152,11 @@ function AccountMenu({ onSignOut, side, avatar }: { onSignOut: () => void; side:
   )
 }
 
-/** Phone top bar brand (Figma Mobile Top Bar): 32 px ring and the 118.5 x 9 wordmark, centered. */
+/** Phone top bar brand (Figma Mobile Top Bar): 29 px ring mark and the 118.5 x 9 wordmark, centered. */
 function MobileBrand() {
   return (
     <div className="flex items-center gap-2">
-      <img src={mark} alt="" width={32} height={32} className="shrink-0" />
+      <img src={mark} alt="" width={29} height={29} className="shrink-0" />
       <img src={wordmark} alt="Civic Pulse" width={118.5} height={9} className="shrink-0" />
     </div>
   )
