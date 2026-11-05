@@ -7,7 +7,7 @@ For a new session (local or cloud) that has no memory of the earlier chats. Upda
 - **2026-11-01 map shapes:** incidents are circles now (they were squares; same sizes). Problem statuses show the warning triangle (16 px) instead of a dot; incident statuses show a round 12 px swatch. The Problems and Incidents toggle chips are hidden while an incident or problem panel is open and come back when it closes. The problem panel waits until the camera has finished flying, then appears as a floating card (no slide since 2026-11-05).
 - **Camera and sidebar:** clicking an incident or problem flies the whole trip with no jump, and the sidebar collapses or expands 1 s later ([design.md](design.md)).
 - **Colors:** red, orange, blue and yellow have 100–900 scales like indigo, the 400s unchanged; 57 colors in total (amber-400 and coral-400 were removed: errors and the Active problem status use red-300, warnings and Monitoring use yellow-300) ([decision 0033](decisions/0033-color-scales-red-orange-blue-yellow.md)). They are in `src/index.css`, the docs and Figma, but **not used on screen yet**.
-- **Map smoothness:** the map is drawn at 2x with antialiasing; antialiasing has no level to set ([decision 0031](decisions/0031-map-drawn-at-2x-with-antialiasing.md)).
+- **Map smoothness:** the map is drawn at 2x with antialiasing (and, since 2026-11-05, with `maxCanvasSize` raised to the GPU limit: the default 4096 px cap dropped the ratio to 1.59 on wide windows and brought the crackle back, decision 0031 update); antialiasing has no level to set ([decision 0031](decisions/0031-map-drawn-at-2x-with-antialiasing.md)).
 - A page that compares the old and new marker side by side is in `explorations/problem-circle-gallery.html`.
 
 ## 🟥 Open items
