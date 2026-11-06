@@ -62,14 +62,14 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 9 | `neutral-200` | `#A9A9B2` | `muted-foreground` | Supporting text, table headers, placeholders |
 | 10 | `neutral-100` | `#C1C1C8` | `foreground` (`primary`, `accent-foreground`, `secondary-foreground`) | Normal text, "white" (it was also the main button fill until 2026-11-02) |
 | 11 | `indigo-900` | `#10112A` | none | Deepest agent indigo. New (2026-10-28), not used on screen yet |
-| 12 | `indigo-800` | `#191B44` | none | New (2026-10-28), not used on screen yet |
+| 12 | `indigo-800` | `#191B44` | none | New (2026-10-28); was the Answer Banner fill until 2026-11-05, not used on screen at the moment |
 | 13 | `indigo-700` | `#272A68` | `ai-banner` | Was the conversation banner background and the answer rings; not used on screen at the moment |
-| 14 | `indigo-600` | `#343193` | none | Not used on screen at the moment (was the locality outline until 2026-10-28). |
+| 14 | `indigo-600` | `#343193` | none | The Answer Banner fill (Figma, 2026-11-05; it was indigo-800 until then, and the locality outline until 2026-10-28). |
 | 15 | `indigo-500` | `#4C49C1` | none (map only, `--map-answer-radius-ring`) | Ring of the agent's answer radius (circle). |
 | 16 | `indigo-400` | `#5C59FF` | `ai-border` | Agent accents: the bars of an answer, the agent input ring, the panel resize line on hover. 3.9 : 1 on the agent panel, so **graphics only, never text** |
 | 17 | `indigo-300` | `#9593FF` | `--map-locality-line` (map only, 2026-10-30) | New (2026-10-28) |
-| 18 | `indigo-200` | `#C1C0FF` | `--map-locality-line-focus` (map only, 2026-10-30) | New (2026-10-28) |
-| 19 | `indigo-100` | `#E7E6FF` | none | Lightest agent indigo. New (2026-10-28), not used on screen yet |
+| 18 | `indigo-200` | `#C1C0FF` | `--map-locality-line-focus` (map only, 2026-10-30); the Answer Banner icon (2026-11-05) | New (2026-10-28) |
+| 19 | `indigo-100` | `#E7E6FF` | none | Lightest agent indigo; the Answer Banner text (2026-11-05). New (2026-10-28) |
 | 20 | `red-900` | `#270D0E` | none | Red scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
 | 21 | `red-800` | `#4B2122` | none | Red scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
 | 22 | `red-700` | `#743537` | none | Red scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
