@@ -243,11 +243,11 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
               <div className="px-2">
                 <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-600) border-(--neutral-400) text-body-sm" />
               </div>
-              {/* The map is always the page, so this row only says where you are. */}
-              <div aria-current="page" className="flex h-10 items-center gap-3 px-2 text-body-sm-medium text-(--neutral-100)">
+              {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
+              <Button variant="ghost" className="h-10 w-full justify-start gap-3 px-[7px] text-body-sm-medium text-(--neutral-100) hover:bg-(--neutral-800)" onClick={onNew}>
                 <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
                 Explore
-              </div>
+              </Button>
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
               <div className="flex flex-col gap-2.5 py-2">
