@@ -65,10 +65,10 @@ function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row }: { title
       <div className="flex h-8 items-center gap-2.5 pr-1.5 pl-2.5">
         <p className="flex-1 text-caption-medium text-(--neutral-200)">{title}</p>
         <Button size="icon" variant="ghost" className="size-8" aria-label={`${title}: ${newest ? 'newest first. Show oldest first' : 'oldest first. Show newest first'}`} title={newest ? 'Newest first' : 'Oldest first'} onClick={() => setNewest((n) => !n)}>
-          <FunnelSimple weight="regular" className="size-4 text-(--white)" />
+          <FunnelSimple weight="regular" className="size-4 text-(--neutral-100)" />
         </Button>
         <Button size="icon" variant="ghost" className="size-8" aria-label={addLabel} title={addLabel} onClick={onAdd}>
-          <Plus weight="regular" className="size-4 text-(--white)" />
+          <Plus weight="regular" className="size-4 text-(--neutral-100)" />
         </Button>
       </div>
       <div className="flex flex-col gap-0.5 px-1">{(newest ? items : [...items].reverse()).map(row)}</div>
@@ -238,8 +238,8 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
                 <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-600) border-(--neutral-400) text-body-sm" />
               </div>
               {/* The map is always the page, so this row only says where you are. */}
-              <div aria-current="page" className="flex h-[38px] items-center gap-3 px-3 text-body-sm-medium text-(--neutral-100)">
-                <Compass weight="regular" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
+              <div aria-current="page" className="flex h-10 items-center gap-3 px-3 text-body-sm-medium text-(--neutral-100)">
+                <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
                 Explore
               </div>
             </div>
