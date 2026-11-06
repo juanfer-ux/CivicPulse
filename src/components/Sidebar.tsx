@@ -65,12 +65,15 @@ function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row }: { title
     <div className={`flex flex-col gap-2 px-1.5 pt-2 ${pb}`}>
       <div className="flex h-8 items-center gap-2.5 pr-1.5 pl-2.5">
         <p className="flex-1 text-caption-medium text-(--neutral-200)">{title}</p>
-        <Button size="icon" variant="ghost" className="size-8" aria-label={`${title}: ${newest ? 'newest first. Show oldest first' : 'oldest first. Show newest first'}`} title={newest ? 'Newest first' : 'Oldest first'} onClick={() => setNewest((n) => !n)}>
-          <FunnelSimple weight="regular" className="size-4 text-(--neutral-100)" />
-        </Button>
-        <Button size="icon" variant="ghost" className="size-8" aria-label={addLabel} title={addLabel} onClick={onAdd}>
-          <Plus weight="regular" className="size-4 text-(--neutral-100)" />
-        </Button>
+        {/* Figma "Actions": the sort and plus buttons side by side with no gap (2 x 32 px). */}
+        <div className="flex">
+          <Button size="icon" variant="ghost" className="size-8" aria-label={`${title}: ${newest ? 'newest first. Show oldest first' : 'oldest first. Show newest first'}`} title={newest ? 'Newest first' : 'Oldest first'} onClick={() => setNewest((n) => !n)}>
+            <FunnelSimple weight="regular" className="size-4 text-(--neutral-100)" />
+          </Button>
+          <Button size="icon" variant="ghost" className="size-8" aria-label={addLabel} title={addLabel} onClick={onAdd}>
+            <Plus weight="regular" className="size-4 text-(--neutral-100)" />
+          </Button>
+        </div>
       </div>
       <div className="flex flex-col gap-0.5 px-1">{(newest ? items : [...items].reverse()).map(row)}</div>
     </div>
