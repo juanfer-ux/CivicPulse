@@ -12,6 +12,7 @@ For a new session (local or cloud) that has no memory of the earlier chats. Upda
 
 ## 🟥 Open items
 - **Sidebar default width 300 px (owner, 2026-11-05):** was 245 (min stays 245, max 380); the Figma expanded Sidebar is 300 wide too (rows fill). A browser that already saved a dragged width keeps it until the handle is double-clicked.
+- **Weight offset -60 and 0 % small-body spacing (owner, 2026-11-05):** every weight is base + `--weight-offset` (-60: 340 / 440 / 540 / 640) and body-sm, body-sm-medium and body-sm-strong have 0 % letter spacing (Figma). `-moz-osx-font-smoothing` is `grayscale`. To undo the offset set it to 0.
 - **Font smoothing is `auto` (owner, 2026-11-05):** the browser default, for both `-webkit-font-smoothing` and `-moz-osx-font-smoothing`. `none` looked terrible (jagged edges) and `antialiased` was thinner. See foundations.md (Smoothing).
 - **Answer Banner (owner's Figma, 2026-11-05):** `indigo-600` fill, `indigo-100` text, `indigo-200` icon, and the "Clear agent results" button is now a secondary small button (24 px high). Details in foundations.md (Conversation banner).
 - **No animation on resize or in answer charts (owner, 2026-11-05):** while a resize handle is dragged `html[data-resizing]` turns every transition off (the map's chips and filter bar used to glide behind the handle); the answer charts (`AnswerCharts.tsx`, Recharts) have `isAnimationActive={false}`, so bars and the area appear at once and do not replay when the panel is resized.
