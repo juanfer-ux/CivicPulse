@@ -257,7 +257,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. */}
       {chatMode && (
-        <div data-float className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-600) px-5 text-meta text-(--indigo-100) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-[var(--map-left)] desk:inset-x-auto">
+        <div data-float className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-600) px-5 text-meta text-(--indigo-100) desk:absolute desk:top-(--page-pad) desk:right-(--page-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:inset-x-auto desk:rounded-sm">
           <ChatCircleDots weight="fill" className="size-5 shrink-0 text-(--indigo-200)" aria-hidden />
           <span className="flex-1">While showing the agent's answer on the map, filters will narrow it down.</span>
           <Button size="sm" variant="secondary" onClick={onClearHighlight}>
@@ -288,7 +288,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
           categories={data.categories}
           counts={byGroup}
           problemCounts={hasProblems ? byProblemStatus : undefined}
-          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--page-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--page-pad)+var(--page-pad))]'} desk:right-(--page-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:transition-[left] desk:duration-300 desk:mx-auto desk:max-w-[1280px]`}
+          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--page-pad)+var(--page-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--page-pad)+var(--page-pad))]'} desk:right-(--page-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:transition-[left] desk:duration-300 desk:mx-auto desk:max-w-[1280px]`}
         />
       )}
 
@@ -317,7 +317,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         role="region"
         data-float
         aria-label="Busiest localities"
-        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-(--page-pad) overflow-y-auto desk:absolute desk:right-(--page-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:z-10 desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--page-pad))]'}`}
+        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-(--page-pad) overflow-y-auto desk:absolute desk:right-(--page-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:z-10 desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--page-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--page-pad))]'}`}
       >
         {error ? (
           <p className="col-span-full text-incident">{error}</p>
@@ -338,7 +338,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:py-(--page-pad) desk:pr-(--page-pad) desk:pl-(--sidebar-gap)`}
       >
         {/* Outer container: the shared float padding (12 px) on every side (owner, 2026-11-06); the panel itself is this inner box. */}
-        <div data-float className="flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-lg desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_92%,transparent)] desk:p-0">
+        <div data-float className="flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-r-lg desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_92%,transparent)] desk:p-0">
           {children}
         </div>
       </div>

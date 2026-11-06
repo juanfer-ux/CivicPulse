@@ -219,7 +219,7 @@
   --stat-row-h: 117px; /* height of the row of Stat Cards over the map (82 top + 33 trend strip + the 2 half-pixel borders, which a standard-density screen draws as 1 px each); the filters start below it */
   --panel-gap: 0px; /* no space between the sidebar, the agent panel and the map on desktop: they touch and a right-side line divides them (owner, 2026-10-30, branch flush-dividers) */
   --page-pad: 12px; /* THE layout rule (owner, 2026-11-06): 12 px around the page and around everything that floats on the map (stat cards, filters, chips, detail panels). Change it here once. */
-  --sidebar-gap: 6px; /* the only exception: the space between the sidebar and the agent panel */
+  --sidebar-gap: 0px; /* the only exception: the space between the sidebar and the agent panel */
   --group-gap: 20px; /* the space between the panels group (sidebar + agent panel) and what floats on the map (stat cards, filters, chips, detail panels) */
   --agent-header-h: 70px; /* height of the Investigate and Ask title row (a line runs across the screen with the map header when it is shown) */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
@@ -296,7 +296,7 @@
   --foreground: var(--neutral-100);
   --ai: var(--neutral-900); /* the agent panel's background (owner, 2026-10-29; it was neutral-800) */
   --ai-border: var(--indigo-400);
-  --answer-banner-h: 48px; /* conversation banner height (Figma Answer Banner: 48 since 2026-11-05, 8 px padding around the 32 px button; it was 44 from 2026-10-28 and 38 before); the filters and the stats card move down by this much while it shows */
+  --answer-banner-h: 56px; /* conversation banner height (Figma Answer Banner: 56 since 2026-11-06, a floating rounded box (radius 4) that respects --page-pad; 48 from 2026-11-05, 8 px padding around the 32 px button; it was 44 from 2026-10-28 and 38 before); the filters and the stats card move down by this much while it shows */
   --ai-banner: var(--indigo-700); /* conversation banner background and the answer rings on the map, light text on it. Figma indigo-700 (map/banner is its alias) */
   --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
   --warning: var(--yellow-300);
