@@ -15,7 +15,7 @@ type Step =
   | { key: string; at: number; kind: 'event'; text: string }
 
 /**
- * A problem's history as two separate floating cards at the bottom of the map (owner, 2026-11-05), apart from the Problem Panel and 40 px apart: the vertical occurrences list on the left, 40% of the width (its own scroll: occurrences with
+ * A problem's history as two separate floating cards at the bottom of the map (owner, 2026-11-05), apart from the Recurrence Panel and 40 px apart: the vertical occurrences list on the left, 40% of the width (its own scroll: occurrences with
  * their reports, interventions and events, oldest first) and the lanes timeline on the right, 60% (percentages of the width without the gap). Both are 360 px tall. On phones they sit stacked in the bottom sheet.
  */
 export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { problem: ProblemRow; detail: ProblemDetailData | null; onSelectIncident: (id: string) => void }) {

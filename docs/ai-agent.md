@@ -40,13 +40,13 @@ Unsupported questions get an honest "I cannot answer that yet". The agent does n
 ## 🛡️ Rules (never break these)
 1. 🔢 Never invent a statistic. Numbers, comparisons, percentages and counts are **calculated by SQL or deterministic code**, not by a language model.
 2. 📎 Always show the evidence and the limitations. Always say the data is synthetic.
-3. 🚫 Never claim a legal violation. The agent identifies *potential obstruction problems*.
+3. 🚫 Never claim a legal violation. The agent identifies *potential obstruction recurrences*.
 4. 📷 Never claim to have inspected photos or video: media are placeholders today.
 5. 🧑 Never act. The agent only recommends; a person decides. (The screens for sending a proposal for review were removed on 2026-10-18; the database part is kept, see [decision 0009](decisions/0009-recommendations-screens-removed.md).)
 6. ❓ If the data cannot support an answer, say so.
 
 ## 🔗 Matching is rules, not AI
-> 🟨 *Decision [0030](decisions/0030-problems-above-incidents.md); not built yet.* Linking reports to persistent problems is **deterministic SQL in this version** (`match_unlinked()`, owner-only), not part of "Investigate and Ask" and not an AI. It uses place, category, address, subtype, vehicle identity, documented interventions and time; every link stores its score and explanation. The agent and its five `tool_*` functions are unchanged and still read incidents. Later, AI may add bounded signals (text and image similarity, explanations) server-side; it may never confirm a link, invent evidence or resolve a problem.
+> 🟨 *Decision [0030](decisions/0030-problems-above-incidents.md); not built yet.* Linking reports to recurrences is **deterministic SQL in this version** (`match_unlinked()`, owner-only), not part of "Investigate and Ask" and not an AI. It uses place, category, address, subtype, vehicle identity, documented interventions and time; every link stores its score and explanation. The agent and its five `tool_*` functions are unchanged and still read incidents. Later, AI may add bounded signals (text and image similarity, explanations) server-side; it may never confirm a link, invent evidence or resolve a problem.
 
 ## 🔮 Target and done
 | | Item |

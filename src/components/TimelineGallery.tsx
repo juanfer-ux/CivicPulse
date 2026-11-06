@@ -9,7 +9,7 @@ import type { ProblemDetailData } from '@/lib/problems'
 import { buildTimeline, tickLabel } from '@/lib/timeline'
 
 /**
- * Open /#timeline (no sign-in): the same problem history shown six ways with shadcn Chart, so one can be chosen for the Problem Panel (owner, 2026-11-02).
+ * Open /#timeline (no sign-in): the same problem history shown six ways with shadcn Chart, so one can be chosen for the Recurrence Panel (owner, 2026-11-02).
  * Nothing in the app uses this page. The switch at the top changes the sample: the Figma example (3 occurrences) or a busy history (14 occurrences over 9 months).
  */
 
@@ -21,7 +21,7 @@ const grid = 'var(--neutral-500)'
 const TOW = 'var(--blue-300)'
 const STATUS = 'var(--map-problem-active)'
 
-/** The two samples, in the same shape the Problem Panel gets from the database. */
+/** The two samples, in the same shape the Recurrence Panel gets from the database. */
 function sample(kind: 'small' | 'busy'): ProblemDetailData {
   const starts = kind === 'small' ? ['2026-08-12', '2026-09-08', '2026-10-12'].map(at) : Array.from({ length: 14 }, (_, i) => at('2026-01-12') + i * 20 * DAY)
   const counts = kind === 'small' ? [5, 4, 3] : starts.map((_, i) => 2 + ((i * 5 + 3) % 8))
@@ -87,7 +87,7 @@ export function TimelineGallery() {
     <main className="mx-auto flex max-w-6xl flex-col gap-8 p-8">
       <header className="flex flex-col gap-3">
         <div>
-          <h1 className="text-heading">Problem history: ways to show it as a timeline</h1>
+          <h1 className="text-heading">Recurrence history: ways to show it as a timeline</h1>
           <p className="text-body-sm text-muted-foreground">
             The same history in each card, all built with shadcn Chart. Nothing in the app uses this page. Blue dashed lines are tows (interventions). Try the busy sample to see how each one copes with many occurrences.
           </p>
@@ -103,7 +103,7 @@ export function TimelineGallery() {
       </header>
 
       <div className="grid items-start gap-4 md:grid-cols-3">
-        <Option name="A · Lanes (in the Problem Panel now)" note="Every kind of mark has its own lane on a time axis to scale; hover for the PRK, source and time, click to open. Shows everything, scrolls sideways when busy.">
+        <Option name="A · Lanes (in the Recurrence Panel now)" note="Every kind of mark has its own lane on a time axis to scale; hover for the PRK, source and time, click to open. Shows everything, scrolls sideways when busy.">
           <ProblemTimeline detail={detail} status="active" onSelectIncident={() => {}} />
         </Option>
 

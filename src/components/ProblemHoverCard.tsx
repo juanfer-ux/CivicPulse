@@ -5,9 +5,9 @@ import type { ProblemRow } from '@/lib/problems'
 const date = (iso: string, year: boolean) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(year ? { year: 'numeric' } : {}) })
 
 /**
- * A very small view of a problem (owner, 2026-10-30; Figma Problem Card, adjusted 2026-11-02), shown while the pointer is over it on the map, at any zoom:
+ * A very small view of a problem (owner, 2026-10-30; Figma Recurrence Card, adjusted 2026-11-02), shown while the pointer is over it on the map, at any zoom:
  * where, its status, the occurrences with the dates they span, the reports behind them and the interventions.
- * The full story is in the Problem Panel (click).
+ * The full story is in the Recurrence Panel (click).
  */
 export function ProblemHoverCard({ problem, className = '', style }: { problem: ProblemRow; className?: string; style?: CSSProperties }) {
   const sameYear = !!problem.first_seen && !!problem.last_seen && new Date(problem.first_seen).getFullYear() === new Date(problem.last_seen).getFullYear()

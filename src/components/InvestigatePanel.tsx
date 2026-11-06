@@ -64,16 +64,16 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:p-8">
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
         <ScrollArea className="min-h-0 flex-1 desk:-mx-8" viewportClassName="[&>div]:!block">
-        <div className={`flex w-full flex-col gap-3 text-body-sm max-desk:mx-auto max-desk:max-w-[664px] desk:px-8 ${turns.length === 0 ? '' : 'desk:max-w-[728px]'}`}>
+        <div className={`flex w-full flex-col gap-3 text-body-sm max-desk:mx-auto max-desk:max-w-[664px] desk:max-w-[728px] desk:px-8 ${turns.length === 0 ? 'desk:mx-auto' : ''}`}>
           {turns.length === 0 && (
-            <div className="flex flex-col gap-6">
-              {/* The empty panel (owner's Figma, 2026-11-05), with Figma's auto layout limits: the Quick questions and the composer are at most 664 wide (the greeting "Let’s take a look..." is hidden in Figma, so it is not shown), and the cards fill the width and wrap (each at least 250 wide). The title row is hidden on desktop until the first question. */}
+            <div className="flex flex-col gap-10">
+              {/* The empty panel (owner's Figma, 2026-11-05), with Figma's auto layout limits: the whole content (cards, Quick questions) and the composer are at most 664 wide and centered (the greeting "Let’s take a look..." is hidden in Figma, so it is not shown), and the cards fill the width and wrap (each at least 250 wide). The title row is hidden on desktop until the first question. */}
               <div className="flex flex-col gap-3">
                 <p className="text-body-strong text-(--neutral-200)">Worth investigating</p>
                 <div className="flex flex-wrap gap-3">
                   {WORTH_INVESTIGATING.map((c) => (
                     <button key={c.title} type="button" className="flex min-w-[250px] flex-1 basis-[250px] cursor-pointer gap-5 overflow-hidden rounded-lg bg-(--neutral-700) p-2 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => void ask(c.question)}>
-                      <span className="flex min-w-0 flex-1 flex-col gap-2.5 p-1">
+                      <span className="flex min-w-0 flex-1 flex-col justify-between gap-2.5 p-1">
                         <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
                         <span className="text-subtitle text-(--neutral-200)">{c.title}</span>
                       </span>
@@ -84,7 +84,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
               </div>
               <div className="flex max-w-[664px] flex-col gap-3">
                 <p className="text-body-strong text-(--neutral-200)">Quick questions</p>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1.5">
                   {SUGGESTIONS.map((s) => (
                     <Button key={s} variant="ghost" className="h-auto justify-start whitespace-normal rounded-lg bg-(--neutral-700) p-3 text-left text-body-sm-medium text-(--neutral-200) hover:bg-(--neutral-600) hover:text-(--neutral-200)" onClick={() => void ask(s)}>
                       {s}
@@ -105,7 +105,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           <div ref={end} />
         </div>
         </ScrollArea>
-        <form onSubmit={onSubmit} className="flex w-full max-w-[664px] items-center gap-2 max-desk:mx-auto">
+        <form onSubmit={onSubmit} className={`flex w-full max-w-[664px] items-center gap-2 max-desk:mx-auto ${turns.length === 0 ? 'desk:mx-auto' : ''}`}>
           <Input name="q" value={text} onChange={(e) => setText(e.target.value)} placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" />
           <Button type="submit" size="icon" aria-label="Ask" className="bg-(--white) hover:bg-(--white)/90" disabled={busy || !text.trim()}>
             <ArrowUp aria-hidden />

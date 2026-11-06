@@ -30,9 +30,9 @@ const PLACEHOLDERS = [
   'Debris on main roads',
 ]
 
-/** The three row types of the sidebar (Figma 2026-11-05): Persistent (a problem, warning icon in its status color), Incident (a red dot) and Investigation. Examples like the investigations' PLACEHOLDERS: they open nothing yet. */
-type Persistent = { id: number; title: string; status: ProblemStatus; reference?: string }
-const PLACEHOLDER_PERSISTENT: Persistent[] = [
+/** The three row types of the sidebar (Figma 2026-11-05): Recurrence (warning icon in its status color), Incident (a red dot) and Investigation. Examples like the investigations' PLACEHOLDERS: they open nothing yet. */
+type RecurrenceRow = { id: number; title: string; status: ProblemStatus; reference?: string }
+const PLACEHOLDER_RECURRENCES: RecurrenceRow[] = [
   { id: -1, title: 'Parque La Serena, costado norte', status: 'active', reference: 'PR-00088' },
   { id: -2, title: 'Av. Boyacá con Cl 72', status: 'monitoring', reference: 'PR-00090' },
   { id: -3, title: 'Cra 13 #62-40, entrada del edificio Aurora', status: 'resolved', reference: 'PR-00091' },
@@ -45,7 +45,7 @@ const PLACEHOLDER_INCIDENTS: Incident[] = [
   { id: -3, title: 'Illegal dumping', reference: 'CP-00202', group: 'approved' },
 ]
 
-/** Two-line row shared by Persistent and Incident (Figma Sidebar Item Persistent / Incident: 224.5 x 50, 6 left, 4 top, 6 bottom, 20 right, a 16 x 40 icon column with the 16 px icon 4 px below its top, 10 px to the text). */
+/** Two-line row shared by Recurrence and Incident (Figma Sidebar Item Recurrence / Incident: 224.5 x 50, 6 left, 4 top, 6 bottom, 20 right, a 16 x 40 icon column with the 16 px icon 4 px below its top, 10 px to the text). */
 function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNode; title: string; sub: ReactNode; active?: boolean; tip: string; onClick: () => void }) {
   return (
     <Button variant="ghost" className={`h-[50px] items-start justify-start gap-2.5 pt-[3px] pb-[5px] pl-[5px] pr-[19px] hover:bg-(--neutral-800) ${active ? 'bg-(--neutral-800)' : ''}`} title={tip} aria-current={active || undefined} onClick={onClick}>
@@ -58,7 +58,7 @@ function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNo
   )
 }
 
-/** One sidebar section (Figma Persistent / Incidents / Investigations): a title row with its own sort button and plus, then the list. Each section sorts on its own. */
+/** One sidebar section (Figma Recurrences / Incidents / Investigations): a title row with its own sort button and plus, then the list. Each section sorts on its own. */
 function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row }: { title: string; items: T[]; addLabel: string; onAdd?: () => void; pb?: string; row: (t: T) => ReactNode }) {
   const [newest, setNewest] = useState(true)
   return (
@@ -223,7 +223,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
   const [caseId, setCaseId] = useState<number | null>(null)
   const [query, setQuery] = useState('')
   const hit = (t: string) => t.toLowerCase().includes(query.trim().toLowerCase())
-  const persistent: Persistent[] = [...cases.map((c) => ({ id: c.id, title: c.title, status: 'active' as const })), ...PLACEHOLDER_PERSISTENT].filter((c) => hit(c.title))
+  const recurrences: RecurrenceRow[] = [...cases.map((c) => ({ id: c.id, title: c.title, status: 'active' as const })), ...PLACEHOLDER_RECURRENCES].filter((c) => hit(c.title))
   const investigations = [...chats.map((c) => ({ key: c.id, title: c.title, id: c.id })), ...PLACEHOLDERS.map((t) => ({ key: t, title: t, id: null }))].filter((c) => hit(c.title)).reverse() // chats arrive oldest first, the list shows newest first
   return (
     <div className="flex h-full flex-col justify-between">
@@ -251,10 +251,10 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
               <div className="flex flex-col gap-2.5 py-2">
-                <Section title="Persistent" items={persistent} addLabel="New case" onAdd={onNewCase} pb="pb-2.5" row={(c) => (
+                <Section title="Recurrences" items={recurrences} addLabel="New recurrence" onAdd={onNewCase} pb="pb-2.5" row={(c) => (
                   <TwoLineItem key={c.id} active={c.id === caseId} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => setCaseId(c.id)} title={c.title}
                     icon={<Warning weight="fill" className="size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
-                    sub={c.reference ? <>{c.reference} · <span className="text-caption-strong">{PROBLEM_STATUS[c.status].label}</span></> : 'Not linked to a problem yet'} />
+                    sub={c.reference ? <>{c.reference} · <span className="text-caption-strong">{PROBLEM_STATUS[c.status].label}</span></> : 'Not linked to a recurrence yet'} />
                 )} />
                 <Section title="Incidents" items={PLACEHOLDER_INCIDENTS.filter((i) => hit(i.title))} addLabel="New incident" row={(i) => (
                   <TwoLineItem key={i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => {}} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-3 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={<>{i.reference} · <span className="text-caption-strong">{GROUPS[i.group].label}</span></>} />
