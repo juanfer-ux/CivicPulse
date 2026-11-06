@@ -26,7 +26,7 @@ const fitPadding = (wide: boolean) => (wide ? { top: 272, bottom: 74, left: 40, 
 const BADGE_ZOOM = 13 // from here the plain squares become squares with the category icon (owner, 2026-10-30; was 14)
 /** Zoom the camera flies to when an incident is opened. */
 const INCIDENT_ZOOM = 15
-/** Zoom the camera flies to when a persistent problem is opened: close enough that its incidents (a few tens of metres around the marker) show as separate dots around the marker's tile. */
+/** Zoom the camera flies to when a recurrence is opened: close enough that its incidents (a few tens of metres around the marker) show as separate dots around the marker's tile. */
 const PROBLEM_ZOOM = 18
 const DOTS_ZOOM = 14 // from here every problem's incidents show as dots
 /** The closest the map zooms (owner, 2026-10-30). The basemap has no more detail past zoom 15, so more zoom only stretches it. */
@@ -67,7 +67,7 @@ const LOCALITY_FILL = 0.04
 const LOCALITY_FILL_FOCUS = 0.06
 /** How strong the answer radius fill gets at its edge (Figma: 5.9 % on the Fill layer). */
 const ANSWER_FILL_ALPHA = 0.06
-/** Problem radius: its size in meters around the marker. */
+/** Recurrence radius: its size in meters around the marker. */
 const PROBLEM_RADIUS_M = 60
 const PROBLEM_FILL_ALPHA = 0.024 // the radius fill and ring follow the owner's Figma Incident Radius (2026-10-30): fill 2.4 %, ring 0.5 px at 35 %...
 const PROBLEM_RING_ALPHA = 0.2 // the ring is drawn 1 px wide at 20 % because a 0.5 px line at 35 % (the Figma value) is the same brightness but crackles on screen: half a pixel cannot be drawn evenly (measured: brightness varied 1 to 51 along the circle, against 9 to 36 for 1 px)
@@ -101,7 +101,7 @@ interface Props {
   /** Locality to zoom to (a bar was clicked); n changes on every click. */
   zoomTo?: { code: number; n: number } | null
   onSelect: (id: string | null) => void
-  /** Persistent problems to draw as one marker each (the Problems view); the incidents prop then holds only the open problem's incidents. */
+  /** Recurrences to draw as one marker each (the Recurrences view); the incidents prop then holds only the open problem's incidents. */
   problems?: ProblemRow[]
   selectedProblemId?: string | null
   onSelectProblem?: (id: string) => void
@@ -312,7 +312,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         },
         underLabels,
       )
-      // Problem radius (owner, 2026-10-30): the same radius look as the agent's answer, one per problem in its status color, so a problem reads as an area and not just a marker. Real meters, under the dots and names.
+      // Recurrence radius (owner, 2026-10-30): the same radius look as the agent's answer, one per problem in its status color, so a problem reads as an area and not just a marker. Real meters, under the dots and names.
       map.addSource('problem-radius', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       // From the first zoom (11, owner 2026-10-30; it used to fade in from 12) at full strength: 72 px in radius up to zoom 12, shrinking to 36 px at zoom 14, then to its real size (60 m, about 50 px in radius at zoom 17). Until the real size is bigger it never draws under that minimum on screen.
       const problemPx = (f: number) =>
@@ -379,7 +379,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
           'icon-allow-overlap': true,
         },
       })
-      // Persistent problems (decision 0030; Figma Problem Marker): one marker per problem, a light disc with the occurrence count over it, a status-colored ring and a category badge. The incidents of the open problem draw with the normal incident layers.
+      // Recurrences (decision 0030; Figma Recurrence Marker): one marker per problem, a light disc with the occurrence count over it, a status-colored ring and a category badge. The incidents of the open problem draw with the normal incident layers.
       map.addSource('problems', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer({
         id: 'problem-markers',
@@ -457,7 +457,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     })
   }, [ready, incidents, highlightIds, dotStatusById, problemIncidentIds])
 
-  // Persistent problems: one marker each, whatever the zoom.
+  // Recurrences: one marker each, whatever the zoom.
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return

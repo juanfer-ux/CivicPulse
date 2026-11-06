@@ -58,7 +58,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   const [filters, setFilters] = useState<Filters>(NO_FILTERS)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState(false) // mobile bottom sheet only
-  // Persistent problems (decision 0030). If the database does not have the layer yet, the list stays empty and the map shows incidents exactly as before.
+  // Recurrences (decision 0030). If the database does not have the layer yet, the list stays empty and the map shows incidents exactly as before.
   const [problems, setProblems] = useState<ProblemRow[]>([])
   const [linked, setLinked] = useState<Map<string, string>>(() => new Map()) // incident -> problem it is confirmed into: the loose layers hide it, the problem's dots show it up close
   const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null)
@@ -146,7 +146,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
     return [...counts].sort((a, b) => b[1].n - a[1].n).slice(0, 4)
   }, [data])
 
-  // Problems view: the same filters, applied to problems. Days means "reported in that window"; a problem has no incident status, it has its own.
+  // Recurrences view: the same filters, applied to problems. Days means "reported in that window"; a problem has no incident status, it has its own.
   const problemsBeforeStatus = useMemo(
     () =>
       problems.filter(

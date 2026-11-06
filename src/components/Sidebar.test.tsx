@@ -38,7 +38,7 @@ describe('Sidebar — creating investigations and cases', () => {
     const onNewCase = vi.fn()
     render(<Sidebar {...baseProps} onNewCase={onNewCase} />)
 
-    await user.click(screen.getByRole('button', { name: 'New case' }))
+    await user.click(screen.getByRole('button', { name: 'New recurrence' }))
     expect(onNewCase).toHaveBeenCalledTimes(1)
   })
 
@@ -60,10 +60,10 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(onNew).toHaveBeenCalledTimes(1)
   })
 
-  it('shows Persistent, Incidents and Investigations in one sidebar', () => {
+  it('shows Recurrences, Incidents and Investigations in one sidebar', () => {
     render(<Sidebar {...baseProps} />)
 
-    for (const t of ['Persistent', 'Incidents', 'Investigations']) expect(screen.getByText(t)).toBeInTheDocument()
+    for (const t of ['Recurrences', 'Incidents', 'Investigations']) expect(screen.getByText(t)).toBeInTheDocument()
     expect(screen.getByText('Existing investigation')).toBeInTheDocument()
     expect(screen.getByText(/PR-00088/)).toBeInTheDocument()
     expect(screen.getByText('Access ramp obstruction')).toBeInTheDocument()
@@ -76,7 +76,7 @@ describe('Sidebar — creating investigations and cases', () => {
 
     await user.click(screen.getByRole('button', { name: /^Incidents: newest first/ }))
     expect(screen.getByRole('button', { name: /^Incidents: oldest first/ })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^Persistent: newest first/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Recurrences: newest first/ })).toBeInTheDocument()
   })
 
   it('the search filters the three lists', async () => {

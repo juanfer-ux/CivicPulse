@@ -9,10 +9,10 @@ export const GROUPS = {
 } as const
 export type Group = keyof typeof GROUPS
 
-/** Lifecycle of a persistent problem (decision 0030): its own, separate from the incident statuses. */
+/** Lifecycle of a recurrence (decision 0030): its own, separate from the incident statuses. */
 export type ProblemStatus = 'active' | 'monitoring' | 'resolved' | 'archived'
 export const PROBLEM_STATUSES: ProblemStatus[] = ['active', 'monitoring', 'resolved', 'archived']
-/** Label and color token (CSS variable) of each problem status; `pill` is the fill and text of its status pill on the Problem Card and Panel (Figma draws only Active: red-900 and red-200; the others follow the same pattern, owner to confirm). */
+/** Label and color token (CSS variable) of each problem status; `pill` is the fill and text of its status pill on the Recurrence Card and Panel (Figma draws only Active: red-900 and red-200; the others follow the same pattern, owner to confirm). */
 export const PROBLEM_STATUS: Record<ProblemStatus, { label: string; token: string; pill: { bg: string; text: string } }> = {
   active: { label: 'Active', token: '--map-problem-active', pill: { bg: '--red-900', text: '--red-200' } },
   monitoring: { label: 'Monitoring', token: '--map-problem-monitoring', pill: { bg: '--yellow-900', text: '--yellow-200' } },

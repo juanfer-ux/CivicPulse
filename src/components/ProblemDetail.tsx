@@ -10,7 +10,7 @@ import { useRestoreFocus } from '@/lib/useRestoreFocus'
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 
 /**
- * The persistent problem (decision 0030): its status and the facts: occurrences, recurrence, reports, interventions, last reported. Its history
+ * The recurrence (decision 0030): its status and the facts: occurrences, recurrence, reports, interventions, last reported. Its history
  * lives in its own floating card at the bottom of the map (ProblemTimelineCard). It is a 400 px floating card in the map's top-left corner (owner, 2026-11-05: no longer a side panel).
  */
 export function ProblemDetail({
@@ -31,7 +31,7 @@ export function ProblemDetail({
       ref={panel}
       tabIndex={-1}
       role="region"
-      aria-label="Problem details"
+      aria-label="Recurrence details"
       className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-6 desk:left-[calc(var(--map-base)+1.5rem)] desk:z-20 desk:max-h-[calc(100%-3rem)] desk:w-[400px] desk:bg-(--neutral-800)"
     >
       <div className="flex flex-col gap-4 px-4 py-6">
@@ -51,7 +51,7 @@ export function ProblemDetail({
         <dl className="grid grid-cols-[6rem_1fr] gap-x-3 gap-y-2 text-muted-foreground [&>dd]:text-body-sm-strong [&>dt]:text-body-sm-medium">
           <dt className="text-muted-foreground">Occurrences</dt>
           <dd className="text-foreground">{problem.occurrences_n}</dd>
-          <dt className="text-muted-foreground">Recurrence</dt>
+          <dt className="text-muted-foreground">Returns</dt>
           <dd className="text-foreground">
             {problem.recurrences_n === 0 ? 'Has not come back' : `Came back ${problem.recurrences_n} ${problem.recurrences_n === 1 ? 'time' : 'times'}`}
           </dd>

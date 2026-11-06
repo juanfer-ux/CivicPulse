@@ -176,7 +176,7 @@ export function ChartGallery() {
       </Row>
 
       <p className="text-body-sm text-muted-foreground">
-        The Problem Panel's history as a timeline has its own page with more options: open <code>/#timeline</code>.
+        The Recurrence Panel's history as a timeline has its own page with more options: open <code>/#timeline</code>.
       </p>
     </main>
   )

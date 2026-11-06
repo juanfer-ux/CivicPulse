@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase'
 import type { Incident } from '@/lib/incidents'
 import type { ProblemStatus } from '@/lib/statusColors'
 
-/** A persistent problem with its derived numbers. Recurrence counts OCCURRENCES, never reports (`reports_n` is intensity only). */
+/** A recurrence with its derived numbers. Recurrence counts OCCURRENCES, never reports (`reports_n` is intensity only). */
 export interface ProblemRow {
   id: string
   reference: string

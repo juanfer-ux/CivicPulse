@@ -55,7 +55,7 @@ Rules:
 - **Every component family page has the background `#3D3D43`** (the pages between the `——— Components ———` separator and Screens), existing and any new one. When creating a components page, set it right away.
 
 ## Figma text styles (every project)
-- **Keep style families together, in order.** The text styles list is grouped by family, biggest to smallest, and each variant sits right next to its base: `title`, `title-regular`, `subtitle`, `subtitle-regular`, `label`, `label-regular`, `meta`, `meta-medium`, `caption`, `caption-medium`, `caption-strong`. When creating a style, put it next to its family right away (`figma.moveLocalTextStyleAfter(style, base)`), never leave it at the end of the list. Re-check the order after every style change, in Figma and in the docs table.
+- **Keep style families together, in order.** The text styles list is grouped by family, biggest to smallest, and each variant sits right next to its base: `title`, `title-regular`, `subtitle`, `subtitle-regular`, `subtitle-strong`, `label`, `label-regular`, `meta`, `meta-medium`, `caption`, `caption-medium`, `caption-strong`. When creating a style, put it next to its family right away (`figma.moveLocalTextStyleAfter(style, base)`), never leave it at the end of the list. Re-check the order after every style change, in Figma and in the docs table.
 
 ## Color rules (every project)
 - Neutrals are always `neutral-100` … `neutral-900`, 900 = darkest. Never 950, 850 or other in-between steps.

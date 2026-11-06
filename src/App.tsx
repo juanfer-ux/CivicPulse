@@ -56,9 +56,9 @@ export default function App() {
     }
     show([])
   }
-  // Cases (sidebar): the plus adds a case to the list; there is no case page yet.
+  // Recurrences (sidebar): the plus adds one to the list; there is no page for it yet.
   const [cases, setCases] = useState<{ id: number; title: string }[]>([])
-  const newCase = () => setCases((cs) => [{ id: (cs[0]?.id ?? 0) + 1, title: `New case ${(cs[0]?.id ?? 0) + 1}` }, ...cs])
+  const newCase = () => setCases((cs) => [{ id: (cs[0]?.id ?? 0) + 1, title: `New recurrence ${(cs[0]?.id ?? 0) + 1}` }, ...cs])
   const zoomArea = (code: number) => setZoomTo((z) => ({ code, n: (z?.n ?? 0) + 1 }))
   const [tab, setTab] = useState<Tab>('explore')
   const [agentWidth, setAgentWidth] = useAgentWidth()

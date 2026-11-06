@@ -46,12 +46,16 @@
   --text-title-regular--letter-spacing: 0.02em;
   --text-subtitle: 16px;
   --text-subtitle--font-weight: calc(500 + var(--weight-offset));
-  --text-subtitle--line-height: 24px;
-  --text-subtitle--letter-spacing: 0.02em;
+  --text-subtitle--line-height: 19px; /* Figma 2026-11-06: 19 and 0 % (it was 24 and 2 %) */
+  --text-subtitle--letter-spacing: 0;
   --text-subtitle-regular: 16px;
   --text-subtitle-regular--font-weight: calc(400 + var(--weight-offset));
-  --text-subtitle-regular--line-height: 24px;
-  --text-subtitle-regular--letter-spacing: 0.02em;
+  --text-subtitle-regular--line-height: 19px;
+  --text-subtitle-regular--letter-spacing: 0;
+  --text-subtitle-strong: 16px; /* new, Figma 2026-11-06: Manrope SemiBold, same size as subtitle */
+  --text-subtitle-strong--font-weight: calc(600 + var(--weight-offset));
+  --text-subtitle-strong--line-height: 19px;
+  --text-subtitle-strong--letter-spacing: 0;
   --text-label: var(--fs-label);
   --text-label--font-weight: calc(600 + var(--weight-offset)); /* Figma label is SemiBold since 2026-10-29 (was Medium, 360) */
   --text-label--line-height: var(--lh-label);
@@ -69,7 +73,7 @@
   --text-button-sm: var(--fs-button-sm);
   --text-button-sm--font-weight: calc(600 + var(--weight-offset));
   --text-button-sm--line-height: 24px;
-  --text-button-sm--letter-spacing: 0.018em; /* Figma 2026-11-05: 1.8 % (it was 2.2 %) */
+  --text-button-sm--letter-spacing: 0.014em; /* Figma 2026-11-06: 1.4 % (it was 1.8 %) */
   --text-body-sm: var(--fs-body-sm);
   --text-body-sm--font-weight: calc(400 + var(--weight-offset));
   --text-body-sm--line-height: var(--lh-body-sm);

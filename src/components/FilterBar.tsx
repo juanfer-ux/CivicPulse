@@ -17,9 +17,9 @@ export interface Filters {
   locality: string
   categories: string[]
   statuses: Group[]
-  /** Status chips of the Problems view (decision 0030); the incident statuses above are untouched. */
+  /** Status chips of the Recurrences view (decision 0030); the incident statuses above are untouched. */
   problemStatuses: ProblemStatus[]
-  /** What the map shows: persistent problems, loose incidents, or (empty) both. */
+  /** What the map shows: recurrences, loose incidents, or (empty) both. */
   types: MapType[]
   days: number
 }
@@ -46,7 +46,7 @@ const typesOn = (filters: Filters, hasProblems: boolean) => ({
 const ICON_OUTLINE = 'overflow-visible stroke-(--neutral-900) stroke-4 [paint-order:stroke] [&_path]:[vector-effect:non-scaling-stroke]'
 
 /**
- * The two map toggles, merged with the counts (owner, 2026-10-30): "Problems 16" and "Incidents 650", at the bottom left of the map where the legend was.
+ * The two map toggles, merged with the counts (owner, 2026-10-30): "Recurrences 16" and "Incidents 650", at the bottom left of the map where the legend was.
  * Both are on by default. Switching one off keeps the other on (never an empty map) and drops the statuses chosen for the one that went away, so a hidden filter never keeps narrowing.
  */
 export function MapTypeChips({ filters, onChange, problemCount, incidentCount }: { filters: Filters; onChange: (f: Filters) => void; problemCount: number; incidentCount: number }) {
@@ -65,7 +65,7 @@ export function MapTypeChips({ filters, onChange, problemCount, incidentCount }:
   return (
     <div role="group" aria-label="What the map shows" className="flex items-center gap-2">
       <Chip pressed={on.problems} icon={<Warning weight="fill" className={`size-[18px]! ${ICON_OUTLINE}`} aria-hidden />} count={problemCount} onClick={() => toggle('problems')}>
-        Problems
+        Recurrences
       </Chip>
       <Chip pressed={on.incidents} icon={<Circle weight="fill" className={ICON_OUTLINE} aria-hidden />} count={incidentCount} onClick={() => toggle('incidents')}>
         Incidents
@@ -92,7 +92,7 @@ export function FilterBar({
   localities: Locality[]
   categories: Category[]
   counts: Record<Group, number>
-  /** Set in the Problems view: the status chip then lists the problem statuses, with their counts. */
+  /** Set in the Recurrences view: the status chip then lists the problem statuses, with their counts. */
   problemCounts?: Record<ProblemStatus, number>
   className?: string
 }) {
@@ -119,7 +119,7 @@ export function FilterBar({
             ...(showProblems
               ? PROBLEM_STATUSES.map((st) => ({
                   value: `p:${st}`,
-                  group: showIncidents ? 'Problems' : undefined,
+                  group: showIncidents ? 'Recurrences' : undefined,
                   label: PROBLEM_STATUS[st].label,
                   icon: <Warning weight="fill" className="size-4 shrink-0" style={{ color: `var(${PROBLEM_STATUS[st].token})` }} aria-hidden />,
                   hint: String(problemCounts?.[st] ?? 0),
