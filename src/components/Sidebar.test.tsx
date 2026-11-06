@@ -60,6 +60,13 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(onNew).toHaveBeenCalledTimes(1)
   })
 
+  it('Explore is selected (aria-current) on the landing page and only there', () => {
+    const { rerender } = render(<Sidebar {...baseProps} exploring />)
+    expect(screen.getByRole('button', { name: 'Explore' })).toHaveAttribute('aria-current', 'page')
+    rerender(<Sidebar {...baseProps} exploring={false} />)
+    expect(screen.getByRole('button', { name: 'Explore' })).not.toHaveAttribute('aria-current')
+  })
+
   it('shows Recurrences, Incidents and Investigations in one sidebar', () => {
     render(<Sidebar {...baseProps} />)
 

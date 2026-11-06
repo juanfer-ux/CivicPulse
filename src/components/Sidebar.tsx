@@ -14,7 +14,7 @@ import { GROUPS, PROBLEM_STATUS, type Group, type ProblemStatus } from '@/lib/st
 import { shortName } from '@/lib/utils'
 
 type Chat = { id: number; title: string }
-type Chats = { chats: Chat[]; activeId: number; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void }
+type Chats = { chats: Chat[]; activeId: number; exploring?: boolean; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void }
 
 /** Example titles so the list looks like a real history (owner, 2026-10-28). They open nothing; delete this list when conversations are saved for real. */
 const PLACEHOLDERS = [
@@ -216,7 +216,7 @@ function MobileBrand() {
 }
 
 /** The menu itself, as in Figma Sidebar (2026-10-29): a 70 px header with the logo and the collapse button, the Investigations and Cases groups, and at the bottom the account row. Used by the desktop column and the phone slide-out. */
-function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, onToggle }: Chats & { collapsed: boolean; onToggle?: () => void }) {
+function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, onNewCase, onToggle }: Chats & { collapsed: boolean; onToggle?: () => void }) {
   const { profile, session, signOut } = useAuth()
   const name = shortName(profile?.full_name) || 'Signed in'
   const email = session?.user?.email
@@ -228,7 +228,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
-        <div className={`flex h-[70px] shrink-0 items-center bg-(--neutral-700) desk:rounded-t-lg ${collapsed ? 'justify-center' : 'justify-between px-3'}`}>
+        <div className={`flex h-[70px] shrink-0 items-center bg-(--neutral-700) desk:rounded-tl-lg ${collapsed ? 'justify-center' : 'justify-between px-3'}`}>
           <Brand collapsed={collapsed} onToggle={onToggle} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
@@ -244,7 +244,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
                 <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-600) border-(--neutral-400) text-body-sm" />
               </div>
               {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
-              <Button variant="ghost" className="h-10 w-full justify-start gap-3 px-[7px] text-body-sm-medium text-(--neutral-100) hover:bg-(--neutral-800)" onClick={onNew}>
+              <Button variant="ghost" aria-current={exploring ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-[7px] text-body-sm-medium text-(--neutral-100) hover:bg-(--neutral-800) ${exploring ? 'bg-(--neutral-800)' : ''}`} onClick={onNew}>
                 <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
                 Explore
               </Button>
@@ -260,7 +260,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
                   <TwoLineItem key={i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => {}} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-3 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={<>{i.reference} · <span className="text-caption-strong">{GROUPS[i.group].label}</span></>} />
                 )} />
                 <Section title="Investigations" items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
-                  <Button key={c.key} variant="ghost" className={`h-[30px] items-center justify-start gap-2.5 py-1 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-800) ${c.id === activeId ? 'bg-(--neutral-800)' : ''}`} aria-current={c.id === activeId || undefined} onClick={() => c.id !== null && onPick(c.id)}>
+                  <Button key={c.key} variant="ghost" className={`h-[30px] items-center justify-start gap-2.5 py-1 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-800) ${c.id === activeId && !exploring ? 'bg-(--neutral-800)' : ''}`} aria-current={c.id === activeId || undefined} onClick={() => c.id !== null && onPick(c.id)}>
                     <Chat weight="regular" className="size-4 shrink-0 text-(--neutral-300)" aria-hidden />
                     <span className="truncate">{c.title}</span>
                   </Button>
@@ -354,7 +354,7 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:m-(--page-pad) desk:mr-0 desk:block desk:rounded-lg bg-(--neutral-700)`}>
+      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:m-(--page-pad) desk:mr-0 desk:block desk:rounded-l-lg bg-(--neutral-700)`}>
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         <Menu_
           {...props}
