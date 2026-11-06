@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-(--brand-primary) text-primary-foreground hover:bg-(--brand-secondary)",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        secondary: "bg-secondary text-secondary-foreground focus-visible:bg-(--neutral-600)",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/40",
         outline: "border-input bg-inset text-foreground hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent focus-visible:border-foreground",
         ghost: "hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent",
@@ -24,6 +24,10 @@ const buttonVariants = cva(
         "icon-lg": "size-(--control-icon-lg)",
       },
     },
+    compoundVariants: [
+      // Secondary with a label (Figma, 2026-11-05): a 1 px neutral-100 outline, white on hover, neutral-300 when disabled; focus swaps the fill to neutral-600 and drops the outline (the 3 px ring stays). The icon sizes have no outline.
+      { variant: "secondary", size: ["sm", "default", "lg"], className: "border-(--neutral-100) hover:border-(--white) focus-visible:border-transparent disabled:border-(--neutral-300)" },
+    ],
     defaultVariants: {
       variant: "default",
       size: "default",
