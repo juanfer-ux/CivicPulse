@@ -260,7 +260,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
                   <TwoLineItem key={i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => {}} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-3 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={<>{i.reference} · <span className="text-caption-strong">{GROUPS[i.group].label}</span></>} />
                 )} />
                 <Section title="Investigations" items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
-                  <Button key={c.key} variant="ghost" className={`h-[30px] items-center justify-start gap-2 py-1 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-800) ${c.id === activeId ? 'bg-(--neutral-800)' : ''}`} aria-current={c.id === activeId || undefined} onClick={() => c.id !== null && onPick(c.id)}>
+                  <Button key={c.key} variant="ghost" className={`h-[30px] items-center justify-start gap-2.5 py-1 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-800) ${c.id === activeId ? 'bg-(--neutral-800)' : ''}`} aria-current={c.id === activeId || undefined} onClick={() => c.id !== null && onPick(c.id)}>
                     <Chat weight="regular" className="size-4 shrink-0 text-(--neutral-300)" aria-hidden />
                     <span className="truncate">{c.title}</span>
                   </Button>
