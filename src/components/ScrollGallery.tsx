@@ -87,7 +87,7 @@ export function ScrollGallery() {
             <History />
           </ScrollArea>
         </Option>
-        <Option name="G · Inset, grows on hover (CHOSEN: the app default)" note="10 px grab area, round 4 px thumb that grows to 6 px on hover, neutral-300 (neutral-200 on hover), always visible, no track.">
+        <Option name="G · Inset, grows on hover (CHOSEN: the app default)" note="10 px grab area, round 4 px thumb that grows to 6 px on hover, neutral-400 (neutral-300 on hover), always visible, no track.">
           <ScrollArea className={card}>
             <History />
           </ScrollArea>

@@ -4,7 +4,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { ScrollArea as ScrollAreaPrimitive } from "radix-ui"
 
-/** The app's scrollbar (owner, 2026-11-05): 10 px grab area with a 4 px round thumb (6 px on hover), neutral-300 (neutral-200 on hover), always visible, no track (style G). Same look as the global CSS rule for native scrollbars. */
+/** The app's scrollbar (owner, 2026-11-05): 10 px grab area with a 4 px round thumb (6 px on hover), neutral-400 (neutral-300 on hover), always visible, no track (style G). Same look as the global CSS rule for native scrollbars. */
 function ScrollArea({
   className,
   children,
@@ -56,7 +56,7 @@ function ScrollBar({
     >
       <ScrollAreaPrimitive.ScrollAreaThumb
         data-slot="scroll-area-thumb"
-        className={cn("relative flex-1 rounded-full bg-(--neutral-300) hover:bg-(--neutral-200)", thumbClassName)}
+        className={cn("relative flex-1 rounded-full bg-(--neutral-400) hover:bg-(--neutral-300)", thumbClassName)}
       />
     </ScrollAreaPrimitive.ScrollAreaScrollbar>
   )
