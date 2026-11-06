@@ -51,6 +51,15 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(onPick).toHaveBeenCalledWith(2)
   })
 
+  it('Explore takes you to the agent landing: it starts a new investigation', async () => {
+    const user = userEvent.setup()
+    const onNew = vi.fn()
+    render(<Sidebar {...baseProps} onNew={onNew} />)
+
+    await user.click(screen.getByRole('button', { name: 'Explore' }))
+    expect(onNew).toHaveBeenCalledTimes(1)
+  })
+
   it('shows Persistent, Incidents and Investigations in one sidebar', () => {
     render(<Sidebar {...baseProps} />)
 
