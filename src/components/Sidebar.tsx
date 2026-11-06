@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
-import { CaretDown, Chat, DotsThreeVertical, List, MapTrifold, Plus, SidebarSimple, SignOut, SortAscending, Warning, X } from '@phosphor-icons/react'
+import { CaretDown, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
@@ -65,10 +65,10 @@ function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row }: { title
       <div className="flex h-8 items-center gap-2.5 pr-1.5 pl-2.5">
         <p className="flex-1 text-caption-medium text-(--neutral-200)">{title}</p>
         <Button size="icon" variant="ghost" className="size-8" aria-label={`${title}: ${newest ? 'newest first. Show oldest first' : 'oldest first. Show newest first'}`} title={newest ? 'Newest first' : 'Oldest first'} onClick={() => setNewest((n) => !n)}>
-          <SortAscending className="size-4 text-(--white)" />
+          <FunnelSimple weight="regular" className="size-4 text-(--white)" />
         </Button>
         <Button size="icon" variant="ghost" className="size-8" aria-label={addLabel} title={addLabel} onClick={onAdd}>
-          <Plus className="size-4 text-(--white)" />
+          <Plus weight="regular" className="size-4 text-(--white)" />
         </Button>
       </div>
       <div className="flex flex-col gap-0.5 px-1">{(newest ? items : [...items].reverse()).map(row)}</div>
@@ -174,7 +174,7 @@ function AccountMenu({ onSignOut, side, avatar }: { onSignOut: () => void; side:
     return () => document.removeEventListener('keydown', esc)
   }, [open])
   return (
-    <div className={`relative ${avatar ? 'my-1' : ''}`} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
+    <div className="relative" onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
       {avatar ? (
         // Collapsed sidebar (owner, 2026-10-30): the profile itself is the button, with a small down chevron badge on its top right so it reads as a menu. No extra height: the area stays as tall as the expanded one.
         <button type="button" aria-label="Account menu" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="group relative cursor-pointer rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
@@ -233,18 +233,18 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 38 px, both 18 px from the edge. */}
-            <div className="flex shrink-0 flex-col gap-4 border-b border-(--neutral-600) px-1.5 pt-4 pb-3">
+            <div className="flex shrink-0 flex-col gap-4 border-b border-(--neutral-500) px-1.5 pt-4 pb-3">
               <div className="px-3">
                 <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-600) border-(--neutral-400) text-body-sm" />
               </div>
               {/* The map is always the page, so this row only says where you are. */}
               <div aria-current="page" className="flex h-[38px] items-center gap-3 px-3 text-body-sm-medium text-(--neutral-100)">
-                <MapTrifold className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
+                <Compass weight="regular" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
                 Explore
               </div>
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
-              <div className="flex flex-col gap-3 py-2">
+              <div className="flex flex-col gap-2.5 py-2">
                 <Section title="Persistent" items={persistent} addLabel="New case" onAdd={onNewCase} pb="pb-2.5" row={(c) => (
                   <TwoLineItem key={c.id} active={c.id === caseId} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => setCaseId(c.id)} title={c.title}
                     icon={<Warning weight="fill" className="size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
@@ -264,7 +264,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
           </>
         )}
       </div>
-      <div className={`flex shrink-0 flex-col border-t border-(--neutral-400) py-4 ${collapsed ? 'items-center gap-3' : ''}`}>
+      <div className={`flex shrink-0 flex-col border-t border-(--neutral-400) ${collapsed ? 'min-h-[85px] items-center justify-center' : 'py-4'}`}>
         {collapsed ? (
           <>
             <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} size="lg" title={name} />} />
@@ -272,7 +272,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
         ) : (
           <div className="flex items-center gap-3 py-1 pl-4 pr-5">
             <Avatar name={profile?.full_name || 'Signed in'} size="lg" />
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
               <p className="truncate text-body-strong text-(--neutral-100)">{name}</p>
               {email && <p className="truncate text-caption-medium text-(--neutral-200)">{email}</p>}
             </div>
