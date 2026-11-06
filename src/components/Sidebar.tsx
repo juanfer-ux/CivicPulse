@@ -80,7 +80,7 @@ function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row }: { title
 const WIDTH_KEY = 'sidebar-width'
 const SIDEBAR_MIN = 245 // min width of the expanded Sidebar (owner, 2026-10-30; it was 260, 266, 262, 240, briefly 220)
 const SIDEBAR_MAX = 380 // Figma max width (was 340)
-const SIDEBAR_DEFAULT = 245 // the width it opens at (owner, 2026-10-30; it was 284), also the width drawn in Figma
+const SIDEBAR_DEFAULT = 300 // the width it opens at (owner, 2026-11-05; it was 245, and 284 before), also the width drawn in Figma
 const clampWidth = (n: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, n))
 const readWidth = () => {
   try {
@@ -91,7 +91,7 @@ const readWidth = () => {
   }
 }
 
-/** Drag handle on the right edge of the expanded desktop sidebar, like the agent panel's (245 to 380 px, double-click resets to 284). */
+/** Drag handle on the right edge of the expanded desktop sidebar, like the agent panel's (245 to 380 px, double-click resets to 300). */
 function SidebarResizer({ width, onChange }: { width: number; onChange: (px: number) => void }) {
   const [dragging, setDragging] = useState(false)
   useNoSelect(dragging)
