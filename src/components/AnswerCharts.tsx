@@ -2,7 +2,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
 import type { Answer } from '@/lib/agent'
 
-/** The agent's answer charts (shadcn Chart on Recharts), in the app's own colors. Fetched right after the app loads (see InvestigatePanel), so no placeholder is needed. */
+/** The agent's answer charts (shadcn Chart on Recharts), in the app's own colors. No grow-in animation (owner, 2026-11-05): the bars and the area appear at once, and do not replay when the panel is resized. Fetched right after the app loads (see InvestigatePanel), so no placeholder is needed. */
 const config = { value: { label: 'Incidents', color: 'var(--ai-border)' } } satisfies ChartConfig
 const tick = { fill: 'var(--muted-foreground)', fontSize: 12 }
 const grid = 'var(--secondary)'
@@ -33,6 +33,7 @@ function Ranking({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
         <ChartTooltip cursor={false} content={tooltip} />
         <Bar
           dataKey="value"
+          isAnimationActive={false}
           fill="var(--color-value)"
           radius={4}
           cursor={onPick ? 'pointer' : undefined}
@@ -57,7 +58,7 @@ function Time({ bars }: { bars: Answer['bars'] }) {
         <CartesianGrid vertical={false} stroke={grid} />
         <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ ...tick, fontSize: 11 }} interval={0} />
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-        <Area dataKey="value" type="monotone" stroke="var(--color-value)" fill="var(--color-value)" fillOpacity={0.2} />
+        <Area dataKey="value" isAnimationActive={false} type="monotone" stroke="var(--color-value)" fill="var(--color-value)" fillOpacity={0.2} />
       </AreaChart>
     </ChartContainer>
   )
@@ -69,7 +70,7 @@ function Period({ bars }: { bars: Answer['bars'] }) {
       <BarChart data={bars} margin={{ top: 16 }}>
         <XAxis dataKey="label" tickLine={false} axisLine={false} tick={tick} />
         <ChartTooltip cursor={false} content={tooltip} />
-        <Bar dataKey="value" fill="var(--color-value)" radius={4} barSize={48}>
+        <Bar dataKey="value" isAnimationActive={false} fill="var(--color-value)" radius={4} barSize={48}>
           <LabelList dataKey="value" position="top" fill="var(--foreground)" fontSize={12} />
         </Bar>
       </BarChart>
