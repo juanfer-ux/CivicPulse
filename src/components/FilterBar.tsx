@@ -99,7 +99,7 @@ export function FilterBar({
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
   const { problems: showProblems, incidents: showIncidents } = typesOn(filters, !!problemCounts)
   return (
-    <div role="group" aria-label="Filters" className={className}>
+    <div role="group" aria-label="Filters" data-float className={className}>
       {/* The filters share one 8 px gap and scroll sideways when they do not fit; "Clear filters" stays put at the far right. */}
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-1 [scrollbar-width:none]">
         {/* One Status chip for both kinds (owner, 2026-10-30): incident statuses and problem statuses are different sets, so the menu lists them in two labeled groups. Values are prefixed `p:` / `i:` only to tell the two apart. */}

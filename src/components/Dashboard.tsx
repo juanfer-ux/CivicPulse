@@ -257,7 +257,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. */}
       {chatMode && (
-        <div className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-600) px-5 text-meta text-(--indigo-100) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-[var(--map-left)] desk:inset-x-auto">
+        <div data-float className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-600) px-5 text-meta text-(--indigo-100) desk:absolute desk:top-(--section-header-h) desk:right-0 desk:left-[var(--map-left)] desk:inset-x-auto">
           <ChatCircleDots weight="fill" className="size-5 shrink-0 text-(--indigo-200)" aria-hidden />
           <span className="flex-1">While showing the agent's answer on the map, filters will narrow it down.</span>
           <Button size="sm" variant="secondary" onClick={onClearHighlight}>
@@ -268,7 +268,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
       {/* Bottom left (owner, 2026-10-30): the Problems and Incidents toggles with their counts, merged with the old "Showing N" legend. Without the problems layer there is one plain count, as before. */}
       {data && (
-        <div className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:transition-[left] desk:duration-300">
+        <div data-float className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-(--page-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:transition-[left] desk:duration-300">
           {hasProblems ? (
             !selected && !selectedProblem && <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
           ) : (
@@ -288,7 +288,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
           categories={data.categories}
           counts={byGroup}
           problemCounts={hasProblems ? byProblemStatus : undefined}
-          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+3rem)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+3rem)]'} desk:right-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:transition-[left] desk:duration-300 desk:mx-auto desk:max-w-[1280px]`}
+          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--page-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--page-pad)+var(--page-pad))]'} desk:right-(--page-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:transition-[left] desk:duration-300 desk:mx-auto desk:max-w-[1280px]`}
         />
       )}
 
@@ -315,8 +315,9 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       {/* The four localities with most incidents (Figma Stat Card), in a row above the filters; hidden while an incident is open, like the filters (owner, 2026-10-30); a click filters the map to that locality. On phones they sit in the Explore tab, two by two. */}
       <div
         role="region"
+        data-float
         aria-label="Busiest localities"
-        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-4 overflow-y-auto desk:absolute desk:right-6 desk:left-[calc(var(--map-left)+1.5rem)] desk:z-10 desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+1.5rem)]' : 'desk:top-[calc(var(--section-header-h)+1.5rem)]'}`}
+        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-(--page-pad) overflow-y-auto desk:absolute desk:right-(--page-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:z-10 desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--page-pad))]'}`}
       >
         {error ? (
           <p className="col-span-full text-incident">{error}</p>
@@ -334,9 +335,12 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       </div>
 
       <div
-        className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col gap-3 desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:border-r desk:border-input desk:bg-ai desk:p-0`}
+        className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:py-(--page-pad) desk:pr-(--page-pad) desk:pl-(--sidebar-gap)`}
       >
-        {children}
+        {/* Outer container: the shared float padding (12 px) on every side (owner, 2026-11-06); the panel itself is this inner box. */}
+        <div data-float className="flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-lg desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_92%,transparent)] desk:p-0">
+          {children}
+        </div>
       </div>
       {/* The incident detail (owner, 2026-10-30, test): its own panel on the map, to the right of the agent panel, like one more sidebar. On phones it stays in the bottom sheet. */}
       {item?.kind === 'incident' ? (
@@ -374,8 +378,9 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
       ref={panel}
       tabIndex={-1}
       role="region"
+      data-float
       aria-label="Incident details"
-      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-6 desk:left-[calc(var(--map-base)+1.5rem)] desk:z-20 desk:max-h-[calc(100%-3rem)] desk:w-[360px] desk:bg-(--neutral-700)"
+      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-(--page-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:max-h-[calc(100%-var(--page-pad)-var(--page-pad))] desk:w-[360px] desk:bg-(--neutral-700)"
     >
       <CardHeader className="flex flex-row items-start justify-between gap-2">
         <div>

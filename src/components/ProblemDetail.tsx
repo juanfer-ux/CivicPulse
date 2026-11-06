@@ -31,8 +31,9 @@ export function ProblemDetail({
       ref={panel}
       tabIndex={-1}
       role="region"
+      data-float
       aria-label="Recurrence details"
-      className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-6 desk:left-[calc(var(--map-base)+1.5rem)] desk:z-20 desk:max-h-[calc(100%-3rem)] desk:w-[400px] desk:bg-(--neutral-800)"
+      className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-(--page-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:max-h-[calc(100%-var(--page-pad)-var(--page-pad))] desk:w-[400px] desk:bg-(--neutral-800)"
     >
       <div className="flex flex-col gap-4 px-4 py-6">
         <header className="flex items-start justify-between gap-2">

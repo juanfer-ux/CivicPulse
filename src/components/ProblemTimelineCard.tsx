@@ -55,7 +55,7 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { pro
   }
 
   return (
-    <div className="flex shrink-0 flex-col gap-2 desk:absolute desk:right-6 desk:bottom-6 desk:left-[calc(var(--map-base)+1.5rem)] desk:z-20 desk:h-[360px] desk:flex-row desk:gap-6">
+    <div data-float className="flex shrink-0 flex-col gap-2 desk:absolute desk:right-(--page-pad) desk:bottom-(--page-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:h-[360px] desk:flex-row desk:gap-6">
     <Card role="region" aria-label="Timeline" className="min-w-0 gap-0 overflow-hidden bg-card/95 py-0 desk:h-full desk:flex-1">
     <ScrollArea className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">
