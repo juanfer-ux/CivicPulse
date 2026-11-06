@@ -228,7 +228,7 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
-        <div className={`flex h-[70px] shrink-0 items-center bg-(--neutral-800) ${collapsed ? 'justify-center' : 'justify-between px-3'}`}>
+        <div className={`flex h-[70px] shrink-0 items-center bg-(--neutral-700) desk:rounded-t-lg ${collapsed ? 'justify-center' : 'justify-between px-3'}`}>
           <Brand collapsed={collapsed} onToggle={onToggle} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
@@ -354,7 +354,7 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:block desk:border-r desk:border-secondary bg-(--neutral-700)`}>
+      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:m-(--page-pad) desk:mr-0 desk:block desk:rounded-lg bg-(--neutral-700)`}>
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         <Menu_
           {...props}

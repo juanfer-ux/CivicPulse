@@ -154,3 +154,7 @@ Phosphor (`@phosphor-icons/react`, [decision 0025](../decisions/0025-phosphor-ic
 | Breakpoint | **1,440 px** (`desk`, `--breakpoint-desk: 90rem`): at and above, sidebar and floating panels; below, top bar and bottom sheet |
 
 Control heights use `h-(--control-sm)`, `h-(--control-default)`, `h-(--control-lg)`, `size-(--control-icon)`, `size-(--control-icon-lg)`; the variables switch at 1,440 px.
+
+## Layout spacing (owner, 2026-11-06)
+
+Three tokens in `src/index.css` set the desktop layout: `--page-pad` 12 px (around the page and everything that floats on the map), `--sidebar-gap` 6 px (sidebar to agent panel), `--group-gap` 20 px (that group to the stat cards, filters, chips and detail panels). The sidebar and the agent panel are floating rounded boxes (radius 8); the page gradient (`--screen-gradient`) is `neutral-400` → `neutral-600` (50 %) → `neutral-800`. The map's start view, flights and fits centre on the area no floating box covers (`data-float`, measured in `IncidentMap.tsx`).

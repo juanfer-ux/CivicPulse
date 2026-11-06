@@ -21,7 +21,23 @@ maplibregl.setWorkerUrl(workerUrl)
 
 /** Zoom where small dots turn into icon badges. */
 /** Room kept free around an answer when the map zooms to fit it. Desktop: top = answer banner 48 + 24 + Stat Cards 116 + 24 + filters 36 + 24; bottom = the legend (24 + 26) + 24; the sides 40. Phones: the filter bar on top, the bottom sheet under. */
-const fitPadding = (wide: boolean) => (wide ? { top: 272, bottom: 74, left: 40, right: 40 } : { top: 100, bottom: 60, left: 40, right: 40 })
+/** The free area of the map (owner, 2026-11-06): what no floating component covers. Every floating box carries `data-float`; the ones on the left half or the top or bottom band push the map's own padding in, so the start view, flights and fits all centre on the free area. */
+const freePadding = (map: maplibregl.Map) => {
+  const box = map.getContainer().getBoundingClientRect()
+  const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-pad')) || 12
+  const p = { top: 0, bottom: 0, left: 0, right: 0 }
+  for (const el of document.querySelectorAll('[data-float]')) {
+    const r = el.getBoundingClientRect()
+    if (r.width === 0 || r.height === 0 || r.bottom < box.top || r.top > box.bottom) continue
+    if (r.right < box.left + box.width * 0.6 && r.height > box.height * 0.4) p.left = Math.max(p.left, r.right - box.left + pad) // a tall box on the left: the panels
+    else if (r.top - box.top < box.height / 2) p.top = Math.max(p.top, r.bottom - box.top + pad) // stat cards, filters, banner
+    else p.bottom = Math.max(p.bottom, box.bottom - r.top + pad) // chips, timeline
+  }
+  return p
+}
+/** Re-reads the panel width: it can change (dragged) without the map's own size changing. */
+const setFree = (map: maplibregl.Map) => map.setPadding(map.getContainer().clientWidth > 700 ? freePadding(map) : { top: 100, bottom: 60, left: 0, right: 0 })
+const fitPadding = () => ({ top: 40, bottom: 40, left: 40, right: 40 })
 
 const BADGE_ZOOM = 13 // from here the plain squares become squares with the category icon (owner, 2026-10-30; was 14)
 /** Zoom the camera flies to when an incident is opened. */
@@ -146,6 +162,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     map.on('movestart', (e) => e.originalEvent && (moved = true))
     map.on('load', async () => {
       map.resize()
+      setFree(map)
+      map.on('resize', () => setFree(map))
       if (!moved) map.jumpTo({ center: BOGOTA, zoom: START_ZOOM })
       await addBadges(map)
       addDots(map)
@@ -489,8 +507,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     const bounds = new maplibregl.LngLatBounds([pts[0].lng, pts[0].lat], [pts[0].lng, pts[0].lat])
     for (const i of pts) bounds.extend([i.lng, i.lat])
     for (const c of radiusGroups(pts)) for (const corner of circleBounds(c)) bounds.extend(corner) // the circles too, not only their incidents
-    const wide = map.getContainer().clientWidth > 700
-    map.fitBounds(bounds, { padding: fitPadding(wide), maxZoom: 15, duration: 700 })
+    setFree(map)
+    map.fitBounds(bounds, { padding: fitPadding(), maxZoom: 15, duration: 700 })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the answer changes, not when filters change the list
   }, [ready, highlightIds])
 
@@ -526,8 +544,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       }
       for (const f of features) extend(f.geometry.coordinates)
       if (!bounds.isEmpty()) {
-        const wide = map.getContainer().clientWidth > 700
-        map.fitBounds(bounds, { padding: fitPadding(wide), maxZoom: 13, duration: 700 })
+        setFree(map)
+    map.fitBounds(bounds, { padding: fitPadding(), maxZoom: 13, duration: 700 })
       }
     })()
     return () => {
@@ -559,8 +577,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
         else (c as unknown[]).forEach(extend)
       }
       extend(f.geometry.coordinates)
-      const wide = map.getContainer().clientWidth > 700
-      map.fitBounds(bounds, { padding: fitPadding(wide), maxZoom: 14, duration: 700 })
+      setFree(map)
+    map.fitBounds(bounds, { padding: fitPadding(), maxZoom: 14, duration: 700 })
     })()
     return () => {
       stale = true
@@ -592,6 +610,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     const map = mapRef.current
     const target = selectedId ? incidents.find((i) => i.id === selectedId) : selectedProblemId ? problems.find((p) => p.id === selectedProblemId) : null
     if (!ready || !map) return
+    setFree(map)
     const from = { lng: map.getCenter().lng, lat: map.getCenter().lat, zoom: map.getZoom() }
     let to: typeof from | null = null
     if (target) {
@@ -655,7 +674,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
 
   // Wrapper positions the map: maplibre's unlayered CSS overrides Tailwind's `absolute` on the map element itself.
   return (
-    <div role="region" aria-label="Incident map" className="absolute inset-x-0 top-0 bottom-14 desk:top-(--section-header-h) desk:bottom-0 desk:left-[var(--map-base)] desk:overflow-hidden">
+    <div role="region" aria-label="Incident map" className="absolute inset-x-0 top-0 bottom-14 desk:top-(--section-header-h) desk:bottom-0 desk:overflow-hidden">
       <div ref={container} className="size-full" />
       {hover && problems.some((p) => p.id === hover.id) && (
         <ProblemHoverCard

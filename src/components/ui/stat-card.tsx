@@ -15,7 +15,7 @@ export function StatCard({ label, value, trend, selected, onClick }: { label: Re
   const t = trend && TREND[trend]
   return (
     <Tag
-      className={`flex min-w-0 flex-col overflow-hidden rounded-sm border-[0.5px] text-left enabled:hover:border-foreground ${selected ? 'border-foreground' : 'border-input'}`}
+      className={`flex min-w-0 flex-col overflow-hidden rounded-sm border-[0.5px] text-left enabled:hover:border-foreground ${selected ? 'border-foreground' : 'border-transparent'}`}
       {...(onClick ? { type: 'button' as const, onClick, 'aria-pressed': !!selected } : {})}
     >
       <span className="flex w-full flex-col gap-1 bg-inset p-3">
