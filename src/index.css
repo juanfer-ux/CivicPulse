@@ -423,3 +423,6 @@
 ::-webkit-scrollbar-thumb { background: var(--neutral-400); background-clip: padding-box; border: 3px solid transparent; border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--neutral-300); background-clip: padding-box; border-width: 2px; }
 @supports not selector(::-webkit-scrollbar) { * { scrollbar-width: thin; scrollbar-color: var(--neutral-400) transparent; } }
+
+/* Dragging a resize handle (useNoSelect): everything follows the pointer at once, no transitions (owner, 2026-11-05). */
+html[data-resizing] *, html[data-resizing] *::before, html[data-resizing] *::after { transition: none !important; }
