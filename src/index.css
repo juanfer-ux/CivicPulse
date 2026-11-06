@@ -17,115 +17,116 @@
   /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is one universal 0.02em on every element (about 0.26 px at 13 px), small enough not to blur; Figma's fixed 0.2 and 0.3 px did blur letters on screens without a Retina display. Weights are ours: 550 headings and numbers, 450 actions and labels, 380 reading text (Manrope variable). */
   /* Display (Figma, 2026-11-03 and 2026-11-05): all three display styles are Michroma Regular, used with `font-display`: display-lg 48 / 56, display 20 / 42, display-sm 20 / 32. */
   --text-display-lg: 48px;
-  --text-display-lg--font-weight: 400;
+  --text-display-lg--font-weight: calc(400 + var(--weight-offset));
   --text-display-lg--line-height: 56px;
   --text-display-lg--letter-spacing: 0;
   --text-display: 20px;
-  --text-display--font-weight: 400;
+  --text-display--font-weight: calc(400 + var(--weight-offset));
   --text-display--line-height: 42px;
   --text-display--letter-spacing: 0.02em;
   --text-display-sm: 20px;
-  --text-display-sm--font-weight: 400;
+  --text-display-sm--font-weight: calc(400 + var(--weight-offset));
   --text-display-sm--line-height: 32px;
   --text-display-sm--letter-spacing: 0.02em;
   --text-stat: 32px; /* Figma stat: Bold 32 / 32, tracking -2 % (it was -4 % until 2026-11-02); the number in a Stat Card */
-  --text-stat--font-weight: 700;
+  --text-stat--font-weight: calc(700 + var(--weight-offset));
   --text-stat--line-height: 32px;
   --text-stat--letter-spacing: -0.02em;
   --text-heading: 20px;
-  --text-heading--font-weight: 600;
+  --text-heading--font-weight: calc(600 + var(--weight-offset));
   --text-heading--line-height: 28px;
   --text-heading--letter-spacing: 0.02em;
   --text-title: 18px;
-  --text-title--font-weight: 600;
+  --text-title--font-weight: calc(600 + var(--weight-offset));
   --text-title--line-height: 28px;
   --text-title--letter-spacing: 0.02em;
   --text-title-regular: 18px;
-  --text-title-regular--font-weight: 400;
+  --text-title-regular--font-weight: calc(400 + var(--weight-offset));
   --text-title-regular--line-height: 28px;
   --text-title-regular--letter-spacing: 0.02em;
   --text-subtitle: 16px;
-  --text-subtitle--font-weight: 500;
+  --text-subtitle--font-weight: calc(500 + var(--weight-offset));
   --text-subtitle--line-height: 24px;
   --text-subtitle--letter-spacing: 0.02em;
   --text-subtitle-regular: 16px;
-  --text-subtitle-regular--font-weight: 400;
+  --text-subtitle-regular--font-weight: calc(400 + var(--weight-offset));
   --text-subtitle-regular--line-height: 24px;
   --text-subtitle-regular--letter-spacing: 0.02em;
   --text-label: var(--fs-label);
-  --text-label--font-weight: 600; /* Figma label is SemiBold since 2026-10-29 (was Medium, 360) */
+  --text-label--font-weight: calc(600 + var(--weight-offset)); /* Figma label is SemiBold since 2026-10-29 (was Medium, 360) */
   --text-label--line-height: var(--lh-label);
   --text-label--letter-spacing: 0.022em;
   /* Figma label-regular (new, 2026-11-02): the label size in Regular, for trend text and inline labels. */
   --text-label-regular: var(--fs-label);
-  --text-label-regular--font-weight: 400;
+  --text-label-regular--font-weight: calc(400 + var(--weight-offset));
   --text-label-regular--line-height: var(--lh-label);
   --text-label-regular--letter-spacing: 0.02em;
   /* Button text (Figma: button and button-sm): same size as label, and one step down for small buttons. */
   --text-button: var(--fs-label);
-  --text-button--font-weight: 600;
+  --text-button--font-weight: calc(600 + var(--weight-offset));
   --text-button--line-height: var(--lh-button);
   --text-button--letter-spacing: 0.022em;
   --text-button-sm: var(--fs-button-sm);
-  --text-button-sm--font-weight: 600;
+  --text-button-sm--font-weight: calc(600 + var(--weight-offset));
   --text-button-sm--line-height: 24px;
   --text-button-sm--letter-spacing: 0.022em;
   --text-body-sm: var(--fs-body-sm);
-  --text-body-sm--font-weight: 400;
+  --text-body-sm--font-weight: calc(400 + var(--weight-offset));
   --text-body-sm--line-height: var(--lh-body-sm);
-  --text-body-sm--letter-spacing: 0.02em;
+  --text-body-sm--letter-spacing: 0; /* Figma 2026-11-05: 0 % (it was 2 %) */
   --text-body-sm-medium: var(--fs-body-sm);
-  --text-body-sm-medium--font-weight: 500;
+  --text-body-sm-medium--font-weight: calc(500 + var(--weight-offset));
   --text-body-sm-medium--line-height: var(--lh-body-sm);
-  --text-body-sm-medium--letter-spacing: 0.02em; /* Figma 2026-11-05: 2 % (it was 4 %) */
+  --text-body-sm-medium--letter-spacing: 0; /* Figma 2026-11-05: 0 % (it was 2 %) */
   --text-body-sm-strong: var(--fs-body-sm);
-  --text-body-sm-strong--font-weight: 600;
+  --text-body-sm-strong--font-weight: calc(600 + var(--weight-offset));
   --text-body-sm-strong--line-height: var(--lh-body-sm);
-  --text-body-sm-strong--letter-spacing: 0.02em;
+  --text-body-sm-strong--letter-spacing: 0; /* Figma 2026-11-05: 0 % (it was 2 %) */
   /* Default body is 14 px on desktop (Figma: body, body-medium, body-strong); body-sm is the 13 px one used so far. */
   --text-body: var(--fs-body);
-  --text-body--font-weight: 400;
+  --text-body--font-weight: calc(400 + var(--weight-offset));
   --text-body--line-height: var(--lh-body);
   --text-body--letter-spacing: 0.022em;
   --text-body-medium: var(--fs-body);
-  --text-body-medium--font-weight: 500;
+  --text-body-medium--font-weight: calc(500 + var(--weight-offset));
   --text-body-medium--line-height: var(--lh-body);
   --text-body-medium--letter-spacing: 0.02em;
   --text-body-strong: var(--fs-body);
-  --text-body-strong--font-weight: 600;
+  --text-body-strong--font-weight: calc(600 + var(--weight-offset));
   --text-body-strong--line-height: var(--lh-body);
   --text-body-strong--letter-spacing: 0.02em;
   --text-meta: var(--fs-meta);
-  --text-meta--font-weight: 400;
+  --text-meta--font-weight: calc(400 + var(--weight-offset));
   --text-meta--line-height: var(--lh-meta);
   --text-meta--letter-spacing: 0.02em;
   /* Figma meta-medium (2026-11-02): the meta size in Medium, for table headers and the agent's suggested questions (it was documented as 12 / 16, 500). */
   --text-meta-medium: var(--fs-meta);
-  --text-meta-medium--font-weight: 500;
+  --text-meta-medium--font-weight: calc(500 + var(--weight-offset));
   --text-meta-medium--line-height: var(--lh-meta);
   --text-meta-medium--letter-spacing: 0.02em;
   /* Figma caption family (2026-11-05): the same 12 / 16 size in three weights, named like body and meta: caption (Regular), caption-medium (Medium; it was called caption until 2026-11-05) and caption-strong (SemiBold). */
   --text-caption: var(--fs-caption);
-  --text-caption--font-weight: 400;
+  --text-caption--font-weight: calc(400 + var(--weight-offset));
   --text-caption--line-height: 16px;
   --text-caption--letter-spacing: 0.024em; /* Figma: 2.4 % */
   --text-caption-medium: var(--fs-caption);
-  --text-caption-medium--font-weight: 500;
+  --text-caption-medium--font-weight: calc(500 + var(--weight-offset));
   --text-caption-medium--line-height: 16px;
   --text-caption-medium--letter-spacing: 0.024em;
   /* Figma caption-strong (2026-11-02): the caption size in SemiBold, for Badge and chip labels. */
   --text-caption-strong: var(--fs-caption);
-  --text-caption-strong--font-weight: 600;
+  --text-caption-strong--font-weight: calc(600 + var(--weight-offset));
   --text-caption-strong--line-height: 16px;
   --text-caption-strong--letter-spacing: 0.024em;
   --text-section-label: 11px; /* the small uppercase title above a group of sidebar items (Figma section-label, 2026-10-28): Bold 11 / 16, spacing 18 %; the same on every screen size */
-  --text-section-label--font-weight: 700;
+  --text-section-label--font-weight: calc(700 + var(--weight-offset));
   --text-section-label--line-height: 16px;
   --text-section-label--letter-spacing: 0.18em;
 }
 
 /* Sizes from Figma's Device collection: Mobile values by default (windows under 1,440 px), Desktop values from 1,440 px. */
 :root {
+  --weight-offset: -60; /* Added to every font weight (owner, 2026-11-05): 400 becomes 340, 500 becomes 440, 600 becomes 540, 700 becomes 640. 0 = the standard weights. Only the variable font Manrope follows it; Michroma has a single weight. Figma text styles keep the named weights. */
   --fs-body-sm: 16px;
   --fs-button-sm: 16px;
   --lh-body-sm: 24px;
@@ -169,9 +170,9 @@
   --font-heading: var(--font-sans);
   --font-display: 'Michroma', var(--font-sans);
   /* The usual 400 / 500 / 600 / 700 (owner, 2026-11-03: with grayscale smoothing on, the lowered 300 / 360 / 400 / 450 are no longer needed). */
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
+  --font-weight-normal: calc(400 + var(--weight-offset));
+  --font-weight-medium: calc(500 + var(--weight-offset));
+  --font-weight-semibold: calc(600 + var(--weight-offset));
   --font-mono: 'Geist Mono', ui-monospace, monospace;
   --radius-xs: 2px;
   --radius-sm: calc(var(--radius) - 4px);
@@ -403,8 +404,8 @@
   /* Letter-spacing is set once on the root and inherited (owner, 2026-11-05: spacing differed from Figma). It used to be `* { letter-spacing: 0.02em }`, which reset every nested element to 2 % and threw away the spacing of its text style (a sidebar row label lost its 4 %, a nested stat number went from -2 % to +2 %). Each text style sets its own spacing on its element, and children inherit that value in pixels; text with no style gets 0.02em of the root size, about 0.32 px. */
   html { letter-spacing: 0.02em; }
   body { @apply bg-background text-foreground; }
-  /* Font smoothing is the browser default, `auto` (owner, 2026-11-05; it was grayscale / `antialiased` from 2026-11-03). Not `none`: that switches smoothing off and the edges turn jagged. */
-  html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
+  /* Font smoothing (owner, 2026-11-05): `-webkit-font-smoothing` is the browser default, `auto` (it was `antialiased` from 2026-11-03); `-moz-osx-font-smoothing` is `grayscale` (Firefox on Mac only). Never `none`: that switches smoothing off and the edges turn jagged. */
+  html { @apply font-sans font-normal; color-scheme: dark; text-rendering: optimizeLegibility; -webkit-font-smoothing: auto; -moz-osx-font-smoothing: grayscale; }
   /* Tailwind 4 stopped giving buttons the pointing hand (owner, 2026-10-30): everything you can click gets it, a disabled one does not. Utilities such as cursor-col-resize still win. */
   button:not(:disabled), [role='button']:not([aria-disabled='true']), [role='menuitem'], [role='option'], [role='tab'], [role='checkbox'], [role='switch'], summary, select, a[href], label:has(input[type='checkbox']), label:has(input[type='radio']) { cursor: pointer; }
   /* Every part of a clickable thing, not only its box (owner, 2026-10-30: the hand dropped out over some letters and icons in Chrome and was missing in Safari): the text, icons and spans inside get the hand explicitly instead of inheriting it. */
