@@ -58,5 +58,5 @@ Unsupported questions get an honest "I cannot answer that yet". The agent does n
 | ⬜ | "Why are you recommending this?" follow-up that explains from the stored evidence. |
 
 ## 🟥 Known gaps
-- The planner understands a limited set of phrasings (the six suggested questions and close variants).
+- The planner understands a limited set of phrasings (the five Quick questions, the two Worth investigating cards and close variants, including the "increased in Chapinero" question that is no longer a suggestion).
 - It cannot yet follow up on a previous answer.

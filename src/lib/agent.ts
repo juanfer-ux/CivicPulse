@@ -69,13 +69,19 @@ const date = (d: string | Date) =>
 const pct = (n: number, total: number) => Math.round((n / total) * 100)
 const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 
+/** The Quick questions on the empty Investigate and Ask panel (owner's Figma, 2026-11-05: five; the "increased in Chapinero" one is out). The planner still understands it. */
 export const SUGGESTIONS = [
   'Which localities have the most parking obstruction incidents?',
   'When do parking obstruction incidents occur most frequently in Usaquén?',
-  'Have parking obstruction incidents increased in Chapinero over the last 30 days?',
   'Which locations have repeated parking obstruction reports?',
   'Which area might deserve further investigation tomorrow evening?',
   'Which localities have the most illegal dumping incidents?',
+]
+
+/** The two Worth investigating cards: a title and the question each one asks (the picture is a placeholder for now). */
+export const WORTH_INVESTIGATING = [
+  { title: 'Recurring Dumping sites', question: 'Which locations have repeated illegal dumping reports?' },
+  { title: 'Recurring Obstructive Parking', question: 'Which locations have repeated parking obstruction reports?' },
 ]
 
 export function plan(question: string, localities: Locality[]): Plan | null {

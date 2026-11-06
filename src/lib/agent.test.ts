@@ -10,7 +10,7 @@ vi.mock('@/lib/supabase', () => ({
   },
 }))
 
-const { SUGGESTIONS, answer, plan } = await import('@/lib/agent')
+const { SUGGESTIONS, WORTH_INVESTIGATING, answer, plan } = await import('@/lib/agent')
 
 const localities: Locality[] = [
   { code: 1, name: 'Usaquén' },
@@ -25,10 +25,16 @@ describe('plan (mock planner)', () => {
     expect(SUGGESTIONS.map((q) => plan(q, localities)?.kind)).toEqual([
       'ranking',
       'time',
-      'compare',
       'recurring',
       'candidates',
       'ranking',
+    ])
+  })
+
+  it('routes the two Worth investigating cards to the recurring investigation, each with its category', () => {
+    expect(WORTH_INVESTIGATING.map((c) => plan(c.question, localities))).toMatchObject([
+      { kind: 'recurring', category: 'illegal_dumping' },
+      { kind: 'recurring', category: 'parking' },
     ])
   })
 
