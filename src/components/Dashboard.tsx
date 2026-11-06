@@ -2,7 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import { CaretDown, CaretUp, ChatCircleDots, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
-import { trendOf } from '@/lib/trend'
+import { trendOf, type Trend } from '@/lib/trend'
+
+/** DEMO (owner, 2026-11-05, released): the four cards show the four trend statuses, one each (Above, About, Below usual, Low reporting), whatever the data says, so the design can be reviewed. The incident data is synthetic anyway. Delete this line and `DEMO_TRENDS[i] ??` below to show the real trends again. */
+const DEMO_TRENDS: Trend[] = ['above', 'about', 'below', 'low']
 import { MediaGallery } from '@/components/MediaGallery'
 import { ProblemDetail } from '@/components/ProblemDetail'
 import { ProblemTimelineCard } from '@/components/ProblemTimelineCard'
@@ -320,7 +323,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         ) : !data ? (
           <p className="col-span-full text-muted-foreground">Loading…</p>
         ) : topLocalities.length ? (
-          topLocalities.map(([code, c]) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
+          topLocalities.map(([code, c], i) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={DEMO_TRENDS[i] ?? trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
                 const on = filters.locality !== String(code)
                 setFilters({ ...filters, locality: on ? String(code) : '' })
                 if (on) onZoomLocality(code) // fly to the locality, wherever the map is now
