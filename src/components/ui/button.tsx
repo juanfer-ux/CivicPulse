@@ -25,8 +25,8 @@ const buttonVariants = cva(
       },
     },
     compoundVariants: [
-      // Secondary with a label (Figma, 2026-11-05): no fill, only a 1 px neutral-100 outline (white on hover); focus is a neutral-600 fill with no outline (the 3 px ring stays); disabled keeps the neutral-500 fill with a neutral-300 outline. The icon sizes keep the neutral-500 fill and have no outline.
-      { variant: "secondary", size: ["sm", "default", "lg"], className: "bg-transparent border-(--neutral-100) hover:border-(--white) focus-visible:bg-(--neutral-600) focus-visible:border-transparent disabled:bg-secondary disabled:border-(--neutral-300)" },
+      // Secondary with a label (Figma, 2026-11-05): no fill in any state, only a 1 px neutral-100 outline (white on hover with the label in brand-primary, neutral-300 when disabled); on focus the outline goes (the 3 px ring stays). The fills Figma draws on its focus and disabled variants are switched off there. The icon sizes keep the neutral-500 fill and have no outline.
+      { variant: "secondary", size: ["sm", "default", "lg"], className: "bg-transparent border-(--neutral-100) hover:border-(--white) hover:text-(--brand-primary) focus-visible:border-transparent disabled:border-(--neutral-300)" },
     ],
     defaultVariants: {
       variant: "default",

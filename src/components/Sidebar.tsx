@@ -45,10 +45,10 @@ const PLACEHOLDER_INCIDENTS: Incident[] = [
   { id: -3, title: 'Illegal dumping', reference: 'CP-00202', group: 'approved' },
 ]
 
-/** Two-line row shared by Persistent and Incident (Figma Sidebar Item Persistent / Incident: 224.5 x 50, 6 left, 4 top, 6 bottom, 20 right, a 16 x 40 icon column with the 16 px icon 4 px below its top, 8 px to the text). */
+/** Two-line row shared by Persistent and Incident (Figma Sidebar Item Persistent / Incident: 224.5 x 50, 6 left, 4 top, 6 bottom, 20 right, a 16 x 40 icon column with the 16 px icon 4 px below its top, 10 px to the text). */
 function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNode; title: string; sub: ReactNode; active?: boolean; tip: string; onClick: () => void }) {
   return (
-    <Button variant="ghost" className={`h-[50px] items-start justify-start gap-2 pt-[3px] pb-[5px] pl-[5px] pr-[19px] hover:bg-(--neutral-800) ${active ? 'bg-(--neutral-800)' : ''}`} title={tip} aria-current={active || undefined} onClick={onClick}>
+    <Button variant="ghost" className={`h-[50px] items-start justify-start gap-2.5 pt-[3px] pb-[5px] pl-[5px] pr-[19px] hover:bg-(--neutral-800) ${active ? 'bg-(--neutral-800)' : ''}`} title={tip} aria-current={active || undefined} onClick={onClick}>
       <span className="flex h-10 w-4 shrink-0 items-start justify-center pt-1">{icon}</span>
       <span className="flex h-10 min-w-0 flex-col justify-center gap-0.5 text-left">
         <span className="truncate text-body-sm text-(--neutral-100)">{title}</span>
@@ -238,13 +238,13 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
         </div>
         {!collapsed && (
           <>
-            {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 38 px, both 18 px from the edge. */}
+            {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
             <div className="flex shrink-0 flex-col gap-4 border-b border-(--neutral-500) px-1.5 pt-4 pb-3">
-              <div className="px-3">
+              <div className="px-2">
                 <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-600) border-(--neutral-400) text-body-sm" />
               </div>
               {/* The map is always the page, so this row only says where you are. */}
-              <div aria-current="page" className="flex h-10 items-center gap-3 px-3 text-body-sm-medium text-(--neutral-100)">
+              <div aria-current="page" className="flex h-10 items-center gap-3 px-2 text-body-sm-medium text-(--neutral-100)">
                 <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
                 Explore
               </div>

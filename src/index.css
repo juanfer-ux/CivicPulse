@@ -20,7 +20,7 @@
   --text-display-lg--font-weight: calc(400 + var(--weight-offset));
   --text-display-lg--line-height: 56px;
   --text-display-lg--letter-spacing: 0;
-  --text-display: 20px;
+  --text-display: 24px; /* Figma 2026-11-05: 24 (it was 20) */
   --text-display--font-weight: calc(400 + var(--weight-offset));
   --text-display--line-height: 42px;
   --text-display--letter-spacing: 0.02em;
@@ -69,19 +69,19 @@
   --text-button-sm: var(--fs-button-sm);
   --text-button-sm--font-weight: calc(600 + var(--weight-offset));
   --text-button-sm--line-height: 24px;
-  --text-button-sm--letter-spacing: 0.022em;
+  --text-button-sm--letter-spacing: 0.018em; /* Figma 2026-11-05: 1.8 % (it was 2.2 %) */
   --text-body-sm: var(--fs-body-sm);
   --text-body-sm--font-weight: calc(400 + var(--weight-offset));
   --text-body-sm--line-height: var(--lh-body-sm);
-  --text-body-sm--letter-spacing: 0; /* Figma 2026-11-05: 0 % (it was 2 %) */
+  --text-body-sm--letter-spacing: 0.014em; /* Figma 2026-11-05: 1.4 % (it was 2 %, then 0 %, 0.5 %, 1 %) */
   --text-body-sm-medium: var(--fs-body-sm);
   --text-body-sm-medium--font-weight: calc(500 + var(--weight-offset));
-  --text-body-sm-medium--line-height: var(--lh-body-sm);
-  --text-body-sm-medium--letter-spacing: 0; /* Figma 2026-11-05: 0 % (it was 2 %) */
+  --text-body-sm-medium--line-height: var(--lh-body-sm-md);
+  --text-body-sm-medium--letter-spacing: 0.014em; /* Figma 2026-11-05: 1.4 % (all three body-sm styles) */
   --text-body-sm-strong: var(--fs-body-sm);
   --text-body-sm-strong--font-weight: calc(600 + var(--weight-offset));
-  --text-body-sm-strong--line-height: var(--lh-body-sm);
-  --text-body-sm-strong--letter-spacing: 0; /* Figma 2026-11-05: 0 % (it was 2 %) */
+  --text-body-sm-strong--line-height: var(--lh-body-sm-md);
+  --text-body-sm-strong--letter-spacing: 0.014em; /* Figma 2026-11-05: 1.4 % (all three body-sm styles) */
   /* Default body is 14 px on desktop (Figma: body, body-medium, body-strong); body-sm is the 13 px one used so far. */
   --text-body: var(--fs-body);
   --text-body--font-weight: calc(400 + var(--weight-offset));
@@ -103,7 +103,7 @@
   --text-meta-medium: var(--fs-meta);
   --text-meta-medium--font-weight: calc(500 + var(--weight-offset));
   --text-meta-medium--line-height: var(--lh-meta);
-  --text-meta-medium--letter-spacing: 0.02em;
+  --text-meta-medium--letter-spacing: 0.014em; /* Figma 2026-11-05: 1.4 % (it was 2 %) */
   /* Figma caption family (2026-11-05): the same 12 / 16 size in three weights, named like body and meta: caption (Regular), caption-medium (Medium; it was called caption until 2026-11-05) and caption-strong (SemiBold). */
   --text-caption: var(--fs-caption);
   --text-caption--font-weight: calc(400 + var(--weight-offset));
@@ -126,10 +126,11 @@
 
 /* Sizes from Figma's Device collection: Mobile values by default (windows under 1,440 px), Desktop values from 1,440 px. */
 :root {
-  --weight-offset: -60; /* Added to every font weight (owner, 2026-11-05): 400 becomes 340, 500 becomes 440, 600 becomes 540, 700 becomes 640. 0 = the standard weights. Only the variable font Manrope follows it; Michroma has a single weight. Figma text styles keep the named weights. */
+  --weight-offset: -65; /* Added to every font weight (owner, 2026-11-05): 400 becomes 335, 500 becomes 435, 600 becomes 535, 700 becomes 635. 0 = the standard weights. Only the variable font Manrope follows it; Michroma has a single weight. Figma text styles keep the named weights. */
   --fs-body-sm: 16px;
   --fs-button-sm: 16px;
   --lh-body-sm: 24px;
+  --lh-body-sm-md: 24px;
   --fs-body: 16px;
   --lh-body: 24px;
   --fs-label: 16px;
@@ -147,15 +148,16 @@
 @media (min-width: 90rem) {
   :root {
     --fs-body-sm: 13px; /* Figma 2026-11-05 (it was 13.5, a fractional size) */
-    --fs-button-sm: 13.5px; /* button-sm keeps Figma's 13.5; it shared body-sm's size until 2026-11-05 */
+    --fs-button-sm: 13px; /* Figma 2026-11-05: 13 (it was 13.5) */
     --lh-body-sm: 22px;
+    --lh-body-sm-md: 23px; /* body-sm-medium and body-sm-strong (Figma 2026-11-05: 23, body-sm stays 22) */
     --fs-body: 14px;
-    --lh-body: 22px;
+    --lh-body: 24px; /* Figma 2026-11-05 (it was 22) */
     --fs-label: 14px;
-    --lh-label: 22px;
+    --lh-label: 24px; /* Figma 2026-11-05 (it was 22) */
     --lh-button: 20px;
     --fs-meta: 13px;
-    --lh-meta: 21px;
+    --lh-meta: 23px; /* Figma 2026-11-05 (it was 21) */
     --fs-caption: 12.5px;
     --control-sm: 32px;
     --control-default: 36px;
@@ -287,7 +289,7 @@
   --foreground: var(--neutral-100);
   --ai: var(--neutral-900); /* the agent panel's background (owner, 2026-10-29; it was neutral-800) */
   --ai-border: var(--indigo-400);
-  --answer-banner-h: 44px; /* conversation banner height (Figma Answer Banner, owner 2026-10-28; was 38); the filters and the stats card move down by this much while it shows */
+  --answer-banner-h: 48px; /* conversation banner height (Figma Answer Banner: 48 since 2026-11-05, 8 px padding around the 32 px button; it was 44 from 2026-10-28 and 38 before); the filters and the stats card move down by this much while it shows */
   --ai-banner: var(--indigo-700); /* conversation banner background and the answer rings on the map, light text on it. Figma indigo-700 (map/banner is its alias) */
   --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
   --warning: var(--yellow-300);

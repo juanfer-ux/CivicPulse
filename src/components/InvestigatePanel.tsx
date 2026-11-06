@@ -1,10 +1,10 @@
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ArrowUp, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
+import { ArrowUp, Compass, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { SUGGESTIONS, answer, type Answer, type Area } from '@/lib/agent'
+import { SUGGESTIONS, WORTH_INVESTIGATING, answer, type Answer, type Area } from '@/lib/agent'
 import { fetchLocalities } from '@/lib/incidents'
 
 // The charts (Recharts) are their own file, fetched right after the app loads so the first answer already has them; nothing is drawn while they load, never the plain bars.
@@ -52,7 +52,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
   return (
     <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-0 max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
       {/* On desktop the title row is as tall as the section header, so one line runs across the screen. */}
-      <div className="flex items-center desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:px-8">
+      <div className={`flex items-center desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:px-8 ${turns.length === 0 ? 'desk:hidden' : ''}`}>
         <CardHeader className="flex w-full flex-row items-center justify-between max-desk:mx-auto max-desk:max-w-[664px]">
           <CardTitle asChild className="flex items-center gap-2 text-label">
             <h2>
@@ -64,15 +64,34 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:p-8">
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
         <ScrollArea className="min-h-0 flex-1 desk:-mx-8" viewportClassName="[&>div]:!block">
-        <div className="mx-auto flex w-full max-w-[664px] flex-col gap-3 text-body-sm desk:max-w-[728px] desk:px-8">
+        <div className={`flex w-full flex-col gap-3 text-body-sm max-desk:mx-auto max-desk:max-w-[664px] desk:px-8 ${turns.length === 0 ? '' : 'desk:max-w-[728px]'}`}>
           {turns.length === 0 && (
-            <div className="flex flex-col gap-2">
-              <p className="text-subtitle text-muted-foreground">Try one of these, or ask your own:</p>
-              {SUGGESTIONS.map((s) => (
-                <Button key={s} variant="outline" className="h-auto justify-start whitespace-normal px-3 py-2 text-left text-meta-medium text-foreground" onClick={() => void ask(s)}>
-                  {s}
-                </Button>
-              ))}
+            <div className="flex flex-col gap-6">
+              {/* The empty panel (owner's Figma, 2026-11-05), with Figma's auto layout limits: the Quick questions and the composer are at most 664 wide (the greeting "Let’s take a look..." is hidden in Figma, so it is not shown), and the cards fill the width and wrap (each at least 250 wide). The title row is hidden on desktop until the first question. */}
+              <div className="flex flex-col gap-3">
+                <p className="text-body-strong text-(--neutral-200)">Worth investigating</p>
+                <div className="flex flex-wrap gap-3">
+                  {WORTH_INVESTIGATING.map((c) => (
+                    <button key={c.title} type="button" className="flex min-w-[250px] flex-1 basis-[250px] cursor-pointer gap-5 overflow-hidden rounded-lg bg-(--neutral-700) p-2 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => void ask(c.question)}>
+                      <span className="flex min-w-0 flex-1 flex-col gap-2.5 p-1">
+                        <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
+                        <span className="text-subtitle text-(--neutral-200)">{c.title}</span>
+                      </span>
+                      <span className="h-[120px] max-w-[400px] min-w-0 flex-1 rounded-lg bg-(--neutral-500)" aria-hidden />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex max-w-[664px] flex-col gap-3">
+                <p className="text-body-strong text-(--neutral-200)">Quick questions</p>
+                <div className="flex flex-col gap-2">
+                  {SUGGESTIONS.map((s) => (
+                    <Button key={s} variant="ghost" className="h-auto justify-start whitespace-normal rounded-lg bg-(--neutral-700) p-3 text-left text-body-sm-medium text-(--neutral-200) hover:bg-(--neutral-600) hover:text-(--neutral-200)" onClick={() => void ask(s)}>
+                      {s}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
           {turns.map((t, i) => (
@@ -86,7 +105,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           <div ref={end} />
         </div>
         </ScrollArea>
-        <form onSubmit={onSubmit} className="mx-auto flex w-full max-w-[664px] items-center gap-2">
+        <form onSubmit={onSubmit} className="flex w-full max-w-[664px] items-center gap-2 max-desk:mx-auto">
           <Input name="q" value={text} onChange={(e) => setText(e.target.value)} placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" />
           <Button type="submit" size="icon" aria-label="Ask" className="bg-(--white) hover:bg-(--white)/90" disabled={busy || !text.trim()}>
             <ArrowUp aria-hidden />
@@ -99,7 +118,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
 
 /** The person's question (Figma Message, role user). */
 export function Question({ text }: { text: string }) {
-  return <p className="self-end rounded-lg bg-foreground/10 px-3 py-2">{text}</p>
+  return <p className="self-end rounded-lg bg-(--neutral-500) px-3 py-2">{text}</p>
 }
 
 /** Thumbs under an answer (Figma Message, role assistant). For now they only mark the choice on screen. */
