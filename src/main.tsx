@@ -9,6 +9,10 @@ import { AuthProvider } from '@/lib/auth'
 // The signed-in app (map, GSAP, the rest) only loads once AuthGate actually renders it, so a
 // signed-out visitor's first load — everyone's first load — never pays for it. Same for the two
 // dev-only galleries: loaded only when their hash route is opened.
+// Font smoothing links (owner, 2026-11-05): /?smoothing=auto|none|antialiased|subpixel-antialiased sets -webkit-font-smoothing on the page, so each option can be compared from its own link. Anything else is ignored. The CSS default (`auto`) applies without the parameter.
+const smoothing = new URLSearchParams(location.search).get('smoothing')
+if (smoothing && ['auto', 'none', 'antialiased', 'subpixel-antialiased'].includes(smoothing)) document.documentElement.style.setProperty('-webkit-font-smoothing', smoothing)
+
 const App = lazy(() => import('./App.tsx'))
 const Gallery = lazy(() => import('@/components/Gallery').then((m) => ({ default: m.Gallery })))
 const ChartGallery = lazy(() => import('@/components/ChartGallery').then((m) => ({ default: m.ChartGallery })))
