@@ -35,7 +35,7 @@ Which page holds which component (the "Components · " prefix was replaced by th
 |---|---|
 | Actions & inputs | Button, Input, Textarea, Select, Select Menu, Checkbox, Multi-select, Form Field |
 | Data display | Badge, Status Badge, Role Badge, Avatar, Card, Stat Card (trend: above, about, low, below), Table Row, User Card, Incident Row, Incident Card (with Media Tile, Video Player, Detail Row), Alert, Skeleton, Separator |
-| Navigation & layout | Sidebar (type explorer / cases), Sidebar Item Explorer, Sidebar Item Cases, Nav Item, Tab Bar, Sheet Tabs, Mobile Top Bar, Section Header, Panel Header, Side Panel, Drawer, Scroll Bar (vertical and horizontal, default and hover; style G) |
+| Navigation & layout | Sidebar, Sidebar Item Persistent / Incident / Investigation, Nav Item, Tab Bar, Sheet Tabs, Mobile Top Bar, Section Header, Panel Header, Side Panel, Drawer, Scroll Bar (vertical and horizontal, default and hover; style G) |
 | Map & agent | (the old Map Marker and Map Pin frames were deleted 2026-11-05, the owner's call: the Archive page keeps unlinked copies) Incident Radius, Filters Card (replaced by Filter Chip and Filter Bar, with Status Dot), Agent Panel, Suggestion, Message, Action Card, Answer Chart, Answer Banner, Map Zoom, Map Legend (two pills: problems and incidents), Problem Marker (category × status × 3 sizes by zoom), Problem Radius (status), Problem Panel, Problem Timeline Card and Problem Occurrences Card (desktop 542 + 361, 24 px apart, 360 tall; phone 358 each), Problem Status Dot (round swatch), Incident Marker (status × 4 sizes by zoom, with a dumping set), Incident Ring (round selected ring) |
 | Auth & brand | Auth Card, Logo |
 

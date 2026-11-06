@@ -3,6 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Sidebar } from '@/components/Sidebar'
 
+// Radix ScrollArea (the lists) needs ResizeObserver, which jsdom lacks.
+globalThis.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} }
+
 vi.mock('@/lib/auth', () => ({
   useAuth: () => ({ profile: { full_name: 'Ada Admin' }, session: { user: { email: 'ada@example.com' } }, signOut: vi.fn() }),
 }))
@@ -35,7 +38,6 @@ describe('Sidebar — creating investigations and cases', () => {
     const onNewCase = vi.fn()
     render(<Sidebar {...baseProps} onNewCase={onNewCase} />)
 
-    await user.click(screen.getByRole('tab', { name: 'Cases' })) // the Explore | Cases toggle
     await user.click(screen.getByRole('button', { name: 'New case' }))
     expect(onNewCase).toHaveBeenCalledTimes(1)
   })
@@ -49,23 +51,31 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(onPick).toHaveBeenCalledWith(2)
   })
 
-  it('the Cases tab lists the cases with their reference and locality', async () => {
-    const user = userEvent.setup()
-    render(<Sidebar {...baseProps} cases={[]} />)
+  it('shows Persistent, Incidents and Investigations in one sidebar', () => {
+    render(<Sidebar {...baseProps} />)
 
-    expect(screen.queryByText('PR-00088 · Engativá')).not.toBeInTheDocument() // Explore is the default view
-    await user.click(screen.getByRole('tab', { name: 'Cases' }))
-    expect(screen.getByRole('tab', { name: 'Cases' })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByText('PR-00088 · Engativá')).toBeInTheDocument()
+    for (const t of ['Persistent', 'Incidents', 'Investigations']) expect(screen.getByText(t)).toBeInTheDocument()
+    expect(screen.getByText('Existing investigation')).toBeInTheDocument()
+    expect(screen.getByText(/PR-00088/)).toBeInTheDocument()
+    expect(screen.getByText('CP-00200 · Monitoring')).toBeInTheDocument()
   })
 
-  it('the sort button flips the label between New and Old', async () => {
+  it('each section has its own sort button', async () => {
     const user = userEvent.setup()
     render(<Sidebar {...baseProps} />)
 
-    expect(screen.getByText('New')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: /Sorted newest first/ }))
-    expect(screen.getByText('Old')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /^Incidents: newest first/ }))
+    expect(screen.getByRole('button', { name: /^Incidents: oldest first/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Persistent: newest first/ })).toBeInTheDocument()
+  })
+
+  it('the search filters the three lists', async () => {
+    const user = userEvent.setup()
+    render(<Sidebar {...baseProps} />)
+
+    await user.type(screen.getByRole('searchbox', { name: 'Search the menu' }), 'Existing')
+    expect(screen.getByText('Existing investigation')).toBeInTheDocument()
+    expect(screen.queryByText(/PR-00088/)).not.toBeInTheDocument()
   })
 })
 
