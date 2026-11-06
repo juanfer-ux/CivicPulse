@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
-import { CaretDown, ChatCircleDots, DotsThreeVertical, List, MapTrifold, Plus, SidebarSimple, SignOut, SortAscending, Warning, X } from '@phosphor-icons/react'
+import { CaretDown, Chat, DotsThreeVertical, List, MapTrifold, Plus, SidebarSimple, SignOut, SortAscending, Warning, X } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useAuth } from '@/lib/auth'
-import { PROBLEM_STATUS, type ProblemStatus } from '@/lib/statusColors'
+import { GROUPS, PROBLEM_STATUS, type Group, type ProblemStatus } from '@/lib/statusColors'
 import { shortName } from '@/lib/utils'
 
 type Chat = { id: number; title: string }
@@ -37,11 +37,11 @@ const PLACEHOLDER_PERSISTENT: Persistent[] = [
   { id: -3, title: 'Cra 13 #62-40, entrada del edificio Aurora', status: 'resolved', reference: 'PR-00091' },
   { id: -4, title: 'Cl 72 #24-30, entrada del colegio', status: 'archived', reference: 'PR-00092' },
 ]
-type Incident = { id: number; title: string; reference: string; status: string }
+type Incident = { id: number; title: string; reference: string; group: Group }
 const PLACEHOLDER_INCIDENTS: Incident[] = [
-  { id: -1, title: 'Parque La Serena, costado norte', reference: 'CP-00200', status: 'Monitoring' },
-  { id: -2, title: 'Cl 39 #20-15, garaje del conjunto Alcázar', reference: 'CP-00201', status: 'Monitoring' },
-  { id: -3, title: 'Cra 72 con Cl 80', reference: 'CP-00202', status: 'Monitoring' },
+  { id: -1, title: 'Access ramp obstruction', reference: 'CP-00200', group: 'pending' },
+  { id: -2, title: 'Blocked bike lane', reference: 'CP-00201', group: 'reviewing' },
+  { id: -3, title: 'Illegal dumping', reference: 'CP-00202', group: 'approved' },
 ]
 
 /** Two-line row shared by Persistent and Incident (Figma Sidebar Item Persistent / Incident: 224.5 x 50, 6 left, 4 top, 6 bottom, 20 right, a 16 x 40 icon column with the 16 px icon 4 px below its top, 8 px to the text). */
@@ -58,7 +58,7 @@ function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNo
 }
 
 /** One sidebar section (Figma Persistent / Incidents / Investigations): a title row with its own sort button and plus, then the list. Each section sorts on its own. */
-function Section<T>({ title, items, addLabel, onAdd, gap, pb = 'pb-3', row }: { title: string; items: T[]; addLabel: string; onAdd?: () => void; gap: string; pb?: string; row: (t: T) => ReactNode }) {
+function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row }: { title: string; items: T[]; addLabel: string; onAdd?: () => void; pb?: string; row: (t: T) => ReactNode }) {
   const [newest, setNewest] = useState(true)
   return (
     <div className={`flex flex-col gap-2 px-1.5 pt-2 ${pb}`}>
@@ -71,7 +71,7 @@ function Section<T>({ title, items, addLabel, onAdd, gap, pb = 'pb-3', row }: { 
           <Plus className="size-4 text-(--white)" />
         </Button>
       </div>
-      <div className={`flex flex-col px-1 ${gap}`}>{(newest ? items : [...items].reverse()).map(row)}</div>
+      <div className="flex flex-col gap-0.5 px-1">{(newest ? items : [...items].reverse()).map(row)}</div>
     </div>
   )
 }
@@ -245,17 +245,17 @@ function Menu_({ collapsed, chats, activeId, onPick, onNew, cases, onNewCase, on
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
               <div className="flex flex-col gap-3 py-2">
-                <Section title="Persistent" items={persistent} addLabel="New case" onAdd={onNewCase} gap="gap-1.5" pb="pb-2.5" row={(c) => (
+                <Section title="Persistent" items={persistent} addLabel="New case" onAdd={onNewCase} pb="pb-2.5" row={(c) => (
                   <TwoLineItem key={c.id} active={c.id === caseId} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => setCaseId(c.id)} title={c.title}
                     icon={<Warning weight="fill" className="size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
                     sub={c.reference ? <>{c.reference} · <span className="text-caption-strong">{PROBLEM_STATUS[c.status].label}</span></> : 'Not linked to a problem yet'} />
                 )} />
-                <Section title="Incidents" items={PLACEHOLDER_INCIDENTS.filter((i) => hit(i.title))} addLabel="New incident" gap="gap-0.5" row={(i) => (
-                  <TwoLineItem key={i.id} tip={i.title} onClick={() => {}} title={i.title} icon={<span className="size-2 rounded-full bg-(--red-500)" aria-hidden />} sub={`${i.reference} · ${i.status}`} />
+                <Section title="Incidents" items={PLACEHOLDER_INCIDENTS.filter((i) => hit(i.title))} addLabel="New incident" row={(i) => (
+                  <TwoLineItem key={i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => {}} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-3 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={<>{i.reference} · <span className="text-caption-strong">{GROUPS[i.group].label}</span></>} />
                 )} />
-                <Section title="Investigations" items={investigations} addLabel="New investigation" onAdd={onNew} gap="gap-0.5" row={(c) => (
+                <Section title="Investigations" items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
                   <Button key={c.key} variant="ghost" className={`h-[30px] items-center justify-start gap-2 py-1 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-800) ${c.id === activeId ? 'bg-(--neutral-800)' : ''}`} aria-current={c.id === activeId || undefined} onClick={() => c.id !== null && onPick(c.id)}>
-                    <ChatCircleDots weight="fill" className="size-4 shrink-0 text-(--neutral-400)" aria-hidden />
+                    <Chat weight="regular" className="size-4 shrink-0 text-(--neutral-300)" aria-hidden />
                     <span className="truncate">{c.title}</span>
                   </Button>
                 )} />

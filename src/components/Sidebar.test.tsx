@@ -57,7 +57,8 @@ describe('Sidebar — creating investigations and cases', () => {
     for (const t of ['Persistent', 'Incidents', 'Investigations']) expect(screen.getByText(t)).toBeInTheDocument()
     expect(screen.getByText('Existing investigation')).toBeInTheDocument()
     expect(screen.getByText(/PR-00088/)).toBeInTheDocument()
-    expect(screen.getByText('CP-00200 · Monitoring')).toBeInTheDocument()
+    expect(screen.getByText('Access ramp obstruction')).toBeInTheDocument()
+    expect(screen.getByText('Pending')).toBeInTheDocument() // the incident's status, in its own run
   })
 
   it('each section has its own sort button', async () => {
