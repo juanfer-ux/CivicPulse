@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
+import { useNoSelect } from '@/lib/useNoSelect'
 
 export const AGENT_MIN = 550
 export const AGENT_MAX = 800
@@ -15,6 +16,7 @@ export const agentWidthCss = (frac: number) => `clamp(${AGENT_MIN}px, ${frac * 1
 export function AgentResizer({ frac, onChange }: { frac: number; onChange: (frac: number) => void }) {
   const ref = useRef<HTMLDivElement>(null)
   const [dragging, setDragging] = useState(false)
+  useNoSelect(dragging)
   const active = useRef(false) // read by the move handler without waiting for a re-render
   const [parent, setParent] = useState(0)
 
@@ -30,6 +32,7 @@ export function AgentResizer({ frac, onChange }: { frac: number; onChange: (frac
   const setPx = (next: number) => parent > 0 && onChange(Math.min(AGENT_MAX, Math.max(AGENT_MIN, next)) / parent)
 
   const down = (e: PointerEvent<HTMLDivElement>) => {
+    e.preventDefault() // no text selection from the drag
     e.currentTarget.setPointerCapture(e.pointerId)
     active.current = true
     setDragging(true)

@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
+import { useNoSelect } from '@/lib/useNoSelect'
 import { CaretDown, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
@@ -93,8 +94,10 @@ const readWidth = () => {
 /** Drag handle on the right edge of the expanded desktop sidebar, like the agent panel's (245 to 380 px, double-click resets to 284). */
 function SidebarResizer({ width, onChange }: { width: number; onChange: (px: number) => void }) {
   const [dragging, setDragging] = useState(false)
+  useNoSelect(dragging)
   const active = useRef(false)
   const down = (e: PointerEvent<HTMLDivElement>) => {
+    e.preventDefault() // no text selection from the drag
     e.currentTarget.setPointerCapture(e.pointerId)
     active.current = true
     setDragging(true)
