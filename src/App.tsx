@@ -2,7 +2,7 @@ import { useState, type CSSProperties } from 'react'
 import { Dashboard, type Tab } from '@/components/Dashboard'
 import type { Area } from '@/lib/agent'
 import { InvestigatePanel, type Turn } from '@/components/InvestigatePanel'
-import { Sidebar, type SidebarIncident, type SidebarRecurrence } from '@/components/Sidebar'
+import { Sidebar, type SidebarIncident, type SidebarRecurrence, type SidebarSelection } from '@/components/Sidebar'
 
 export default function App() {
   const [highlightIds, setHighlightIds] = useState<string[]>([])
@@ -38,6 +38,7 @@ export default function App() {
   const zoomArea = (code: number) => setZoomTo((z) => ({ code, n: (z?.n ?? 0) + 1 }))
   const [tab, setTab] = useState<Tab>('explore')
   const [rows, setRows] = useState<{ recurrences: SidebarRecurrence[]; incidents: SidebarIncident[] }>({ recurrences: [], incidents: [] })
+  const [selection, setSelection] = useState<SidebarSelection | null>(null)
   const [focus, setFocus] = useState<{ kind: 'recurrence' | 'incident'; id: string; n: number } | null>(null)
   const open = (kind: 'recurrence' | 'incident') => (id: string) => setFocus((f) => ({ kind, id, n: (f?.n ?? 0) + 1 }))
   const [inspecting, setInspecting] = useState(false) // an incident or problem is open: the sidebar collapses (the 360 px panel overlays the map, which keeps its size; see Dashboard)
@@ -48,11 +49,11 @@ export default function App() {
         Skip to main content
       </a>
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
-      <Sidebar collapse={inspecting} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
+      <Sidebar collapse={inspecting} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
       <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': '550px', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
-          <Dashboard highlightIds={highlightIds} areas={areas} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} focus={focus} onRows={setRows}>
+          <Dashboard highlightIds={highlightIds} areas={areas} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} focus={focus} onRows={setRows} onSelection={setSelection}>
             {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
               <InvestigatePanel chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} />
