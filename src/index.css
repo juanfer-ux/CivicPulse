@@ -28,6 +28,10 @@
   --text-display-sm--font-weight: calc(400 + var(--weight-offset));
   --text-display-sm--line-height: 32px;
   --text-display-sm--letter-spacing: 0.02em;
+  --text-display-xs: 14px; /* Figma 2026-11-06: the smallest display style (14 / 20; first 16 / 24, then the owner changed it) */
+  --text-display-xs--font-weight: calc(400 + var(--weight-offset));
+  --text-display-xs--line-height: 20px;
+  --text-display-xs--letter-spacing: 0.02em;
   --text-stat: 32px; /* Figma stat: Bold 32 / 32, tracking -2 % (it was -4 % until 2026-11-02); the number in a Stat Card */
   --text-stat--font-weight: calc(700 + var(--weight-offset));
   --text-stat--line-height: 32px;

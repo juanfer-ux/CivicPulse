@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ArrowUp, Compass, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
+import { ArrowRight, ArrowUp, Sparkle, ThumbsDown, ThumbsUp, WarningCircle } from '@phosphor-icons/react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -69,24 +70,30 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
             <div className="flex flex-col gap-10">
               {/* The empty panel (owner's Figma, 2026-11-05), with Figma's auto layout limits: the whole content (cards, Quick questions) and the composer are at most 664 wide and centered (the greeting "Let’s take a look..." is hidden in Figma, so it is not shown), and the cards fill the width and wrap (each at least 250 wide). The title row is hidden on desktop until the first question. */}
               <div className="@container flex flex-col gap-4">
-                <p className="text-body-strong text-(--neutral-200)">Worth investigating</p>
+                <p className="font-display text-display-xs text-(--neutral-200)">Worth investigating</p>
                 <div className="flex flex-wrap items-start gap-4">
                   {WORTH_INVESTIGATING.map((c) => (
-                    <button key={c.title} type="button" className="flex max-w-none min-w-[250px] flex-1 basis-0 @min-[516px]:max-w-[320px] cursor-pointer gap-2 overflow-hidden rounded-lg bg-(--neutral-700) p-2 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => void ask(c.question)}>
-                      <span className="h-[120px] max-w-[400px] min-w-0 flex-1 rounded-sm bg-(--neutral-500)" aria-hidden />
-                      <span className="flex min-w-0 flex-1 flex-col justify-between p-1.5">
-                        <span className="text-body-strong [overflow-wrap:anywhere] text-(--neutral-200)">{c.title}</span>
-                        <Compass weight="regular" className="size-6 shrink-0 self-end text-(--neutral-200)" aria-hidden />
+                    <button key={c.title} type="button" className="flex max-w-none min-w-[250px] flex-1 basis-0 @min-[516px]:max-w-[320px] cursor-pointer gap-3 overflow-hidden rounded-lg bg-(--neutral-700) px-2 py-3 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => void ask(c.question)}>
+                      <span className="h-[160px] max-w-[400px] min-w-[132px] flex-1 rounded-sm bg-(--neutral-500)" aria-hidden />
+                      <span className="flex min-w-0 flex-1 flex-col justify-between p-2">
+                        <span className="flex flex-col items-start gap-3">
+                          <Badge variant="outline" size="lg" className="h-[31px] border-(--neutral-400) bg-(--neutral-900) px-2.5 text-(--neutral-100)">
+                            <WarningCircle weight="regular" aria-hidden />
+                            {c.category}
+                          </Badge>
+                          <span className="text-label-regular [overflow-wrap:anywhere] text-(--neutral-200)">{c.title}</span>
+                        </span>
+                        <ArrowRight weight="regular" className="size-4 shrink-0 self-end text-(--neutral-200)" aria-hidden />
                       </span>
                     </button>
                   ))}
                 </div>
               </div>
               <div className="flex max-w-[664px] flex-col gap-4">
-                <p className="text-body-strong text-(--neutral-200)">Quick questions</p>
+                <p className="font-display text-display-xs text-(--neutral-200)">Quick questions</p>
                 <div className="flex flex-col gap-1.5">
                   {SUGGESTIONS.map((s) => (
-                    <Button key={s} variant="ghost" className="h-auto justify-start whitespace-normal rounded-[6px] bg-(--neutral-700) p-3 text-left text-body-sm-medium text-(--neutral-200) hover:bg-(--neutral-600) hover:text-(--neutral-200)" onClick={() => void ask(s)}>
+                    <Button key={s} variant="ghost" className="h-auto justify-start whitespace-normal rounded-none border-0 border-b border-(--neutral-400) p-3 text-left text-body-sm-medium text-(--neutral-200) hover:bg-(--neutral-700) hover:text-(--neutral-200)" onClick={() => void ask(s)}>
                       {s}
                     </Button>
                   ))}

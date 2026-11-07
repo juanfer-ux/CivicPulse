@@ -80,8 +80,8 @@ export const SUGGESTIONS = [
 
 /** The two Worth investigating cards: a title and the question each one asks (the picture is a placeholder for now). */
 export const WORTH_INVESTIGATING = [
-  { title: 'Recurring Dumping sites', question: 'Which locations have repeated illegal dumping reports?' },
-  { title: 'Recurring Obstructive Parking', question: 'Which locations have repeated parking obstruction reports?' },
+  { title: 'Recurring Dumping sites', category: 'Illegal dumping', question: 'Which locations have repeated illegal dumping reports?' },
+  { title: 'Recurring Obstructive Parking', category: 'Parking obstruction', question: 'Which locations have repeated parking obstruction reports?' },
 ]
 
 export function plan(question: string, localities: Locality[]): Plan | null {
