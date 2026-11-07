@@ -101,7 +101,7 @@ export async function addBadges(map: { addImage: AddImage }) {
   )
 }
 
-/** Recurrence marker (decision 0030; the owner's option F, 2026-11-01): a neutral-700 circle with a 1 px outline in the problem's status color (softened by 2 px of blur), the category icon in neutral-100 inside, and on its upper right a warning triangle in the status color with a 4 px neutral-900 outline. The sizes are in PROBLEM_FAR (markerSizes.ts), set at the farthest zoom and scaled in proportion for each image size (PROBLEM_CIRCLE_PX). The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category, status and size, each centered on the circle so the layer needs no offset. */
+/** Recurrence marker (decision 0030; the owner's option F, 2026-11-01): a neutral-900 circle (neutral-700 until 2026-11-07) with a 1 px outline in the problem's status color (softened by 2 px of blur), the category icon in neutral-100 inside, and on its upper right a warning triangle in the status color with a 4 px neutral-900 outline. The sizes are in PROBLEM_FAR (markerSizes.ts), set at the farthest zoom and scaled in proportion for each image size (PROBLEM_CIRCLE_PX). The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category, status and size, each centered on the circle so the layer needs no offset. */
 export const problemMarkerId = (category: string, status: string, px: number) => `problem-${iconCategory(category)}-${status}-${px}`
 
 async function drawIcon(Icon: (typeof ICONS)[keyof typeof ICONS], color: string, size: number) {
@@ -119,6 +119,7 @@ const TRI_MARK = new Path2D('M120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,
 async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string, size: number) {
   const { circle, iconPx, badgeD, alertOutline, up } = problemSizes(size)
   const statusColor = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token)
+  const outlineColor = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].outline) // the 400 step (owner, 2026-11-07); the triangle keeps the 300 step
   const off = (circle / 2 + PROBLEM_FAR.badgeGap) / Math.SQRT2 // the triangle's center, on the diagonal from the circle's edge...
   const half = Math.ceil(Math.max(circle / 2 + PROBLEM_FAR.outline + PROBLEM_FAR.outlineBlur, off + up + badgeD / 2 + alertOutline)) + 1 // screen px from the circle's center to the image edge, on every side
   const side = half * 2 * PR
@@ -130,12 +131,12 @@ async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: s
   g.beginPath() // the circle, with its outline outside it: stroke twice as wide (with a soft edge), then paint the fill over the inner half
   g.arc(mid, mid, (circle / 2) * PR, 0, Math.PI * 2)
   g.lineWidth = PROBLEM_FAR.outline * PR * 2
-  g.strokeStyle = statusColor
-  g.shadowColor = statusColor
+  g.strokeStyle = outlineColor
+  g.shadowColor = outlineColor
   g.shadowBlur = PROBLEM_FAR.outlineBlur * PR
   g.stroke()
   g.shadowBlur = 0
-  g.fillStyle = token('--neutral-700')
+  g.fillStyle = token('--neutral-900') // the disc (owner, 2026-11-07; it was neutral-700)
   g.fill()
   g.drawImage(icon, mid - (iconPx * PR) / 2, mid - (iconPx * PR) / 2, iconPx * PR, iconPx * PR)
   // the warning triangle: ...and a little higher, so it overlaps the circle less vertically

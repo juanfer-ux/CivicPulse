@@ -91,12 +91,29 @@ const PROBLEM_FILL_ALPHA_NEAR = 0.035 // ...and from zoom 16 up (owner, 2026-10-
 const PROBLEM_RING_ALPHA_NEAR = 0.5
 const PROBLEM_ALPHA_ZOOM: [number, number] = [14, 16] // fill, ring opacity and ring weight change evenly from zoom 14 to 16 (owner, 2026-10-30: progressive, no jump)
 const PROBLEM_RING_PX = 1
+const PROBLEM_GLOW_ALPHA = 0.12 // the inner glow of a recurrence's ring (owner, 2026-11-07, from the /#glow gallery): thin bands inside the ring, easing in toward the edge, in the status color; the edge band's opacity
+const PROBLEM_GLOW_N = 16 // thin bands so no step shows (4 wide ones looked like rings)
+const PROBLEM_GLOW_BANDS = Array.from({ length: PROBLEM_GLOW_N }, (_, i) => [0.4 + (0.6 * i) / PROBLEM_GLOW_N, 0.4 + (0.6 * (i + 1)) / PROBLEM_GLOW_N]) // from the center, as fractions of the radius
 const PROBLEM_RING_BLUR = 0.01 // the ring's circle-blur (owner, 2026-11-01), relative to its radius (1 = fully soft): about 0.4 px at the smallest ring and 1 px at a 100 px radius; softens the edge a little
 const PROBLEM_RADIUS_ZOOM = 11 // the radius shows from the start (owner, 2026-10-30; it faded in from zoom 12): the map's minimum zoom
 const PROBLEM_RADIUS_RAMP_ZOOM = 12 // below this it keeps its starting size on screen, and it grows from here
 const PROBLEM_RADIUS_FULL_ZOOM = 14 // and reaches the minimum size on screen here
 const PROBLEM_RADIUS_MIN_PX = 36 // from the full-opacity zoom it never draws smaller than this on screen (the marker is 20 px in radius)
 const PROBLEM_RADIUS_START_PX = 72 // its size on screen up to the ramp zoom (owner, 2026-10-30: bigger at the start, it was 20, 48, then 60), shrinking to the minimum at zoom 14
+/** The recurrence ring's radius in px at each whole zoom (72 px up to zoom 12, shrinking to 36 at 14, then its real size of 60 m); the ring layers and the pulse both read it. */
+const PROBLEM_STOPS = Array.from({ length: 12 }, (_, k) => {
+  const z = PROBLEM_RADIUS_ZOOM + k
+  const floor = PROBLEM_RADIUS_START_PX + (PROBLEM_RADIUS_MIN_PX - PROBLEM_RADIUS_START_PX) * Math.min(1, Math.max(0, (z - PROBLEM_RADIUS_RAMP_ZOOM) / (PROBLEM_RADIUS_FULL_ZOOM - PROBLEM_RADIUS_RAMP_ZOOM)))
+  return [z, Math.max(floor, PROBLEM_RADIUS_M * METERS_TO_PX_Z0 * 2 ** z)] as const
+})
+/** The same curve at any zoom: MapLibre's exponential (base 2) interpolation between the stops. */
+const problemRingPx = (zoom: number) => {
+  const z = Math.min(Math.max(zoom, PROBLEM_STOPS[0][0]), PROBLEM_STOPS[PROBLEM_STOPS.length - 1][0] - 1e-9)
+  const i = PROBLEM_STOPS.findIndex(([zk], k) => z >= zk && z < PROBLEM_STOPS[k + 1][0])
+  const [z0, v0] = PROBLEM_STOPS[i]
+  const [z1, v1] = PROBLEM_STOPS[i + 1]
+  return v0 + (v1 - v0) * ((2 ** (z - z0) - 1) / (2 ** (z1 - z0) - 1))
+}
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
 /** The map always opens here (owner's choice, 2026-10-26). */
@@ -128,6 +145,8 @@ interface Props {
   dotStatusById?: Map<string, ProblemStatus>
   /** Ids of the open problem's incidents: their dots show at every zoom. */
   problemIncidentIds?: string[]
+  /** The glows (inner glow of the recurrence rings, strong glow on what is selected); on by default. */
+  glow?: boolean
 }
 
 /** MapLibre caps the canvas at 4096 px by default and quietly lowers the pixel ratio to fit, so a wide window (the owner's 3440 px monitor: 2576 px of map × 2 = 5152) drew at 1.59x and the crisp marker edges crackled again (2026-11-05). Allow what this GPU can do. */
@@ -138,7 +157,7 @@ const MAX_CANVAS = (() => {
   return Math.min(Math.max(max, 4096), 16384)
 })()
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS, glow = true }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
@@ -333,12 +352,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       // Recurrence radius (owner, 2026-10-30): the same radius look as the agent's answer, one per problem in its status color, so a problem reads as an area and not just a marker. Real meters, under the dots and names.
       map.addSource('problem-radius', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       // From the first zoom (11, owner 2026-10-30; it used to fade in from 12) at full strength: 72 px in radius up to zoom 12, shrinking to 36 px at zoom 14, then to its real size (60 m, about 50 px in radius at zoom 17). Until the real size is bigger it never draws under that minimum on screen.
-      const problemPx = (f: number) =>
-        ['interpolate', ['exponential', 2], ['zoom'], ...Array.from({ length: 12 }, (_, k) => {
-          const z = PROBLEM_RADIUS_ZOOM + k
-          const floor = PROBLEM_RADIUS_START_PX + (PROBLEM_RADIUS_MIN_PX - PROBLEM_RADIUS_START_PX) * Math.min(1, Math.max(0, (z - PROBLEM_RADIUS_RAMP_ZOOM) / (PROBLEM_RADIUS_FULL_ZOOM - PROBLEM_RADIUS_RAMP_ZOOM)))
-          return [z, Math.max(floor * f, PROBLEM_RADIUS_M * METERS_TO_PX_Z0 * 2 ** z * f)]
-        }).flat()] as never
+      const problemPx = (f: number) => ['interpolate', ['exponential', 2], ['zoom'], ...PROBLEM_STOPS.flatMap(([z, v]) => [z, v * f])] as never
       // The look is the owner's Figma Incident Radius (2026-10-30): a flat fill at 2.4 % and a ring, in the problem's status color; the ring is drawn 1 px at 20 % (the same brightness as the Figma 0.5 px at 35 %, without the crackle); from zoom 16 up the fill is 3.5 % and the ring 1 px at 50 % (reached evenly over zoom 14 to 16).
       map.addLayer(
         { id: 'problem-radius-fill', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-color': ['get', 'color'], 'circle-opacity': ['interpolate', ['linear'], ['zoom'], PROBLEM_ALPHA_ZOOM[0], PROBLEM_FILL_ALPHA, PROBLEM_ALPHA_ZOOM[1], PROBLEM_FILL_ALPHA_NEAR] as never } },
@@ -347,6 +361,19 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       map.addLayer(
         { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-blur': PROBLEM_RING_BLUR, 'circle-stroke-width': PROBLEM_RING_PX, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': ['interpolate', ['linear'], ['zoom'], PROBLEM_ALPHA_ZOOM[0], PROBLEM_RING_ALPHA, PROBLEM_ALPHA_ZOOM[1], PROBLEM_RING_ALPHA_NEAR] as never } },
         underLabels,
+      )
+      // Inner glow (owner, 2026-11-07): the same stacked-strokes trick as the answer radius, inside the ring of every recurrence, strongest at the edge. A few static circle layers, nothing animated.
+      PROBLEM_GLOW_BANDS.forEach(([from, to], i) =>
+        map.addLayer(
+          {
+            id: `problem-radius-glow-${i}`,
+            type: 'circle',
+            source: 'problem-radius',
+            minzoom: PROBLEM_RADIUS_ZOOM,
+            paint: { 'circle-radius': problemPx((from + to) / 2), 'circle-opacity': 0, 'circle-stroke-width': problemPx(to - from), 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': PROBLEM_GLOW_ALPHA * ((i + 1) / PROBLEM_GLOW_N) ** 2 },
+          },
+          underLabels,
+        ),
       )
       // An answer about localities (owner, 2026-10-27): the localities themselves are outlined in the radius ring color and filled with the radius fill color (LOCALITY_FILL, the same 4 % for every locality), with their names in neutral-100. No circles then.
       // The locality fill sits above the roads and under the names (owner, 2026-10-27), so it tints everything under it evenly and each locality reads as one shade; the outline is drawn on top of everything.
@@ -397,6 +424,11 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
           'icon-allow-overlap': true,
         },
       })
+      // A strong glow only on the selected incident (owner, 2026-11-07; the selected recurrence marker has none, tried and removed the same day): two soft halos (a wide faint one and a tight bright one) in its own status color. A halo is a blurred stroke starting at the marker's edge, so the light shows around it (a plain blurred disc hides behind the marker). Their filter matches one feature, so they draw one shape; under every dot and marker.
+      const haloLayer = (id: string, source: string, radius: unknown, width: number, opacity: number, blur: number) =>
+        map.addLayer({ id, type: 'circle', source, filter: ['==', ['get', 'id'], ''], paint: { 'circle-radius': radius as never, 'circle-opacity': 0, 'circle-stroke-width': width, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': opacity, 'circle-blur': blur } }, 'problem-incident-dots')
+      haloLayer('incident-selected-glow', 'incidents', 17, 56, 0.7, 0.8)
+      haloLayer('incident-selected-glow-core', 'incidents', 17, 24, 1, 0.7)
       // Recurrences (decision 0030; Figma Recurrence Marker): one marker per problem, a light disc with the occurrence count over it, a status-colored ring and a category badge. The incidents of the open problem draw with the normal incident layers.
       map.addSource('problems', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer({
@@ -602,7 +634,46 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     if (!ready || !map) return
     map.setFilter('incident-selected', ['==', ['get', 'id'], selectedId ?? ''])
     map.setFilter('incident-selected-pin', ['==', ['get', 'id'], selectedId ?? ''])
+    for (const id of ['incident-selected-glow', 'incident-selected-glow-core']) map.setFilter(id, ['==', ['get', 'id'], selectedId ?? ''])
   }, [ready, selectedId])
+
+  // A very subtle pulse around the ring of every Active recurrence (owner, 2026-11-07): a thin ring in the status color that grows a little and fades, a few seconds apart, each one out of step with the others. DOM markers with a CSS animation (index.css), so the map is not redrawn for it; each is sized to the ring at the current zoom.
+  const pulses = useRef(new Map<string, { marker: maplibregl.Marker; el: HTMLDivElement }>())
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    const live = glow ? problems.filter((p) => p.status === 'active') : []
+    const have = pulses.current
+    for (const [id, m] of have) {
+      if (live.some((p) => p.id === id)) continue
+      m.marker.remove()
+      have.delete(id)
+    }
+    const size = () => `${2 * problemRingPx(map.getZoom())}px`
+    live.forEach((p, i) => {
+      if (have.has(p.id)) return
+      const el = document.createElement('div')
+      el.className = 'problem-pulse'
+      el.style.setProperty('--c', token(PROBLEM_STATUS[p.status].token))
+      el.style.setProperty('--d', `${(i * 1.3) % 5}s`)
+      el.style.setProperty('--s', size())
+      have.set(p.id, { marker: new maplibregl.Marker({ element: el }).setLngLat([p.lng, p.lat]).addTo(map), el })
+    })
+    const onZoom = () => {
+      const s = size()
+      for (const { el } of have.values()) el.style.setProperty('--s', s)
+    }
+    map.on('zoom', onZoom)
+    return () => void map.off('zoom', onZoom)
+  }, [ready, problems, glow])
+
+  // The glows can be switched off together (the /#glow-map preview compares with and without them).
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    const ids = ['incident-selected-glow', 'incident-selected-glow-core', ...PROBLEM_GLOW_BANDS.map((_, i) => `problem-radius-glow-${i}`)]
+    for (const id of ids) map.setLayoutProperty(id, 'visibility', glow ? 'visible' : 'none')
+  }, [ready, glow])
 
   // Test (owner, 2026-10-30): opening an incident flies the camera to it with GSAP, easing the centre and the zoom together; any touch of the map stops it. Closing it flies back to where the map was before (a conscious decision to leave it).
   const home = useRef<{ lng: number; lat: number; zoom: number } | null>(null)
