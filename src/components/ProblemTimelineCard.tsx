@@ -67,20 +67,20 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { pro
   }
 
   return (
-    <div data-float className="flex shrink-0 flex-col gap-2 desk:absolute desk:right-(--map-pad) desk:bottom-(--map-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:h-[360px] desk:flex-row desk:gap-6">
+    <div data-float className="flex shrink-0 flex-col gap-2 desk:absolute desk:right-(--map-pad) desk:bottom-(--map-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:h-[360px] desk:flex-row desk:gap-3">
     <Card role="region" aria-label="Timeline" className="min-w-0 gap-0 overflow-hidden bg-card/95 py-0 desk:h-full desk:flex-1 desk:border-0 desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)]">
     <ScrollArea className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">
-        <h3 className="text-section-label uppercase text-(--neutral-200)">Timeline · {problem.reference}</h3>
+        <h3 className="text-caption-medium text-(--neutral-200)">Timeline · {problem.reference}</h3>
         {!detail && <p className="text-muted-foreground">Loading…</p>}
         {detail && <ProblemTimeline detail={detail} status={problem.status} onSelectIncident={onSelectIncident} onPick={setFocus} />}
       </section>
     </ScrollArea>
     </Card>
-    <Card role="region" aria-label="Occurrences history" className="gap-0 overflow-hidden bg-card/95 py-0 desk:h-full desk:w-[calc((100%-1.5rem)*0.4)] desk:shrink-0 desk:border-0 desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)]">
+    <Card role="region" aria-label="Occurrences history" className="gap-0 overflow-hidden bg-card/95 py-0 desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0 desk:border-0 desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)]">
     <ScrollArea viewportRef={list} className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">
-        <h3 className="text-section-label uppercase text-(--neutral-200)">Occurrences history</h3>
+        <h3 className="text-caption-medium text-(--neutral-200)">Occurrences history</h3>
         {detail && steps.length === 0 && <p className="text-muted-foreground">No history yet.</p>}
         <ol className="flex flex-col gap-3">
           {steps.map((st) => {

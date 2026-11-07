@@ -13,6 +13,7 @@ import { groupOf, label, typeOf, type Incident } from '@/lib/incidents'
 import type { ProblemRow } from '@/lib/problems'
 import { GROUPS, PROBLEM_STATUS, type ProblemStatus } from '@/lib/statusColors'
 import { ProblemHoverCard } from '@/components/ProblemHoverCard'
+import { MapZoomControl } from '@/components/MapZoomControl'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.
 const STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
@@ -173,7 +174,6 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
   useEffect(() => {
     if (!WEBGL2) return
     const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: START_ZOOM, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, attributionControl: { compact: true }, canvasContextAttributes: { antialias: true }, pixelRatio: Math.max(2, window.devicePixelRatio), maxCanvasSize: [MAX_CANVAS, MAX_CANVAS] }) // (owner, 2026-10-30, edges looked crackled) antialias smooths the edges of lines, outlines and shapes, and pixelRatio draws the map at twice the screen's resolution on ordinary 1x screens, which the browser then shrinks smoothly; the marker images are drawn for pixelRatio 2
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
     // On first entry the container can still be settling its size when the map is created, so once the style has loaded we re-measure it and set the start view again, unless the person has already moved the map.
     let moved = false
     map.on('movestart', (e) => e.originalEvent && (moved = true))
@@ -425,8 +425,9 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       // A strong glow only on the selected incident (owner, 2026-11-07; the selected recurrence marker has none, tried and removed the same day): two soft halos (a wide faint one and a tight bright one) in its own status color. A halo is a blurred stroke starting at the marker's edge, so the light shows around it (a plain blurred disc hides behind the marker). Their filter matches one feature, so they draw one shape; under every dot and marker.
       const haloLayer = (id: string, source: string, radius: unknown, width: number, opacity: number, blur: number) =>
         map.addLayer({ id, type: 'circle', source, filter: ['==', ['get', 'id'], ''], paint: { 'circle-radius': radius as never, 'circle-opacity': 0, 'circle-stroke-width': width, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': opacity, 'circle-blur': blur } }, 'problem-incident-dots')
-      haloLayer('incident-selected-glow', 'incidents', 17, 56, 0.7, 0.8)
-      haloLayer('incident-selected-glow-core', 'incidents', 17, 24, 1, 0.7)
+      const INCIDENT_GLOW_ALPHA = 0.06 // owner, 2026-11-07: both halos at 0.06 (they were 0.7 and 1)
+      haloLayer('incident-selected-glow', 'incidents', 17, 56, INCIDENT_GLOW_ALPHA, 0.8)
+      haloLayer('incident-selected-glow-core', 'incidents', 17, 24, INCIDENT_GLOW_ALPHA, 0.7)
       // Recurrences (decision 0030; Figma Recurrence Marker): one marker per problem, a light disc with the occurrence count over it, a status-colored ring and a category badge. The incidents of the open problem draw with the normal incident layers.
       map.addSource('problems', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addLayer({
@@ -737,6 +738,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
   return (
     <div role="region" aria-label="Incident map" className="absolute inset-x-0 top-0 bottom-14 desk:top-(--section-header-h) desk:bottom-0 desk:overflow-hidden">
       <div ref={container} className="size-full" />
+      <MapZoomControl map={ready ? mapRef.current : null} min={MIN_ZOOM} max={MAX_ZOOM} home={{ center: BOGOTA, zoom: START_ZOOM }} />
       {hover && problems.some((p) => p.id === hover.id) && (
         <ProblemHoverCard
           problem={problems.find((p) => p.id === hover.id)!}

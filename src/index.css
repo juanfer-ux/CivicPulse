@@ -403,6 +403,16 @@
   box-shadow: none !important;
 }
 
+/* The zoom control (owner, 2026-11-07; MapZoomControl.tsx): home, plus, a vertical slider, minus. It sits where MapLibre's own control was (77 px above the bottom, 14 px from the right) and rides above the history cards like it did. */
+.map-zoom { bottom: 77px; transition: bottom 0.3s; }
+@media (min-width: 90rem) { [data-history] .map-zoom { bottom: calc(77px + 384px); } }
+.zoom-slider { appearance: none; -webkit-appearance: none; writing-mode: vertical-lr; direction: rtl; width: 29px; height: 100%; margin: 0; background: transparent; cursor: pointer; }
+.zoom-slider::-webkit-slider-runnable-track { width: 2px; border-radius: 1px; background: var(--neutral-300); }
+.zoom-slider::-moz-range-track { width: 2px; border-radius: 1px; background: var(--neutral-300); }
+.zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 6px; margin-left: -7px; border-radius: 2px; background: var(--neutral-100); }
+.zoom-slider::-moz-range-thumb { width: 16px; height: 6px; border: 0; border-radius: 2px; background: var(--neutral-100); }
+.zoom-slider:focus-visible { outline: 1.5px solid var(--foreground); outline-offset: -1px; }
+
 /* Zoom buttons (Figma Map Zoom, 2026-10-27): two 29 px squares with a 0.5 px neutral-500 border, 4 px radius, neutral-500 fill and a bold neutral-200 plus and minus, 10 px, square ends (MapLibre's own icons are thin and dark, so ours replace them). Hover neutral-400, pressed neutral-600, at the zoom limit 50 %. */
 .maplibregl-map .maplibregl-ctrl-group { background: var(--secondary); box-shadow: none; border: 0.5px solid var(--secondary); }
 .maplibregl-map .maplibregl-ctrl-group button + button { border-top: 0.5px solid var(--secondary); }
