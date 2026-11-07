@@ -91,6 +91,14 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(onOpenIncident).toHaveBeenCalledWith('i1')
   })
 
+  it('the row of what is open on the map is highlighted', () => {
+    const { rerender } = render(<Sidebar {...baseProps} selected={{ kind: 'incident', id: 'i1' }} />)
+    expect(screen.getByRole('button', { name: /Access ramp obstruction/ })).toHaveAttribute('aria-current', 'true')
+    rerender(<Sidebar {...baseProps} selected={{ kind: 'recurrence', id: 'p1' }} />)
+    expect(screen.getByRole('button', { name: /Parque La Serena/ })).toHaveAttribute('aria-current', 'true')
+    expect(screen.getByRole('button', { name: /Access ramp obstruction/ })).not.toHaveAttribute('aria-current')
+  })
+
   it('each section has its own sort button', async () => {
     const user = userEvent.setup()
     render(<Sidebar {...baseProps} />)

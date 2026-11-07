@@ -24,7 +24,7 @@ import {
 import type { Area } from '@/lib/agent'
 import { fetchLinkedIncidentIds, fetchProblemDetail, fetchProblems, type ProblemDetailData, type ProblemRow } from '@/lib/problems'
 import { PROBLEM_STATUSES, type ProblemStatus } from '@/lib/statusColors'
-import type { SidebarIncident, SidebarRecurrence } from '@/components/Sidebar'
+import type { SidebarIncident, SidebarRecurrence, SidebarSelection } from '@/components/Sidebar'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
 import { useHeld } from '@/lib/useSlide'
 
@@ -49,12 +49,13 @@ interface Props {
   tab: Tab
   onTab: (tab: Tab) => void
   focus?: { kind: 'recurrence' | 'incident'; id: string; n: number } | null // the sidebar asked for a row: the map flies to it and its panel opens, as after a click on the map (owner, 2026-11-06)
+  onSelection?: (s: SidebarSelection | null) => void // what is open on the map, so the sidebar highlights its row
   onRows?: (rows: { recurrences: SidebarRecurrence[]; incidents: SidebarIncident[] }) => void // the real rows for the sidebar lists
   onInspect: (open: boolean) => void // an incident is open: App makes room for its panel and collapses the sidebar
   children?: ReactNode
 }
 
-export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, focus, onRows, children }: Props) {
+export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, focus, onRows, onSelection, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -238,6 +239,9 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       incidents: (data?.incidents ?? []).map((i) => ({ id: i.id, title: i.title, reference: i.reference, group: groupOf(i.status) })),
     })
   }, [problems, data, onRows])
+  useEffect(() => {
+    onSelection?.(selectedId ? { kind: 'incident', id: selectedId } : selectedProblemId ? { kind: 'recurrence', id: selectedProblemId } : null)
+  }, [selectedId, selectedProblemId, onSelection])
   // A row of the sidebar was clicked: clear what hides it (filters, an agent answer) and open it like a click on the map. Only a new request (n) does this.
   useEffect(() => {
     if (!focus) return
