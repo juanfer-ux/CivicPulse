@@ -235,9 +235,11 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   }
 
   const item = shown.value
+  // While a detail panel is open the agent panel slides away completely (owner, 2026-11-06, test) and the detail panel takes its place next to the sidebar: 2 x page-pad - group-gap makes `left: map-base - page-pad + group-gap` land on one page-pad.
+  const mapBase = open ? 'calc(2 * var(--page-pad) - var(--group-gap))' : 'calc(var(--agent-w) + var(--panel-gap))'
   // Both detail panels float over the map (owner, 2026-11-05), so the map and the controls over it never move for them.
   return (
-    <div className="contents" data-history={item?.kind === 'problem' && !shown.leaving ? '' : undefined} style={{ '--map-base': 'calc(var(--agent-w) + var(--panel-gap))', '--map-left': 'calc(var(--agent-w) + var(--panel-gap))' } as CSSProperties}>
+    <div className="contents" data-history={item?.kind === 'problem' && !shown.leaving ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -335,7 +337,8 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
       </div>
 
       <div
-        className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:py-(--page-pad) desk:pr-(--page-pad) desk:pl-(--sidebar-gap)`}
+        className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:py-(--page-pad) desk:pr-(--page-pad) desk:pl-(--sidebar-gap) desk:transition-transform desk:duration-300 ${open ? 'desk:-translate-x-full' : ''}`}
+        inert={open}
       >
         {/* Outer container: the shared float padding (12 px) on every side (owner, 2026-11-06); the panel itself is this inner box. */}
         <div data-float className="flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-r-lg desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)] desk:p-0">
