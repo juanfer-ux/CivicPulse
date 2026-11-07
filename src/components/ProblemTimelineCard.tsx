@@ -4,10 +4,11 @@ import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { ProblemTimeline } from '@/components/ProblemTimeline'
 import { label, type Incident } from '@/lib/incidents'
+import { initials } from '@/lib/sourceInitials'
 import type { ProblemDetailData, ProblemRow } from '@/lib/problems'
 
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-const time = (iso: string) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+const clock = (iso: string) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }) // 24 h, no AM or PM (owner, 2026-11-07)
 
 type Step =
   | { key: string; at: number; kind: 'occurrence'; id: string }
@@ -41,14 +42,25 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { pro
   const report = (id: string, proposed: boolean) => {
     const i = incidents.get(id)
     if (!i) return null
+    const source = detail?.sources[id] ?? 'Unknown source'
     return (
-      <li key={id}>
-        <button type="button" onClick={() => onSelectIncident(id)} className="flex w-full flex-wrap items-center gap-x-2 gap-y-0.5 rounded-sm py-0.5 text-left text-meta text-muted-foreground hover:bg-sidebar focus-visible:bg-sidebar">
-          <span>{i.reference}</span>
-          <span>
-            {detail?.sources[id] ?? 'Unknown source'} · {time(i.occurred_at)}
+      <li key={id} className="border-b border-(--neutral-600) last:border-b-0">
+        {/* Three columns (owner, 2026-11-07, from /#history): a square tile with the source's initials, the source with its reference below, and the date with the time (24 h) below. */}
+        <button type="button" onClick={() => onSelectIncident(id)} className="flex w-full items-center gap-3 rounded-sm py-4 text-left hover:bg-(--neutral-800) focus-visible:bg-(--neutral-800)">
+          <span className="grid size-8 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--neutral-100)" aria-hidden>
+            {initials(source)}
           </span>
-          {proposed && <Badge variant="outline">Needs review</Badge>}
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className="truncate text-body-sm-medium text-foreground">{source}</span>
+            <span className="flex items-center gap-2 text-meta text-muted-foreground">
+              {i.reference}
+              {proposed && <Badge variant="outline">Needs review</Badge>}
+            </span>
+          </span>
+          <span className="flex w-[52px] shrink-0 flex-col items-start text-left">
+            <span className="text-body-sm text-foreground">{day(i.occurred_at)}</span>
+            <span className="text-meta tabular-nums text-muted-foreground">{clock(i.occurred_at)}</span>
+          </span>
         </button>
       </li>
     )
@@ -56,7 +68,7 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { pro
 
   return (
     <div data-float className="flex shrink-0 flex-col gap-2 desk:absolute desk:right-(--map-pad) desk:bottom-(--map-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:h-[360px] desk:flex-row desk:gap-6">
-    <Card role="region" aria-label="Timeline" className="min-w-0 gap-0 overflow-hidden bg-card/95 py-0 desk:h-full desk:flex-1 desk:bg-(--neutral-800)">
+    <Card role="region" aria-label="Timeline" className="min-w-0 gap-0 overflow-hidden bg-card/95 py-0 desk:h-full desk:flex-1 desk:border-0 desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)]">
     <ScrollArea className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">
         <h3 className="text-section-label uppercase text-(--neutral-200)">Timeline · {problem.reference}</h3>
@@ -65,7 +77,7 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { pro
       </section>
     </ScrollArea>
     </Card>
-    <Card role="region" aria-label="Occurrences history" className="gap-0 overflow-hidden bg-card/95 py-0 desk:h-full desk:w-[calc((100%-1.5rem)*0.4)] desk:shrink-0 desk:bg-(--neutral-800)">
+    <Card role="region" aria-label="Occurrences history" className="gap-0 overflow-hidden bg-card/95 py-0 desk:h-full desk:w-[calc((100%-1.5rem)*0.4)] desk:shrink-0 desk:border-0 desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)]">
     <ScrollArea viewportRef={list} className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">
         <h3 className="text-section-label uppercase text-(--neutral-200)">Occurrences history</h3>

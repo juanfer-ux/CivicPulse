@@ -119,7 +119,7 @@ const TRI_MARK = new Path2D('M120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,
 async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string, size: number) {
   const { circle, iconPx, badgeD, alertOutline, up } = problemSizes(size)
   const statusColor = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token)
-  const outlineColor = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].outline) // the 400 step (owner, 2026-11-07); the triangle keeps the 300 step
+  const outlineColor = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].outline) // the 600 step (owner, 2026-11-07); the triangle keeps the 300 step
   const off = (circle / 2 + PROBLEM_FAR.badgeGap) / Math.SQRT2 // the triangle's center, on the diagonal from the circle's edge...
   const half = Math.ceil(Math.max(circle / 2 + PROBLEM_FAR.outline + PROBLEM_FAR.outlineBlur, off + up + badgeD / 2 + alertOutline)) + 1 // screen px from the circle's center to the image edge, on every side
   const side = half * 2 * PR

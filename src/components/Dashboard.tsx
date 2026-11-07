@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import { CaretDown, CaretUp, ChatCircleDots, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
+import { localityShapes } from '@/lib/localityShape'
 import { trendOf, type Trend } from '@/lib/trend'
 
 /** DEMO (owner, 2026-11-05, released): the four cards show the four trend statuses, one each (Above, About, Below usual, Low reporting), whatever the data says, so the design can be reviewed. The incident data is synthetic anyway. Delete this line and `DEMO_TRENDS[i] ??` below to show the real trends again. */
@@ -70,6 +71,11 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
 
   useEffect(() => {
     fetchDashboardData().then(setData, (e: Error) => setError(e.message))
+  }, [])
+  // The outline of each locality for its Stat Card (owner, 2026-11-07): the boundaries load once, each shape fills a 72 px box.
+  const [shapes, setShapes] = useState<ReturnType<typeof localityShapes> | null>(null)
+  useEffect(() => {
+    fetch('/bogota-localities.geojson').then((r) => r.json()).then((d) => setShapes(localityShapes(d.features, 72, false)), () => setShapes(null))
   }, [])
 
   useEffect(() => {
@@ -346,7 +352,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         ) : !data ? (
           <p className="col-span-full text-muted-foreground">Loading…</p>
         ) : topLocalities.length ? (
-          topLocalities.map(([code, c], i) => <StatCard key={code} label={localityName.get(code)} value={c.n} trend={DEMO_TRENDS[i] ?? trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
+          topLocalities.map(([code, c], i) => <StatCard key={code} shape={shapes?.get(code)} label={localityName.get(code)} value={c.n} trend={DEMO_TRENDS[i] ?? trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
                 const on = filters.locality !== String(code)
                 setFilters({ ...filters, locality: on ? String(code) : '' })
                 if (on) onZoomLocality(code) // fly to the locality, wherever the map is now
@@ -402,7 +408,7 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
       role="region"
       data-float
       aria-label="Incident details"
-      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-(--map-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad))] desk:w-[360px] desk:bg-(--neutral-700)"
+      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-(--map-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad))] desk:w-[360px] desk:border-0 desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)]"
     >
       <CardHeader className="flex flex-row items-start justify-between gap-2">
         <div>
