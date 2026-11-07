@@ -70,8 +70,8 @@ export default function App() {
         Skip to main content
       </a>
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
-      <Sidebar collapse={inspecting} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
-      <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': agentWidthCss(agentWidth), '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
+      <Sidebar collapse={false /* stays open for detail panels (owner, 2026-11-06); was `inspecting` */} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
+      <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1 overflow-x-clip" style={{ '--agent-w': agentWidthCss(agentWidth), '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
           <Dashboard highlightIds={highlightIds} areas={areas} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting}>
@@ -81,7 +81,7 @@ export default function App() {
             </div>
           </Dashboard>
         </div>
-        <AgentResizer frac={agentWidth} onChange={setAgentWidth} />
+        {!inspecting && <AgentResizer frac={agentWidth} onChange={setAgentWidth} />}
       </main>
     </div>
   )
