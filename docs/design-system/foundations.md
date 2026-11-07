@@ -68,7 +68,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 13 | `indigo-700` | `#272A68` | `ai-banner` | Was the conversation banner background and the answer rings; not used on screen at the moment |
 | 14 | `indigo-600` | `#343193` | none | The Answer Banner fill (Figma, 2026-11-05; it was indigo-800 until then, and the locality outline until 2026-10-28). |
 | 15 | `indigo-500` | `#4C49C1` | none (map only, `--map-answer-radius-ring`) | Ring of the agent's answer radius (circle). |
-| 16 | `indigo-400` | `#5C59FF` | `ai-border` | Agent accents: the bars of an answer, the agent input ring, the panel resize line on hover. 3.9 : 1 on the agent panel, so **graphics only, never text** |
+| 16 | `indigo-400` | `#5C59FF` | `ai-border` | Agent accents: the bars of an answer, the agent input ring. 3.9 : 1 on the agent panel, so **graphics only, never text** |
 | 17 | `indigo-300` | `#9593FF` | `--map-locality-line` (map only, 2026-10-30) | New (2026-10-28) |
 | 18 | `indigo-200` | `#C1C0FF` | `--map-locality-line-focus` (map only, 2026-10-30); the Answer Banner icon (2026-11-05) | New (2026-10-28) |
 | 19 | `indigo-100` | `#E7E6FF` | none | Lightest agent indigo; the Answer Banner text (2026-11-05). New (2026-10-28) |
@@ -158,4 +158,4 @@ Control heights use `h-(--control-sm)`, `h-(--control-default)`, `h-(--control-l
 
 ## Layout spacing (owner, 2026-11-06)
 
-Three tokens in `src/index.css` set the desktop layout: `--page-pad` 12 px (around the page and everything that floats on the map), `--sidebar-gap` 0 px (sidebar to agent panel), `--group-gap` 20 px (that group to the stat cards, filters, chips and detail panels). The sidebar and the agent panel are floating rounded boxes (radius 8); the page gradient (`--screen-gradient`) is `neutral-400` → `neutral-600` (50 %) → `neutral-800`. The map's start view, flights and fits centre on the area no floating box covers (`data-float`, measured in `IncidentMap.tsx`).
+Four tokens in `src/index.css` set the desktop layout: `--page-pad` 12 px (around the page and everything that floats on the map), `--sidebar-gap` 0 px (sidebar to agent panel), `--group-gap` 24 px (that group to the stat cards, filters, chips and detail panels), `--map-pad` 16 px (the map area's inside padding, page-pad + 4: banner, stat cards, filters, chips, detail and history cards from the map's top, right and bottom edges; owner, 2026-11-06). The agent panel is a fixed 550 px (538 px box + 12 px padding), no resize handle. The sidebar and the agent panel are floating rounded boxes (radius 8); the page gradient (`--screen-gradient`) is `neutral-400` → `neutral-600` (50 %) → `neutral-800`. The map's start view, flights and fits centre on the area no floating box covers (`data-float`, measured in `IncidentMap.tsx`).

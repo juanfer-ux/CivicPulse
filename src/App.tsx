@@ -1,32 +1,8 @@
-import { useCallback, useState, type CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { Dashboard, type Tab } from '@/components/Dashboard'
 import type { Area } from '@/lib/agent'
 import { InvestigatePanel, type Turn } from '@/components/InvestigatePanel'
 import { Sidebar } from '@/components/Sidebar'
-import { AGENT_DEFAULT, AgentResizer, agentWidthCss } from '@/components/AgentResizer'
-
-const AGENT_KEY = 'agent-width-share'
-
-/** Width of the docked Investigate and Ask panel on desktop, as a share of the space next to the sidebar: draggable, remembered per browser. */
-function useAgentWidth() {
-  const [width, setWidth] = useState(() => {
-    try {
-      const v = Number(localStorage.getItem(AGENT_KEY))
-      return v > 0.1 && v < 0.9 ? v : AGENT_DEFAULT
-    } catch {
-      return AGENT_DEFAULT
-    }
-  })
-  const change = useCallback((share: number) => {
-    setWidth(share)
-    try {
-      localStorage.setItem(AGENT_KEY, String(share))
-    } catch {
-      /* works without storage */
-    }
-  }, [])
-  return [width, change] as const
-}
 
 export default function App() {
   const [highlightIds, setHighlightIds] = useState<string[]>([])
@@ -61,7 +37,6 @@ export default function App() {
   const newCase = () => setCases((cs) => [{ id: (cs[0]?.id ?? 0) + 1, title: `New recurrence ${(cs[0]?.id ?? 0) + 1}` }, ...cs])
   const zoomArea = (code: number) => setZoomTo((z) => ({ code, n: (z?.n ?? 0) + 1 }))
   const [tab, setTab] = useState<Tab>('explore')
-  const [agentWidth, setAgentWidth] = useAgentWidth()
   const [inspecting, setInspecting] = useState(false) // an incident or problem is open: the sidebar collapses (the 360 px panel overlays the map, which keeps its size; see Dashboard)
 
   return (
@@ -70,8 +45,8 @@ export default function App() {
         Skip to main content
       </a>
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
-      <Sidebar collapse={false /* stays open for detail panels (owner, 2026-11-06); was `inspecting` */} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
-      <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1 overflow-x-clip" style={{ '--agent-w': agentWidthCss(agentWidth), '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
+      <Sidebar collapse={inspecting} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
+      <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': '550px', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
           <Dashboard highlightIds={highlightIds} areas={areas} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting}>
@@ -81,7 +56,6 @@ export default function App() {
             </div>
           </Dashboard>
         </div>
-        {!inspecting && <AgentResizer frac={agentWidth} onChange={setAgentWidth} />}
       </main>
     </div>
   )

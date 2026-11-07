@@ -225,7 +225,8 @@
   --panel-gap: 0px; /* no space between the sidebar, the agent panel and the map on desktop: they touch and a right-side line divides them (owner, 2026-10-30, branch flush-dividers) */
   --page-pad: 12px; /* THE layout rule (owner, 2026-11-06): 12 px around the page and around everything that floats on the map (stat cards, filters, chips, detail panels). Change it here once. */
   --sidebar-gap: 0px; /* the only exception: the space between the sidebar and the agent panel */
-  --group-gap: 20px; /* the space between the panels group (sidebar + agent panel) and what floats on the map (stat cards, filters, chips, detail panels) */
+  --map-pad: 16px; /* the inside padding of the map area (owner, 2026-11-06): page-pad + 4 px, between the map's edges and the stat cards, filters, banner, chips, detail and history cards */
+  --group-gap: 24px; /* the space between the panels group (sidebar + agent panel) and what floats on the map (stat cards, filters, chips, detail panels) */
   --agent-header-h: 70px; /* height of the Investigate and Ask title row (a line runs across the screen with the map header when it is shown) */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
   /* The whole palette is these 57 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
