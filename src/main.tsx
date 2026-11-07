@@ -18,7 +18,8 @@ const Gallery = lazy(() => import('@/components/Gallery').then((m) => ({ default
 const ChartGallery = lazy(() => import('@/components/ChartGallery').then((m) => ({ default: m.ChartGallery })))
 const ScrollGallery = lazy(() => import('@/components/ScrollGallery').then((m) => ({ default: m.ScrollGallery })))
 const GlowGallery = lazy(() => import('@/components/GlowGallery').then((m) => ({ default: m.GlowGallery })))
-const GlowMapPreview = lazy(() => import('@/components/GlowMapPreview').then((m) => ({ default: m.GlowMapPreview })))
+const LocalityGallery = lazy(() => import('@/components/LocalityGallery').then((m) => ({ default: m.LocalityGallery })))
+const HistoryGallery = lazy(() => import('@/components/HistoryGallery').then((m) => ({ default: m.HistoryGallery })))
 const TimelineGallery = lazy(() => import('@/components/TimelineGallery').then((m) => ({ default: m.TimelineGallery })))
 
 // The gallery has no data, so it skips sign-in: open /#components.
@@ -26,7 +27,8 @@ const gallery = location.hash === '#components'
 const charts = location.hash === '#charts' // chart options for the agent's answers
 const scroll = location.hash === '#scroll' // scrollbar styles on the shadcn ScrollArea
 const glow = location.hash === '#glow' // glow options for the map's outlines, markers and dots
-const glowMap = location.hash === '#glow-map' // the chosen glows on the real map with made-up data
+const locality = location.hash === '#locality' // locality outlines for the Stat Card
+const history = location.hash === '#history' // the rows of the occurrences history as three columns
 const timeline = location.hash === '#timeline' // ways to show a problem's history as a timeline
 
 createRoot(document.getElementById('root')!).render(
@@ -34,9 +36,13 @@ createRoot(document.getElementById('root')!).render(
     {/* Every Phosphor icon is the bold weight (owner, 2026-10-30) unless it asks for another (fill on the map badges, the buttons' sparkle and the bullet). */}
     <IconContext.Provider value={{ weight: 'bold' }}>
       <ErrorBoundary>
-        {glowMap ? (
+        {history ? (
           <Suspense fallback={null}>
-            <GlowMapPreview />
+            <HistoryGallery />
+          </Suspense>
+        ) : locality ? (
+          <Suspense fallback={null}>
+            <LocalityGallery />
           </Suspense>
         ) : glow ? (
           <Suspense fallback={null}>

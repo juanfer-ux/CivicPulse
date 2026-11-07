@@ -91,7 +91,7 @@ const PROBLEM_FILL_ALPHA_NEAR = 0.035 // ...and from zoom 16 up (owner, 2026-10-
 const PROBLEM_RING_ALPHA_NEAR = 0.5
 const PROBLEM_ALPHA_ZOOM: [number, number] = [14, 16] // fill, ring opacity and ring weight change evenly from zoom 14 to 16 (owner, 2026-10-30: progressive, no jump)
 const PROBLEM_RING_PX = 1
-const PROBLEM_GLOW_ALPHA = 0.12 // the inner glow of a recurrence's ring (owner, 2026-11-07, from the /#glow gallery): thin bands inside the ring, easing in toward the edge, in the status color; the edge band's opacity
+const PROBLEM_GLOW_ALPHA = 0.05 // the inner glow of a recurrence's ring (owner, 2026-11-07, from the /#glow gallery): thin bands inside the ring, easing in toward the edge, in the status color; the edge band's opacity
 const PROBLEM_GLOW_N = 16 // thin bands so no step shows (4 wide ones looked like rings)
 const PROBLEM_GLOW_BANDS = Array.from({ length: PROBLEM_GLOW_N }, (_, i) => [0.4 + (0.6 * i) / PROBLEM_GLOW_N, 0.4 + (0.6 * (i + 1)) / PROBLEM_GLOW_N]) // from the center, as fractions of the radius
 const PROBLEM_RING_BLUR = 0.01 // the ring's circle-blur (owner, 2026-11-01), relative to its radius (1 = fully soft): about 0.4 px at the smallest ring and 1 px at a 100 px radius; softens the edge a little
@@ -145,8 +145,6 @@ interface Props {
   dotStatusById?: Map<string, ProblemStatus>
   /** Ids of the open problem's incidents: their dots show at every zoom. */
   problemIncidentIds?: string[]
-  /** The glows (inner glow of the recurrence rings, strong glow on what is selected); on by default. */
-  glow?: boolean
 }
 
 /** MapLibre caps the canvas at 4096 px by default and quietly lowers the pixel ratio to fit, so a wide window (the owner's 3440 px monitor: 2576 px of map × 2 = 5152) drew at 1.59x and the crisp marker edges crackled again (2026-11-05). Allow what this GPU can do. */
@@ -157,7 +155,7 @@ const MAX_CANVAS = (() => {
   return Math.min(Math.max(max, 4096), 16384)
 })()
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS, glow = true }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
@@ -642,7 +640,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
-    const live = glow ? problems.filter((p) => p.status === 'active') : []
+    const live = problems.filter((p) => p.status === 'active')
     const have = pulses.current
     for (const [id, m] of have) {
       if (live.some((p) => p.id === id)) continue
@@ -665,15 +663,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     }
     map.on('zoom', onZoom)
     return () => void map.off('zoom', onZoom)
-  }, [ready, problems, glow])
-
-  // The glows can be switched off together (the /#glow-map preview compares with and without them).
-  useEffect(() => {
-    const map = mapRef.current
-    if (!ready || !map) return
-    const ids = ['incident-selected-glow', 'incident-selected-glow-core', ...PROBLEM_GLOW_BANDS.map((_, i) => `problem-radius-glow-${i}`)]
-    for (const id of ids) map.setLayoutProperty(id, 'visibility', glow ? 'visible' : 'none')
-  }, [ready, glow])
+  }, [ready, problems])
 
   // Test (owner, 2026-10-30): opening an incident flies the camera to it with GSAP, easing the centre and the zoom together; any touch of the map stops it. Closing it flies back to where the map was before (a conscious decision to leave it).
   const home = useRef<{ lng: number; lat: number; zoom: number } | null>(null)

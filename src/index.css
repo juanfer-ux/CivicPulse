@@ -314,7 +314,7 @@
   --map-approved: var(--blue-400);
   --map-rejected: var(--red-400);
   /* Persistent-problem status colors (decision 0030; Figma Map collection): their own set, not the incident status colors. Aliases of palette colors, so no color was added. */
-  --map-problem-active: var(--red-300); /* owner, 2026-11-01: every problem status uses a 300 step (the marker's own inner outline uses the 400 step, PROBLEM_STATUS.outline) */
+  --map-problem-active: var(--red-300); /* owner, 2026-11-01: every problem status uses a 300 step (the marker's own inner outline uses the 600 step, PROBLEM_STATUS.outline) */
   --map-problem-monitoring: var(--yellow-300);
   --map-problem-resolved: var(--indigo-300);
   --map-problem-archived: var(--neutral-300);

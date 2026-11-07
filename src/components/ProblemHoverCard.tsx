@@ -12,7 +12,7 @@ const date = (iso: string, year: boolean) => new Date(iso).toLocaleDateString('e
 export function ProblemHoverCard({ problem, className = '', style }: { problem: ProblemRow; className?: string; style?: CSSProperties }) {
   const sameYear = !!problem.first_seen && !!problem.last_seen && new Date(problem.first_seen).getFullYear() === new Date(problem.last_seen).getFullYear()
   return (
-    <div role="tooltip" style={style} className={`pointer-events-none flex w-[353px] flex-col gap-2 rounded-sm border border-(--neutral-400) bg-(--neutral-800) p-3 text-body-sm shadow-lg ${className}`}>
+    <div role="tooltip" style={style} className={`pointer-events-none flex w-[353px] flex-col gap-2 rounded-sm bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)] p-3 text-body-sm shadow-lg backdrop-blur-[16px] ${className}`}>
       <p className="line-clamp-2 text-title text-foreground">{problem.location_description}</p>
       <ProblemStatusPill status={problem.status} />
       <div className="flex flex-col gap-0.5">
