@@ -14,7 +14,10 @@ import { GROUPS, PROBLEM_STATUS, type Group, type ProblemStatus } from '@/lib/st
 import { shortName } from '@/lib/utils'
 
 type Chat = { id: number; title: string }
-type Chats = { chats: Chat[]; activeId: number; exploring?: boolean; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void }
+/** The real recurrences and incidents the lists show (shaped by Dashboard, so this file stays free of Supabase); a click flies the map to the row (owner, 2026-11-06). */
+export type SidebarRecurrence = { id: string; title: string; status: ProblemStatus; reference: string }
+export type SidebarIncident = { id: string; title: string; reference: string; group: Group }
+type Chats = { chats: Chat[]; activeId: number; exploring?: boolean; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void; recurrences?: SidebarRecurrence[]; incidents?: SidebarIncident[]; onOpenRecurrence?: (id: string) => void; onOpenIncident?: (id: string) => void }
 
 /** Example titles so the list looks like a real history (owner, 2026-10-28). They open nothing; delete this list when conversations are saved for real. */
 const PLACEHOLDERS = [
@@ -30,20 +33,8 @@ const PLACEHOLDERS = [
   'Debris on main roads',
 ]
 
-/** The three row types of the sidebar (Figma 2026-11-05): Recurrence (warning icon in its status color), Incident (a red dot) and Investigation. Examples like the investigations' PLACEHOLDERS: they open nothing yet. */
-type RecurrenceRow = { id: number; title: string; status: ProblemStatus; reference?: string }
-const PLACEHOLDER_RECURRENCES: RecurrenceRow[] = [
-  { id: -1, title: 'Parque La Serena, costado norte', status: 'active', reference: 'PR-00088' },
-  { id: -2, title: 'Av. Boyacá con Cl 72', status: 'monitoring', reference: 'PR-00090' },
-  { id: -3, title: 'Cra 13 #62-40, entrada del edificio Aurora', status: 'resolved', reference: 'PR-00091' },
-  { id: -4, title: 'Cl 72 #24-30, entrada del colegio', status: 'archived', reference: 'PR-00092' },
-]
-type Incident = { id: number; title: string; reference: string; group: Group }
-const PLACEHOLDER_INCIDENTS: Incident[] = [
-  { id: -1, title: 'Access ramp obstruction', reference: 'CP-00200', group: 'pending' },
-  { id: -2, title: 'Blocked bike lane', reference: 'CP-00201', group: 'reviewing' },
-  { id: -3, title: 'Illegal dumping', reference: 'CP-00202', group: 'approved' },
-]
+/** The three row types of the sidebar (Figma 2026-11-05): Recurrence (warning icon in its status color), Incident (a dot in its status color) and Investigation. */
+type RecurrenceRow = { id: string | number; title: string; status: ProblemStatus; reference?: string }
 
 /** Two-line row shared by Recurrence and Incident (Figma Sidebar Item Recurrence / Incident: 224.5 x 50, 6 left, 4 top, 6 bottom, 20 right, a 16 x 40 icon column with the 16 px icon 4 px below its top, 10 px to the text). */
 function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNode; title: string; sub: ReactNode; active?: boolean; tip: string; onClick: () => void }) {
@@ -61,9 +52,20 @@ function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNo
 /** One sidebar section (Figma Recurrences / Incidents / Investigations): a title row with its own sort button and plus, then the list. Each section sorts on its own. */
 function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row }: { title: string; items: T[]; addLabel: string; onAdd?: () => void; pb?: string; row: (t: T) => ReactNode }) {
   const [newest, setNewest] = useState(true)
+  // The title row sticks at the top while its section scrolls (owner, 2026-11-06) and then gets a bottom line: it sticks 1 px above the viewport (-top-px), so it is clipped (ratio < 1) only while stuck.
+  const head = useRef<HTMLDivElement>(null)
+  const [stuck, setStuck] = useState(false)
+  useEffect(() => {
+    const el = head.current
+    const root = el?.closest('[data-radix-scroll-area-viewport]')
+    if (!el || !root || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([e]) => setStuck(!!e.rootBounds && e.boundingClientRect.top < e.rootBounds.top), { root, threshold: [1] })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
   return (
     <div className={`flex flex-col gap-2 px-1.5 pt-2 ${pb}`}>
-      <div className="flex h-8 items-center gap-2.5 pr-1.5 pl-2.5">
+      <div ref={head} className={`sticky -top-px z-10 flex h-8 items-center gap-2.5 border-b-[1px] bg-(--neutral-700) pr-1.5 pl-2.5 ${stuck ? 'border-(--neutral-600)' : 'border-transparent'}`}>
         <p className="flex-1 text-caption-medium text-(--neutral-200)">{title}</p>
         {/* Figma "Actions": the sort and plus buttons side by side with no gap (2 x 32 px). */}
         <div className="flex">
@@ -216,14 +218,14 @@ function MobileBrand() {
 }
 
 /** The menu itself, as in Figma Sidebar (2026-10-29): a 70 px header with the logo and the collapse button, the Investigations and Cases groups, and at the bottom the account row. Used by the desktop column and the phone slide-out. */
-function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, onNewCase, onToggle }: Chats & { collapsed: boolean; onToggle?: () => void }) {
+function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, onNewCase, recurrences: real = [], incidents = [], onOpenRecurrence, onOpenIncident, onToggle }: Chats & { collapsed: boolean; onToggle?: () => void }) {
   const { profile, session, signOut } = useAuth()
   const name = shortName(profile?.full_name) || 'Signed in'
   const email = session?.user?.email
-  const [caseId, setCaseId] = useState<number | null>(null)
+  const [caseId, setCaseId] = useState<string | number | null>(null) // the row last clicked: a recurrence id, or `i:` + an incident id
   const [query, setQuery] = useState('')
   const hit = (t: string) => t.toLowerCase().includes(query.trim().toLowerCase())
-  const recurrences: RecurrenceRow[] = [...cases.map((c) => ({ id: c.id, title: c.title, status: 'active' as const })), ...PLACEHOLDER_RECURRENCES].filter((c) => hit(c.title))
+  const recurrences: RecurrenceRow[] = [...cases.map((c): RecurrenceRow => ({ id: c.id, title: c.title, status: 'active' })), ...real].filter((c) => hit(c.title) || hit(c.reference ?? ''))
   const investigations = [...chats.map((c) => ({ key: c.id, title: c.title, id: c.id })), ...PLACEHOLDERS.map((t) => ({ key: t, title: t, id: null }))].filter((c) => hit(c.title)).reverse() // chats arrive oldest first, the list shows newest first
   return (
     <div className="flex h-full flex-col justify-between">
@@ -252,12 +254,12 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
               <div className="flex flex-col gap-2.5 py-2">
                 <Section title="Recurrences" items={recurrences} addLabel="New recurrence" onAdd={onNewCase} pb="pb-2.5" row={(c) => (
-                  <TwoLineItem key={c.id} active={c.id === caseId} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => setCaseId(c.id)} title={c.title}
+                  <TwoLineItem key={c.id} active={c.id === caseId} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => (setCaseId(c.id), typeof c.id === 'string' && onOpenRecurrence?.(c.id))} title={c.title}
                     icon={<Warning weight="fill" className="size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
                     sub={c.reference ? <>{c.reference} · <span className="text-caption-strong">{PROBLEM_STATUS[c.status].label}</span></> : 'Not linked to a recurrence yet'} />
                 )} />
-                <Section title="Incidents" items={PLACEHOLDER_INCIDENTS.filter((i) => hit(i.title))} addLabel="New incident" row={(i) => (
-                  <TwoLineItem key={i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => {}} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-3 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={<>{i.reference} · <span className="text-caption-strong">{GROUPS[i.group].label}</span></>} />
+                <Section title="Incidents" items={incidents.filter((i) => hit(i.title) || hit(i.reference))} addLabel="New incident" row={(i) => (
+                  <TwoLineItem key={i.id} active={caseId === `i:${i.id}`} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => (setCaseId(`i:${i.id}`), onOpenIncident?.(i.id))} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-3 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={<>{i.reference} · <span className="text-caption-strong">{GROUPS[i.group].label}</span></>} />
                 )} />
                 <Section title="Investigations" items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
                   <Button key={c.key} variant="ghost" className={`h-[30px] items-center justify-start gap-2.5 py-1 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-800) ${c.id === activeId && !exploring ? 'bg-(--neutral-800)' : ''}`} aria-current={c.id === activeId || undefined} onClick={() => c.id !== null && onPick(c.id)}>
@@ -349,7 +351,7 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
     })
   }
   // On phones the menu closes after a choice.
-  const phone: Chats = { ...props, onPick: (id) => (props.onPick(id), setOpen(false)), onNew: () => (props.onNew(), setOpen(false)), onNewCase: () => (props.onNewCase(), setOpen(false)) }
+  const phone: Chats = { ...props, onPick: (id) => (props.onPick(id), setOpen(false)), onNew: () => (props.onNew(), setOpen(false)), onNewCase: () => (props.onNewCase(), setOpen(false)), onOpenRecurrence: (id) => (props.onOpenRecurrence?.(id), setOpen(false)), onOpenIncident: (id) => (props.onOpenIncident?.(id), setOpen(false)) }
 
   return (
     <>

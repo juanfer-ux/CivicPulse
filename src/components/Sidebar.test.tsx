@@ -17,6 +17,8 @@ const baseProps = {
   onNew: vi.fn(),
   cases: [],
   onNewCase: vi.fn(),
+  recurrences: [{ id: 'p1', title: 'Parque La Serena, costado norte', status: 'active' as const, reference: 'PR-00088' }],
+  incidents: [{ id: 'i1', title: 'Access ramp obstruction', reference: 'CP-00200', group: 'pending' as const }],
 }
 
 describe('Sidebar — creating investigations and cases', () => {
@@ -75,6 +77,18 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(screen.getByText(/PR-00088/)).toBeInTheDocument()
     expect(screen.getByText('Access ramp obstruction')).toBeInTheDocument()
     expect(screen.getByText('Pending')).toBeInTheDocument() // the incident's status, in its own run
+  })
+
+  it('clicking a recurrence or an incident asks the map to open it', async () => {
+    const user = userEvent.setup()
+    const onOpenRecurrence = vi.fn()
+    const onOpenIncident = vi.fn()
+    render(<Sidebar {...baseProps} onOpenRecurrence={onOpenRecurrence} onOpenIncident={onOpenIncident} />)
+
+    await user.click(screen.getByText('Parque La Serena, costado norte'))
+    expect(onOpenRecurrence).toHaveBeenCalledWith('p1')
+    await user.click(screen.getByText('Access ramp obstruction'))
+    expect(onOpenIncident).toHaveBeenCalledWith('i1')
   })
 
   it('each section has its own sort button', async () => {
