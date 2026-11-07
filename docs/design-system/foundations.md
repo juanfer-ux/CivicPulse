@@ -30,7 +30,7 @@ Each class sets size, line height and weight together, so a component never need
 | button-sm | 13 / 24 (spacing 1.4 %; was 1.8 % until 2026-11-06 and 13.5 / 2.2 % until 2026-11-05) | **16 / 24** | 600 | Text in small Button | `text-button-sm` |
 | body | 14 / 24 (spacing 2.2 %; line was 22 until 2026-11-05) | **16 / 24** | 400 | Default paragraph text (new; not used by a screen yet) | `text-body` |
 | body-medium | 14 / 24 (spacing 2 %) | **16 / 24** | 500 | Default body, medium | `text-body-medium` |
-| body-strong | 14 / 24 (spacing 2 %) | **16 / 24** | 600 | Default body, strong | `text-body-strong` |
+| body-strong | 14 / 20 (spacing 1 %; Figma 2026-11-06) | **16 / 24** | 600 | Default body, strong | `text-body-strong` |
 | body-sm | 13 / 22 (spacing 1.4 %, was 2 % until 2026-11-05) | **16 / 24** | 400 | Paragraphs, inputs, table cells (this was `body` until 2026-10-23; 13 px since 2026-11-05, it was the fractional 13.5) | `text-body-sm` |
 | body-sm-medium | 13 / 23 (line was 22; spacing 1.4 %, 0.5 % earlier that day, was 2 % until 2026-11-05) | **16 / 24** | 500 | Small body, medium (spacing was 4 % from 2026-11-02 to 2026-11-05, and 2 % before) | `text-body-sm-medium` |
 | body-sm-strong | 13 / 23 (line was 22; spacing 1.4 %, 0 % earlier that day, was 2 % until 2026-11-05) | **16 / 24** | 600 | Small body, strong | `text-body-sm-strong` |

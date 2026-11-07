@@ -97,8 +97,8 @@
   --text-body-medium--letter-spacing: 0.02em;
   --text-body-strong: var(--fs-body);
   --text-body-strong--font-weight: calc(600 + var(--weight-offset));
-  --text-body-strong--line-height: var(--lh-body);
-  --text-body-strong--letter-spacing: 0.02em;
+  --text-body-strong--line-height: var(--lh-body-strong);
+  --text-body-strong--letter-spacing: 0.01em;
   --text-meta: var(--fs-meta);
   --text-meta--font-weight: calc(400 + var(--weight-offset));
   --text-meta--line-height: var(--lh-meta);
@@ -137,6 +137,7 @@
   --lh-body-sm-md: 24px;
   --fs-body: 16px;
   --lh-body: 24px;
+  --lh-body-strong: 20px; /* Figma body-strong: 14 / 20, spacing 1 % (2026-11-06) */
   --fs-label: 16px;
   --lh-label: 24px;
   --lh-button: 24px;
