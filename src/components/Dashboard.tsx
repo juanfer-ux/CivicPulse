@@ -24,6 +24,7 @@ import {
 import type { Area } from '@/lib/agent'
 import { fetchLinkedIncidentIds, fetchProblemDetail, fetchProblems, type ProblemDetailData, type ProblemRow } from '@/lib/problems'
 import { PROBLEM_STATUSES, type ProblemStatus } from '@/lib/statusColors'
+import type { SidebarIncident, SidebarRecurrence } from '@/components/Sidebar'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
 import { useHeld } from '@/lib/useSlide'
 
@@ -47,11 +48,13 @@ interface Props {
   /** Active panel on mobile (on desktop everything is visible). */
   tab: Tab
   onTab: (tab: Tab) => void
+  focus?: { kind: 'recurrence' | 'incident'; id: string; n: number } | null // the sidebar asked for a row: the map flies to it and its panel opens, as after a click on the map (owner, 2026-11-06)
+  onRows?: (rows: { recurrences: SidebarRecurrence[]; incidents: SidebarIncident[] }) => void // the real rows for the sidebar lists
   onInspect: (open: boolean) => void // an incident is open: App makes room for its panel and collapses the sidebar
   children?: ReactNode
 }
 
-export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, children }: Props) {
+export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, focus, onRows, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -229,6 +232,20 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
     setSelectedId(null)
     if (id) setCollapsed(false)
   }
+  useEffect(() => {
+    onRows?.({
+      recurrences: [...problems].sort((a, b) => (b.last_seen ?? '').localeCompare(a.last_seen ?? '')).map((p) => ({ id: p.id, title: p.title, status: p.status, reference: p.reference })),
+      incidents: (data?.incidents ?? []).map((i) => ({ id: i.id, title: i.title, reference: i.reference, group: groupOf(i.status) })),
+    })
+  }, [problems, data, onRows])
+  // A row of the sidebar was clicked: clear what hides it (filters, an agent answer) and open it like a click on the map. Only a new request (n) does this.
+  useEffect(() => {
+    if (!focus) return
+    setFilters(NO_FILTERS)
+    onClearHighlight()
+    if (focus.kind === 'recurrence') selectProblem(focus.id)
+    else select(focus.id)
+  }, [focus]) // eslint-disable-line react-hooks/exhaustive-deps -- reacts to a new request only
   const pick = (t: Tab) => {
     onTab(t)
     setCollapsed(false)
