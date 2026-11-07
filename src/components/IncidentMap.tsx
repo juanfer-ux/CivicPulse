@@ -24,7 +24,7 @@ maplibregl.setWorkerUrl(workerUrl)
 /** The free area of the map (owner, 2026-11-06): what no floating component covers. Every floating box carries `data-float`; the ones on the left half or the top or bottom band push the map's own padding in, so the start view, flights and fits all centre on the free area. */
 const freePadding = (map: maplibregl.Map) => {
   const box = map.getContainer().getBoundingClientRect()
-  const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-pad')) || 12
+  const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--map-pad')) || 16
   const p = { top: 0, bottom: 0, left: 0, right: 0 }
   for (const el of document.querySelectorAll('[data-float]')) {
     const r = el.getBoundingClientRect()
