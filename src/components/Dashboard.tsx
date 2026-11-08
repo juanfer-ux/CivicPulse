@@ -1,3 +1,4 @@
+import { titleCase } from '@/lib/titleCase'
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { CaretDown, CaretUp, ChatCircleDots, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
@@ -242,7 +243,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   }
   useEffect(() => {
     onRows?.({
-      recurrences: [...problems].sort((a, b) => (b.last_seen ?? '').localeCompare(a.last_seen ?? '')).map((p) => ({ id: p.id, title: p.title, status: p.status, reference: p.reference })),
+      recurrences: [...problems].sort((a, b) => (b.last_seen ?? '').localeCompare(a.last_seen ?? '')).map((p) => ({ id: p.id, title: titleCase(p.title), status: p.status, reference: p.reference })),
       incidents: (data?.incidents ?? []).map((i) => ({ id: i.id, title: i.title, reference: i.reference, group: groupOf(i.status) })),
     })
   }, [problems, data, onRows])

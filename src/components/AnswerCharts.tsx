@@ -93,7 +93,7 @@ function Cards({ bars }: { bars: Answer['bars'] }) {
         <li key={b.label} className="flex min-w-0 flex-col gap-1 rounded-sm bg-(--neutral-600) p-2">
           <span className="truncate text-caption text-muted-foreground">{b.label}</span>
           <span className="text-stat text-foreground">{b.value}</span>
-          <span className="text-caption text-muted-foreground">evening incidents</span>
+          <span className="text-caption text-muted-foreground">Evening Incidents</span>
         </li>
       ))}
     </ul>

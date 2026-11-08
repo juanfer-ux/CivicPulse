@@ -181,3 +181,12 @@ describe('titleCase', () => {
     expect(titleCase('Cra 72 con Cl 80, cruce peatonal')).toBe('Cra 72 con Cl 80, Cruce Peatonal')
   })
 })
+
+describe('text casing', () => {
+  it('title-cases codes and sentence-cases free text, also after a colon', async () => {
+    const { titleCase, sentenceCase } = await import('@/lib/titleCase')
+    expect(titleCase('human rejected')).toBe('Human Rejected')
+    expect(titleCase('Access Ramp blocked by a parked vehicle')).toBe('Access Ramp Blocked by a Parked Vehicle')
+    expect(sentenceCase('synthetic report: car blocking access ramp. second one')).toBe('Synthetic report: Car blocking access ramp. Second one')
+  })
+})

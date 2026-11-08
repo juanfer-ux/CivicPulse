@@ -56,9 +56,8 @@ type Plan = { category: string | null } & (
 const CATEGORY_NAMES: Record<string, string> = { parking: 'Obstructive Parking', illegal_dumping: 'Illegal Dumping' }
 const categoryName = (c: string | null) => (c ? (CATEGORY_NAMES[c] ?? c) : 'all categories you can see')
 
-/** Title Case for the places in the answers (the data writes them in lowercase after the comma: "..., entrada del edificio Aurora"). Short Spanish words stay lowercase; the rest of each word is left as written (Cra, Cl, #62-40). */
-const SMALL = new Set(['de', 'del', 'la', 'las', 'el', 'los', 'con', 'y', 'en', 'a', 'por', 'al'])
-export const titleCase = (t: string) => t.replace(/\S+/g, (w, i) => (i > 0 && SMALL.has(w) ? w : w[0].toUpperCase() + w.slice(1)))
+export { titleCase } from '@/lib/titleCase'
+import { titleCase } from '@/lib/titleCase'
 
 const DAY = 86_400_000
 const TZ = 'America/Bogota'

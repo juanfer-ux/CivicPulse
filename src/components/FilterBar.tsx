@@ -31,7 +31,7 @@ export const isFiltered = (f: Filters) => !!(f.locality || f.categories.length |
 const CATEGORY_ICON: Record<string, ComponentType> = { parking: Car, illegal_dumping: Trash, damaged_infrastructure: TrafficSignal, accessibility: Wheelchair, other: DotsThree }
 /** Categories from the brief that have no data yet: shown in the menu, switched off, so the dropdown can be designed with a realistic list. Remove an entry once the category exists in the database. */
 const PLANNED: Category[] = [
-  { code: 'damaged_infrastructure', name: 'Damaged infrastructure' },
+  { code: 'damaged_infrastructure', name: 'Damaged Infrastructure' },
   { code: 'accessibility', name: 'Accessibility' },
   { code: 'other', name: 'Others' },
 ]
