@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ArrowRight, ArrowUp, Sparkle, ThumbsDown, ThumbsUp, WarningCircle } from '@phosphor-icons/react'
+import { ArrowUp, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -70,20 +70,18 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
             <div className="flex flex-col gap-10">
               {/* The empty panel (owner's Figma, 2026-11-05), with Figma's auto layout limits: the whole content (cards, Quick questions) and the composer are at most 664 wide and centered (the greeting "Let’s take a look..." is hidden in Figma, so it is not shown), and the cards fill the width and wrap (each at least 250 wide). The title row is hidden on desktop until the first question. */}
               <div className="@container flex flex-col gap-4">
-                <p className="font-display text-display-xs text-(--neutral-200)">Worth investigating</p>
+                <p className="font-display text-display-xs text-(--neutral-100)">Worth investigating</p>
                 <div className="flex flex-wrap items-start gap-4">
                   {WORTH_INVESTIGATING.map((c) => (
                     <button key={c.title} type="button" className="flex max-w-none min-w-[250px] flex-1 basis-0 @min-[516px]:max-w-[320px] cursor-pointer gap-3 overflow-hidden rounded-lg bg-(--neutral-700) px-2 py-3 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => void ask(c.question)}>
-                      <span className="h-[160px] max-w-[400px] min-w-[132px] flex-1 rounded-sm bg-(--neutral-500)" aria-hidden />
-                      <span className="flex min-w-0 flex-1 flex-col justify-between p-2">
+                      <span className="h-[100px] max-w-[400px] min-w-[132px] flex-1 rounded-sm bg-(--neutral-500)" aria-hidden />
+                      <span className="flex min-w-0 flex-1 flex-col p-2">
                         <span className="flex flex-col items-start gap-3">
-                          <Badge variant="outline" size="lg" className="h-[31px] border-(--neutral-400) bg-(--neutral-900) px-2.5 text-(--neutral-100)">
-                            <WarningCircle weight="regular" aria-hidden />
+                          <Badge className="border-0 bg-(--neutral-500) px-1.5 text-(--neutral-100)">
                             {c.category}
                           </Badge>
                           <span className="text-label-regular [overflow-wrap:anywhere] text-(--neutral-200)">{c.title}</span>
                         </span>
-                        <ArrowRight weight="regular" className="size-4 shrink-0 self-end text-(--neutral-200)" aria-hidden />
                       </span>
                     </button>
                   ))}
@@ -125,7 +123,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
 
 /** The person's question (Figma Message, role user). */
 export function Question({ text }: { text: string }) {
-  return <p className="self-end rounded-lg bg-(--neutral-500) px-3 py-2">{text}</p>
+  return <p className="self-end rounded-lg bg-(--neutral-600) px-3 py-2">{text}</p>
 }
 
 /** Thumbs under an answer (Figma Message, role assistant). For now they only mark the choice on screen. */

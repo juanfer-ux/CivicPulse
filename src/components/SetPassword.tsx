@@ -40,7 +40,7 @@ export function SetPassword({ onDone }: { onDone: () => void }) {
             <CardTitle asChild className="font-display text-display">
               <h1>Set up your account</h1>
             </CardTitle>
-            <CardDescription>Choose the password you will use to sign in.</CardDescription>
+            <CardDescription className="text-body">Choose the password you will use to sign in.</CardDescription>
           </CardHeader>
           <div className="flex flex-col gap-4">
             <Field label="Name">
