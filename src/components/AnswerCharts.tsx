@@ -85,15 +85,23 @@ function Dots({ bars }: { bars: Answer['bars'] }) {
   )
 }
 
-/** Tomorrow's candidates: a big number per location (the three strongest). */
-function Cards({ bars }: { bars: Answer['bars'] }) {
+/** Tomorrow's candidates: a numbered list, the full name on top, a thin bar under it and the count on the right (room for long names). */
+function Rows({ bars }: { bars: Answer['bars'] }) {
+  const max = Math.max(...bars.map((b) => b.value))
   return (
-    <ul className="grid grid-cols-3 gap-2" aria-label={summary('Evening incidents per candidate', bars)}>
-      {bars.slice(0, 3).map((b: Bar) => (
-        <li key={b.label} className="flex min-w-0 flex-col gap-1 rounded-sm bg-(--neutral-600) p-2">
-          <span className="truncate text-caption text-muted-foreground">{b.label}</span>
-          <span className="text-stat text-foreground">{b.value}</span>
-          <span className="text-caption text-muted-foreground">Evening Incidents</span>
+    <ul className="flex flex-col" aria-label={summary('Evening incidents per candidate', bars)}>
+      {bars.map((b, i) => (
+        <li key={b.label} className={`flex items-center gap-3 py-2.5 ${i ? 'border-t border-(--neutral-600)' : ''}`}>
+          <span className="grid size-7 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--neutral-100)">{i + 1}</span>
+          <span className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className="truncate text-body-sm text-foreground" title={b.label}>
+              {b.label}
+            </span>
+            <span className="h-1 rounded-full bg-(--neutral-600)">
+              <span className="block h-full rounded-full" style={{ width: `${(b.value / max) * 100}%`, background: COLOR }} />
+            </span>
+          </span>
+          <span className="w-8 text-right tabular-nums text-foreground">{b.value}</span>
         </li>
       ))}
     </ul>
@@ -130,7 +138,7 @@ function Period({ bars }: { bars: Answer['bars'] }) {
 export default function AnswerChart({ kind, bars, onFocus, onPick }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars'] } & Link) {
   return (
     <div className="rounded-[6px] border-[0.5px] border-(--neutral-500) bg-(--neutral-700) p-4">
-      {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : kind === 'dots' ? <Dots bars={bars} /> : kind === 'cards' ? <Cards bars={bars} /> : kind === 'donut' ? <Donut bars={bars} onFocus={onFocus} onPick={onPick} /> : <BarList bars={bars} onFocus={onFocus} onPick={onPick} />}
+      {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : kind === 'dots' ? <Dots bars={bars} /> : kind === 'rows' ? <Rows bars={bars} /> : kind === 'donut' ? <Donut bars={bars} onFocus={onFocus} onPick={onPick} /> : <BarList bars={bars} onFocus={onFocus} onPick={onPick} />}
     </div>
   )
 }
