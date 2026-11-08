@@ -47,6 +47,12 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0039](0039-floating-cards-and-timeline-card.md) | Detail panels float over the map; the problem's history is its own bottom card (occurrences 40 % / timeline 60 %) | ✅ Accepted |
 | [0040](0040-scrollbar-style-g.md) | One scrollbar style for the whole platform: style G (round 4 px thumb, 6 px on hover, neutral-300, always visible) | ✅ Accepted |
 | [0041](0041-problems-are-called-recurrences.md) | What the screen called a problem is now a recurrence (code and database keep the old name) | ✅ Accepted |
+| [0042](0042-floating-cards-agent-panel-look.md) | every floating card has the agent panel's look | ✅ Accepted |
+| [0043](0043-locality-outline-on-stat-card.md) | the Stat Card shows the outline of its locality | ✅ Accepted |
+| [0044](0044-map-zoom-control-with-home-and-slider.md) | a zoom control with a home button and a slider, like Google's | ✅ Accepted |
+| [0045](0045-occurrences-history-rows-three-columns.md) | Occurrences History rows have three columns | ✅ Accepted |
+| [0046](0046-stat-card-state-variants-and-stat-trend.md) | Stat Card in two states, the trend as its own component | ✅ Accepted |
+| [0047](0047-recurrence-glow-and-pulse.md) | glows and a pulse on the recurrences and the selected incident | ✅ Accepted |
 
 ## ✍️ Template
 ```

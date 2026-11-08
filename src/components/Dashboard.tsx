@@ -265,7 +265,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
   const mapBase = 'calc(var(--agent-w) + var(--panel-gap))'
   // Both detail panels float over the map (owner, 2026-11-05), so the map and the controls over it never move for them.
   return (
-    <div className="contents" data-history={item?.kind === 'problem' && !shown.leaving ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase } as CSSProperties}>
+    <div className="contents" data-history={item?.kind === 'problem' && !shown.leaving ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -283,7 +283,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         onSelect={select}
       />
 
-      {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. */}
+      {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. The banner keeps the whole top row; an open incident or recurrence panel sits below it (`--banner-offset`, owner, 2026-11-07). */}
       {chatMode && (
         <div data-float className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-600) px-5 text-meta text-(--indigo-100) desk:absolute desk:top-(--map-pad) desk:right-(--map-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:inset-x-auto desk:rounded-sm">
           <ChatCircleDots weight="fill" className="size-5 shrink-0 text-(--indigo-200)" aria-hidden />
@@ -408,7 +408,7 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
       role="region"
       data-float
       aria-label="Incident details"
-      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-(--map-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad))] desk:w-[360px] desk:border-0 desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)]"
+      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[360px] desk:border-0 desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)]"
     >
       <CardHeader className="flex flex-row items-start justify-between gap-2">
         <div>
