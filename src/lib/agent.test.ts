@@ -86,7 +86,7 @@ describe('answers', () => {
     rpc.mockResolvedValue({ data: [], error: null })
     const a = await answer('Which localities have the most illegal dumping incidents?', localities)
     expect(rpc).toHaveBeenCalledWith('tool_incidents_by_locality', expect.objectContaining({ p_category: 'illegal_dumping' }))
-    expect(a.text).toMatch(/illegal dumping/)
+    expect(a.text).toMatch(/illegal dumping/i)
     rpc.mockResolvedValue({ data: [{ locality_code: 2, locality_name: 'Chapinero', incident_count: 3, first_at: ago(5), last_at: ago(1), incident_ids: ['a'] }], error: null })
     const all = await answer('Which localities have the most incidents?', localities)
     expect(rpc).toHaveBeenLastCalledWith('tool_incidents_by_locality', expect.objectContaining({ p_category: null }))
@@ -171,5 +171,13 @@ describe('answers', () => {
   it('surfaces tool errors rather than swallowing them', async () => {
     rpc.mockResolvedValue({ data: null, error: { message: 'permission denied' } })
     await expect(answer('Which localities have the most incidents?', localities)).rejects.toThrow('permission denied')
+  })
+})
+
+describe('titleCase', () => {
+  it('capitalizes the lowercase part after the comma and keeps short Spanish words and addresses', async () => {
+    const { titleCase } = await import('@/lib/agent')
+    expect(titleCase('Cra 13 #62-40, entrada del edificio Aurora')).toBe('Cra 13 #62-40, Entrada del Edificio Aurora')
+    expect(titleCase('Cra 72 con Cl 80, cruce peatonal')).toBe('Cra 72 con Cl 80, Cruce Peatonal')
   })
 })

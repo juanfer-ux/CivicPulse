@@ -7,9 +7,11 @@ import { Sidebar, type SidebarIncident, type SidebarRecurrence, type SidebarSele
 export default function App() {
   const [highlightIds, setHighlightIds] = useState<string[]>([])
   const [areas, setAreas] = useState<Area[]>([])
-  const show = (ids: string[], a: Area[] = []) => {
+  const [spots, setSpots] = useState<string[][]>([]) // the answer is about specific spots (the incident ids of each): one radius around each, no locality outlines
+  const show = (ids: string[], a: Area[] = [], s: string[][] = []) => {
     setHighlightIds(ids)
     setAreas(a)
+    setSpots(s)
   }
   const [focusCode, setFocusCode] = useState<number | null>(null) // a bar of the answer is under the pointer: its locality lights up on the map
   const [zoomTo, setZoomTo] = useState<{ code: number; n: number } | null>(null) // a bar was clicked: the map zooms to that locality (n makes a second click on the same bar count)
@@ -22,7 +24,7 @@ export default function App() {
     setChats((cs) => cs.filter((c) => c.id === id || c.turns.length)) // an empty new investigation you leave is dropped
     setActiveId(id)
     const last = chats.find((c) => c.id === id)?.turns.findLast((t) => t.result)?.result
-    show(last?.highlightIds ?? [], last?.areas) // the map shows the answer of the last question of that conversation
+    show(last?.highlightIds ?? [], last?.areas, last?.spots) // the map shows the answer of the last question of that conversation
   }
   const startChat = () => {
     if (active.turns.length) {
@@ -53,7 +55,7 @@ export default function App() {
       <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': '550px', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
-          <Dashboard highlightIds={highlightIds} areas={areas} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} focus={focus} onRows={setRows} onSelection={setSelection}>
+          <Dashboard highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} focus={focus} onRows={setRows} onSelection={setSelection}>
             {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
               <InvestigatePanel chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} />

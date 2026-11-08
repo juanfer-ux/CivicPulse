@@ -41,6 +41,7 @@ interface Props {
   highlightIds: string[]
   /** Localities to outline for an answer about localities. */
   areas: Area[]
+  spots: string[][]
   focusCode: number | null
   zoomTo: { code: number; n: number } | null
   /** Ask the map to fly to a locality (a Stat Card was clicked). */
@@ -56,7 +57,7 @@ interface Props {
   children?: ReactNode
 }
 
-export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, focus, onRows, onSelection, children }: Props) {
+export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, focus, onRows, onSelection, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -278,6 +279,7 @@ export function Dashboard({ highlightIds, areas, focusCode, zoomTo, onZoomLocali
         selectedId={selected?.id ?? null}
         highlightIds={highlightIds}
         areas={areas}
+        spots={spots}
         focusCode={focusCode}
         zoomTo={zoomTo}
         onSelect={select}

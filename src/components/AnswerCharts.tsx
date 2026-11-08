@@ -70,8 +70,9 @@ function Dots({ bars }: { bars: Answer['bars'] }) {
     <ul className="flex flex-col gap-2.5" aria-label={summary('Reports per location', bars)}>
       {bars.map((b) => (
         <li key={b.label} className="flex flex-col gap-1">
-          <span className="truncate text-meta text-muted-foreground">
-            {b.label} <span className="tabular-nums text-foreground">{b.value}</span>
+          <span className="flex items-baseline justify-between gap-3 text-meta">
+            <span className="truncate text-muted-foreground">{b.label}</span>
+            <span className="shrink-0 tabular-nums text-foreground">{b.value}</span>
           </span>
           <span className="flex flex-wrap gap-1">
             {Array.from({ length: b.value }, (_, i) => (

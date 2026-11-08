@@ -37,6 +37,8 @@ export interface Answer {
   chart?: 'donut' | 'barlist' | 'time' | 'period' | 'dots' | 'cards'
   /** Localities to outline and shade on the map (code, and a value that sets the shade). An answer about localities shows these instead of circles. */
   areas?: Area[]
+  /** Repeated locations: the incident ids of each spot. The map draws one radius around each spot's reports, not the locality outlines. */
+  spots?: string[][]
   /** Set when the answer is a recommendation a human can send for review. */
   proposal?: Draft
 }
@@ -51,8 +53,12 @@ type Plan = { category: string | null } & (
 )
 
 /** Display names, mirroring incident_categories. */
-const CATEGORY_NAMES: Record<string, string> = { parking: 'obstructive parking', illegal_dumping: 'illegal dumping' }
+const CATEGORY_NAMES: Record<string, string> = { parking: 'Obstructive Parking', illegal_dumping: 'Illegal Dumping' }
 const categoryName = (c: string | null) => (c ? (CATEGORY_NAMES[c] ?? c) : 'all categories you can see')
+
+/** Title Case for the places in the answers (the data writes them in lowercase after the comma: "..., entrada del edificio Aurora"). Short Spanish words stay lowercase; the rest of each word is left as written (Cra, Cl, #62-40). */
+const SMALL = new Set(['de', 'del', 'la', 'las', 'el', 'los', 'con', 'y', 'en', 'a', 'por', 'al'])
+export const titleCase = (t: string) => t.replace(/\S+/g, (w, i) => (i > 0 && SMALL.has(w) ? w : w[0].toUpperCase() + w.slice(1)))
 
 const DAY = 86_400_000
 const TZ = 'America/Bogota'
@@ -80,8 +86,8 @@ export const SUGGESTIONS = [
 
 /** The two Worth investigating cards: a title and the question each one asks (the picture is a placeholder for now). */
 export const WORTH_INVESTIGATING = [
-  { title: 'Recurring Dumping sites', category: 'Illegal dumping', question: 'Which locations have repeated illegal dumping reports?' },
-  { title: 'Recurring Obstructive Parking', category: 'Parking obstruction', question: 'Which locations have repeated parking obstruction reports?' },
+  { title: 'Recurring Dumping Sites', category: 'Illegal Dumping', question: 'Which locations have repeated illegal dumping reports?' },
+  { title: 'Recurring Obstructive Parking', category: 'Parking Obstruction', question: 'Which locations have repeated parking obstruction reports?' },
 ]
 
 export function plan(question: string, localities: Locality[]): Plan | null {
@@ -425,8 +431,8 @@ async function recurring(days: number | null, category: string | null): Promise<
   return {
     text:
       `${rows.length} locations have at least ${MIN_REPEATS} reports in ${period}: ${exact} exact ${exact === 1 ? 'match' : 'matches'} (same described location) and ${rows.length - exact} approximate ${rows.length - exact === 1 ? 'match' : 'matches'}. ` +
-      `The most repeated is "${rows[0].label}" with ${rows[0].incident_count} reports between ${date(rows[0].first_at)} and ${date(rows[0].last_at)}.`,
-    bars: top.map((r) => ({ label: r.label.replace('Synthetic ', ''), value: r.incident_count })),
+      `The most repeated is "${titleCase(rows[0].label)}" with ${rows[0].incident_count} reports between ${date(rows[0].first_at)} and ${date(rows[0].last_at)}.`,
+    bars: top.map((r) => ({ label: titleCase(r.label.replace('Synthetic ', '')), value: r.incident_count })),
     chart: 'dots',
     evidence: [
       {
@@ -439,7 +445,7 @@ async function recurring(days: number | null, category: string | null): Promise<
     ],
     limitations,
     highlightIds: ids,
-    areas: [...new Set(top.map((r) => r.locality_code))].map((code) => ({ code, value: 1 })),
+    spots: top.map((r) => r.incident_ids),
   }
 }
 
@@ -476,21 +482,21 @@ async function candidates(category: string | null): Promise<Answer> {
     COUNTING,
     SYNTHETIC,
   ]
-  const others = rows.slice(1, 3).map((r) => `"${r.label}" (${r.evening_count} evening)`).join(', ')
+  const others = rows.slice(1, 3).map((r) => `"${titleCase(r.label)}" (${r.evening_count} evening)`).join(', ')
 
   return {
     text:
-      `Based on ${period}, the location with the most evening (16:00–20:00) incidents is "${top.label}" in ${top.locality_name}: ` +
+      `Based on ${period}, the location with the most evening (16:00–20:00) incidents is "${titleCase(top.label)}" in ${top.locality_name}: ` +
       `${top.evening_count} of its ${top.total_count} incidents fell in that window and ${top.recent_count} in the last 30 days. ` +
       `${top.weekday_evening_count} of the evening incidents ${top.weekday_evening_count === 1 ? 'was' : 'were'} on a ${tomorrow}. ` +
       `It is a candidate for human review tomorrow evening, not a prediction.${others ? ` Other candidates: ${others}.` : ''} ` +
       `Category: ${categoryName(top.category)}.`,
-    bars: rows.map((r) => ({ label: r.label.replace('Synthetic ', ''), value: r.evening_count })),
+    bars: rows.map((r) => ({ label: titleCase(r.label.replace('Synthetic ', '')), value: r.evening_count })),
     chart: 'cards',
     evidence: [
       {
         tool: 'tool_candidate_areas',
-        scope: `top candidate of ${rows.length}: ${top.label} · ${categoryName(top.category)}`,
+        scope: `top candidate of ${rows.length}: ${titleCase(top.label)} · ${categoryName(top.category)}`,
         period,
         incidentCount: top.incident_ids.length,
         references: await references(top.incident_ids),
@@ -502,8 +508,8 @@ async function candidates(category: string | null): Promise<Answer> {
     proposal: {
       locality_code: top.locality_code,
       category: top.category,
-      title: `Review ${top.label.replace('Synthetic ', '')} tomorrow evening`,
-      problem: `${top.total_count} ${categoryName(top.category)} reports at "${top.label}" in the last ${CANDIDATE_DAYS} days; ${top.evening_count} between 16:00 and 20:00 (Bogotá time), ${top.recent_count} in the last 30 days.`,
+      title: `Review ${titleCase(top.label.replace('Synthetic ', ''))} tomorrow evening`,
+      problem: `${top.total_count} ${categoryName(top.category)} reports at "${titleCase(top.label)}" in the last ${CANDIDATE_DAYS} days; ${top.evening_count} between 16:00 and 20:00 (Bogotá time), ${top.recent_count} in the last 30 days.`,
       period_start: from.toISOString(),
       period_end: to.toISOString(),
       evidence: {
