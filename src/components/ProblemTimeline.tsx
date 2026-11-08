@@ -62,7 +62,7 @@ export function ProblemTimeline({ detail, status, onSelectIncident, onPick }: { 
           </li>
         ))}
       </ul>
-      <ScrollArea viewportRef={scroller} horizontal role="img" aria-label={`History chart: ${inLane('occurrence').length} occurrences, ${inLane('report').length} reports, ${inLane('intervention').length} interventions. The same history is in the list below.`}>
+      <ScrollArea viewportRef={scroller} horizontal role="img" aria-label={`History chart: ${inLane('occurrence').length} Occurrences, ${inLane('report').length} Reports, ${inLane('intervention').length} Interventions. The same history is in the list below.`}>
         <div style={{ minWidth: tl.minWidth }}>
           <ChartContainer config={config} className="w-full" style={{ height: tl.lanes.length * LANE_PX + 32 }}>
             <ScatterChart margin={{ top: 8, right: 24, bottom: 0, left: 20 }}>

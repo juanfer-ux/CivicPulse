@@ -108,7 +108,7 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { pro
             return (
               <li key={o.occurrence_id} data-step={st.key} className={`flex flex-col gap-1${focus === st.key ? ' rounded-sm outline outline-1 outline-offset-4 outline-(--neutral-200)' : ''}`}>
                 <p className="flex flex-wrap items-center gap-2 text-body-sm-medium text-foreground">
-                  Occurrence {occN.get(o.occurrence_id)} · {day(o.first_report_at!)} · {o.reports_n} {o.reports_n === 1 ? 'report' : 'reports'}
+                  Occurrence {occN.get(o.occurrence_id)} · {day(o.first_report_at!)} · {o.reports_n} {o.reports_n === 1 ? 'Report' : 'Reports'}
                   {o.boundary_uncertain && <Badge variant="outline">Boundary uncertain</Badge>}
                 </p>
                 <ul className="flex flex-col">{rows.map((l) => report(l.incident_id, l.state === 'proposed'))}</ul>
