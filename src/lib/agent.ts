@@ -33,8 +33,8 @@ export interface Answer {
   evidence: Evidence[]
   limitations: string[]
   highlightIds: string[]
-  /** Which chart draws `bars`: a ranking (horizontal bars), the day in 4-hour blocks (area) or two periods (two columns). Without it, the plain bar list. */
-  chart?: 'ranking' | 'time' | 'period'
+  /** Which chart draws `bars`: localities of one category (donut, the smaller ones grouped as "Others"), localities of all categories (bar list), the day in 4-hour blocks (area), two periods (two columns), repeated locations (dot matrix) or tomorrow's candidates (cards). Without it, the plain bar list. */
+  chart?: 'donut' | 'barlist' | 'time' | 'period' | 'dots' | 'cards'
   /** Localities to outline and shade on the map (code, and a value that sets the shade). An answer about localities shows these instead of circles. */
   areas?: Area[]
   /** Set when the answer is a recommendation a human can send for review. */
@@ -241,12 +241,15 @@ async function ranking(days: number | null, category: string | null): Promise<An
     .map((r) => `${r.locality_name} (${r.incident_count})`)
     .join(', ')
   const shown = rows.slice(0, 10)
+  // The chart shows the biggest localities and the rest together as "Others" (owner, 2026-11-08): five for the donut, ten for the bar list.
+  const keep = category ? 5 : 10
+  const rest = rows.slice(keep).reduce((n, r) => n + r.incident_count, 0)
   const topIds = shown.flatMap((r) => r.incident_ids)
 
   return {
     text: `${lead}, across ${rows.length} localities, ${period}.${next ? ` Next: ${next}.` : ''}`,
-    bars: shown.map((r) => ({ label: r.locality_name, value: r.incident_count, code: r.locality_code })),
-    chart: 'ranking',
+    bars: [...rows.slice(0, keep).map((r) => ({ label: r.locality_name, value: r.incident_count, code: r.locality_code })), ...(rest ? [{ label: 'Others', value: rest }] : [])],
+    chart: category ? 'donut' : 'barlist',
     areas: shown.map((r) => ({ code: r.locality_code, value: r.incident_count })),
     evidence: [
       {
@@ -424,6 +427,7 @@ async function recurring(days: number | null, category: string | null): Promise<
       `${rows.length} locations have at least ${MIN_REPEATS} reports in ${period}: ${exact} exact ${exact === 1 ? 'match' : 'matches'} (same described location) and ${rows.length - exact} approximate ${rows.length - exact === 1 ? 'match' : 'matches'}. ` +
       `The most repeated is "${rows[0].label}" with ${rows[0].incident_count} reports between ${date(rows[0].first_at)} and ${date(rows[0].last_at)}.`,
     bars: top.map((r) => ({ label: r.label.replace('Synthetic ', ''), value: r.incident_count })),
+    chart: 'dots',
     evidence: [
       {
         tool: 'tool_recurring_locations',
@@ -482,6 +486,7 @@ async function candidates(category: string | null): Promise<Answer> {
       `It is a candidate for human review tomorrow evening, not a prediction.${others ? ` Other candidates: ${others}.` : ''} ` +
       `Category: ${categoryName(top.category)}.`,
     bars: rows.map((r) => ({ label: r.label.replace('Synthetic ', ''), value: r.evening_count })),
+    chart: 'cards',
     evidence: [
       {
         tool: 'tool_candidate_areas',

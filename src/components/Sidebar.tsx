@@ -167,7 +167,7 @@ function Brand({ collapsed, onToggle }: { collapsed: boolean; onToggle?: () => v
     return (
       <Button variant="ghost" className="group size-11 p-0" aria-label="Expand menu" title="Expand menu" onClick={onToggle}>
         <img src={mark} alt="" width={30.8} height={30.8} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
-        <SidebarSimple className="hidden size-5 shrink-0 -scale-x-100 group-hover:block group-focus-visible:block" />
+        <SidebarSimple weight="regular" className="hidden size-5 shrink-0 -scale-x-100 group-hover:block group-focus-visible:block" />
       </Button>
     )
   return (
@@ -240,7 +240,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
           <Brand collapsed={collapsed} onToggle={onToggle} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
-              <SidebarSimple className="size-5 shrink-0" />
+              <SidebarSimple weight="regular" className="size-5 shrink-0" />
             </Button>
           )}
         </div>

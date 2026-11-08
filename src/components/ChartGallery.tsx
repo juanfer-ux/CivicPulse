@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts'
 import { Bars } from '@/components/InvestigatePanel'
+import { QuestionCharts } from '@/components/QuestionCharts'
 import { StatCard } from '@/components/ui/stat-card'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
 
@@ -89,6 +90,8 @@ function MetricTile({ now, before, label }: { now: number; before: number; label
 export function ChartGallery() {
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-10 p-8">
+      <QuestionCharts />
+      <hr className="border-(--neutral-600)" />
       <header>
         <h1 className="text-heading">Chart options for the agent's answers</h1>
         <p className="text-body-sm text-muted-foreground">
