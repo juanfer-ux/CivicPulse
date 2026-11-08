@@ -33,8 +33,8 @@ export interface Answer {
   evidence: Evidence[]
   limitations: string[]
   highlightIds: string[]
-  /** Which chart draws `bars`: localities of one category (donut, the smaller ones grouped as "Others"), localities of all categories (bar list), the day in 4-hour blocks (area), two periods (two columns), repeated locations (dot matrix) or tomorrow's candidates (cards). Without it, the plain bar list. */
-  chart?: 'donut' | 'barlist' | 'time' | 'period' | 'dots' | 'cards'
+  /** Which chart draws `bars`: localities of one category (donut, the smaller ones grouped as "Others"), localities of all categories (bar list), the day in 4-hour blocks (area), two periods (two columns), repeated locations (dot matrix) or tomorrow's candidates (numbered rows with a thin bar). Without it, the plain bar list. */
+  chart?: 'donut' | 'barlist' | 'time' | 'period' | 'dots' | 'rows'
   /** Localities to outline and shade on the map (code, and a value that sets the shade). An answer about localities shows these instead of circles. */
   areas?: Area[]
   /** Repeated locations: the incident ids of each spot. The map draws one radius around each spot's reports, not the locality outlines. */
@@ -491,7 +491,7 @@ async function candidates(category: string | null): Promise<Answer> {
       `It is a candidate for human review tomorrow evening, not a prediction.${others ? ` Other candidates: ${others}.` : ''} ` +
       `Category: ${categoryName(top.category)}.`,
     bars: rows.map((r) => ({ label: titleCase(r.label.replace('Synthetic ', '')), value: r.evening_count })),
-    chart: 'cards',
+    chart: 'rows',
     evidence: [
       {
         tool: 'tool_candidate_areas',
