@@ -15,7 +15,7 @@ const AnswerChart = lazy(loadChart)
 export type Turn = { question: string; result?: Answer; error?: string }
 
 /** `turns` are this conversation's questions and answers; the app keeps one list per conversation (the sidebar's Investigations). `onTurns` edits the conversation with this id, even if the person has switched to another one meanwhile. */
-export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea }: { chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
+export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea }: { chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
   const setTurns = (edit: (t: Turn[]) => Turn[]) => onTurns(chatId, edit)
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
@@ -35,7 +35,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
     let turn: Turn
     try {
       const result = await answer(q, await fetchLocalities())
-      onHighlight(result.highlightIds, result.areas)
+      onHighlight(result.highlightIds, result.areas, result.spots)
       turn = { question: q, result }
     } catch (e) {
       turn = { question: q, error: e instanceof Error ? e.message : 'Something went wrong' }
@@ -106,7 +106,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
               <Question text={t.question} />
               {!t.result && !t.error && <p className="text-muted-foreground">Querying…</p>}
               {t.error && <p className="text-incident">{t.error}</p>}
-              {t.result && <AnswerView result={t.result} shown={t.result.highlightIds === highlightIds} onFocusArea={onFocusArea} onZoomArea={onZoomArea} onToggle={(on) => onHighlight(on ? t.result!.highlightIds : [], on ? t.result!.areas : [])} />}
+              {t.result && <AnswerView result={t.result} shown={t.result.highlightIds === highlightIds} onFocusArea={onFocusArea} onZoomArea={onZoomArea} onToggle={(on) => onHighlight(on ? t.result!.highlightIds : [], on ? t.result!.areas : [], on ? t.result!.spots : [])} />}
             </div>
           ))}
           <div ref={end} />

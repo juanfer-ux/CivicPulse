@@ -44,6 +44,14 @@ export function radiusGroups(points: { lng: number; lat: number }[], link = 1200
   return wide.map(circle)
 }
 
+/** One circle around one spot's reports: centered on them, covering all with room to spare, never under `min` meters. */
+export function circleAround(points: { lng: number; lat: number }[], min: number, pad = 30): Circle {
+  const lng = points.reduce((s, p) => s + p.lng, 0) / points.length
+  const lat = points.reduce((s, p) => s + p.lat, 0) / points.length
+  const far = Math.max(...points.map((p) => Math.hypot((p.lng - lng) * M_LNG, (p.lat - lat) * M_LAT)))
+  return { lng, lat, radius: Math.max(min, far + pad) }
+}
+
 /** West, south, east, north of a circle, in degrees: lets the map fit the whole circle, not only its points. */
 export const circleBounds = (c: Circle): [[number, number], [number, number]] => [
   [c.lng - c.radius / M_LNG, c.lat - c.radius / M_LAT],

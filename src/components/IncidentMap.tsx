@@ -7,7 +7,7 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { hitsProblemMarker } from '@/lib/markerSizes'
 import { PROBLEM_CIRCLE_PX, PROBLEM_SWITCH_ZOOMS, addBadges, addDots, addSelectedRing, addProblemMarkers, iconCategory, selectedRingId } from '@/lib/markerIcons'
 import { labelPoint } from '@/lib/polygons'
-import { circleBounds, radiusGroups } from '@/lib/radius'
+import { circleAround, circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
 import { groupOf, label, typeOf, type Incident } from '@/lib/incidents'
 import type { ProblemRow } from '@/lib/problems'
@@ -117,6 +117,13 @@ const problemRingPx = (zoom: number) => {
 }
 
 const BOGOTA: [number, number] = [-74.09, 4.65]
+const NO_SPOTS: string[][] = []
+const SPOT_MIN_PX = 72 // radius on screen of a repeated location's circle at the farthest zoom (twice the recurrence ring's minimum; owner, 2026-11-08: bigger), so every spot is visible from the whole-city view
+const SPOT_MIN_M = 120 // and its real size when zoomed in (twice the recurrence's 60 m)
+/** One radius per group of incidents; for spots, one circle per spot around all its reports (at least 120 m). */
+const spotGroups = (pts: (Incident)[], spots: string[][]) =>
+  spots.length ? spots.map((ids) => pts.filter((i) => ids.includes(i.id))).filter((g) => g.length).map((g) => circleAround(g, SPOT_MIN_M)) : radiusGroups(pts)
+
 /** The map always opens here (owner's choice, 2026-10-26). */
 const START_ZOOM = 12
 
@@ -130,6 +137,8 @@ interface Props {
   highlightIds: string[]
   /** Localities to outline and shade (an answer about localities); they replace the circles. */
   areas: Area[]
+  /** The answer is about specific spots: one small radius (like a recurrence's) around each spot. */
+  spots?: string[][]
   /** Locality whose outline lights up (a bar of the answer is under the pointer). */
   focusCode?: number | null
   /** Locality to zoom to (a bar was clicked); n changes on every click. */
@@ -156,7 +165,7 @@ const MAX_CANVAS = (() => {
   return Math.min(Math.max(max, 4096), 16384)
 })()
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots = NO_SPOTS, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
@@ -319,7 +328,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
       // Figma Incident Radius (agent): a radial gradient fill, clear up to half the radius and strongest at the edge, and a 1 px ring. A circle layer cannot hold a gradient, so the fill is three bands (outer half of the radius) stacked as wide strokes, each a bit stronger than the one inside it.
       // Under the basemap's place and street names (owner, 2026-10-27), so the names stay readable inside a radius; still above roads, land and buildings.
       const underLabels = map.getStyle().layers.find((l) => l.type === 'symbol')?.id
-      const px = (f: number) => ['interpolate', ['exponential', 2], ['zoom'], 0, ['*', ['get', 'r'], METERS_TO_PX_Z0 * f], 22, ['*', ['get', 'r'], METERS_TO_PX_Z0 * 2 ** 22 * f]] as never
+      const px = (f: number) => ['interpolate', ['exponential', 2], ['zoom'], ...Array.from({ length: 23 }, (_, z) => [z, ['max', ['*', ['get', 'r'], METERS_TO_PX_Z0 * 2 ** z * f], ['*', ['get', 'minpx'], f]]]).flat()] as never // zoom must stay the input of the top-level interpolate; minpx: a spot's circle never draws smaller than this on screen, so it shows at every zoom
       const BANDS = [[0.5, 0.667], [0.667, 0.833], [0.833, 1]] // from the radius' center, as fractions of it
       BANDS.forEach(([from, to], i) =>
         map.addLayer(
@@ -537,7 +546,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     if (!pts.length) return
     const bounds = new maplibregl.LngLatBounds([pts[0].lng, pts[0].lat], [pts[0].lng, pts[0].lat])
     for (const i of pts) bounds.extend([i.lng, i.lat])
-    for (const c of radiusGroups(pts)) for (const corner of circleBounds(c)) bounds.extend(corner) // the circles too, not only their incidents
+    for (const c of spotGroups(pts, spots)) for (const corner of circleBounds(c)) bounds.extend(corner) // the circles too, not only their incidents
     setFree(map)
     map.fitBounds(bounds, { padding: fitPadding(), maxZoom: 15, duration: 700 })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the answer changes, not when filters change the list
@@ -621,12 +630,12 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, focusC
     const map = mapRef.current
     if (!ready || !map) return
     const highlight = new Set(highlightIds)
-    const circles = highlightIds.length && !areas.length ? radiusGroups(incidents.filter((i) => highlight.has(i.id))) : []
+    const circles = highlightIds.length && !areas.length ? spotGroups(incidents.filter((i) => highlight.has(i.id)), spots) : []
     ;(map.getSource('answer-radius') as maplibregl.GeoJSONSource).setData({
       type: 'FeatureCollection',
-      features: circles.map((c) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [c.lng, c.lat] }, properties: { r: c.radius } })),
+      features: circles.map((c) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [c.lng, c.lat] }, properties: { r: c.radius, minpx: spots.length ? SPOT_MIN_PX : 0 } })),
     })
-  }, [ready, incidents, highlightIds, areas])
+  }, [ready, incidents, highlightIds, areas, spots])
 
   useEffect(() => {
     const map = mapRef.current
