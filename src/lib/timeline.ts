@@ -57,7 +57,7 @@ export function buildTimeline(detail: ProblemDetailData, label: (code: string) =
   for (const o of detail.occurrences) {
     if (!o.first_report_at) continue
     const t = Date.parse(o.first_report_at)
-    raw.push({ id: `o-${o.occurrence_id}`, lane: 'occurrence', t, size: Math.max(1, o.reports_n), occurrenceId: o.occurrence_id, text: `Occurrence ${occN.get(o.occurrence_id)} · ${day(t)} · ${o.reports_n} ${o.reports_n === 1 ? 'report' : 'reports'}` })
+    raw.push({ id: `o-${o.occurrence_id}`, lane: 'occurrence', t, size: Math.max(1, o.reports_n), occurrenceId: o.occurrence_id, text: `Occurrence ${occN.get(o.occurrence_id)} · ${day(t)} · ${o.reports_n} ${o.reports_n === 1 ? 'Report' : 'Reports'}` })
   }
   for (const l of detail.links) {
     const i = incidents.get(l.incident_id)

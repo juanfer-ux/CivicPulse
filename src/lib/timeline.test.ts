@@ -35,7 +35,7 @@ describe('buildTimeline', () => {
 
   it('says what each mark is', () => {
     const text = (id: string) => tl.points.find((p) => p.id === id)!.text
-    expect(text('o-o2')).toBe('Occurrence 2 · 8 Sept · 4 reports')
+    expect(text('o-o2')).toBe('Occurrence 2 · 8 Sept · 4 Reports')
     expect(text('r-i2')).toMatch(/^PRK-0063 · Salvajes en la Via · 8 Sept, \d\d:\d\d$/)
     expect(text('r-i3')).toMatch(/^PRK-0095 · Unknown source · .* · Needs review$/)
     expect(text('v-v2')).toBe('12 Sept · Tow · Movilidad · Outcome: Not recorded yet')

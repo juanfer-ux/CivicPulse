@@ -1,3 +1,4 @@
+import { titleCase } from '@/lib/titleCase'
 import type { ReactNode } from 'react'
 import { Select as BaseSelect } from '@base-ui/react/select'
 import { CaretDown, Check } from '@phosphor-icons/react'
@@ -33,7 +34,7 @@ export function ChipMultiSelect({
     if (g) g[1].push(o)
     else groups.push([o.group, [o]])
   }
-  const summary = (v: string[]) => (v.length === 0 ? all : v.length === 1 ? (options.find((o) => o.value === v[0])?.label ?? all) : `${v.length} ${noun}`)
+  const summary = (v: string[]) => (v.length === 0 ? all : v.length === 1 ? (options.find((o) => o.value === v[0])?.label ?? all) : `${v.length} ${titleCase(noun)}`)
   return (
     <BaseSelect.Root multiple value={value} onValueChange={(v) => onValueChange(v as string[])} items={options}>
       <BaseSelect.Trigger aria-label={ariaLabel} data-active={value.length ? '' : undefined} className={cn(chipClass)}>

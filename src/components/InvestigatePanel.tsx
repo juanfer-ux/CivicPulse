@@ -186,7 +186,7 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea }:
         ))}
       {result.evidence.map((e) => (
         <details key={e.tool + e.scope} className="text-meta text-muted-foreground">
-          <summary className="cursor-pointer">Evidence: {e.incidentCount} incidents</summary>
+          <summary className="cursor-pointer">Evidence: {e.incidentCount} Incidents</summary>
           <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-2">
             <dt>Tool</dt>
             <dd className="text-foreground">{e.tool}</dd>

@@ -17,7 +17,7 @@ export function ProblemHoverCard({ problem, className = '', style }: { problem: 
       <ProblemStatusPill status={problem.status} />
       <div className="flex flex-col gap-0.5">
         <p className="text-foreground">
-          {problem.occurrences_n} {problem.occurrences_n === 1 ? 'occurrence' : 'occurrences'}
+          {problem.occurrences_n} {problem.occurrences_n === 1 ? 'Occurrence' : 'Occurrences'}
           {problem.first_seen && problem.last_seen && (
             <>
               {' '}
