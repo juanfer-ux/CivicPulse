@@ -15,6 +15,7 @@ Start here. Every topic has **one** document; other documents link to it instead
 | 🏗️ | [architecture.md](architecture.md) | How do the pieces fit together? | 🟨 Draft |
 | 🚀 | [deploy.md](deploy.md) | How do I publish it and fix common problems? | 🟩 In use |
 | 🧪 | [testing.md](testing.md) | What is tested and how do I run it? | 🟨 Draft |
+| 📚 | [storybook.md](storybook.md) | Component stories and Chromatic | 🟨 Draft |
 | 🎨 | [design.md](design.md) | Brand, mobile rule, Figma workflow (index) | 🟨 Draft |
 | 🧩 | [design-system/](design-system/README.md) | The detailed design spec: foundations, components and patterns, accessibility | 🟩 In use |
 | 🤝 | [handoff.md](handoff.md) | Where did we stop, what is open, how do we work? (for a new session) | 🟩 In use |
