@@ -7,29 +7,29 @@
 
 /* Manrope (Google Fonts, open licence), served from our own site by the fontsource package. Variable font (weights 200 to 800). */
 @import "@fontsource-variable/manrope";
-/* Michroma (Google Fonts, OFL), same route: the display-lg and display styles (owner's Figma, 2026-11-03). One weight, Regular. */
-@import "@fontsource/michroma";
+/* Zalando Sans Expanded (Google Fonts, OFL), same route: the four display styles (owner's Figma, 2026-11-08). Variable font, weights 200 to 900. */
+@import "@fontsource-variable/zalando-sans-expanded";
 
 /* The desktop layout (sidebar, floating panels) starts here; narrower windows get the mobile layout. */
 @theme {
   --breakpoint-desk: 90rem; /* 1440 px */
 
   /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is one universal 0.02em on every element (about 0.26 px at 13 px), small enough not to blur; Figma's fixed 0.2 and 0.3 px did blur letters on screens without a Retina display. Weights are ours: 550 headings and numbers, 450 actions and labels, 380 reading text (Manrope variable). */
-  /* Display (Figma, 2026-11-03 and 2026-11-05): all three display styles are Michroma Regular, used with `font-display`: display-lg 48 / 56, display 20 / 42, display-sm 20 / 32. */
-  --text-display-lg: 48px;
-  --text-display-lg--font-weight: calc(400 + var(--weight-offset));
+  /* Display (Figma, 2026-11-08): all four display styles are Zalando Sans Expanded, used with `font-display`: display-lg ExtraLight 56 / 56, display Regular 24 / 42, display-sm Regular 20 / 32, display-xs Regular 14 / 20. The weights follow --display-weight-offset (-300), not Manrope's --weight-offset. */
+  --text-display-lg: 56px; /* Figma 2026-11-08: 56 (it was 48); line height stays 56 */
+  --text-display-lg--font-weight: calc(200 + var(--display-weight-offset));
   --text-display-lg--line-height: 56px;
   --text-display-lg--letter-spacing: 0;
   --text-display: 24px; /* Figma 2026-11-05: 24 (it was 20) */
-  --text-display--font-weight: calc(400 + var(--weight-offset));
+  --text-display--font-weight: calc(400 + var(--display-weight-offset));
   --text-display--line-height: 42px;
   --text-display--letter-spacing: 0.02em;
   --text-display-sm: 20px;
-  --text-display-sm--font-weight: calc(400 + var(--weight-offset));
+  --text-display-sm--font-weight: calc(400 + var(--display-weight-offset));
   --text-display-sm--line-height: 32px;
   --text-display-sm--letter-spacing: 0.02em;
   --text-display-xs: 14px; /* Figma 2026-11-06: the smallest display style (14 / 20; first 16 / 24, then the owner changed it) */
-  --text-display-xs--font-weight: calc(400 + var(--weight-offset));
+  --text-display-xs--font-weight: calc(400 + var(--display-weight-offset));
   --text-display-xs--line-height: 20px;
   --text-display-xs--letter-spacing: 0.02em;
   --text-stat: 40px; /* Figma stat (2026-11-07): SemiBold 40 / 32, tracking -4 % (it was Bold 32 / 32, -2 %); the number in a Stat Card */
@@ -134,7 +134,8 @@
 
 /* Sizes from Figma's Device collection: Mobile values by default (windows under 1,440 px), Desktop values from 1,440 px. */
 :root {
-  --weight-offset: -65; /* Added to every font weight (owner, 2026-11-05): 400 becomes 335, 500 becomes 435, 600 becomes 535, 700 becomes 635. 0 = the standard weights. Only the variable font Manrope follows it; Michroma has a single weight. Figma text styles keep the named weights. */
+  --display-weight-offset: -300; /* Zalando Sans Expanded (owner, 2026-11-08; -100, then -200 first): added to every display weight, so Regular 400 asks for 100 and display-lg for -100; the font starts at 200, so all four display styles draw as ExtraLight, the thinnest it has. Figma: all four ExtraLight. */
+  --weight-offset: -65; /* Added to every font weight (owner, 2026-11-05): 400 becomes 335, 500 becomes 435, 600 becomes 535, 700 becomes 635. 0 = the standard weights. Only the variable font Manrope follows it; Zalando Sans Expanded uses the Figma weights as they are. Figma text styles keep the named weights. */
   --fs-body-sm: 16px;
   --fs-button-sm: 16px;
   --lh-body-sm: 24px;
@@ -179,7 +180,7 @@
 @theme inline {
   --font-sans: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
-  --font-display: 'Michroma', var(--font-sans);
+  --font-display: 'Zalando Sans Expanded Variable', var(--font-sans);
   /* The usual 400 / 500 / 600 / 700 (owner, 2026-11-03: with grayscale smoothing on, the lowered 300 / 360 / 400 / 450 are no longer needed). */
   --font-weight-normal: calc(400 + var(--weight-offset));
   --font-weight-medium: calc(500 + var(--weight-offset));
