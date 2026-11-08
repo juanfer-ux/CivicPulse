@@ -6,7 +6,7 @@ const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
       'font-size': [{ text: ['display-lg', 'display', 'display-sm', 'display-xs', 'stat', 'heading', 'title', 'title-regular', 'subtitle', 'subtitle-regular', 'subtitle-strong', 'label', 'label-regular', 'button', 'button-sm', 'body', 'body-medium', 'body-strong', 'body-sm', 'body-sm-medium', 'body-sm-strong', 'meta', 'meta-medium', 'caption', 'caption-strong', 'section-label'] }],
-      // `font-display` (Michroma) replaces `font-heading` on a card title that asks for a display style.
+      // `font-display` (Zalando Sans Expanded) replaces `font-heading` on a card title that asks for a display style.
       'font-family': [{ font: ['heading', 'display'] }],
     },
   },

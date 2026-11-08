@@ -43,7 +43,8 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0035](0035-brand-primary-and-secondary.md) | Brand primary `#E3E3E7` (the primary button) and brand secondary `#87DBC7` (its hover) | ✅ Accepted |
 | [0036](0036-display-typeface-science-gothic.md) | Display styles use Science Gothic; text styles brought in line with Figma | ✅ Accepted |
 | [0037](0037-manrope-weights-400-700.md) | Manrope weights follow the Figma names: 400 / 500 / 600 / 700 | ✅ Accepted |
-| [0038](0038-display-typeface-michroma.md) | display-lg and display use Michroma; Sign in colors and logo follow Figma | ✅ Accepted |
+| [0038](0038-display-typeface-michroma.md) | display-lg and display use Michroma; Sign in colors and logo follow Figma | ♻️ Font superseded by 0048 |
+| [0048](0048-display-typeface-zalando-sans-expanded.md) | All four display styles use Zalando Sans Expanded (ExtraLight for display-lg, Regular for the others) | ✅ Accepted |
 | [0039](0039-floating-cards-and-timeline-card.md) | Detail panels float over the map; the problem's history is its own bottom card (occurrences 40 % / timeline 60 %) | ✅ Accepted |
 | [0040](0040-scrollbar-style-g.md) | One scrollbar style for the whole platform: style G (round 4 px thumb, 6 px on hover, neutral-300, always visible) | ✅ Accepted |
 | [0041](0041-problems-are-called-recurrences.md) | What the screen called a problem is now a recurrence (code and database keep the old name) | ✅ Accepted |
