@@ -15,7 +15,7 @@
   --breakpoint-desk: 90rem; /* 1440 px */
 
   /* Text styles: size / line height from the CivicPulse Figma file (Foundations · Typography). Letter-spacing is one universal 0.02em on every element (about 0.26 px at 13 px), small enough not to blur; Figma's fixed 0.2 and 0.3 px did blur letters on screens without a Retina display. Weights are ours: 550 headings and numbers, 450 actions and labels, 380 reading text (Manrope variable). */
-  /* Display (Figma, 2026-11-08): all four display styles are Zalando Sans Expanded, used with `font-display`: display-lg ExtraLight 56 / 56, display Regular 24 / 42, display-sm Regular 20 / 32, display-xs Regular 14 / 20. The weights follow --display-weight-offset (-300), not Manrope's --weight-offset. */
+  /* Display (Figma, 2026-11-08): all four display styles are Zalando Sans Expanded, used with `font-display`: display-lg ExtraLight 56 / 56, display Regular 24 / 42, display-sm Regular 20 / 30 (it was 32 until 2026-11-08), display-xs Regular 14 / 20. The weights follow --display-weight-offset (-300), not Manrope's --weight-offset. */
   --text-display-lg: 56px; /* Figma 2026-11-08: 56 (it was 48); line height stays 56 */
   --text-display-lg--font-weight: calc(200 + var(--display-weight-offset));
   --text-display-lg--line-height: 56px;
@@ -26,7 +26,7 @@
   --text-display--letter-spacing: 0.02em;
   --text-display-sm: 20px;
   --text-display-sm--font-weight: calc(400 + var(--display-weight-offset));
-  --text-display-sm--line-height: 32px;
+  --text-display-sm--line-height: 30px;
   --text-display-sm--letter-spacing: 0.02em;
   --text-display-xs: 14px; /* Figma 2026-11-06: the smallest display style (14 / 20; first 16 / 24, then the owner changed it) */
   --text-display-xs--font-weight: calc(400 + var(--display-weight-offset));

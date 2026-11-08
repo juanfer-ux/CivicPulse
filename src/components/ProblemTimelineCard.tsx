@@ -5,6 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { ProblemTimeline } from '@/components/ProblemTimeline'
 import { label, type Incident } from '@/lib/incidents'
 import { initials } from '@/lib/sourceInitials'
+import { HEADER, StatList } from '@/components/ProblemDetail'
 import type { ProblemDetailData, ProblemRow } from '@/lib/problems'
 
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
@@ -66,9 +67,10 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { pro
     )
   }
 
+  const M3 = HEADER === '3' // option 3: a 300 px left column (numbers + occurrences history) and the timeline along the bottom
   return (
-    <div data-float className="flex shrink-0 flex-col gap-2 desk:absolute desk:right-(--map-pad) desk:bottom-(--map-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:h-[360px] desk:flex-row desk:gap-3">
-    <Card role="region" aria-label="Timeline" className="min-w-0 gap-0 overflow-hidden bg-card/95 py-0 desk:h-full desk:flex-1 desk:border-0 desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)]">
+    <div data-float={M3 ? undefined : true} className={M3 ? 'flex shrink-0 flex-col gap-2 desk:contents' : 'flex shrink-0 flex-col gap-2 desk:absolute desk:right-(--map-pad) desk:bottom-(--map-pad) '+'desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:h-[360px] desk:flex-row desk:gap-3'}>
+    <Card role="region" aria-label="Timeline" data-float={M3 ? true : undefined} className={`min-w-0 gap-0 overflow-hidden bg-card/95 py-0 ${M3 ? 'desk:absolute desk:right-(--map-pad) desk:bottom-(--map-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap)+360px+12px)] desk:z-20 desk:h-[360px]' : 'desk:h-full desk:flex-1'} desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]`}>
     <ScrollArea className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">
         <h3 className="text-caption-medium text-(--neutral-200)">Timeline · {problem.reference}</h3>
@@ -77,7 +79,8 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident }: { pro
       </section>
     </ScrollArea>
     </Card>
-    <Card role="region" aria-label="Occurrences history" className="gap-0 overflow-hidden bg-card/95 py-0 desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0 desk:border-0 desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)]">
+    <Card role="region" aria-label="Occurrences history" data-float={M3 ? true : undefined} className={`gap-0 overflow-hidden bg-card/95 py-0 ${M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:top-[calc(var(--map-pad)+var(--banner-offset,0px)+96px+12px)] desk:z-20 desk:w-[360px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]`}>
+    {M3 && <StatList problem={problem} />}
     <ScrollArea viewportRef={list} className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">
         <h3 className="text-caption-medium text-(--neutral-200)">Occurrences history</h3>

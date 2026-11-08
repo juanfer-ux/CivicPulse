@@ -201,9 +201,12 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea }:
           </dl>
         </details>
       ))}
-      <ul className="list-disc pl-4 text-meta text-muted-foreground">
-        {result.limitations.map((l) => (
-          <li key={l}>{l}</li>
+      <ul className="flex flex-col text-meta text-muted-foreground">
+        {result.limitations.map((l, i) => (
+          <li key={l} className="flex items-start gap-3 border-b border-(--neutral-600) py-2.5 last:border-b-0">
+            <span className="grid size-5 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--neutral-100)">{i + 1}</span>
+            <span className="pt-0.5">{l}</span>
+          </li>
         ))}
       </ul>
       {result.highlightIds.length > 0 && (

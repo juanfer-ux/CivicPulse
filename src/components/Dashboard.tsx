@@ -1,6 +1,6 @@
 import { titleCase } from '@/lib/titleCase'
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
-import { CaretDown, CaretUp, ChatCircleDots, X } from '@phosphor-icons/react'
+import { CaretDown, CaretLeft, CaretUp, ChatCircleDots, Sparkle, X } from '@phosphor-icons/react'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
 import { localityShapes } from '@/lib/localityShape'
@@ -54,11 +54,13 @@ interface Props {
   focus?: { kind: 'recurrence' | 'incident'; id: string; n: number } | null // the sidebar asked for a row: the map flies to it and its panel opens, as after a click on the map (owner, 2026-11-06)
   onSelection?: (s: SidebarSelection | null) => void // what is open on the map, so the sidebar highlights its row
   onRows?: (rows: { recurrences: SidebarRecurrence[]; incidents: SidebarIncident[] }) => void // the real rows for the sidebar lists
+  agentOff: boolean // the agent panel is collapsed to a 44 px rail
+  onAgentOff: (off: boolean) => void
   onInspect: (open: boolean) => void // an incident is open: App makes room for its panel and collapses the sidebar
   children?: ReactNode
 }
 
-export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, focus, onRows, onSelection, children }: Props) {
+export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, agentOff, onAgentOff, focus, onRows, onSelection, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -299,7 +301,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
 
       {/* Bottom left (owner, 2026-10-30): the Problems and Incidents toggles with their counts, merged with the old "Showing N" legend. Without the problems layer there is one plain count, as before. */}
       {data && (
-        <div data-float className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-(--map-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:transition-[left] desk:duration-300">
+        <div data-float className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-(--map-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:transition-[left] desk:duration-300 desk:right-(--map-pad) desk:mx-auto desk:max-w-[1400px] desk:pointer-events-none desk:[&>*]:pointer-events-auto">
           {hasProblems ? (
             !selected && !selectedProblem && <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
           ) : (
@@ -319,7 +321,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
           categories={data.categories}
           counts={byGroup}
           problemCounts={hasProblems ? byProblemStatus : undefined}
-          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--map-pad)+var(--page-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+var(--page-pad))]'} desk:right-(--map-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:transition-[left] desk:duration-300 desk:mx-auto desk:max-w-[1280px]`}
+          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--map-pad)+var(--page-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+var(--page-pad))]'} desk:right-(--map-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:transition-[left] desk:duration-300 desk:mx-auto desk:max-w-[1400px]`}
         />
       )}
 
@@ -348,7 +350,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         role="region"
         data-float
         aria-label="Busiest localities"
-        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-(--page-pad) overflow-y-auto desk:absolute desk:right-(--map-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:z-10 desk:mx-auto desk:max-w-[1280px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--map-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--map-pad))]'}`}
+        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-(--page-pad) overflow-y-auto desk:absolute desk:right-(--map-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:z-10 desk:mx-auto desk:max-w-[1400px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--map-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--map-pad))]'}`}
       >
         {error ? (
           <p className="col-span-full text-incident">{error}</p>
@@ -366,11 +368,21 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
       </div>
 
       <div
-        className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:py-(--page-pad) desk:pr-(--page-pad) desk:pl-(--sidebar-gap)`}
+        className={`${tab !== 'explore' ? 'flex' : 'hidden'} desk:transition-[width] desk:duration-300 min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:py-(--page-pad) desk:pr-(--page-pad) desk:pl-(--sidebar-gap)`}
       >
         {/* Outer container: the shared float padding (12 px) on every side (owner, 2026-11-06); the panel itself is this inner box. */}
-        <div data-float className="flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-r-lg desk:backdrop-blur-[32px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)] desk:p-0">
-          {children}
+        <div data-float className="relative flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-r-lg desk:backdrop-blur-[32px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)] desk:p-0">
+          {agentOff ? (
+            <button type="button" aria-label="Open agent" title="Open agent" onClick={() => onAgentOff(false)} className="hidden h-full w-full flex-col items-center gap-3 py-4 text-(--neutral-200) hover:text-(--neutral-100) desk:flex">
+              <Sparkle className="size-4" />
+              <span className="text-caption [writing-mode:vertical-rl]">Ask the agent</span>
+            </button>
+          ) : (
+            <button type="button" aria-label="Collapse agent" title="Collapse agent" onClick={() => onAgentOff(true)} className="absolute top-3 right-3 z-10 hidden size-8 place-items-center rounded-sm text-(--neutral-200) hover:bg-(--neutral-700) hover:text-(--neutral-100) desk:grid">
+            <CaretLeft weight="regular" className="size-4" />
+          </button>
+          )}
+          <div className={agentOff ? 'contents desk:hidden' : 'contents'}>{children}</div>
         </div>
       </div>
       {/* The incident detail (owner, 2026-10-30, test): its own panel on the map, to the right of the agent panel, like one more sidebar. On phones it stays in the bottom sheet. */}
@@ -411,7 +423,7 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
       role="region"
       data-float
       aria-label="Incident details"
-      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[360px] desk:border-0 desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)]"
+      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[360px] desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]"
     >
       <CardHeader className="flex flex-row items-start justify-between gap-2">
         <div>
