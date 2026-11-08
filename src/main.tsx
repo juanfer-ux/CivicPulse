@@ -20,6 +20,7 @@ const ScrollGallery = lazy(() => import('@/components/ScrollGallery').then((m) =
 const GlowGallery = lazy(() => import('@/components/GlowGallery').then((m) => ({ default: m.GlowGallery })))
 const LocalityGallery = lazy(() => import('@/components/LocalityGallery').then((m) => ({ default: m.LocalityGallery })))
 const HistoryGallery = lazy(() => import('@/components/HistoryGallery').then((m) => ({ default: m.HistoryGallery })))
+const SidebarListGallery = lazy(() => import('@/components/SidebarListGallery').then((m) => ({ default: m.SidebarListGallery })))
 const TimelineGallery = lazy(() => import('@/components/TimelineGallery').then((m) => ({ default: m.TimelineGallery })))
 
 // The gallery has no data, so it skips sign-in: open /#components.
@@ -29,6 +30,7 @@ const scroll = location.hash === '#scroll' // scrollbar styles on the shadcn Scr
 const glow = location.hash === '#glow' // glow options for the map's outlines, markers and dots
 const locality = location.hash === '#locality' // locality outlines for the Stat Card
 const history = location.hash === '#history' // the rows of the occurrences history as three columns
+const sidebarLists = location.hash === '#sidebar' // ways to keep the sidebar's Recurrences and Incidents lists short
 const timeline = location.hash === '#timeline' // ways to show a problem's history as a timeline
 
 createRoot(document.getElementById('root')!).render(
@@ -36,7 +38,11 @@ createRoot(document.getElementById('root')!).render(
     {/* Every Phosphor icon is the bold weight (owner, 2026-10-30) unless it asks for another (fill on the map badges, the buttons' sparkle and the bullet). */}
     <IconContext.Provider value={{ weight: 'bold' }}>
       <ErrorBoundary>
-        {history ? (
+        {sidebarLists ? (
+          <Suspense fallback={null}>
+            <SidebarListGallery />
+          </Suspense>
+        ) : history ? (
           <Suspense fallback={null}>
             <HistoryGallery />
           </Suspense>

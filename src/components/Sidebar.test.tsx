@@ -19,6 +19,7 @@ const baseProps = {
   onNewCase: vi.fn(),
   recurrences: [{ id: 'p1', title: 'Parque La Serena, costado norte', status: 'active' as const, reference: 'PR-00088' }],
   incidents: [{ id: 'i1', title: 'Access ramp obstruction', reference: 'CP-00200', group: 'pending' as const }],
+  chatItems: [{ title: 'A question', ids: ['p1', 'i1'] }], // only what a conversation touched is listed
 }
 
 describe('Sidebar — creating investigations and cases', () => {
@@ -76,7 +77,7 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(screen.getByText('Existing investigation')).toBeInTheDocument()
     expect(screen.getByText(/PR-00088/)).toBeInTheDocument()
     expect(screen.getByText('Access ramp obstruction')).toBeInTheDocument()
-    expect(screen.getByText('Pending')).toBeInTheDocument() // the incident's status, in its own run
+    expect(screen.getByText(/CP-00200 · Pending/)).toBeInTheDocument() // the incident's reference and status
   })
 
   it('clicking a recurrence or an incident asks the map to open it', async () => {
@@ -99,13 +100,18 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(screen.getByRole('button', { name: /Access ramp obstruction/ })).not.toHaveAttribute('aria-current')
   })
 
-  it('each section has its own sort button', async () => {
+  it('Investigations flips newest and oldest; Recurrences and Incidents have a view menu that starts at View all by last update', async () => {
     const user = userEvent.setup()
     render(<Sidebar {...baseProps} />)
 
-    await user.click(screen.getByRole('button', { name: /^Incidents: newest first/ }))
-    expect(screen.getByRole('button', { name: /^Incidents: oldest first/ })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^Recurrences: newest first/ })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /^Investigations: newest first/ }))
+    expect(screen.getByRole('button', { name: /^Investigations: oldest first/ })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Incidents: view options' }))
+    expect(screen.getByRole('menuitemradio', { name: 'View all' })).toHaveAttribute('aria-checked', 'true')
+    expect(screen.getByRole('menuitemradio', { name: 'Last updated' })).toHaveAttribute('aria-checked', 'true')
+    await user.click(screen.getByRole('menuitemradio', { name: 'Date created' }))
+    await user.click(screen.getByRole('button', { name: 'Incidents: view options' }))
+    expect(screen.getByRole('menuitemradio', { name: 'Date created' })).toHaveAttribute('aria-checked', 'true')
   })
 
   it('the search filters the three lists', async () => {
@@ -151,5 +157,24 @@ describe('Sidebar — accessibility regressions', () => {
     await user.keyboard('{Escape}')
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(opener).toHaveFocus()
+  })
+})
+
+describe('Sidebar — only what a conversation touched is listed', () => {
+  it('lists the rows an (opened or answered) conversation holds and says which one', () => {
+    render(<Sidebar {...baseProps} recurrences={[]} incidents={[{ id: 'a', title: 'In a chat', reference: 'CP-1', group: 'pending' as const }, { id: 'b', title: 'Never mentioned', reference: 'CP-2', group: 'pending' as const }]} chatItems={[{ title: 'My question', ids: ['a'] }]} />)
+    expect(screen.getByText('In a chat')).toBeInTheDocument()
+    expect(screen.queryByText('Never mentioned')).toBeNull()
+  })
+
+  it('the first status group is open and the later ones start collapsed', async () => {
+    const user = userEvent.setup()
+    render(<Sidebar {...baseProps} recurrences={[]} incidents={[{ id: 'a', title: 'Open one', reference: 'CP-1', group: 'pending' as const }, { id: 'b', title: 'Folded one', reference: 'CP-2', group: 'rejected' as const }]} chatItems={[{ title: 'Q', ids: ['a', 'b'] }]} />)
+    await user.click(screen.getByRole('button', { name: 'Incidents: view options' }))
+    await user.click(screen.getByRole('menuitemradio', { name: 'By status' }))
+    expect(screen.getByText('Open one')).toBeInTheDocument()
+    expect(screen.queryByText('Folded one')).toBeNull()
+    await user.click(screen.getByRole('button', { name: /Rejected · 1/ }))
+    expect(screen.getByText('Folded one')).toBeInTheDocument()
   })
 })

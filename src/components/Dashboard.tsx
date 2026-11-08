@@ -243,8 +243,8 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   }
   useEffect(() => {
     onRows?.({
-      recurrences: [...problems].sort((a, b) => (b.last_seen ?? '').localeCompare(a.last_seen ?? '')).map((p) => ({ id: p.id, title: titleCase(p.title), status: p.status, reference: p.reference })),
-      incidents: (data?.incidents ?? []).map((i) => ({ id: i.id, title: i.title, reference: i.reference, group: groupOf(i.status) })),
+      recurrences: [...problems].sort((a, b) => (b.last_seen ?? '').localeCompare(a.last_seen ?? '')).map((p) => ({ id: p.id, title: titleCase(p.title), status: p.status, reference: p.reference, created: Date.parse(p.first_seen ?? '') || 0, updated: Date.parse(p.last_seen ?? '') || 0 })),
+      incidents: (data?.incidents ?? []).map((i) => ({ id: i.id, title: i.title, reference: i.reference, group: groupOf(i.status), created: Date.parse(i.reported_at) || 0, updated: Date.parse(i.reported_at) || 0 })) // the data has no update time for incidents yet: reported_at stands for both,
     })
   }, [problems, data, onRows])
   useEffect(() => {

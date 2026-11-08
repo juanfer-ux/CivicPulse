@@ -1,4 +1,5 @@
-import { useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { mockChats } from '@/lib/mockChats'
 import { Dashboard, type Tab } from '@/components/Dashboard'
 import type { Area } from '@/lib/agent'
 import { InvestigatePanel, type Turn } from '@/components/InvestigatePanel'
@@ -42,7 +43,35 @@ export default function App() {
   const [rows, setRows] = useState<{ recurrences: SidebarRecurrence[]; incidents: SidebarIncident[] }>({ recurrences: [], incidents: [] })
   const [selection, setSelection] = useState<SidebarSelection | null>(null)
   const [focus, setFocus] = useState<{ kind: 'recurrence' | 'incident'; id: string; n: number } | null>(null)
-  const open = (kind: 'recurrence' | 'incident') => (id: string) => setFocus((f) => ({ kind, id, n: (f?.n ?? 0) + 1 }))
+  // What each conversation touched (owner, 2026-11-08): the incidents behind its answers, plus whatever was opened from the map or the menu. The sidebar lists only these.
+  const [opened, setOpened] = useState<Record<number, string[]>>({}) // opened from the map or the menu, kept with the conversation that was open at the time
+  useEffect(() => {
+    if (selection && !(opened[active.id] ?? []).includes(selection.id)) setOpened((o) => ({ ...o, [active.id]: [...(o[active.id] ?? []), selection.id] })) // eslint-disable-line react-hooks/set-state-in-effect
+  }, [selection, opened, active.id])
+  // The mocked conversations for the demo (src/lib/mockChats.ts): seeded once the rows are loaded, so clicking one opens a real conversation in the agent panel.
+  const [mockIds, setMockIds] = useState<Record<number, string[]>>({})
+  const seeded = useRef(false)
+  useEffect(() => {
+    if (seeded.current || !rows.incidents.length) return
+    seeded.current = true
+    const mocks = mockChats(rows.recurrences, rows.incidents)
+    const first = 1001
+    setChats((cs) => [...cs, ...mocks.map((m, k) => ({ id: first + k, turns: m.turns }))])
+    setMockIds(Object.fromEntries(mocks.map((m, k) => [first + k, m.ids])))
+  }, [rows])
+  // The sidebar always lists every conversation's items (owner, 2026-11-08: switching conversations must not change the lists); what was opened from the map belongs to the conversation that was open then.
+  const idsOf = (c: { id: number; turns: Turn[] }) => [...new Set([...(mockIds[c.id] ?? []), ...(opened[c.id] ?? []), ...c.turns.flatMap((t) => t.result?.highlightIds ?? [])])]
+  // A row of the sidebar opens the item on the map and its conversation in the agent panel (owner, 2026-11-08): the open conversation if it holds the item, else the newest one that does. Items no conversation holds leave the panel as it is.
+  const open = (kind: 'recurrence' | 'incident') => (id: string) => {
+    const holder = idsOf(active).includes(id) ? active : [...chats].reverse().find((c) => idsOf(c).includes(id))
+    if (holder && holder.id !== active.id) pick(holder.id)
+    setFocus((f) => ({ kind, id, n: (f?.n ?? 0) + 1 }))
+  }
+  const chatItems = [
+    ...chats
+      .map((c) => ({ title: c.turns[0]?.question ?? 'Opened on the map', ids: idsOf(c) }))
+      .filter((c) => c.ids.length),
+  ]
   const [inspecting, setInspecting] = useState(false) // an incident or problem is open: the sidebar collapses (the 360 px panel overlays the map, which keeps its size; see Dashboard)
 
   return (
@@ -51,7 +80,7 @@ export default function App() {
         Skip to main content
       </a>
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
-      <Sidebar collapse={inspecting} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
+      <Sidebar collapse={inspecting} chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
       {/* The agent panel is 38 % of the area next to the sidebar, never under 550 px (the cards and the composer break) nor over 680 px (its content stops at 664 to 728 px): the same 550 px up to a 1750 px window (owner, 2026-11-08). */}
       <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': 'clamp(550px, 38%, 680px)', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
