@@ -1,3 +1,4 @@
+import { titleCase } from '@/lib/titleCase'
 import { supabase } from '@/lib/supabase'
 import type { AppRole } from '@/lib/auth'
 import type { Locality } from '@/lib/incidents'
@@ -73,8 +74,8 @@ export async function fetchUserAdminData(): Promise<AdminData> {
       categories: (cats.get(p.id) ?? []).sort(),
     })),
     localities: localities.data as Locality[],
-    categories: categories.data as CategoryRow[],
-    specializations: specializations.data as Specialization[],
+    categories: (categories.data as CategoryRow[]).map((c) => ({ ...c, name: titleCase(c.name) })),
+    specializations: (specializations.data as Specialization[]).map((x) => ({ ...x, name: titleCase(x.name) })),
   }
 }
 

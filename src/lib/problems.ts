@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
-import type { Incident } from '@/lib/incidents'
+import { polishIncident, type Incident } from '@/lib/incidents'
+import { sentenceCase, titleCase } from '@/lib/titleCase'
 import type { ProblemStatus } from '@/lib/statusColors'
 
 /** A recurrence with its derived numbers. Recurrence counts OCCURRENCES, never reports (`reports_n` is intensity only). */
@@ -36,6 +37,8 @@ export async function fetchProblems(): Promise<ProblemRow[]> {
     const s = byId.get(p.id as string)
     return {
       ...(p as Omit<ProblemRow, 'occurrences_n' | 'recurrences_n' | 'reports_n' | 'interventions_n' | 'uncertain_n' | 'first_seen' | 'last_seen' | 'quiet'>),
+      title: titleCase(String(p.title)),
+      location_description: titleCase(String(p.location_description)),
       occurrences_n: Number(s?.occurrences_n ?? 0),
       recurrences_n: Number(s?.recurrences_n ?? 0),
       reports_n: Number(s?.reports_n ?? 0),
@@ -119,11 +122,11 @@ export async function fetchProblemDetail(problemId: string): Promise<ProblemDeta
     // oldest first, so "Occurrence n" is the nth time it happened whatever order the server answers in
     occurrences: ((occ.data ?? []).map((o) => ({ ...o, reports_n: Number(o.reports_n) })) as OccurrenceRow[]).sort((a, b) => Date.parse(a.first_report_at ?? '') - Date.parse(b.first_report_at ?? '')),
     links: linkRows,
-    incidents: (incidents.data ?? []) as Incident[],
+    incidents: ((incidents.data ?? []) as Incident[]).map(polishIncident),
     sources: Object.fromEntries((sources.data ?? []).map((s) => [s.incident_id as string, platformName.get(s.platform as string) ?? String(s.platform)])),
     interventions: (ivs.data ?? []).map((v) => {
       const results = (v.intervention_results ?? []) as { id: number; outcome: string }[]
-      return { id: v.id, action_type: v.action_type, agency: v.agency, performed_at: v.performed_at, description: v.description, outcome: results.sort((a, b) => b.id - a.id)[0]?.outcome ?? null }
+      return { id: v.id, action_type: v.action_type, agency: v.agency, performed_at: v.performed_at, description: sentenceCase(String(v.description ?? '')), outcome: results.sort((a, b) => b.id - a.id)[0]?.outcome ?? null }
     }) as InterventionRow[],
     events: (events.data ?? []) as ProblemEvent[],
   }

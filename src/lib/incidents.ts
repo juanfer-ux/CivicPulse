@@ -1,3 +1,4 @@
+import { sentenceCase, titleCase } from '@/lib/titleCase'
 import { supabase } from '@/lib/supabase'
 import type { Group } from '@/lib/statusColors'
 
@@ -58,6 +59,16 @@ export const STATUSES: IncidentStatus[] = [
 export const typeOf = (i: Pick<Incident, 'subtype' | 'obstruction_subtype'>) =>
   i.subtype ?? i.obstruction_subtype ?? 'unknown'
 
+/** The database writes some text in lowercase: titles, places and classifications in Title Case, descriptions and outcomes as sentences. Done once, where the data is loaded, so every screen shows the same. */
+export const polishIncident = (i: Incident): Incident => ({
+  ...i,
+  ...(i.title && { title: titleCase(i.title) }),
+  ...(i.description && { description: sentenceCase(i.description) }),
+  ...(i.location_description && { location_description: titleCase(i.location_description) }),
+  ...(i.ai_classification && { ai_classification: titleCase(i.ai_classification) }),
+  ...(i.outcome && { outcome: sentenceCase(i.outcome) }),
+})
+
 export interface Category {
   code: string
   name: string
@@ -71,10 +82,8 @@ export function groupOf(status: IncidentStatus): Group {
   return 'approved'
 }
 
-export const label = (value: string) => {
-  const text = value.replace(/_/g, ' ')
-  return text[0].toUpperCase() + text.slice(1)
-}
+/** A code as text in Title Case: "human_rejected" is "Human Rejected". */
+export const label = (value: string) => titleCase(value.replace(/_/g, ' '))
 
 /** RLS decides which rows come back: a user only receives incidents in their scope. */
 export async function fetchDashboardData() {
@@ -87,9 +96,9 @@ export async function fetchDashboardData() {
   if (localities.error) throw localities.error
   if (categories.error) throw categories.error
   return {
-    incidents: incidents.data as Incident[],
+    incidents: (incidents.data as Incident[]).map(polishIncident),
     localities: localities.data as Locality[],
-    categories: categories.data as Category[],
+    categories: (categories.data as Category[]).map((c) => ({ ...c, name: titleCase(c.name) })),
   }
 }
 
