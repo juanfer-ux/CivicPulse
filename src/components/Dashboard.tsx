@@ -369,7 +369,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         className={`${tab !== 'explore' ? 'flex' : 'hidden'} min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:py-(--page-pad) desk:pr-(--page-pad) desk:pl-(--sidebar-gap)`}
       >
         {/* Outer container: the shared float padding (12 px) on every side (owner, 2026-11-06); the panel itself is this inner box. */}
-        <div data-float className="flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-r-lg desk:backdrop-blur-[16px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)] desk:p-0">
+        <div data-float className="flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-r-lg desk:backdrop-blur-[32px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)] desk:p-0">
           {children}
         </div>
       </div>

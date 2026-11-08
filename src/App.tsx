@@ -52,7 +52,8 @@ export default function App() {
       </a>
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
       <Sidebar collapse={inspecting} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
-      <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': '550px', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
+      {/* The agent panel is 38 % of the area next to the sidebar, never under 550 px (the cards and the composer break) nor over 680 px (its content stops at 664 to 728 px): the same 550 px up to a 1750 px window (owner, 2026-11-08). */}
+      <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': 'clamp(550px, 38%, 680px)', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
           <Dashboard highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} focus={focus} onRows={setRows} onSelection={setSelection}>

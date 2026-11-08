@@ -63,7 +63,7 @@ export function AuthPage() {
               <CardTitle asChild className="font-display text-display text-(--brand-primary)">
                 <h1>{signup ? 'Create account' : 'Sign in'}</h1>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-body">
                 {signup
                   ? 'New accounts have no access until a Super Admin assigns a role.'
                   : 'Welcome to the Operations Agent Platform'}
