@@ -179,16 +179,20 @@ describe('Sidebar — only what a conversation touched is listed', () => {
   })
 })
 
-describe('Sidebar — the Incidents list shows ten', () => {
+describe('Sidebar — only five incidents and two investigations show', () => {
   const twelve = Array.from({ length: 12 }, (_, k) => ({ id: `i${k}`, title: `Incident number ${k}`, reference: `CP-${k}`, group: 'pending' as const, updated: 100 - k }))
-  it('shows the first ten and a control for the rest', async () => {
-    const user = userEvent.setup()
+  it('shows the first five incidents and nothing more', () => {
     render(<Sidebar {...baseProps} recurrences={[]} incidents={twelve} chatItems={[{ title: 'Q', ids: twelve.map((i) => i.id) }]} />)
-    expect(screen.getByText('Incident number 9')).toBeInTheDocument()
-    expect(screen.queryByText('Incident number 10')).toBeNull()
-    await user.click(screen.getByRole('button', { name: 'Show all 12' }))
-    expect(screen.getByText('Incident number 11')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Show 10' }))
-    expect(screen.queryByText('Incident number 11')).toBeNull()
+    expect(screen.getByText('Incident number 4')).toBeInTheDocument()
+    expect(screen.queryByText('Incident number 5')).toBeNull()
+    expect(screen.queryByRole('button', { name: /Show all/ })).toBeNull()
+  })
+
+  it('shows the first two investigations and nothing more', () => {
+    const chats = [{ id: 1, title: 'First question' }, { id: 2, title: 'Second question' }, { id: 3, title: 'Third question' }]
+    render(<Sidebar {...baseProps} chats={chats} />)
+    expect(screen.getByText('Third question')).toBeInTheDocument() // newest first: the last chat leads
+    expect(screen.getByText('Second question')).toBeInTheDocument()
+    expect(screen.queryByText('First question')).toBeNull()
   })
 })

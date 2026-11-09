@@ -26,20 +26,10 @@ type Chats = { chats: Chat[]; activeId: number; exploring?: boolean; onPick: (id
 
 /** The items of a section in its view: one list, or grouped by status, ordered as the view says. */
 function ViewList<T extends { id: string | number; created?: number; updated?: number }>({ items, view, group, order, labels, primary, row, limit }: { items: T[]; view: View; group: (t: T) => string; order: string[]; labels: Record<string, string>; primary: string; row: (t: T) => ReactNode; limit?: number }) {
-  // `limit`: only that many rows show (owner, 2026-11-09: the Incidents list shows 10) and a small control shows all of them.
-  const [all, setAll] = useState(false)
+  // `limit`: only that many rows show, and only those (owner, 2026-11-09: the Incidents list shows 5); the section title still counts them all.
   const sorted = sortItems(items, view)
-  const shown = limit && !all ? sorted.slice(0, limit) : sorted
-  return (
-    <>
-      {view.group === 'status' ? <Groups items={shown} newest group={group} order={order} labels={labels} primary={primary} row={row} /> : <>{shown.map(row)}</>}
-      {limit && sorted.length > limit && (
-        <Button variant="ghost" size="sm" className="mt-1 ml-3 h-7 w-fit px-2 text-meta text-(--neutral-300) hover:bg-(--neutral-800)" onClick={() => setAll(!all)}>
-          {all ? `Show ${limit}` : `Show all ${sorted.length}`}
-        </Button>
-      )}
-    </>
-  )
+  const shown = limit ? sorted.slice(0, limit) : sorted
+  return view.group === 'status' ? <Groups items={shown} newest group={group} order={order} labels={labels} primary={primary} row={row} /> : <>{shown.map(row)}</>
 }
 
 /** A list grouped by status (owner, 2026-11-08): every group has its own title with a caret and a count; the first (Active, Pending) is open and the later ones start collapsed. Active, Monitoring, Resolved, Archived for recurrences; Pending, Reviewing, Approved, Rejected for incidents. */
@@ -130,7 +120,7 @@ function ViewMenu({ view, onChange, onClose }: { view: View; onChange: (v: View)
 }
 
 /** One sidebar section (Figma Recurrences / Incidents / Investigations): a title row with its own view button and plus, then the list. Each section has its own view. Recurrences and Incidents (`views`) get the view menu; Investigations just flips newest and oldest. */
-function Section<T>({ title, count, items, addLabel, onAdd, pb = 'pb-3', row, children, empty, views }: { title: string; count?: number; items: T[]; addLabel: string; onAdd?: () => void; pb?: string; row?: (t: T) => ReactNode; children?: (view: View) => ReactNode; empty?: string; views?: boolean }) {
+function Section<T>({ title, count, items, addLabel, onAdd, pb = 'pb-3', row, children, empty, views, limit }: { limit?: number; title: string; count?: number; items: T[]; addLabel: string; onAdd?: () => void; pb?: string; row?: (t: T) => ReactNode; children?: (view: View) => ReactNode; empty?: string; views?: boolean }) {
   const [view, setView] = useState<View>(DEFAULT_VIEW)
   const [menu, setMenu] = useState(false)
   const newest = view.newest
@@ -166,7 +156,7 @@ function Section<T>({ title, count, items, addLabel, onAdd, pb = 'pb-3', row, ch
           {menu && <ViewMenu view={view} onChange={(v) => (setView(v), setMenu(false))} onClose={() => setMenu(false)} />}
         </div>
       </div>
-      <div className="flex flex-col gap-0.5 px-1">{children ? children(view) : row && (newest ? items : [...items].reverse()).map(row)}{empty && !items.length && <p className="px-2 pb-1 text-caption text-(--neutral-300)">{empty}</p>}</div>
+      <div className="flex flex-col gap-0.5 px-1">{children ? children(view) : row && (newest ? items : [...items].reverse()).slice(0, limit).map(row)}{empty && !items.length && <p className="px-2 pb-1 text-caption text-(--neutral-300)">{empty}</p>}</div>
     </div>
   )
 }
@@ -363,12 +353,12 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                 </Section>
                 <Section title="Incidents" count={incidentRows.length} items={incidentRows} addLabel="New incident" views empty="Nothing here yet. Incidents an answer points to, or that you open, appear here.">
                   {(view) => (
-                    <ViewList items={incidentRows} limit={10} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
+                    <ViewList items={incidentRows} limit={5} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
                       <TwoLineItem key={i.id} active={selected?.kind === 'incident' && selected.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => onOpenIncident?.(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-3 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${GROUPS[i.group].label}`} />
                     )} />
                   )}
                 </Section>
-                <Section title="Investigations" items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
+                <Section title="Investigations" limit={2} items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
                   <Button key={c.key} variant="ghost" className={`h-[30px] items-center justify-start gap-2.5 py-1 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-800) ${c.id === activeId && !exploring ? 'bg-(--neutral-800)' : ''}`} aria-current={c.id === activeId || undefined} onClick={() => onPick(c.id)}>
                     <Chat weight="regular" className="size-4 shrink-0 text-(--neutral-300)" aria-hidden />
                     <span className="truncate">{c.title}</span>
