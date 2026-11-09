@@ -7,8 +7,8 @@ import { label } from '@/lib/incidents'
 import type { ProblemRow } from '@/lib/problems'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
 
-// Header test links (owner, 2026-11-08): /?header=1 or /?header=3 draw the panel as the wide header of that gallery option (/#header) on desktop. Anything else keeps today's card.
-export const HEADER = new URLSearchParams(location.search).get('header')
+// Header (owner, 2026-11-08): option 3 of the header gallery (/#header) is the default on desktop; /?header=1 draws the strip option and /?header=0 today's 400 px card.
+export const HEADER = new URLSearchParams(location.search).get('header') ?? '3'
 const WIDE = HEADER === '1' || HEADER === '3'
 
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
@@ -37,7 +37,7 @@ export function ProblemDetail({
       role="region"
       data-float
       aria-label="Recurrence details"
-      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)] ${WIDE ? 'desk:right-(--map-pad)' : 'desk:w-[400px]'} ${WIDE ? 'desk:bg-(--neutral-900)!' : ''}`}
+      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)] ${WIDE ? 'desk:right-(--col-right)' : 'desk:w-[400px]'} ${WIDE ? 'desk:bg-(--neutral-900)!' : ''}`}
     >
       {WIDE && (
         <>

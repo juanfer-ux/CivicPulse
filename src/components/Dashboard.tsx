@@ -224,7 +224,13 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
     const t = setTimeout(() => onInspect(open), open && !selected ? 0 : SIDEBAR_DELAY_MS)
     return () => clearTimeout(t)
   }, [open, selected, onInspect])
+  // A recurrence is open (owner, 2026-11-09): a click on one of its incidents (a dot, a row of the history, a point of the timeline) opens that report inside the history, it does not leave for the Incident Panel; a second click or Escape closes it before the recurrence.
+  const [openReportId, setOpenReportId] = useState<string | null>(null)
   const select = (id: string | null) => {
+    if (selectedProblemId && !selectedId && (!id ? openReportId : problemIncidentIds.includes(id))) {
+      setOpenReportId((cur) => (!id || cur === id ? null : id))
+      return
+    }
     if (!id && !selectedId && selectedProblemId) {
       setSelectedProblemId(null) // a click on empty map (or Escape) closes the incident first, then the problem
       setShownProblemId(null)
@@ -238,6 +244,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
       setSelectedId(null) // a second click on the open problem does nothing, except to come back to it from one of its incidents (its panel is still there)
       return
     }
+    setOpenReportId(null)
     setSelectedProblemId(id)
     setShownProblemId(null) // the panel waits for the camera again
     setSelectedId(null)
@@ -269,13 +276,14 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   const mapBase = 'calc(var(--agent-w) + var(--panel-gap))'
   // Both detail panels float over the map (owner, 2026-11-05), so the map and the controls over it never move for them.
   return (
-    <div className="contents" data-history={item?.kind === 'problem' && !shown.leaving ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
+    <div className="contents map-col" data-history={item?.kind === 'problem' && !shown.leaving ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
         problems={showProblems ? problemsFiltered : undefined}
         problemIncidentIds={problemIncidentIds}
         selectedProblemId={selectedProblem?.id ?? null}
+        openReportId={openReportId}
         dotStatusById={dotStatusById}
         onSelectProblem={selectProblem}
         onFlightEnd={onFlightEnd}
@@ -290,7 +298,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. The banner keeps the whole top row; an open incident or recurrence panel sits below it (`--banner-offset`, owner, 2026-11-07). */}
       {chatMode && (
-        <div data-float className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-600) px-5 text-meta text-(--indigo-100) desk:absolute desk:top-(--map-pad) desk:right-(--map-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:inset-x-auto desk:rounded-sm">
+        <div data-float className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-600) px-5 text-meta text-(--indigo-100) desk:absolute desk:top-(--map-pad) desk:right-(--col-right) desk:left-(--col-left) desk:inset-x-auto desk:rounded-sm">
           <ChatCircleDots weight="fill" className="size-5 shrink-0 text-(--indigo-200)" aria-hidden />
           <span className="flex-1">While showing the agent's answer on the map, filters will narrow it down.</span>
           <Button size="sm" variant="secondary" onClick={onClearHighlight}>
@@ -301,7 +309,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
 
       {/* Bottom left (owner, 2026-10-30): the Problems and Incidents toggles with their counts, merged with the old "Showing N" legend. Without the problems layer there is one plain count, as before. */}
       {data && (
-        <div data-float className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-(--map-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:transition-[left] desk:duration-300 desk:right-(--map-pad) desk:mx-auto desk:max-w-[1400px] desk:pointer-events-none desk:[&>*]:pointer-events-auto">
+        <div data-float className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-(--map-pad) desk:left-(--col-left) desk:transition-[left] desk:duration-300 desk:right-(--col-right) desk:pointer-events-none desk:[&>*]:pointer-events-auto">
           {hasProblems ? (
             !selected && !selectedProblem && <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
           ) : (
@@ -321,7 +329,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
           categories={data.categories}
           counts={byGroup}
           problemCounts={hasProblems ? byProblemStatus : undefined}
-          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--map-pad)+var(--page-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+var(--page-pad))]'} desk:right-(--map-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:transition-[left] desk:duration-300 desk:mx-auto desk:max-w-[1400px]`}
+          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--map-pad)+var(--page-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+var(--page-pad))]'} desk:right-(--col-right) desk:left-(--col-left) desk:transition-[left] desk:duration-300`}
         />
       )}
 
@@ -350,7 +358,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         role="region"
         data-float
         aria-label="Busiest localities"
-        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-(--page-pad) overflow-y-auto desk:absolute desk:right-(--map-pad) desk:left-[calc(var(--map-left)-var(--page-pad)+var(--group-gap))] desk:z-10 desk:mx-auto desk:max-w-[1400px] desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--map-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--map-pad))]'}`}
+        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-(--page-pad) overflow-y-auto desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--map-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--map-pad))]'}`}
       >
         {error ? (
           <p className="col-span-full text-incident">{error}</p>
@@ -404,7 +412,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
               categoryName={data?.categories.find((c) => c.code === item.problem.category)?.name}
               onClose={() => selectProblem(null)}
             />
-            {!shown.leaving && <ProblemTimelineCard key={`h-${item.problem.id}`} problem={item.problem} detail={item.detail} onSelectIncident={select} />}
+            {!shown.leaving && <ProblemTimelineCard key={`h-${item.problem.id}`} problem={item.problem} detail={item.detail} onSelectIncident={select} openReportId={openReportId} />}
           </>
         )
       )}
@@ -423,7 +431,7 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
       role="region"
       data-float
       aria-label="Incident details"
-      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-[calc(var(--map-base)-var(--page-pad)+var(--group-gap))] desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[360px] desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]"
+      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[360px] desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]"
     >
       <CardHeader className="flex flex-row items-start justify-between gap-2">
         <div>
