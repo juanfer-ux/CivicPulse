@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import { CaretDown, CaretLeft, CaretUp, ChatCircleDots, Sparkle, X } from '@phosphor-icons/react'
 import { ModuleDock } from '@/components/modules/ModuleDock'
 import { useModules } from '@/components/modules/ModulesProvider'
-import { rightUsed, DOCK_GAP, RIGHT_W } from '@/lib/modules'
+import { pushOf } from '@/lib/modules'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
 import { localityShapes } from '@/lib/localityShape'
@@ -188,7 +188,9 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   const problemDetail = detail && detail.id === selectedProblemId ? detail.data : null
   // The modules' right column (decision 0049, behind /?modules=1) pushes the map content: --dock-w feeds .map-col.
   const modules = useModules()
-  const dockW = modules.on && rightUsed(modules.placed, modules.follow, selectedProblem?.id ?? null) ? `${RIGHT_W + DOCK_GAP}px` : '0px'
+  const recurrenceOpen = !!selectedProblem && !selectedId // an open incident hides the recurrence panel
+  const dockW = modules.on ? pushOf(modules.placed, 'right', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
+  const dockL = modules.on ? pushOf(modules.placed, 'left', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
   // The map holds the loose incidents plus, while a problem is open, that problem's own incidents (drawn as tiny dots around its marker).
   const problemIncidents = useMemo(() => (selectedProblem ? (problemDetail?.incidents ?? []) : []), [selectedProblem, problemDetail])
   const problemIncidentIds = useMemo(() => problemIncidents.map((i) => i.id), [problemIncidents])
@@ -282,7 +284,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   const mapBase = 'calc(var(--agent-w) + var(--panel-gap))'
   // Both detail panels float over the map (owner, 2026-11-05), so the map and the controls over it never move for them.
   return (
-    <div className="contents map-col" data-history={item?.kind === 'problem' && !shown.leaving && HEADER !== '3' ? '' : undefined} data-rp={item?.kind === 'problem' && !shown.leaving && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': dockW, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
+    <div className="contents map-col" data-history={item?.kind === 'problem' && !shown.leaving && HEADER !== '3' ? '' : undefined} data-rp={item?.kind === 'problem' && !shown.leaving && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': `${dockW}px`, '--dock-l': `${dockL}px`, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -423,7 +425,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         )
       )}
       </div>
-      <ModuleDock problems={problems} openProblemId={selectedProblem?.id ?? null} openDetail={problemDetail} historyOpen={item?.kind === 'problem' && !shown.leaving && HEADER !== '3'} openKind={item?.kind === 'incident' ? 'incident' : selectedProblem ? 'recurrence' : null} />
+      <ModuleDock problems={problems} openProblemId={selectedProblem?.id ?? null} openDetail={problemDetail} openKind={item?.kind === 'incident' ? 'incident' : selectedProblem ? 'recurrence' : null} />
     </div>
   )
 }

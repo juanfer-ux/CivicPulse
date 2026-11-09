@@ -15,6 +15,11 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2,
  * Evidence for one incident: photos and videos. Files will arrive from the future Citizen Agent; until
  * then every row is a placeholder tile. Nothing here has been visually inspected by anyone or anything.
  */
+const PROTOTYPE_PLACEHOLDERS = true
+const placeholderPhotos = (incidentId: string, have: Media[]): Media[] => {
+  const n = 2 + ([...incidentId].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 97, 7) % 4) // 2 to 5
+  return Array.from({ length: n }, (_, k) => have[k] ?? { id: `placeholder-${incidentId}-${k}`, kind: 'photo' as const, duration_seconds: null, is_placeholder: true })
+}
 const CAROUSEL_MAX = 6 // a report card shows at most six items (owner, 2026-11-09)
 
 /** `carousel` (owner, 2026-11-09, the report card in the Occurrences History): 4:3 tiles at the full width, at most six, one at a time. The strip's own scrollbar is hidden because the arrows and the dots do its job. */
@@ -42,7 +47,9 @@ export function MediaGallery({ incidentId, carousel = false }: { incidentId: str
   if (loaded?.id !== incidentId) return <div className="aspect-video rounded-md bg-muted/40" aria-hidden />
 
   const photos = loaded.rows.filter((m) => m.kind === 'photo')
-  const tiles = (loaded.rows.length ? loaded.rows : [null]).slice(0, carousel ? CAROUSEL_MAX : undefined)
+  // The seed gives a report at most one placeholder photo, so the carousel would never show (owner, 2026-11-09): until real files exist, a report with fewer than two items shows two to five placeholder tiles, a number fixed by its id. Set PROTOTYPE_PLACEHOLDERS to false to show only what the database has.
+  const rows = carousel && PROTOTYPE_PLACEHOLDERS && loaded.rows.length < 2 ? placeholderPhotos(incidentId, loaded.rows) : loaded.rows
+  const tiles = (rows.length ? rows : [null]).slice(0, carousel ? CAROUSEL_MAX : undefined)
 
   if (carousel) {
     const shown = tiles

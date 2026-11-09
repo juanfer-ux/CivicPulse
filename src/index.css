@@ -367,7 +367,7 @@
 /* The map column (owner, 2026-11-09): everything that floats on the map (stat cards, filters, chips, answer banner, detail panels, history cards) sits inside ONE column, at most --map-max (1,400 px) wide and centered in the map area between the agent panel group and the map's right padding. Put `map-col` on the element that sets --map-left (Dashboard's root) and position floating things with `desk:left-(--col-left)` and `desk:right-(--col-right)`; never give a floating panel its own max width. Map controls (zoom, attribution) stay at the map's edge. */
 .map-col {
   --map-max: 1400px;
-  --col-l: calc(var(--map-left) - var(--page-pad) + var(--group-gap));
+  --col-l: calc(var(--map-left) - var(--page-pad) + var(--group-gap) + var(--dock-l, 0px));
   --col-w: min(var(--map-max), 100% - var(--col-l) - var(--map-pad) - var(--dock-w, 0px));
   --col-left: calc(var(--col-l) + (100% - var(--col-l) - var(--map-pad) - var(--dock-w, 0px) - var(--col-w)) / 2);
   --col-right: calc(var(--map-pad) + var(--dock-w, 0px) + (100% - var(--col-l) - var(--map-pad) - var(--dock-w, 0px) - var(--col-w)) / 2);
@@ -418,6 +418,7 @@
 /* The zoom control (owner, 2026-11-07; MapZoomControl.tsx): home, plus, a vertical slider, minus. It sits where MapLibre's own control was (77 px above the bottom, 14 px from the right) and rides above the history cards like it did. */
 .map-zoom { bottom: 77px; transition: bottom 0.3s, right 0.3s; }
 .map-col .map-zoom { right: calc(14px + var(--dock-w, 0px)); }
+@media (min-width: 90rem) { .map-col:not([data-history]) .map-zoom { bottom: var(--map-pad); } } /* the zoom control sits at the very bottom on desktop (owner, 2026-11-09): the on-map credit is gone from that corner */
 @media (min-width: 90rem) { .map-col[data-rp] .map-zoom { right: calc(var(--col-right) + 360px + 12px); } } /* a recurrence is open (owner, 2026-11-09): the history column is flush right and the zoom control sits inside the map, left of it */ /* the modules' right column (decision 0049) sits left of the zoom control */
 @media (min-width: 90rem) { [data-history] .map-zoom { bottom: calc(77px + 384px); } }
 .zoom-slider { appearance: none; -webkit-appearance: none; writing-mode: vertical-lr; direction: rtl; width: 29px; height: 100%; margin: 0; background: transparent; cursor: pointer; }

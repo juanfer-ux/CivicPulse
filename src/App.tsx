@@ -91,7 +91,7 @@ export default function App() {
           <Dashboard highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} agentOff={agentOff} onAgentOff={setAgentOff} focus={focus} onRows={setRows} onSelection={setSelection}>
             {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
-              <InvestigatePanel chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} />
+              <InvestigatePanel chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} recurrenceId={selection?.kind === 'recurrence' ? selection.id : null} onOpenRecurrence={open('recurrence')} />
             </div>
           </Dashboard>
         </div>
