@@ -99,6 +99,8 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
   const M3 = HEADER === '3' // option 3: a 300 px left column (numbers + occurrences history) and the timeline along the bottom
   return (
     <div data-float={M3 ? undefined : true} className={M3 ? 'flex shrink-0 flex-col gap-2 desk:contents' : 'flex shrink-0 flex-col gap-2 desk:absolute desk:right-(--col-right) desk:bottom-(--map-pad) '+'desk:left-(--col-left) desk:z-20 desk:h-[360px] desk:flex-row desk:gap-3'}>
+    {/* The timeline card is gone in the default layout (owner, 2026-11-09): the timeline is a module now, docked from the sidebar (decision 0049). */}
+    {!M3 && (
     <Card role="region" aria-label="Timeline" data-float={M3 ? true : undefined} className={`min-w-0 gap-0 overflow-hidden bg-card/95 py-0 ${M3 ? 'desk:absolute desk:right-(--col-right) desk:bottom-(--map-pad) desk:left-[calc(var(--col-left)+360px+12px)] desk:z-20 desk:h-[360px]' : 'desk:h-full desk:flex-1'} desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]`}>
     <ScrollArea className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">
@@ -108,7 +110,8 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
       </section>
     </ScrollArea>
     </Card>
-    <Card role="region" aria-label="Occurrences history" data-float={M3 ? true : undefined} className={`gap-0 overflow-hidden bg-card/95 py-0 ${M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:left-(--col-left) desk:top-[calc(var(--map-pad)+var(--banner-offset,0px)+96px+12px)] desk:z-20 desk:w-[360px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]`}>
+    )}
+    <Card role="region" aria-label="Occurrences history" data-float={M3 ? true : undefined} className={`gap-0 overflow-hidden bg-card/95 py-0 ${M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:right-(--col-right) desk:top-[calc(var(--map-pad)+var(--banner-offset,0px)+96px+12px)] desk:z-20 desk:w-[360px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]`}>
     {M3 && <StatList problem={problem} />}
     <ScrollArea viewportRef={list} className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">

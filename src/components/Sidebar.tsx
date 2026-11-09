@@ -8,6 +8,7 @@ import wordmark from '@/assets/logo-wordmark.svg'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ModulesSection } from '@/components/modules/ModulesSection'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useAuth } from '@/lib/auth'
 import { GROUPS, PROBLEM_STATUS, PROBLEM_STATUSES, type Group, type ProblemStatus } from '@/lib/statusColors'
@@ -273,10 +274,14 @@ function AccountMenu({ onSignOut, side, avatar }: { onSignOut: () => void; side:
         </Button>
       )}
       {open && (
-        <div role="menu" className={`absolute z-40 w-40 rounded-sm border bg-card p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
+        <div role="menu" className={`absolute z-40 w-48 rounded-sm border bg-card p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
           <Button role="menuitem" variant="ghost" className="h-8 w-full justify-start gap-2 px-3 hover:bg-sidebar" onClick={onSignOut}>
             <SignOut className="size-5 shrink-0" /> Sign out
           </Button>
+          {/* The map credit (required by OpenStreetMap and CARTO) moved here from the map's corner on desktop (owner, 2026-11-09). */}
+          <p className="border-t px-3 pt-2 pb-1 text-meta text-muted-foreground">
+            Map data © <a className="underline" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors, © <a className="underline" href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>
+          </p>
         </div>
       )}
     </div>
@@ -331,6 +336,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                 <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
                 Explore
               </Button>
+              <ModulesSection />
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
               <div className="flex flex-col gap-2.5 py-2">

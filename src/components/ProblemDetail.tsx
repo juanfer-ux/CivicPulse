@@ -87,7 +87,7 @@ export function ProblemDetail({
   )
 }
 
-const stats = (p: ProblemRow) => [
+export const stats = (p: ProblemRow) => [
   { Icon: Stack, label: 'Occurrences', value: String(p.occurrences_n) },
   { Icon: ArrowsClockwise, label: 'Returns', value: String(p.recurrences_n) },
   { Icon: FileText, label: 'Reports', value: String(p.reports_n) },
