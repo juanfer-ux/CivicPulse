@@ -55,7 +55,7 @@ export function ModulesSection() {
       {(Object.keys(MODULES) as ModuleType[]).map((t) => {
         const Icon = ICON[t]
         return (
-          <div key={t} role="button" tabIndex={0} aria-label={`${MODULES[t].title}: drag to a zone on the map`} onPointerDown={startDrag(t)} className="flex touch-none cursor-grab select-none items-center gap-2 rounded-sm px-1 py-1.5 text-body-sm hover:bg-(--neutral-800) active:cursor-grabbing">
+          <div key={t} role="button" tabIndex={0} aria-label={`${MODULES[t].title}: drag to an area on the map`} onPointerDown={startDrag(t)} className="flex touch-none cursor-grab select-none items-center gap-2 rounded-sm px-1 py-1.5 text-body-sm hover:bg-(--neutral-800) active:cursor-grabbing">
             <DotsSixVertical className="size-3.5 text-(--neutral-300)" aria-hidden />
             <Icon weight="regular" className="size-4 text-(--neutral-200)" aria-hidden />
             <span className="flex-1 truncate">{MODULES[t].title}</span>

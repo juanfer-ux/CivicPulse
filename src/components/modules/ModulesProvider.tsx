@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
-import { MODULES, MODULES_ON, ZONES, canDock, place, type ModuleType, type Placed } from '@/lib/modules'
+import { MODULES, MODULES_ON, canDock, insertPos, place, type Area, type ModuleType, type Placed } from '@/lib/modules'
 
 /**
  * The modules' shared state (decision 0049, behind /?modules=1): what is docked where, the follow / stay option, the drag in progress and the case that is open. The sidebar's Modules section starts a drag; the dock (in Dashboard) shows the zones and takes the drop. Kept in memory for now (saving comes later). Safe to use without the provider (tests): everything is off.
@@ -15,13 +15,26 @@ type Ctx = {
   open: Open
   setOpen: (o: Open) => void
   message: string
+  /** The element in the right column where the recurrence's history card is shown (it shrinks when modules dock below it). */
+  rightSlot: HTMLElement | null
+  setRightSlot: (el: HTMLElement | null) => void
   startDrag: (type: ModuleType) => (e: ReactPointerEvent) => void
-  dockAt: (zoneId: string | null | undefined, type: ModuleType) => void
+  dockAt: (area: Area | null | undefined, type: ModuleType, pos?: number) => void
   remove: (p: Placed) => void
 }
-const OFF: Ctx = { on: false, placed: [], follow: true, setFollow: () => {}, drag: null, open: { id: null, kind: null }, setOpen: () => {}, message: '', startDrag: () => () => {}, dockAt: () => {}, remove: () => {} }
+const OFF: Ctx = { on: false, placed: [], follow: true, setFollow: () => {}, drag: null, open: { id: null, kind: null }, setOpen: () => {}, message: '', rightSlot: null, setRightSlot: () => {}, startDrag: () => () => {}, dockAt: () => {}, remove: () => {} }
 const ModulesContext = createContext<Ctx>(OFF)
 export const useModules = () => useContext(ModulesContext)
+
+/** Where a drop lands in an area: among the items already there (each carries data-pos; the module being moved does not count), by the pointer's position along the area (x for the bottom strip, y for a column). */
+function dropPos(area: Area, type: ModuleType, x: number, y: number) {
+  const box = document.querySelector(`[data-col="${area}"]`)
+  const items = [...(box?.querySelectorAll(':scope > [data-pos]') ?? [])].filter((el) => (el as HTMLElement).dataset.type !== type).map((el) => {
+    const r = el.getBoundingClientRect()
+    return { pos: Number((el as HTMLElement).dataset.pos), mid: area === 'bottom' ? r.left + r.width / 2 : r.top + r.height / 2 }
+  })
+  return insertPos(items, area === 'bottom' ? x : y)
+}
 
 export function ModulesProvider({ children }: { children: ReactNode }) {
   const [placed, setPlaced] = useState<Placed[]>([])
@@ -29,18 +42,18 @@ export function ModulesProvider({ children }: { children: ReactNode }) {
   const [drag, setDrag] = useState<Drag | null>(null)
   const [open, setOpen] = useState<Open>({ id: null, kind: null })
   const [message, setMessage] = useState('')
+  const [rightSlot, setRightSlot] = useState<HTMLElement | null>(null)
 
   const dockAt = useCallback(
-    (zoneId: string | null | undefined, type: ModuleType) => {
-      const zone = ZONES.find((z) => z.id === zoneId)
-      if (!zone) return
+    (area: Area | null | undefined, type: ModuleType, pos?: number) => {
+      if (!area) return
       if (!canDock(type, open.kind)) return setMessage('Recurrence modules dock on a recurrence: open one first.')
       setMessage('')
-      setPlaced((list) => place(list, zone, type, open.id))
+      setPlaced((list) => place(list, area, type, open.id, pos))
     },
     [open],
   )
-  /** Pointer-events drag (mouse and touch, no library), the same pattern as the sidebar's resize handle; the dock's zones carry data-zone. */
+  /** Pointer-events drag (mouse and touch, no library), the same pattern as the sidebar's resize handle; the docking areas carry data-area. */
   const startDrag = useCallback(
     (type: ModuleType) => (e: ReactPointerEvent) => {
       e.preventDefault()
@@ -51,7 +64,10 @@ export function ModulesProvider({ children }: { children: ReactNode }) {
         window.removeEventListener('pointermove', move)
         window.removeEventListener('pointerup', up)
         window.removeEventListener('pointercancel', up)
-        if (u.type === 'pointerup') dockAt(document.elementsFromPoint(u.clientX, u.clientY).find((el) => (el as HTMLElement).dataset?.zone)?.getAttribute('data-zone'), type)
+        if (u.type === 'pointerup') {
+          const area = document.elementsFromPoint(u.clientX, u.clientY).find((el) => (el as HTMLElement).dataset?.area)?.getAttribute('data-area') as Area | undefined
+          dockAt(area, type, area ? dropPos(area, type, u.clientX, u.clientY) : undefined)
+        }
         setDrag(null)
       }
       window.addEventListener('pointermove', move)
@@ -61,7 +77,7 @@ export function ModulesProvider({ children }: { children: ReactNode }) {
     [dockAt],
   )
   const remove = useCallback((p: Placed) => setPlaced((list) => list.filter((x) => x !== p)), [])
-  const value = useMemo<Ctx>(() => ({ on: MODULES_ON, placed, follow, setFollow, drag, open, setOpen, message, startDrag, dockAt, remove }), [placed, follow, drag, open, message, startDrag, dockAt, remove])
+  const value = useMemo<Ctx>(() => ({ on: MODULES_ON, placed, follow, setFollow, drag, open, setOpen, message, rightSlot, setRightSlot, startDrag, dockAt, remove }), [placed, follow, drag, open, message, rightSlot, startDrag, dockAt, remove])
   return (
     <ModulesContext.Provider value={value}>
       {children}

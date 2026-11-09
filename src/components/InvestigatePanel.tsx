@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { ModuleOffer } from '@/components/modules/ModuleOffer'
 import { SUGGESTIONS, WORTH_INVESTIGATING, answer, type Answer, type Area } from '@/lib/agent'
 import { fetchLocalities } from '@/lib/incidents'
 
@@ -15,7 +16,7 @@ const AnswerChart = lazy(loadChart)
 export type Turn = { question: string; result?: Answer; error?: string }
 
 /** `turns` are this conversation's questions and answers; the app keeps one list per conversation (the sidebar's Investigations). `onTurns` edits the conversation with this id, even if the person has switched to another one meanwhile. */
-export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea }: { chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
+export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea, recurrenceId = null, onOpenRecurrence }: { recurrenceId?: string | null; onOpenRecurrence?: (id: string) => void; chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
   const setTurns = (edit: (t: Turn[]) => Turn[]) => onTurns(chatId, edit)
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
@@ -34,7 +35,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
     setTurns((t) => [...t, { question: q }])
     let turn: Turn
     try {
-      const result = await answer(q, await fetchLocalities())
+      const result = await answer(q, await fetchLocalities(), { recurrenceId })
       onHighlight(result.highlightIds, result.areas, result.spots)
       turn = { question: q, result }
     } catch (e) {
@@ -104,7 +105,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
               <Question text={t.question} />
               {!t.result && !t.error && <p className="text-muted-foreground">Querying…</p>}
               {t.error && <p className="text-incident">{t.error}</p>}
-              {t.result && <AnswerView result={t.result} shown={t.result.highlightIds === highlightIds} onFocusArea={onFocusArea} onZoomArea={onZoomArea} onToggle={(on) => onHighlight(on ? t.result!.highlightIds : [], on ? t.result!.areas : [], on ? t.result!.spots : [])} />}
+              {t.result && <AnswerView result={t.result} shown={t.result.highlightIds === highlightIds} onFocusArea={onFocusArea} onZoomArea={onZoomArea} onPickRecurrence={onOpenRecurrence} onToggle={(on) => onHighlight(on ? t.result!.highlightIds : [], on ? t.result!.areas : [], on ? t.result!.spots : [])} />}
             </div>
           ))}
           <div ref={end} />
@@ -168,7 +169,7 @@ export function Bars({ bars, onFocus, onPick }: { bars: Answer['bars']; onFocus?
   )
 }
 
-export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea }: { result: Answer; shown: boolean; onToggle: (on: boolean) => void; onFocusArea?: (code: number | null) => void; onZoomArea?: (code: number) => void }) {
+export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, onPickRecurrence }: { result: Answer; shown: boolean; onToggle: (on: boolean) => void; onFocusArea?: (code: number | null) => void; onZoomArea?: (code: number) => void; onPickRecurrence?: (id: string) => void }) {
   // Only the answer that is on the map can point at it.
   const link = shown && result.areas?.length ? { onFocus: onFocusArea, onPick: onZoomArea } : {}
   return (
@@ -177,7 +178,7 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea }:
       {result.bars.length > 0 &&
         (result.chart ? (
           <Suspense fallback={null}>
-            <AnswerChart kind={result.chart} bars={result.bars} {...link} />
+            <AnswerChart kind={result.chart} bars={result.bars} onPickRecurrence={onPickRecurrence} {...link} />
           </Suspense>
         ) : (
           <Bars bars={result.bars} {...link} />
@@ -209,6 +210,9 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea }:
           </li>
         ))}
       </ul>
+      {result.offers?.map((o) => (
+        <ModuleOffer key={`${o.type}-${o.problemId}`} offer={o} />
+      ))}
       {result.highlightIds.length > 0 && (
         <Button size="sm" variant="ghost" className="self-start" onClick={() => onToggle(!shown)}>
           {shown ? 'Clear map highlight' : 'Show on map'}

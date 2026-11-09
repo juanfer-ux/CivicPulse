@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import { useModules } from '@/components/modules/ModulesProvider'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -96,7 +98,9 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
     )
   }
 
-  const M3 = HEADER === '3' // option 3: a 300 px left column (numbers + occurrences history) and the timeline along the bottom
+  const M3 = HEADER === '3' // option 3: a 360 px right column (numbers + occurrences history); the timeline is a module
+  const { rightSlot } = useModules() // with /?modules=1 the history card lives in the right column, above the modules docked there, and shrinks for them
+  const inSlot = M3 && !!rightSlot
   return (
     <div data-float={M3 ? undefined : true} className={M3 ? 'flex shrink-0 flex-col gap-2 desk:contents' : 'flex shrink-0 flex-col gap-2 desk:absolute desk:right-(--col-right) desk:bottom-(--map-pad) '+'desk:left-(--col-left) desk:z-20 desk:h-[360px] desk:flex-row desk:gap-3'}>
     {/* The timeline card is gone in the default layout (owner, 2026-11-09): the timeline is a module now, docked from the sidebar (decision 0049). */}
@@ -111,7 +115,8 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
     </ScrollArea>
     </Card>
     )}
-    <Card role="region" aria-label="Occurrences history" data-float={M3 ? true : undefined} className={`gap-0 overflow-hidden bg-card/95 py-0 ${M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:right-(--col-right) desk:top-[calc(var(--map-pad)+var(--banner-offset,0px)+96px+12px)] desk:z-20 desk:w-[360px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]`}>
+    <PortalTo target={inSlot ? rightSlot : null}>
+    <Card role="region" aria-label="Occurrences history" data-float={M3 && !inSlot ? true : undefined} className={`gap-0 overflow-hidden bg-card/95 py-0 ${inSlot ? 'desk:pointer-events-auto desk:h-full desk:w-full' : M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:right-(--col-right) desk:top-[calc(var(--map-pad)+var(--banner-offset,0px)+96px+12px)] desk:z-20 desk:w-[360px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]`}>
     {M3 && <StatList problem={problem} />}
     <ScrollArea viewportRef={list} className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">
@@ -160,6 +165,12 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
       </section>
     </ScrollArea>
     </Card>
+    </PortalTo>
     </div>
   )
+}
+
+/** Renders its children where they are, or inside `target` (the right column's slot) when there is one. */
+function PortalTo({ target, children }: { target: HTMLElement | null; children: ReactNode }) {
+  return target ? createPortal(children, target) : <>{children}</>
 }

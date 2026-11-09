@@ -10,7 +10,7 @@ vi.mock('@/lib/supabase', () => ({
   },
 }))
 
-const { SUGGESTIONS, WORTH_INVESTIGATING, answer, plan } = await import('@/lib/agent')
+const { SUGGESTIONS, WORTH_INVESTIGATING, answer, plan, rankForAttention } = await import('@/lib/agent')
 
 const localities: Locality[] = [
   { code: 1, name: 'Usaquén' },
@@ -23,12 +23,19 @@ const ago = (days: number) => new Date(Date.now() - days * 86_400_000).toISOStri
 describe('plan (mock planner)', () => {
   it('routes the suggested questions to the right investigation', () => {
     expect(SUGGESTIONS.map((q) => plan(q, localities)?.kind)).toEqual([
+      'attention',
       'ranking',
       'time',
       'recurring',
       'candidates',
-      'ranking',
     ])
+  })
+
+  it('sends a question about recurrences that need attention to the ranking of recurrences, and a timeline request to the timeline', () => {
+    expect(plan('Which parking obstruction recurrences need the most attention?', localities)).toEqual({ kind: 'attention', category: 'parking' })
+    expect(plan('I would like to see the occurrences in a different way', localities)?.kind).toBe('timeline')
+    expect(plan('Show me a timeline of this recurrence', localities)?.kind).toBe('timeline')
+    expect(plan('Which locations have repeated parking obstruction reports?', localities)?.kind).toBe('recurring') // unchanged
   })
 
   it('routes the two Worth investigating cards to the recurring investigation, each with its category', () => {
@@ -188,5 +195,22 @@ describe('text casing', () => {
     expect(titleCase('human rejected')).toBe('Human Rejected')
     expect(titleCase('Access Ramp blocked by a parked vehicle')).toBe('Access Ramp Blocked by a Parked Vehicle')
     expect(sentenceCase('synthetic report: car blocking access ramp. second one')).toBe('Synthetic report: Car blocking access ramp. Second one')
+  })
+})
+
+describe('recurrences that need attention', () => {
+  const row = (id: string, status: string, recurrences_n: number, last_seen: string, category = 'parking') =>
+    ({ id, status, recurrences_n, last_seen, category, reference: id, title: id, occurrences_n: recurrences_n + 1, reports_n: 5, interventions_n: 0 }) as never
+  it('ranks Active before Monitoring, then by returns, then by the latest report, and skips the rest', () => {
+    const rows = [row('m-many', 'monitoring', 9, '2026-10-30'), row('a-few', 'active', 1, '2026-10-01'), row('a-many-old', 'active', 4, '2026-08-01'), row('a-many-new', 'active', 4, '2026-10-20'), row('resolved', 'resolved', 20, '2026-10-31'), row('dump', 'active', 30, '2026-10-31', 'illegal_dumping')]
+    expect(rankForAttention(rows, 'parking', 10).map((r) => r.id)).toEqual(['a-many-new', 'a-many-old', 'a-few', 'm-many'])
+    expect(rankForAttention(rows, 'parking')).toHaveLength(3) // the top three by default
+    expect(rankForAttention(rows, null, 1)[0].id).toBe('dump') // no category: every category
+  })
+
+  it('asks for a recurrence first when none is open', async () => {
+    const a = await answer('I would like to see a timeline', localities)
+    expect(a.offers).toBeUndefined()
+    expect(a.text).toMatch(/Pick a recurrence first/)
   })
 })

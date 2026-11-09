@@ -108,6 +108,35 @@ function Rows({ bars }: { bars: Answer['bars'] }) {
   )
 }
 
+/** Recurrences the agent ranked (owner, 2026-11-09): numbered rows like the candidates', each a button that opens that recurrence on the map; the bar and the count are its returns (occurrences minus one). */
+function Recurrences({ bars, onPick }: { bars: Answer['bars']; onPick?: (id: string) => void }) {
+  const max = Math.max(1, ...bars.map((b) => b.value))
+  return (
+    <ul className="flex flex-col" aria-label={summary('Returns per recurrence', bars)}>
+      {bars.map((b, i) => (
+        <li key={b.problemId ?? b.label} className={i ? 'border-t border-(--neutral-600)' : ''}>
+          <button type="button" onClick={() => b.problemId && onPick?.(b.problemId)} className="-mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-sm px-2 py-2.5 text-left hover:bg-(--neutral-800) focus-visible:bg-(--neutral-800)">
+            <span className="grid size-7 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--neutral-100)">{i + 1}</span>
+            <span className="flex min-w-0 flex-1 flex-col gap-1">
+              <span className="truncate text-body-sm text-foreground" title={b.label}>
+                {b.label}
+              </span>
+              {b.sub && <span className="truncate text-meta text-muted-foreground">{b.sub}</span>}
+              <span className="h-1 rounded-full bg-(--neutral-600)">
+                <span className="block h-full rounded-full" style={{ width: `${(b.value / max) * 100}%`, background: COLOR }} />
+              </span>
+            </span>
+            <span className="flex w-14 flex-col items-end">
+              <span className="tabular-nums text-foreground">{b.value}</span>
+              <span className="text-meta text-muted-foreground">returns</span>
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function Time({ bars }: { bars: Answer['bars'] }) {
   return (
     <ChartContainer config={config} className="h-[180px] w-full" role="img" aria-label={summary('Incidents by time of day', bars)}>
@@ -135,10 +164,10 @@ function Period({ bars }: { bars: Answer['bars'] }) {
   )
 }
 
-export default function AnswerChart({ kind, bars, onFocus, onPick }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars'] } & Link) {
+export default function AnswerChart({ kind, bars, onFocus, onPick, onPickRecurrence }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars']; onPickRecurrence?: (id: string) => void } & Link) {
   return (
     <div className="rounded-[6px] border-[0.5px] border-(--neutral-500) bg-(--neutral-700) p-4">
-      {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : kind === 'dots' ? <Dots bars={bars} /> : kind === 'rows' ? <Rows bars={bars} /> : kind === 'donut' ? <Donut bars={bars} onFocus={onFocus} onPick={onPick} /> : <BarList bars={bars} onFocus={onFocus} onPick={onPick} />}
+      {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : kind === 'dots' ? <Dots bars={bars} /> : kind === 'rows' ? <Rows bars={bars} /> : kind === 'recurrences' ? <Recurrences bars={bars} onPick={onPickRecurrence} /> : kind === 'donut' ? <Donut bars={bars} onFocus={onFocus} onPick={onPick} /> : <BarList bars={bars} onFocus={onFocus} onPick={onPick} />}
     </div>
   )
 }

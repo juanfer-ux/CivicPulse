@@ -2,6 +2,9 @@ import { supabase } from '@/lib/supabase'
 import type { Locality } from '@/lib/incidents'
 import type { Draft } from '@/lib/recommendations'
 import { timeBlockLabel } from '@/lib/utils'
+import { fetchLinkedIncidentIds, fetchProblems, type ProblemRow } from '@/lib/problems'
+import type { Shape } from '@/lib/modules'
+import type { ProblemStatus } from '@/lib/statusColors'
 
 /**
  * Civic Operations Agent, MOCK MODE.
@@ -15,6 +18,9 @@ export interface Bar {
   value: number
   /** Locality code when the bar is a locality: hovering it lights its outline on the map and clicking it zooms there. */
   code?: number
+  /** A recurrence row (chart 'recurrences'): the line under the title (reference and status) and the recurrence it opens when picked. */
+  sub?: string
+  problemId?: string
 }
 export interface Evidence {
   tool: string
@@ -34,13 +40,31 @@ export interface Answer {
   limitations: string[]
   highlightIds: string[]
   /** Which chart draws `bars`: localities of one category (donut, the smaller ones grouped as "Others"), localities of all categories (bar list), the day in 4-hour blocks (area), two periods (two columns), repeated locations (dot matrix) or tomorrow's candidates (numbered rows with a thin bar). Without it, the plain bar list. */
-  chart?: 'donut' | 'barlist' | 'time' | 'period' | 'dots' | 'rows'
+  chart?: 'donut' | 'barlist' | 'time' | 'period' | 'dots' | 'rows' | 'recurrences'
   /** Localities to outline and shade on the map (code, and a value that sets the shade). An answer about localities shows these instead of circles. */
   areas?: Area[]
   /** Repeated locations: the incident ids of each spot. The map draws one radius around each spot's reports, not the locality outlines. */
   spots?: string[][]
   /** Set when the answer is a recommendation a human can send for review. */
   proposal?: Draft
+  /** Ready-made panels the agent suggests for this answer (decision 0049): a deterministic suggestion the person accepts, never UI the agent invents. */
+  offers?: Offer[]
+}
+
+/** A module the agent offers: which one, for which recurrence, in which shape (the zone shape it suits best) and why. */
+export interface Offer {
+  type: 'timeline'
+  label: string
+  reason: string
+  shape: Shape
+  problemId: string
+  reference: string
+  status: ProblemStatus
+}
+
+/** What the planner may know about the screen: the recurrence that is open (from the map or the list). */
+export interface AskContext {
+  recurrenceId?: string | null
 }
 
 /** category: a code from incident_categories, or null for "all categories the user can see". */
@@ -50,6 +74,8 @@ type Plan = { category: string | null } & (
   | { kind: 'compare'; locality: Locality | null; days: number }
   | { kind: 'recurring'; days: number | null }
   | { kind: 'candidates' }
+  | { kind: 'attention' }
+  | { kind: 'timeline' }
 )
 
 /** Display names, mirroring incident_categories. */
@@ -76,11 +102,11 @@ const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').t
 
 /** The Quick questions on the empty Investigate and Ask panel (owner's Figma, 2026-11-05: five; the "increased in Chapinero" one is out). The planner still understands it. */
 export const SUGGESTIONS = [
+  'Which parking obstruction recurrences need the most attention?',
   'Which localities have the most parking obstruction incidents?',
   'When do parking obstruction incidents occur most frequently in Usaquén?',
   'Which locations have repeated parking obstruction reports?',
   'Which area might deserve further investigation tomorrow evening?',
-  'Which localities have the most illegal dumping incidents?',
 ]
 
 /** The two Worth investigating cards: a title and the question each one asks (the picture is a placeholder for now). */
@@ -100,6 +126,8 @@ export function plan(question: string, localities: Locality[]): Plan | null {
   const parking = /\b(parking|parked|obstruction\w*|obstructive|blocking)\b/.test(q)
   const category = dumping && !parking ? 'illegal_dumping' : parking && !dumping ? 'parking' : null
 
+  if (/\battention\b/.test(q) && /\brecurr\w*/.test(q)) return { kind: 'attention', category }
+  if (/\b(timeline|different way|another way|see (the )?occurrences|chart (of )?(the )?occurrences)\b/.test(q)) return { kind: 'timeline', category }
   if (/\b(tomorrow|tonight|next (shift|evening)|deserve\w*|recommend\w*|prioriti\w+)\b/.test(q)) return { kind: 'candidates', category }
   if (/\b(recurr\w*|repeat\w*|same (place|location))\b|which locations/.test(q)) return { kind: 'recurring', days, category }
   if (/\b(increase\w*|decrease\w*|chang\w+|trend\w*|compar\w+|versus|vs)\b/.test(q)) {
@@ -177,10 +205,63 @@ async function references(ids: string[]) {
   return (data ?? []).map((r) => r.reference as string)
 }
 
+// ───────── Recurrences (read from the problems layer, ranked by a stated rule: deterministic code, no model) ─────────
+const ATTENTION_RANK: Partial<Record<ProblemStatus, number>> = { active: 0, monitoring: 1 }
+const ATTENTION_COUNT = 3
+
+/** The recurrences that need the most attention: Active before Monitoring, then the most returns (occurrences minus one), then the latest report. A rule the person can read, not a risk score. */
+export function rankForAttention(rows: ProblemRow[], category: string | null, count = ATTENTION_COUNT): ProblemRow[] {
+  return rows
+    .filter((r) => (category ? r.category === category : true) && r.status in ATTENTION_RANK)
+    .sort((a, b) => ATTENTION_RANK[a.status]! - ATTENTION_RANK[b.status]! || b.recurrences_n - a.recurrences_n || (b.last_seen ?? '').localeCompare(a.last_seen ?? ''))
+    .slice(0, count)
+}
+
+async function attention(category: string | null): Promise<Answer> {
+  const rows = rankForAttention(await fetchProblems(), category)
+  if (!rows.length) {
+    return { text: 'No active or monitored recurrences in your scope.', bars: [], evidence: [], limitations: [SYNTHETIC], highlightIds: [] }
+  }
+  const linked = await fetchLinkedIncidentIds()
+  const ids = rows.flatMap((r) => [...linked].filter(([, pid]) => pid === r.id).map(([iid]) => iid))
+  const top = rows[0]
+  return {
+    text:
+      `${rows.length === 1 ? 'One recurrence needs' : `${rows.length} recurrences need`} the most attention. ` +
+      `${top.title} comes first: ${top.recurrences_n} returns, ${top.occurrences_n} occurrences, ${top.reports_n} reports, last reported ${top.last_seen ? date(top.last_seen) : 'never'}. Pick one to open it on the map.`,
+    bars: rows.map((r) => ({ label: r.title, value: r.recurrences_n, sub: `${r.reference} · ${titleCase(r.status)}`, problemId: r.id })),
+    chart: 'recurrences',
+    evidence: [{ tool: 'recurrence ranking (status, returns, latest report)', scope: `${rows.length} recurrences`, period: 'all available data', incidentCount: rows.reduce((n, r) => n + r.reports_n, 0), references: rows.map((r) => r.reference) }],
+    limitations: ['Ranked by status (Active before Monitoring), then by returns (occurrences minus one), then by the latest report: a rule you can read, not a risk score.', 'A return counts occurrences, never reports: many reports of one event are one occurrence.', SYNTHETIC],
+    highlightIds: ids,
+  }
+}
+
+/** The follow-up about the open recurrence: what its history looks like, and the offer of a timeline module (decision 0049). The offer's shape is the zone shape that suits the data: many reports read better wide. */
+async function timelineAnswer(recurrenceId: string | null): Promise<Answer> {
+  if (!recurrenceId) {
+    return { text: 'Pick a recurrence first: open one on the map or from the list, then ask again and I can show its occurrences as a timeline.', bars: [], evidence: [], limitations: ['I do not guess: without an open recurrence there is no history to draw.'], highlightIds: [] }
+  }
+  const r = (await fetchProblems()).find((x) => x.id === recurrenceId)
+  if (!r) return { text: 'I cannot find that recurrence in your scope.', bars: [], evidence: [], limitations: [], highlightIds: [] }
+  const wide = r.reports_n > 8
+  const shape: Shape = wide ? '4:2' : '4:3'
+  return {
+    text: `${r.title} (${r.reference}) has ${r.occurrences_n} occurrences, ${r.recurrences_n} returns and ${r.reports_n} reports${r.first_seen && r.last_seen ? `, from ${date(r.first_seen)} to ${date(r.last_seen)}` : ''}, with ${r.interventions_n} interventions. A timeline puts each occurrence, its reports and the interventions on one time axis.`,
+    bars: [],
+    evidence: [{ tool: 'recurrence history (occurrences, reports, interventions)', scope: r.reference, period: r.first_seen && r.last_seen ? `${date(r.first_seen)} to ${date(r.last_seen)}` : 'all available data', incidentCount: r.reports_n, references: [r.reference] }],
+    limitations: ['The timeline only shows what is recorded; a gap between occurrences does not mean the problem is solved.', SYNTHETIC],
+    highlightIds: [],
+    offers: [{ type: 'timeline', label: `Draw a ${wide ? 'wide ' : ''}timeline of these occurrences?`, reason: wide ? `Many reports (${r.reports_n}), so it reads best in the wide strip along the bottom (4:2).` : 'A short history fits the 4:3 zone in the right column.', shape, problemId: r.id, reference: r.reference, status: r.status }],
+  }
+}
+
 // ───────── Answers ─────────
-export async function answer(question: string, localities: Locality[]): Promise<Answer> {
+export async function answer(question: string, localities: Locality[], ctx: AskContext = {}): Promise<Answer> {
   const p = plan(question, localities)
   if (!p) return unsupported()
+  if (p.kind === 'attention') return withCategory(await attention(p.category), p.category)
+  if (p.kind === 'timeline') return timelineAnswer(ctx.recurrenceId ?? null)
   if (p.kind === 'candidates') return candidates(p.category) // names its own category
   const result =
     p.kind === 'ranking'
