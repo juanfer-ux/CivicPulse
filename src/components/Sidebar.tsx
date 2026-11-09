@@ -25,9 +25,21 @@ export type SidebarSelection = { kind: 'recurrence' | 'incident'; id: string }
 type Chats = { chats: Chat[]; activeId: number; exploring?: boolean; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void; chatItems?: ChatItems; recurrences?: SidebarRecurrence[]; incidents?: SidebarIncident[]; onOpenRecurrence?: (id: string) => void; onOpenIncident?: (id: string) => void; selected?: SidebarSelection | null }
 
 /** The items of a section in its view: one list, or grouped by status, ordered as the view says. */
-function ViewList<T extends { id: string | number; created?: number; updated?: number }>({ items, view, group, order, labels, primary, row }: { items: T[]; view: View; group: (t: T) => string; order: string[]; labels: Record<string, string>; primary: string; row: (t: T) => ReactNode }) {
+function ViewList<T extends { id: string | number; created?: number; updated?: number }>({ items, view, group, order, labels, primary, row, limit }: { items: T[]; view: View; group: (t: T) => string; order: string[]; labels: Record<string, string>; primary: string; row: (t: T) => ReactNode; limit?: number }) {
+  // `limit`: only that many rows show (owner, 2026-11-09: the Incidents list shows 10) and a small control shows all of them.
+  const [all, setAll] = useState(false)
   const sorted = sortItems(items, view)
-  return view.group === 'status' ? <Groups items={sorted} newest group={group} order={order} labels={labels} primary={primary} row={row} /> : <>{sorted.map(row)}</>
+  const shown = limit && !all ? sorted.slice(0, limit) : sorted
+  return (
+    <>
+      {view.group === 'status' ? <Groups items={shown} newest group={group} order={order} labels={labels} primary={primary} row={row} /> : <>{shown.map(row)}</>}
+      {limit && sorted.length > limit && (
+        <Button variant="ghost" size="sm" className="mt-1 ml-3 h-7 w-fit px-2 text-meta text-(--neutral-300) hover:bg-(--neutral-800)" onClick={() => setAll(!all)}>
+          {all ? `Show ${limit}` : `Show all ${sorted.length}`}
+        </Button>
+      )}
+    </>
+  )
 }
 
 /** A list grouped by status (owner, 2026-11-08): every group has its own title with a caret and a count; the first (Active, Pending) is open and the later ones start collapsed. Active, Monitoring, Resolved, Archived for recurrences; Pending, Reviewing, Approved, Rejected for incidents. */
@@ -351,7 +363,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                 </Section>
                 <Section title="Incidents" count={incidentRows.length} items={incidentRows} addLabel="New incident" views empty="Nothing here yet. Incidents an answer points to, or that you open, appear here.">
                   {(view) => (
-                    <ViewList items={incidentRows} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
+                    <ViewList items={incidentRows} limit={10} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
                       <TwoLineItem key={i.id} active={selected?.kind === 'incident' && selected.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => onOpenIncident?.(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-3 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${GROUPS[i.group].label}`} />
                     )} />
                   )}
