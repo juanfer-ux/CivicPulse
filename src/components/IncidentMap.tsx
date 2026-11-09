@@ -30,7 +30,8 @@ const freePadding = (map: maplibregl.Map) => {
   for (const el of document.querySelectorAll('[data-float]')) {
     const r = el.getBoundingClientRect()
     if (r.width === 0 || r.height === 0 || r.bottom < box.top || r.top > box.bottom) continue
-    if (r.right < box.left + box.width * 0.6 && r.height > box.height * 0.4) p.left = Math.max(p.left, r.right - box.left + pad) // a tall box on the left: the panels
+    if (r.left > box.left + box.width * 0.6 && r.height > box.height * 0.3) p.right = Math.max(p.right, box.right - r.left + pad) // a tall box on the right: the modules' column (decision 0049)
+    else if (r.right < box.left + box.width * 0.6 && r.height > box.height * 0.4) p.left = Math.max(p.left, r.right - box.left + pad) // a tall box on the left: the panels
     else if (r.top - box.top < box.height / 2) p.top = Math.max(p.top, r.bottom - box.top + pad) // stat cards, filters, banner
     else p.bottom = Math.max(p.bottom, box.bottom - r.top + pad) // chips, timeline
   }
@@ -495,9 +496,12 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     })
     mapRef.current = map
     const clear = (e: KeyboardEvent) => e.key === 'Escape' && onSelectRef.current(null)
+    const onFloat = () => map.loaded() && setFree(map) // a floating box appeared or went without the map resizing (the modules' column)
     window.addEventListener('keydown', clear)
+    window.addEventListener('civic:float', onFloat)
     return () => {
       window.removeEventListener('keydown', clear)
+      window.removeEventListener('civic:float', onFloat)
       setReady(false)
       map.remove()
     }

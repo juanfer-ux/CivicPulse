@@ -1,6 +1,9 @@
 import { titleCase } from '@/lib/titleCase'
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { CaretDown, CaretLeft, CaretUp, ChatCircleDots, Sparkle, X } from '@phosphor-icons/react'
+import { ModuleDock } from '@/components/modules/ModuleDock'
+import { useModules } from '@/components/modules/ModulesProvider'
+import { rightUsed, DOCK_GAP, RIGHT_W } from '@/lib/modules'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
 import { localityShapes } from '@/lib/localityShape'
@@ -9,7 +12,7 @@ import { trendOf, type Trend } from '@/lib/trend'
 /** DEMO (owner, 2026-11-05, released): the four cards show the four trend statuses, one each (Above, About, Below usual, Low reporting), whatever the data says, so the design can be reviewed. The incident data is synthetic anyway. Delete this line and `DEMO_TRENDS[i] ??` below to show the real trends again. */
 const DEMO_TRENDS: Trend[] = ['above', 'about', 'below', 'low']
 import { MediaGallery } from '@/components/MediaGallery'
-import { ProblemDetail } from '@/components/ProblemDetail'
+import { HEADER, ProblemDetail } from '@/components/ProblemDetail'
 import { ProblemTimelineCard } from '@/components/ProblemTimelineCard'
 import { Badge } from '@/components/ui/badge'
 import { FilterBar, MapTypeChips, NO_FILTERS, type Filters } from '@/components/FilterBar'
@@ -183,6 +186,9 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
 
   const selectedProblem = showProblems ? (problemsFiltered.find((p) => p.id === selectedProblemId) ?? null) : null
   const problemDetail = detail && detail.id === selectedProblemId ? detail.data : null
+  // The modules' right column (decision 0049, behind /?modules=1) pushes the map content: --dock-w feeds .map-col.
+  const modules = useModules()
+  const dockW = modules.on && rightUsed(modules.placed, modules.follow, selectedProblem?.id ?? null) ? `${RIGHT_W + DOCK_GAP}px` : '0px'
   // The map holds the loose incidents plus, while a problem is open, that problem's own incidents (drawn as tiny dots around its marker).
   const problemIncidents = useMemo(() => (selectedProblem ? (problemDetail?.incidents ?? []) : []), [selectedProblem, problemDetail])
   const problemIncidentIds = useMemo(() => problemIncidents.map((i) => i.id), [problemIncidents])
@@ -276,7 +282,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   const mapBase = 'calc(var(--agent-w) + var(--panel-gap))'
   // Both detail panels float over the map (owner, 2026-11-05), so the map and the controls over it never move for them.
   return (
-    <div className="contents map-col" data-history={item?.kind === 'problem' && !shown.leaving ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
+    <div className="contents map-col" data-history={item?.kind === 'problem' && !shown.leaving && HEADER !== '3' ? '' : undefined} data-rp={item?.kind === 'problem' && !shown.leaving && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': dockW, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -417,6 +423,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         )
       )}
       </div>
+      <ModuleDock problems={problems} openProblemId={selectedProblem?.id ?? null} openDetail={problemDetail} historyOpen={item?.kind === 'problem' && !shown.leaving && HEADER !== '3'} openKind={item?.kind === 'incident' ? 'incident' : selectedProblem ? 'recurrence' : null} />
     </div>
   )
 }

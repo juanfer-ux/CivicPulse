@@ -3,6 +3,7 @@ import { mockChats } from '@/lib/mockChats'
 import { Dashboard, type Tab } from '@/components/Dashboard'
 import type { Area } from '@/lib/agent'
 import { InvestigatePanel, type Turn } from '@/components/InvestigatePanel'
+import { ModulesProvider } from '@/components/modules/ModulesProvider'
 import { Sidebar, type SidebarIncident, type SidebarRecurrence, type SidebarSelection } from '@/components/Sidebar'
 
 export default function App() {
@@ -76,6 +77,7 @@ export default function App() {
   const [inspecting, setInspecting] = useState(false) // an incident or problem is open: the sidebar collapses (the 360 px panel overlays the map, which keeps its size; see Dashboard)
 
   return (
+    <ModulesProvider>
     <div className="flex h-svh overflow-hidden bg-(image:--screen-gradient)">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-sm focus:bg-card focus:px-3 focus:py-2 focus:text-body-sm focus:text-foreground focus:outline focus:outline-2 focus:outline-ring">
         Skip to main content
@@ -95,5 +97,6 @@ export default function App() {
         </div>
       </main>
     </div>
+    </ModulesProvider>
   )
 }

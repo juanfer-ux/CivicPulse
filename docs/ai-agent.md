@@ -60,3 +60,4 @@ Unsupported questions get an honest "I cannot answer that yet". The agent does n
 ## 🟥 Known gaps
 - The planner understands a limited set of phrasings (the five Quick questions, the two Worth investigating cards and close variants, including the "increased in Chapinero" question that is no longer a suggestion).
 - It cannot yet follow up on a previous answer.
+- It cannot yet offer modules (ready-made side panels such as a recurrence timeline): planned in decision [0049](decisions/0049-agent-modules-dock-and-library.md); the offer will be a deterministic suggestion the person accepts, the module read-only, no numbers from a model.
