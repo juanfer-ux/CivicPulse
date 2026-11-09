@@ -19,6 +19,7 @@ Start here. Every topic has **one** document; other documents link to it instead
 | 🎨 | [design.md](design.md) | Brand, mobile rule, Figma workflow (index) | 🟨 Draft |
 | 🧩 | [design-system/](design-system/README.md) | The detailed design spec: foundations, components and patterns, accessibility | 🟩 In use |
 | 🤝 | [handoff.md](handoff.md) | Where did we stop, what is open, how do we work? (for a new session) | 🟩 In use |
+| ⏳ | [pending.md](pending.md) | What is still missing? (the one list of open work) | 🟩 In use |
 | 📜 | [decisions/](decisions/README.md) | Why did we choose X? (short numbered records) | 🟩 Started |
 
 ## 🧭 Which one do I read?
