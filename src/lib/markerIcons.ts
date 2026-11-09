@@ -102,7 +102,7 @@ export async function addBadges(map: { addImage: AddImage }) {
 }
 
 /** Recurrence marker (decision 0030; the owner's option F, 2026-11-01): a neutral-900 circle (neutral-700 until 2026-11-07) with a 1 px outline in the problem's status color (softened by 2 px of blur), the category icon in neutral-100 inside, and on its upper right a warning triangle in the status color with a 4 px neutral-900 outline. The sizes are in PROBLEM_FAR (markerSizes.ts), set at the farthest zoom and scaled in proportion for each image size (PROBLEM_CIRCLE_PX). The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category, status and size, each centered on the circle so the layer needs no offset. */
-export const problemMarkerId = (category: string, status: string, px: number) => `problem-${iconCategory(category)}-${status}-${px}`
+export const problemMarkerId = (category: string, status: string, px: number, dim = false) => `problem-${iconCategory(category)}${dim ? '-dim' : ''}-${status}-${px}`
 
 async function drawIcon(Icon: (typeof ICONS)[keyof typeof ICONS], color: string, size: number) {
   const { renderToStaticMarkup } = await import('react-dom/server')
@@ -116,14 +116,17 @@ async function drawIcon(Icon: (typeof ICONS)[keyof typeof ICONS], color: string,
 const TRI_BODY = new Path2D('M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09Z')
 const TRI_MARK = new Path2D('M120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z')
 
-async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string, size: number) {
+/** `dim` is the toned-down image (owner, 2026-11-09), drawn while another recurrence is open: every color mixed toward the land color at KEEP, opaque, like the incidents' dim images (opacity would let the map show through). */
+async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: string, size: number, dim = false) {
+  const land = token('--map-background')
+  const tone = (color: string) => (dim ? mix(color, land, KEEP) : color)
   const { circle, iconPx, badgeD, alertOutline, up } = problemSizes(size)
-  const statusColor = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token)
-  const outlineColor = token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].outline) // the 600 step (owner, 2026-11-07); the triangle keeps the 300 step
+  const statusColor = tone(token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token))
+  const outlineColor = tone(token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].outline)) // the 600 step (owner, 2026-11-07); the triangle keeps the 300 step
   const off = (circle / 2 + PROBLEM_FAR.badgeGap) / Math.SQRT2 // the triangle's center, on the diagonal from the circle's edge...
   const half = Math.ceil(Math.max(circle / 2 + PROBLEM_FAR.outline + PROBLEM_FAR.outlineBlur, off + up + badgeD / 2 + alertOutline)) + 1 // screen px from the circle's center to the image edge, on every side
   const side = half * 2 * PR
-  const icon = await drawIcon(Icon, token('--neutral-100'), iconPx * PR)
+  const icon = await drawIcon(Icon, tone(token('--neutral-100')), iconPx * PR)
   const c = document.createElement('canvas')
   c.width = c.height = side
   const g = c.getContext('2d')!
@@ -136,7 +139,7 @@ async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: s
   g.shadowBlur = PROBLEM_FAR.outlineBlur * PR
   g.stroke()
   g.shadowBlur = 0
-  g.fillStyle = token('--neutral-900') // the disc (owner, 2026-11-07; it was neutral-700)
+  g.fillStyle = tone(token('--neutral-900')) // the disc (owner, 2026-11-07; it was neutral-700)
   g.fill()
   g.drawImage(icon, mid - (iconPx * PR) / 2, mid - (iconPx * PR) / 2, iconPx * PR, iconPx * PR)
   // the warning triangle: ...and a little higher, so it overlaps the circle less vertically
@@ -145,11 +148,11 @@ async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: s
   g.scale((badgeD * PR) / 256, (badgeD * PR) / 256)
   g.lineJoin = 'round'
   g.lineWidth = (2 * alertOutline * 256) / badgeD
-  g.strokeStyle = token('--neutral-900')
+  g.strokeStyle = tone(token('--neutral-900'))
   g.stroke(TRI_BODY) // outline outside: stroke twice as wide, then the fill covers the inner half
   g.fillStyle = statusColor
   g.fill(TRI_BODY)
-  g.fillStyle = token('--neutral-900')
+  g.fillStyle = tone(token('--neutral-900'))
   g.fill(TRI_MARK)
   g.restore()
   return g.getImageData(0, 0, side, side)
@@ -158,7 +161,7 @@ async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], status: s
 export async function addProblemMarkers(map: { addImage: AddImage }) {
   await Promise.all(
     Object.entries(ICONS).flatMap(([category, Icon]) =>
-      Object.keys(PROBLEM_STATUS).flatMap((status) => PROBLEM_CIRCLE_PX.map(async (px) => put(map, problemMarkerId(category, status, px), await problemMarker(Icon, status, px)))),
+      Object.keys(PROBLEM_STATUS).flatMap((status) => PROBLEM_CIRCLE_PX.flatMap((px) => [false, true].map(async (dim) => put(map, problemMarkerId(category, status, px, dim), await problemMarker(Icon, status, px, dim))))),
     ),
   )
 }

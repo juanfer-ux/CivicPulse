@@ -29,16 +29,6 @@ function ViewList<T extends { id: string | number; created?: number; updated?: n
   return view.group === 'status' ? <Groups items={sorted} newest group={group} order={order} labels={labels} primary={primary} row={row} /> : <>{sorted.map(row)}</>
 }
 
-/** The third line of a row: the conversation it belongs to, with a chat icon (owner, 2026-11-08). */
-function ConvLine({ conv }: { conv?: string }) {
-  return conv ? (
-    <span className="flex items-center gap-1 text-caption">
-      <Chat weight="regular" className="size-3 shrink-0 text-(--indigo-300)" aria-hidden />
-      <span className="truncate text-(--indigo-200)">{conv}</span>
-    </span>
-  ) : null
-}
-
 /** A list grouped by status (owner, 2026-11-08): every group has its own title with a caret and a count; the first (Active, Pending) is open and the later ones start collapsed. Active, Monitoring, Resolved, Archived for recurrences; Pending, Reviewing, Approved, Rejected for incidents. */
 function Groups<T extends { id: string | number }>({ items, group, order, labels, primary, row, newest }: { items: T[]; group: (t: T) => string; order: string[]; labels: Record<string, string>; primary: string; row: (t: T) => ReactNode; newest: boolean }) {
   const [open, setOpen] = useState<Set<string>>(new Set([primary]))
@@ -66,18 +56,19 @@ function Groups<T extends { id: string | number }>({ items, group, order, labels
 type RecurrenceRow = { id: string | number; title: string; status: ProblemStatus; reference?: string }
 
 /** Two-line row shared by Recurrence and Incident (Figma Sidebar Item Recurrence / Incident: 224.5 x 50, 6 left, 4 top, 6 bottom, 20 right, a 16 x 40 icon column with the 16 px icon 4 px below its top, 10 px to the text). */
-function TwoLineItem({ icon, title, sub, third, active, tip, onClick }: { icon: ReactNode; title: string; sub: ReactNode; third?: ReactNode; active?: boolean; tip: string; onClick: () => void }) {
+function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNode; title: string; sub: ReactNode; active?: boolean; tip: string; onClick: () => void }) {
   const row = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     if (active) row.current?.scrollIntoView?.({ block: 'nearest' }) // the open one is always in view, under the sticky section title (scroll-mt-10)
   }, [active])
   return (
-    <Button ref={row} variant="ghost" className={`scroll-mt-10 ${third ? 'h-[66px]' : 'h-[50px]'} items-start justify-start gap-2.5 pt-[3px] pb-[5px] pl-[5px] pr-[19px] hover:bg-(--neutral-800) ${active ? 'bg-(--neutral-800)' : ''}`} title={tip} aria-current={active || undefined} onClick={onClick}>
-      <span className="flex h-10 w-4 shrink-0 items-start justify-center pt-1">{icon}</span>
-      <span className={`flex ${third ? 'h-14' : 'h-10'} min-w-0 flex-col justify-center gap-0.5 text-left`}>
-        <span className="truncate text-body-sm text-(--neutral-100)">{title}</span>
-        <span className="truncate text-caption text-(--neutral-200)">{sub}</span>
-        {third}
+    <Button ref={row} variant="ghost" className={`scroll-mt-10 h-[50px] pt-[3px] pb-[5px] items-start justify-start gap-2.5 pl-[5px] pr-[19px] hover:bg-(--neutral-800) ${active ? 'bg-(--neutral-800)' : ''}`} title={tip} aria-current={active || undefined} onClick={onClick}>
+      <span className={`flex h-10 w-4 shrink-0 items-start justify-center pt-1`}>{icon}</span>
+      <span className={`flex h-10 justify-center min-w-0 flex-col text-left`}>
+        <span className="flex min-w-0 flex-col gap-0.5">
+          <span className="truncate text-body-sm text-(--neutral-100)">{title}</span>
+          <span className="truncate text-caption text-(--neutral-200)">{sub}</span>
+        </span>
       </span>
     </Button>
   )
@@ -314,10 +305,6 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   const convs = chatItems
   const tags = new Map<string, string[]>()
   convs.forEach((c) => c.ids.forEach((id) => tags.set(id, [...(tags.get(id) ?? []), c.title])))
-  const tagOf = (id: string) => {
-    const t = tags.get(id) ?? []
-    return t.length > 1 ? `${t.length} conversations` : t[0]
-  }
   const recurrences: RecurrenceRow[] = [...cases.map((c): RecurrenceRow => ({ id: c.id, title: c.title, status: 'active' })), ...real.filter((r) => tags.has(r.id))].filter((c) => hit(c.title) || hit(c.reference ?? ''))
   const incidentRows = incidents.filter((i) => tags.has(i.id) && (hit(i.title) || hit(i.reference)))
   const investigations = chats.map((c) => ({ key: c.id, title: c.title, id: c.id })).filter((c) => hit(c.title)).reverse() // chats arrive oldest first, the list shows newest first
@@ -352,14 +339,14 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                     <ViewList items={recurrences} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
                       <TwoLineItem key={c.id} active={c.id === caseId || (selected?.kind === 'recurrence' && selected.id === c.id)} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => (typeof c.id === 'string' ? onOpenRecurrence?.(c.id) : setCaseId(c.id))} title={c.title}
                         icon={<Warning weight="fill" className="size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
-                        sub={c.reference ? `${c.reference} · ${PROBLEM_STATUS[c.status].label}` : 'Not linked to a recurrence yet'} third={c.reference ? <ConvLine conv={tagOf(String(c.id))} /> : undefined} />
+                        sub={c.reference ? `${c.reference} · ${PROBLEM_STATUS[c.status].label}` : 'Not linked to a recurrence yet'} />
                     )} />
                   )}
                 </Section>
                 <Section title="Incidents" count={incidentRows.length} items={incidentRows} addLabel="New incident" views empty="Nothing here yet. Incidents an answer points to, or that you open, appear here.">
                   {(view) => (
                     <ViewList items={incidentRows} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
-                      <TwoLineItem key={i.id} active={selected?.kind === 'incident' && selected.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => onOpenIncident?.(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-3 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${GROUPS[i.group].label}`} third={<ConvLine conv={tagOf(i.id)} />} />
+                      <TwoLineItem key={i.id} active={selected?.kind === 'incident' && selected.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => onOpenIncident?.(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-3 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${GROUPS[i.group].label}`} />
                     )} />
                   )}
                 </Section>
@@ -420,12 +407,12 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
   const [width, setWidth] = useState(readWidth)
   const aside = useRef<HTMLElement>(null)
   const shownWidth = useRef(0) // the width on the last render: where a collapse or expand starts from (a drag changes it without animating)
-  // Collapse and expand: a quick GSAP tween of the width (0.2 s); the content is clipped while it runs.
+  // Collapse and expand: a GSAP tween of the width, 0.32 s (owner, 2026-11-08: a little slower than the 0.2 s before), the same opening and closing; the content is clipped while it runs.
   useLayoutEffect(() => {
     const el = aside.current
     const to = collapsed ? COLLAPSED_W : width
     if (el && shownWidth.current && shownWidth.current !== to && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      gsap.fromTo(el, { width: shownWidth.current, overflow: 'hidden' }, { width: to, duration: 0.2, ease: 'power2.out', clearProps: 'overflow' })
+      gsap.fromTo(el, { width: shownWidth.current, overflow: 'hidden' }, { width: to, duration: 0.32, ease: 'power2.out', clearProps: 'overflow' })
     }
   }, [collapsed]) // eslint-disable-line react-hooks/exhaustive-deps -- only the toggle animates, not a drag of the width
   useLayoutEffect(() => {

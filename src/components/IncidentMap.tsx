@@ -51,7 +51,8 @@ const MAX_ZOOM = 18
 /** The map cannot zoom out past this (owner, 2026-10-30: zoom 11): Bogotá and its surroundings, no further. */
 const MIN_ZOOM = 11
 const NO_PROBLEMS: ProblemRow[] = []
-const problemImage = ['step', ['zoom'], ...PROBLEM_CIRCLE_PX.flatMap((px, i) => [...(i ? [PROBLEM_SWITCH_ZOOMS[i - 1]] : []), ['concat', 'problem-', ['get', 'category'], '-', ['get', 'status'], `-${px}`]])] as never
+/** The recurrence marker's image by zoom; with `sel` (the open recurrence's id) every other recurrence gets the toned-down image (opaque, like the incidents'). */
+const problemImage = (sel: string | null) => ['step', ['zoom'], ...PROBLEM_CIRCLE_PX.flatMap((px, i) => { const id = (dim: boolean) => ['concat', 'problem-', ['get', 'category'], dim ? '-dim-' : '-', ['get', 'status'], `-${px}`]; return [...(i ? [PROBLEM_SWITCH_ZOOMS[i - 1]] : []), sel ? ['case', ['==', ['get', 'id'], sel], id(false), id(true)] : id(false)] })] as never
 /** The plain square's image: one per size (step 0 below zoom 12, step 1 from 12); with `focus` (an expression) every incident but the focused one gets the toned-down image. */
 const dotImage = (focus?: unknown[]) => {
   const id = (step: number, dim: boolean) => ['concat', 'dot-', dim ? 'dim-' : '', ['get', 'group'], `-${step}`]
@@ -95,6 +96,11 @@ const PROBLEM_RING_PX = 1
 const PROBLEM_GLOW_ALPHA = 0.05 // the inner glow of a recurrence's ring (owner, 2026-11-07, from the /#glow gallery): thin bands inside the ring, easing in toward the edge, in the status color; the edge band's opacity
 const PROBLEM_GLOW_N = 16 // thin bands so no step shows (4 wide ones looked like rings)
 const PROBLEM_GLOW_BANDS = Array.from({ length: PROBLEM_GLOW_N }, (_, i) => [0.4 + (0.6 * i) / PROBLEM_GLOW_N, 0.4 + (0.6 * (i + 1)) / PROBLEM_GLOW_N]) // from the center, as fractions of the radius
+/** While a recurrence is open (owner, 2026-11-09) everything of the other recurrences (ring, fill, glow, marker, pulse, dots) is toned down to KEEP, like the other incidents when one incident is open; `sel` is the open recurrence's id. */
+const dimmed = (v: number, sel: string | null) => (sel ? ['case', ['==', ['get', 'id'], sel], v, v * KEEP] : v) as never
+const ringFill = (sel: string | null) => ['interpolate', ['linear'], ['zoom'], PROBLEM_ALPHA_ZOOM[0], dimmed(PROBLEM_FILL_ALPHA, sel), PROBLEM_ALPHA_ZOOM[1], dimmed(PROBLEM_FILL_ALPHA_NEAR, sel)] as never
+const ringStroke = (sel: string | null) => ['interpolate', ['linear'], ['zoom'], PROBLEM_ALPHA_ZOOM[0], dimmed(PROBLEM_RING_ALPHA, sel), PROBLEM_ALPHA_ZOOM[1], dimmed(PROBLEM_RING_ALPHA_NEAR, sel)] as never
+const glowAlpha = (i: number) => PROBLEM_GLOW_ALPHA * ((i + 1) / PROBLEM_GLOW_N) ** 2
 const PROBLEM_RING_BLUR = 0.01 // the ring's circle-blur (owner, 2026-11-01), relative to its radius (1 = fully soft): about 0.4 px at the smallest ring and 1 px at a 100 px radius; softens the edge a little
 const PROBLEM_RADIUS_ZOOM = 11 // the radius shows from the start (owner, 2026-10-30; it faded in from zoom 12): the map's minimum zoom
 const PROBLEM_RADIUS_RAMP_ZOOM = 12 // below this it keeps its starting size on screen, and it grows from here
@@ -147,6 +153,8 @@ interface Props {
   /** Recurrences to draw as one marker each (the Recurrences view); the incidents prop then holds only the open problem's incidents. */
   problems?: ProblemRow[]
   selectedProblemId?: string | null
+  /** A report of the open recurrence opened in its history (owner, 2026-11-09): its dot gets the ring, the other dots of the recurrence tone down; the camera does not move. */
+  openReportId?: string | null
   onSelectProblem?: (id: string) => void
   /** Fires when a camera flight to a selection ends (or a touch stops it): the problem panel waits for it before it slides in. */
   onFlightEnd?: () => void
@@ -165,7 +173,7 @@ const MAX_CANVAS = (() => {
   return Math.min(Math.max(max, 4096), 16384)
 })()
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots = NO_SPOTS, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots = NO_SPOTS, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, openReportId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const onSelectRef = useRef(onSelect)
@@ -362,11 +370,11 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       const problemPx = (f: number) => ['interpolate', ['exponential', 2], ['zoom'], ...PROBLEM_STOPS.flatMap(([z, v]) => [z, v * f])] as never
       // The look is the owner's Figma Incident Radius (2026-10-30): a flat fill at 2.4 % and a ring, in the problem's status color; the ring is drawn 1 px at 20 % (the same brightness as the Figma 0.5 px at 35 %, without the crackle); from zoom 16 up the fill is 3.5 % and the ring 1 px at 50 % (reached evenly over zoom 14 to 16).
       map.addLayer(
-        { id: 'problem-radius-fill', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-color': ['get', 'color'], 'circle-opacity': ['interpolate', ['linear'], ['zoom'], PROBLEM_ALPHA_ZOOM[0], PROBLEM_FILL_ALPHA, PROBLEM_ALPHA_ZOOM[1], PROBLEM_FILL_ALPHA_NEAR] as never } },
+        { id: 'problem-radius-fill', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-color': ['get', 'color'], 'circle-opacity': ringFill(null) } },
         underLabels,
       )
       map.addLayer(
-        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-blur': PROBLEM_RING_BLUR, 'circle-stroke-width': PROBLEM_RING_PX, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': ['interpolate', ['linear'], ['zoom'], PROBLEM_ALPHA_ZOOM[0], PROBLEM_RING_ALPHA, PROBLEM_ALPHA_ZOOM[1], PROBLEM_RING_ALPHA_NEAR] as never } },
+        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-blur': PROBLEM_RING_BLUR, 'circle-stroke-width': PROBLEM_RING_PX, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': ringStroke(null) } },
         underLabels,
       )
       // Inner glow (owner, 2026-11-07): the same stacked-strokes trick as the answer radius, inside the ring of every recurrence, strongest at the edge. A few static circle layers, nothing animated.
@@ -377,7 +385,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
             type: 'circle',
             source: 'problem-radius',
             minzoom: PROBLEM_RADIUS_ZOOM,
-            paint: { 'circle-radius': problemPx((from + to) / 2), 'circle-opacity': 0, 'circle-stroke-width': problemPx(to - from), 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': PROBLEM_GLOW_ALPHA * ((i + 1) / PROBLEM_GLOW_N) ** 2 },
+            paint: { 'circle-radius': problemPx((from + to) / 2), 'circle-opacity': 0, 'circle-stroke-width': problemPx(to - from), 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': glowAlpha(i) },
           },
           underLabels,
         ),
@@ -445,7 +453,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         source: 'problems',
         layout: {
           // The circle follows a smooth curve by zoom (28 px at zoom 12 and below, 32 at 13, 42 from 14; PROBLEM_CIRCLE_BY_ZOOM), drawn as one crisp image per 2 px (PROBLEM_CIRCLE_PX) so no image is ever shrunk by a fraction, which made the outlines look crackled (owner, 2026-10-30). Each image is centered on its circle, so no offset is needed.
-          'icon-image': problemImage,
+          'icon-image': problemImage(null),
           'icon-size': 1,
           'icon-allow-overlap': true, // a problem is never hidden; where markers overlap, the one with more occurrences draws on top
           'symbol-sort-key': ['get', 'count'],
@@ -532,7 +540,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       features: problems.map((p) => ({
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
-        properties: { r: PROBLEM_RADIUS_M, color: token(PROBLEM_STATUS[p.status].token) },
+        properties: { id: p.id, r: PROBLEM_RADIUS_M, color: token(PROBLEM_STATUS[p.status].token) },
       })),
     })
   }, [ready, problems])
@@ -640,10 +648,10 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
-    map.setFilter('incident-selected', ['==', ['get', 'id'], selectedId ?? ''])
+    map.setFilter('incident-selected', ['==', ['get', 'id'], selectedId ?? openReportId ?? ''])
     map.setFilter('incident-selected-pin', ['==', ['get', 'id'], selectedId ?? ''])
     for (const id of ['incident-selected-glow', 'incident-selected-glow-core']) map.setFilter(id, ['==', ['get', 'id'], selectedId ?? ''])
-  }, [ready, selectedId])
+  }, [ready, selectedId, openReportId])
 
   // A very subtle pulse around the ring of every Active recurrence (owner, 2026-11-07): a thin ring in the status color that grows a little and fades, a few seconds apart, each one out of step with the others. DOM markers with a CSS animation (index.css), so the map is not redrawn for it; each is sized to the ring at the current zoom.
   const pulses = useRef(new Map<string, { marker: maplibregl.Marker; el: HTMLDivElement }>())
@@ -674,6 +682,19 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     map.on('zoom', onZoom)
     return () => void map.off('zoom', onZoom)
   }, [ready, problems])
+
+  // The open recurrence's look (owner, 2026-11-09): its ring, marker, pulse and incident dots stay as they are, the other recurrences are toned down to KEEP (their dots keep the dim color of the incidents' own tone-down); nothing is dimmed when none is open.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    const sel = selectedProblemId
+    map.setPaintProperty('problem-radius-fill', 'circle-opacity', ringFill(sel))
+    map.setPaintProperty('problem-radius-ring', 'circle-stroke-opacity', ringStroke(sel))
+    PROBLEM_GLOW_BANDS.forEach((_, i) => map.setPaintProperty(`problem-radius-glow-${i}`, 'circle-stroke-opacity', dimmed(glowAlpha(i), sel)))
+    map.setLayoutProperty('problem-markers', 'icon-image', problemImage(sel))
+    map.setPaintProperty('problem-incident-dots', 'circle-color', (sel ? (openReportId ? ['case', ['==', ['get', 'id'], openReportId], ['get', 'color'], ['get', 'dim']] : ['case', ['get', 'po'], ['get', 'color'], ['get', 'dim']]) : ['get', 'color']) as never)
+    for (const [id, { el }] of pulses.current) el.style.opacity = sel && id !== sel ? String(KEEP) : ''
+  }, [ready, selectedProblemId, openReportId, problems])
 
   // Test (owner, 2026-10-30): opening an incident flies the camera to it with GSAP, easing the centre and the zoom together; any touch of the map stops it. Closing it flies back to where the map was before (a conscious decision to leave it).
   const home = useRef<{ lng: number; lat: number; zoom: number } | null>(null)
@@ -735,11 +756,11 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     const filter = (answer ? ['all', normal, answer] : normal) as never
     map.setFilter('incidents', filter)
     map.setFilter('incident-badges', filter)
-    const focus = selectedId ? ['==', ['get', 'id'], selectedId] : null
+    const focus = selectedId ? ['==', ['get', 'id'], selectedId] : selectedProblemId ? ['==', ['get', 'po'], true] : null // an open recurrence: only its incidents stay lit (they draw in their own dot layer), every other incident is toned down
     map.setLayoutProperty('incidents', 'icon-image', dotImage(focus ?? undefined))
     map.setLayoutProperty('incident-badges', 'icon-image', badgeImage(focus ?? undefined))
     map.setLayoutProperty('incident-badges', 'symbol-sort-key', (focus ? ['case', focus, 1, 0] : 0) as never)
-  }, [ready, selectedId, highlightIds])
+  }, [ready, selectedId, selectedProblemId, highlightIds])
 
   if (!WEBGL2) return <ListFallback incidents={incidents} selectedId={selectedId} onSelect={onSelect} />
 

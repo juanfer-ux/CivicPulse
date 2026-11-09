@@ -72,6 +72,7 @@ export default function App() {
       .map((c) => ({ title: c.turns[0]?.question ?? 'Opened on the map', ids: idsOf(c) }))
       .filter((c) => c.ids.length),
   ]
+  const [agentOff, setAgentOff] = useState(false) // the agent panel is collapsed to a 44 px rail (owner's try, 2026-11-08; the composer bar was tried first); the panel stays mounted, so the conversation stays
   const [inspecting, setInspecting] = useState(false) // an incident or problem is open: the sidebar collapses (the 360 px panel overlays the map, which keeps its size; see Dashboard)
 
   return (
@@ -81,11 +82,11 @@ export default function App() {
       </a>
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
       <Sidebar collapse={inspecting} chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
-      {/* The agent panel is 38 % of the area next to the sidebar, never under 550 px (the cards and the composer break) nor over 680 px (its content stops at 664 to 728 px): the same 550 px up to a 1750 px window (owner, 2026-11-08). */}
-      <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': 'clamp(550px, 38%, 680px)', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
+      {/* The agent panel is always 30 % of the browser window width (30vw), no minimum or maximum (owner, 2026-11-08; it was clamp(550px, 38%, 680px), which kept the cards and the composer from breaking on narrow windows). */}
+      <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': agentOff ? '56px' : 'min(30vw, 590px)', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
-          <Dashboard highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} focus={focus} onRows={setRows} onSelection={setSelection}>
+          <Dashboard highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} agentOff={agentOff} onAgentOff={setAgentOff} focus={focus} onRows={setRows} onSelection={setSelection}>
             {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
               <InvestigatePanel chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} />
