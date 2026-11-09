@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ChartScatter, Check, DotsSixVertical, GearSix, Hash } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
-import { MODULES, MODULES_ON, type ModuleType } from '@/lib/modules'
+import { MODULES, type ModuleType } from '@/lib/modules'
 import { useModules } from '@/components/modules/ModulesProvider'
 
 const ICON = { timeline: ChartScatter, numbers: Hash } as const
@@ -44,8 +44,8 @@ function Settings() {
 
 /** The sidebar's Modules section (decision 0049, behind /?modules=1), right below the Explore row: the built-in modules, each a drag source for the docking zones on the map. */
 export function ModulesSection() {
-  const { startDrag } = useModules()
-  if (!MODULES_ON) return null
+  const { on, startDrag } = useModules() // off without the provider (tests) or with /?modules=0
+  if (!on) return null
   return (
     <div className="flex flex-col gap-1 px-2" aria-label="Modules">
       <div className="relative flex h-8 items-center justify-between">

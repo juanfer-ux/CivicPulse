@@ -8,7 +8,7 @@ The one list of what is not done yet, grouped by area. [handoff.md](handoff.md) 
 - [ ] **Drag a saved module onto a case later** (a recurrence or incident) without the agent: depends on saving.
 - [ ] **Phone version** of the dock, the areas and the Modules section (the mobile rule: about 390 x 844). Proposal: modules stacked as cards in the bottom sheet, the library as a list with "Add".
 - [ ] **Timeline module sizing:** it reuses the full chart, so in a short area it scrolls instead of resizing.
-- [ ] **Take the `?modules=1` switch off** when the owner approves.
+- [x] The `?modules=1` switch is off: modules are on for everyone (2026-11-09); `/?modules=0` hides them.
 - [ ] **Check the whole flow on the signed-in map** (Quick question, pick a recurrence, timeline offer, dock): only throwaway pages with made-up data were measured.
 
 ## 🎨 Figma

@@ -15,7 +15,7 @@ While investigating (for example recurring parking obstruction) the owner wants 
 - **Shapes:** a module's content re-lays out for its area (the timeline: thin lanes along the bottom strip, labelled lanes in a column; the numbers: five in a row along the bottom, three columns in a column). Each module lists the areas it supports (timeline: bottom, right, left; numbers: right, left, bottom).
 - **A module shows the data of the case it is on** (recurrence or incident). A recurrence module only docks on a recurrence.
 - **Follow or stay (owner, 2026-11-09):** a gear in the sidebar's Modules title row opens a small menu (the look of the view menu) with two choices: **Follow the open case** (the dock stays and shows whichever case is open; the default) or **Stay with each case** (each module keeps the case it was placed on and shows only there). Chosen from `/#module-options` (a gallery kept local).
-- Built behind a `?modules=1` switch, in phases, Figma first.
+- Built in phases, Figma first; shown for everyone since 2026-11-09 (`/?modules=0` hides them).
 
 ## Consequences
 Everything is additive and reversible. The browser-only library does not sync across devices and is per user on a shared computer. Phones need their own design (modules stacked in the bottom sheet, the library as a list with "Add"), to be agreed before building.

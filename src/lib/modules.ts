@@ -57,5 +57,5 @@ export const inArea = (list: Placed[], area: Area, follow: boolean, openId: stri
 /** How much a column pushes the map content aside: only while no recurrence is open (an open recurrence has its header across the top and the columns below it). */
 export const pushOf = (list: Placed[], area: 'left' | 'right', follow: boolean, openId: string | null, recurrenceOpen: boolean) => (!recurrenceOpen && inArea(list, area, follow, openId).length ? COLUMN_PUSH : 0)
 
-/** The switch (owner's test, 2026-11-09): /?modules=1. */
-export const MODULES_ON = typeof location !== 'undefined' && new URLSearchParams(location.search).has('modules')
+/** Modules are on for everyone (owner, 2026-11-09); /?modules=0 turns them off for a look at the page without them. */
+export const MODULES_ON = typeof location !== 'undefined' && new URLSearchParams(location.search).get('modules') !== '0'
