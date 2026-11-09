@@ -178,3 +178,17 @@ describe('Sidebar — only what a conversation touched is listed', () => {
     expect(screen.getByText('Folded one')).toBeInTheDocument()
   })
 })
+
+describe('Sidebar — the Incidents list shows ten', () => {
+  const twelve = Array.from({ length: 12 }, (_, k) => ({ id: `i${k}`, title: `Incident number ${k}`, reference: `CP-${k}`, group: 'pending' as const, updated: 100 - k }))
+  it('shows the first ten and a control for the rest', async () => {
+    const user = userEvent.setup()
+    render(<Sidebar {...baseProps} recurrences={[]} incidents={twelve} chatItems={[{ title: 'Q', ids: twelve.map((i) => i.id) }]} />)
+    expect(screen.getByText('Incident number 9')).toBeInTheDocument()
+    expect(screen.queryByText('Incident number 10')).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Show all 12' }))
+    expect(screen.getByText('Incident number 11')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Show 10' }))
+    expect(screen.queryByText('Incident number 11')).toBeNull()
+  })
+})
