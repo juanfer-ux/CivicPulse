@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChartScatter, Check, DotsSixVertical, GearSix, Hash } from '@phosphor-icons/react'
+import { Check, GearSix, Stack } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { MODULES, type ModuleType } from '@/lib/modules'
 import { useModules } from '@/components/modules/ModulesProvider'
-
-const ICON = { timeline: ChartScatter, numbers: Hash } as const
 
 const Item = ({ label, on, pick }: { label: string; on: boolean; pick: () => void }) => (
   <Button role="menuitemradio" aria-checked={on} variant="ghost" className="h-8 w-full justify-start gap-2 px-2 text-body-sm hover:bg-(--neutral-800)" onClick={pick}>
@@ -53,11 +51,9 @@ export function ModulesSection() {
         <Settings />
       </div>
       {(Object.keys(MODULES) as ModuleType[]).map((t) => {
-        const Icon = ICON[t]
         return (
-          <div key={t} role="button" tabIndex={0} aria-label={`${MODULES[t].title}: drag to an area on the map`} onPointerDown={startDrag(t)} className="flex touch-none cursor-grab select-none items-center gap-2 rounded-sm px-1 py-1.5 text-body-sm hover:bg-(--neutral-800) active:cursor-grabbing">
-            <DotsSixVertical className="size-3.5 text-(--neutral-300)" aria-hidden />
-            <Icon weight="regular" className="size-4 text-(--neutral-200)" aria-hidden />
+          <div key={t} role="button" tabIndex={0} aria-label={`${MODULES[t].title}: drag to an area on the map`} onPointerDown={startDrag(t)} className="flex touch-none cursor-grab select-none items-center gap-2 h-8 rounded-sm px-1 text-body-sm hover:bg-(--neutral-600) active:cursor-grabbing">
+            <Stack weight="regular" className="size-4 text-(--neutral-200)" aria-hidden />
             <span className="flex-1 truncate">{MODULES[t].title}</span>
           </div>
         )

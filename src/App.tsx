@@ -2,11 +2,34 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { mockChats } from '@/lib/mockChats'
 import { Dashboard, type Tab } from '@/components/Dashboard'
 import type { Area } from '@/lib/agent'
+import { AGENT_MIN, agentMax, AgentResizer } from '@/components/AgentResizer'
 import { InvestigatePanel, type Turn } from '@/components/InvestigatePanel'
 import { ModulesProvider } from '@/components/modules/ModulesProvider'
 import { Sidebar, type SidebarIncident, type SidebarRecurrence, type SidebarSelection } from '@/components/Sidebar'
 
+const AGENT_KEY = 'agent-width'
+/** The agent panel's width on desktop: automatic (a share of the window) until the owner drags the handle, then that width, kept in this browser. Always between Figma's minimum and half the width beside the sidebar. */
+function useAgentWidth() {
+  const [w, setW] = useState<number | null>(() => {
+    try { const v = Number(localStorage.getItem(AGENT_KEY)); return v >= AGENT_MIN ? v : null } catch { return null }
+  })
+  const change = (px: number | null) => {
+    setW(px)
+    try { if (px) localStorage.setItem(AGENT_KEY, String(px)); else localStorage.removeItem(AGENT_KEY) } catch { /* works without storage */ }
+  }
+  return [w, change] as const
+}
+
 export default function App() {
+  const [agentW, setAgentW] = useAgentWidth()
+  const mainRef = useRef<HTMLElement>(null)
+  const [areaW, setAreaW] = useState(() => window.innerWidth) // the width beside the sidebar, which changes when the sidebar does
+  useEffect(() => {
+    const ro = new ResizeObserver(([e]) => setAreaW(e.contentRect.width))
+    ro.observe(mainRef.current!)
+    return () => ro.disconnect()
+  }, [])
+  const maxW = agentMax(areaW)
   const [highlightIds, setHighlightIds] = useState<string[]>([])
   const [areas, setAreas] = useState<Area[]>([])
   const [spots, setSpots] = useState<string[][]>([]) // the answer is about specific spots (the incident ids of each): one radius around each, no locality outlines
@@ -83,15 +106,16 @@ export default function App() {
         Skip to main content
       </a>
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
-      <Sidebar collapse={inspecting} chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
+      <Sidebar chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
       {/* The agent panel is always 30 % of the browser window width (30vw), no minimum or maximum (owner, 2026-11-08; it was clamp(550px, 38%, 680px), which kept the cards and the composer from breaking on narrow windows). */}
-      <main id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': agentOff ? '56px' : 'min(30vw, 590px)', '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
+      <main ref={mainRef} id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': agentOff ? '56px' : agentW ? `${Math.min(maxW, agentW)}px` : `clamp(${AGENT_MIN}px, calc(34.5vw + 12px), ${maxW}px)`, '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
+        {!agentOff && <AgentResizer max={maxW} onChange={setAgentW} />}
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
           <Dashboard highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} agentOff={agentOff} onAgentOff={setAgentOff} focus={focus} onRows={setRows} onSelection={setSelection}>
             {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
-              <InvestigatePanel chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} recurrenceId={selection?.kind === 'recurrence' ? selection.id : null} onOpenRecurrence={open('recurrence')} />
+              <InvestigatePanel onCollapse={() => setAgentOff(true)} chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} recurrenceId={selection?.kind === 'recurrence' ? selection.id : null} onOpenRecurrence={open('recurrence')} />
             </div>
           </Dashboard>
         </div>

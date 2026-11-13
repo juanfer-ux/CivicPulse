@@ -109,10 +109,11 @@ export const SUGGESTIONS = [
   'Which area might deserve further investigation tomorrow evening?',
 ]
 
-/** The two Worth investigating cards: a title and the question each one asks (the picture is a placeholder for now). */
+/** The three Worth investigating cards (Figma has three since 2026-11-12): a title and the question each one asks (the picture is a placeholder for now). */
 export const WORTH_INVESTIGATING = [
-  { title: 'Recurring Dumping Sites', category: 'Illegal Dumping', question: 'Which locations have repeated illegal dumping reports?' },
-  { title: 'Recurring Obstructive Parking', category: 'Parking Obstruction', question: 'Which locations have repeated parking obstruction reports?' },
+  { title: 'Dumping Sites', category: 'Illegal Dumping', question: 'Which locations have repeated illegal dumping reports?' },
+  { title: 'Obstructive Parking', category: 'Parking Obstruction', question: 'Which locations have repeated parking obstruction reports?' },
+  { title: 'Damaged Infrastructure', category: 'Damaged Infrastructure', question: 'Which locations have repeated damaged infrastructure reports?' }, // no such category in the data yet (owner, 2026-11-12): the agent answers it as a general recurring question
 ]
 
 export function plan(question: string, localities: Locality[]): Plan | null {

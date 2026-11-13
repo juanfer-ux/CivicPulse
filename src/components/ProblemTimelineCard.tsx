@@ -54,9 +54,9 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
     const source = detail?.sources[id] ?? 'Unknown source'
     const open = openReportId === id // the open report's row becomes a raised card with its details under the same row (owner, 2026-11-09, option 2 of /#report-expand); the row itself keeps its places
     return (
-      <li key={id} data-report={id} className={`border-b border-(--neutral-600) last:border-b-0${open ? ' -mx-3 my-1 rounded-sm border-b-0 bg-(--neutral-800) px-3' : ''}`}>
+      <li key={id} data-report={id} className={open ? '-mx-3 my-1 rounded-sm bg-(--neutral-700) px-3' : undefined}>
         {/* Three columns (owner, 2026-11-07, from /#history): a square tile with the source's initials, the source with its reference below, and the date with the time (24 h) below. */}
-        <button type="button" aria-expanded={open} onClick={() => onSelectIncident(id)} className={`flex items-center gap-3 rounded-sm py-4 text-left hover:bg-(--neutral-800) focus-visible:bg-(--neutral-800) ${open ? 'w-full' : '-mx-3 w-[calc(100%+1.5rem)] px-3'}`}>
+        <button type="button" aria-expanded={open} onClick={() => onSelectIncident(id)} className={`flex items-center gap-3 rounded-sm py-3 text-left hover:bg-(--neutral-700) focus-visible:bg-(--neutral-700) ${open ? 'w-full' : '-mx-3 w-[calc(100%+1.5rem)] px-3'}`}>
           <span className="grid size-8 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--neutral-100)" aria-hidden>
             {initials(source)}
           </span>
@@ -68,7 +68,7 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
             </span>
           </span>
           <span className="flex w-[52px] shrink-0 flex-col items-start text-left">
-            <span className="text-body-sm text-foreground">{day(i.occurred_at)}</span>
+            <span className="text-body-sm-medium text-foreground">{day(i.occurred_at)}</span>
             <span className="text-meta tabular-nums text-muted-foreground">{clock(i.occurred_at)}</span>
           </span>
         </button>
@@ -116,7 +116,7 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
     </Card>
     )}
     <PortalTo target={inSlot ? rightSlot : null}>
-    <Card role="region" aria-label="Occurrences history" data-float={M3 && !inSlot ? true : undefined} className={`gap-0 overflow-hidden bg-card/95 py-0 ${inSlot ? 'desk:pointer-events-auto desk:h-full desk:w-full' : M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:right-(--col-right) desk:top-[calc(var(--map-pad)+var(--banner-offset,0px)+96px+12px)] desk:z-20 desk:w-[360px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]`}>
+    <Card role="region" aria-label="Occurrences history" data-float={M3 && !inSlot ? true : undefined} className={`gap-0 overflow-hidden bg-card/95 py-0 ${inSlot ? 'desk:pointer-events-auto desk:h-full desk:w-full' : M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:right-(--col-right) desk:top-[calc(var(--map-pad)+var(--banner-offset,0px)+96px+12px)] desk:z-20 desk:w-[360px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} desk:rounded-lg desk:border desk:border-(--neutral-900) desk:bg-(--neutral-800)`}>
     {M3 && <StatList problem={problem} />}
     <ScrollArea viewportRef={list} className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">

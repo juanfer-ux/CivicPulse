@@ -28,3 +28,5 @@ images/
 
 # Supabase CLI link data (project ref): local only
 supabase/.temp/
+
+storybook-static

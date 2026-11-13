@@ -1,8 +1,9 @@
-import { createContext, useCallback, useContext, useMemo, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
-import { MODULES, MODULES_ON, canDock, insertPos, place, type Area, type ModuleType, type Placed } from '@/lib/modules'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+import { useAuth } from '@/lib/auth'
+import { MODULES, MODULES_ON, canDock, insertPos, parseLayout, place, type Area, type ModuleType, type Placed } from '@/lib/modules'
 
 /**
- * The modules' shared state (decision 0049, behind /?modules=1): what is docked where, the follow / stay option, the drag in progress and the case that is open. The sidebar's Modules section starts a drag; the dock (in Dashboard) shows the zones and takes the drop. Kept in memory for now (saving comes later). Safe to use without the provider (tests): everything is off.
+ * The modules' shared state (decision 0049, behind /?modules=1): what is docked where, the follow / stay option, the drag in progress and the case that is open. The sidebar's Modules section starts a drag; the dock (in Dashboard) shows the zones and takes the drop. The docked modules and the follow / stay choice are saved in the browser per user (`modules:v1:<user id>`), so a reload brings them back. Safe to use without the provider (tests): everything is off.
  */
 type Drag = { type: ModuleType; x: number; y: number }
 type Open = { id: string | null; kind: 'recurrence' | 'incident' | null }
@@ -43,6 +44,29 @@ export function ModulesProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<Open>({ id: null, kind: null })
   const [message, setMessage] = useState('')
   const [rightSlot, setRightSlot] = useState<HTMLElement | null>(null)
+
+  const userId = useAuth().session?.user.id
+  const key = userId ? `modules:v1:${userId}` : null
+  const [loadedKey, setLoadedKey] = useState<string | null>(null) // saving waits until this user's layout is read, so the empty start never overwrites it
+  useEffect(() => {
+    if (!key) return
+    try {
+      const saved = parseLayout(localStorage.getItem(key))
+      setPlaced(saved.placed)
+      setFollow(saved.follow)
+    } catch {
+      /* storage blocked: modules work for this visit only */
+    }
+    setLoadedKey(key)
+  }, [key])
+  useEffect(() => {
+    if (!key || loadedKey !== key) return
+    try {
+      localStorage.setItem(key, JSON.stringify({ placed, follow }))
+    } catch {
+      /* storage blocked or full */
+    }
+  }, [key, loadedKey, placed, follow])
 
   const dockAt = useCallback(
     (area: Area | null | undefined, type: ModuleType, pos?: number) => {

@@ -1,3 +1,4 @@
+import { activeRow, type Pick } from '@/lib/sidebarActive'
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
 import { useNoSelect } from '@/lib/useNoSelect'
@@ -58,14 +59,14 @@ function Groups<T extends { id: string | number }>({ items, group, order, labels
 /** The three row types of the sidebar (Figma 2026-11-05): Recurrence (warning icon in its status color), Incident (a dot in its status color) and Investigation. */
 type RecurrenceRow = { id: string | number; title: string; status: ProblemStatus; reference?: string }
 
-/** Two-line row shared by Recurrence and Incident (Figma Sidebar Item Recurrence / Incident: 224.5 x 50, 6 left, 4 top, 6 bottom, 20 right, a 16 x 40 icon column with the 16 px icon 4 px below its top, 10 px to the text). */
+/** Two-line row shared by Recurrence and Incident (Figma Sidebar Item Recurrence / Incident, 2026-11-12: 51 high, 6 left, 3 top, 8 bottom, 20 right; active = neutral-900, hover = neutral-600 (owner's Figma, 2026-11-12; hover was neutral-800), a 16 x 40 icon column with the 16 px icon 4 px below its top, 10 px to the text). */
 function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNode; title: string; sub: ReactNode; active?: boolean; tip: string; onClick: () => void }) {
   const row = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     if (active) row.current?.scrollIntoView?.({ block: 'nearest' }) // the open one is always in view, under the sticky section title (scroll-mt-10)
   }, [active])
   return (
-    <Button ref={row} variant="ghost" className={`scroll-mt-10 h-[50px] pt-[3px] pb-[5px] items-start justify-start gap-2.5 pl-[5px] pr-[19px] hover:bg-(--neutral-800) ${active ? 'bg-(--neutral-800)' : ''}`} title={tip} aria-current={active || undefined} onClick={onClick}>
+    <Button ref={row} variant="ghost" className={`scroll-mt-10 h-[51px] pt-[3px] pb-2 items-start justify-start gap-2.5 pl-[5px] pr-[19px] hover:bg-(--neutral-600) ${active ? 'bg-(--neutral-900)' : ''}`} title={tip} aria-current={active || undefined} onClick={onClick}>
       <span className={`flex h-10 w-4 shrink-0 items-start justify-center pt-1`}>{icon}</span>
       <span className={`flex h-10 justify-center min-w-0 flex-col text-left`}>
         <span className="flex min-w-0 flex-col gap-0.5">
@@ -136,7 +137,7 @@ function Section<T>({ title, count, items, addLabel, onAdd, pb = 'pb-3', row, ch
     return () => io.disconnect()
   }, [])
   return (
-    <div className={`flex flex-col gap-2 px-1.5 pt-2 ${pb}`}>
+    <div className={`flex flex-col gap-2 px-2 pt-2 ${pb}`}>
       <div ref={head} className={`sticky -top-px z-10 flex h-8 items-center gap-2.5 border-b-[1px] bg-(--neutral-700) pr-1.5 pl-2.5 ${stuck ? 'border-(--neutral-600)' : 'border-transparent'}`}>
         <p className="flex-1 text-caption-medium text-(--neutral-200)">{title}{count !== undefined && <span className="text-(--neutral-300)"> · {count}</span>}</p>
         {/* Figma "Actions": the view and plus buttons side by side with no gap (2 x 32 px). */}
@@ -162,9 +163,9 @@ function Section<T>({ title, count, items, addLabel, onAdd, pb = 'pb-3', row, ch
 }
 
 const WIDTH_KEY = 'sidebar-width'
-const SIDEBAR_MIN = 245 // min width of the expanded Sidebar (owner, 2026-10-30; it was 260, 266, 262, 240, briefly 220)
+const SIDEBAR_MIN = 260 // min width of the expanded Sidebar (owner's Figma, 2026-11-12; it was 245 since 2026-10-30, 260, 266, 262, 240, briefly 220)
 const SIDEBAR_MAX = 380 // Figma max width (was 340)
-const SIDEBAR_DEFAULT = 300 // the width it opens at (owner, 2026-11-05; it was 245, and 284 before), also the width drawn in Figma
+const SIDEBAR_DEFAULT = 260 // the width it opens at (owner's Figma, 2026-11-12; it was 300, 245 and 284 before)
 const clampWidth = (n: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, n))
 const readWidth = () => {
   try {
@@ -175,7 +176,7 @@ const readWidth = () => {
   }
 }
 
-/** Drag handle on the right edge of the expanded desktop sidebar, like the agent panel's (245 to 380 px, double-click resets to 300). */
+/** Drag handle on the right edge of the expanded desktop sidebar, like the agent panel's (260 to 380 px, double-click resets to 260). */
 function SidebarResizer({ width, onChange }: { width: number; onChange: (px: number) => void }) {
   const [dragging, setDragging] = useState(false)
   useNoSelect(dragging)
@@ -305,7 +306,11 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   const { profile, session, signOut } = useAuth()
   const name = shortName(profile?.full_name) || 'Signed in'
   const email = session?.user?.email
-  const [caseId, setCaseId] = useState<number | null>(null) // the local "New recurrence" row last clicked (the real rows follow `selected`)
+  const selKey = selected ? selected.kind + selected.id : ''
+  const [local, setLocal] = useState<(Pick & { sel: string }) | null>(null) // the row last clicked (Explore, an investigation, the local "New recurrence" row) and which recurrence or incident was open then: it stays the active row until a different one is opened, even while the old one is still open on the map
+  const act = activeRow({ selected, pick: local && local.sel === selKey ? local : null, exploring: !!exploring, activeId })
+  const noCase = <A extends unknown[]>(f?: (...a: A) => void) => (...a: A) => { setLocal(null); f?.(...a) }
+  const pickRow = <A extends unknown[]>(p: Pick, f?: (...a: A) => void) => (...a: A) => { setLocal({ ...p, sel: selKey }); f?.(...a) }
   const [query, setQuery] = useState('')
   const hit = (t: string) => t.toLowerCase().includes(query.trim().toLowerCase())
   // Only what a conversation touched is listed (owner, 2026-11-08); the map still shows everything.
@@ -318,7 +323,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
-        <div className={`flex h-[70px] shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'justify-center bg-(--neutral-900)' : 'justify-between bg-(--neutral-700) px-3'}`}>
+        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-[70px] justify-center bg-(--neutral-800)' : 'h-16 justify-between bg-(--neutral-700) px-2'}`}>
           <Brand collapsed={collapsed} onToggle={onToggle} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
@@ -329,12 +334,12 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
-            <div className="flex shrink-0 flex-col gap-4 border-b border-(--neutral-500) px-1.5 pt-4 pb-3">
-              <div className="px-2">
-                <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-600) border-(--neutral-400) text-body-sm" />
+            <div className="flex shrink-0 flex-col gap-4 border-b border-(--neutral-500) px-3 pt-4 pb-3">
+              <div>
+                <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-800) border-(--neutral-400) text-body-sm" />
               </div>
               {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
-              <Button variant="ghost" aria-current={exploring ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-[7px] text-body-sm-medium text-(--neutral-100) hover:bg-(--neutral-800) ${exploring ? 'bg-(--neutral-800)' : ''}`} onClick={onNew}>
+              <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--neutral-100) hover:bg-(--neutral-600) ${act.kind === 'explore' ? 'bg-(--neutral-900)' : ''}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
                 <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
                 Explore
               </Button>
@@ -345,7 +350,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                 <Section title="Recurrences" count={recurrences.length} items={recurrences} addLabel="New recurrence" onAdd={onNewCase} views pb="pb-2.5" empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
                     <ViewList items={recurrences} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
-                      <TwoLineItem key={c.id} active={c.id === caseId || (selected?.kind === 'recurrence' && selected.id === c.id)} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => (typeof c.id === 'string' ? onOpenRecurrence?.(c.id) : setCaseId(c.id))} title={c.title}
+                      <TwoLineItem key={c.id} active={act.kind === 'case' ? c.id === act.id : act.kind === 'recurrence' && c.id === act.id} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => (typeof c.id === 'string' ? noCase(onOpenRecurrence)(c.id) : setLocal({ kind: 'case', id: c.id, sel: selKey }))} title={c.title}
                         icon={<Warning weight="fill" className="size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
                         sub={c.reference ? `${c.reference} · ${PROBLEM_STATUS[c.status].label}` : 'Not linked to a recurrence yet'} />
                     )} />
@@ -354,13 +359,13 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                 <Section title="Incidents" count={incidentRows.length} items={incidentRows} addLabel="New incident" views empty="Nothing here yet. Incidents an answer points to, or that you open, appear here.">
                   {(view) => (
                     <ViewList items={incidentRows} limit={5} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
-                      <TwoLineItem key={i.id} active={selected?.kind === 'incident' && selected.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => onOpenIncident?.(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-3 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${GROUPS[i.group].label}`} />
+                      <TwoLineItem key={i.id} active={act.kind === 'incident' && act.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => noCase(onOpenIncident)(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-2 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${GROUPS[i.group].label}`} />
                     )} />
                   )}
                 </Section>
                 <Section title="Investigations" limit={2} items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
-                  <Button key={c.key} variant="ghost" className={`h-[30px] items-center justify-start gap-2.5 py-1 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-800) ${c.id === activeId && !exploring ? 'bg-(--neutral-800)' : ''}`} aria-current={c.id === activeId || undefined} onClick={() => onPick(c.id)}>
-                    <Chat weight="regular" className="size-4 shrink-0 text-(--neutral-300)" aria-hidden />
+                  <Button key={c.key} variant="ghost" className={`h-7 items-center justify-start gap-2.5 py-1 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-600) ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900)' : ''}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
+                    <Chat weight="regular" className="size-4 shrink-0 text-(--neutral-200)" aria-hidden />
                     <span className="truncate">{c.title}</span>
                   </Button>
                 )} />
@@ -369,16 +374,16 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
           </>
         )}
       </div>
-      <div className={`flex shrink-0 flex-col border-t border-(--neutral-400) ${collapsed ? 'min-h-[85px] items-center justify-center' : 'py-4'}`}>
+      <div className={`flex shrink-0 flex-col border-t border-(--neutral-600) ${collapsed ? 'min-h-[85px] items-center justify-center' : 'py-3'}`}>
         {collapsed ? (
           <>
             <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} size="lg" title={name} />} />
           </>
         ) : (
           <div className="flex items-center gap-3 py-1 pl-4 pr-5">
-            <Avatar name={profile?.full_name || 'Signed in'} size="lg" />
+            <Avatar name={profile?.full_name || 'Signed in'} />
             <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
-              <p className="truncate text-body-strong text-(--neutral-100)">{name}</p>
+              <p className="truncate text-body-sm-strong text-(--neutral-100)">{name}</p>
               {email && <p className="truncate text-caption-medium text-(--neutral-200)">{email}</p>}
             </div>
             <AccountMenu onSignOut={signOut} side="above" />
@@ -389,20 +394,8 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   )
 }
 
-export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) {
+export function Sidebar(props: Chats) {
   const [collapsed, setCollapsed] = useState(read)
-  const autoCollapsed = useRef(false) // we collapsed it for an incident, so closing the incident expands it again (unless the owner toggled it meanwhile)
-  useEffect(() => {
-    if (collapse) {
-      setCollapsed((c) => {
-        autoCollapsed.current = !c
-        return true
-      })
-    } else if (autoCollapsed.current) {
-      autoCollapsed.current = false
-      setCollapsed(false)
-    }
-  }, [collapse])
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -437,7 +430,6 @@ export function Sidebar({ collapse, ...props }: Chats & { collapse?: boolean }) 
   }
 
   const toggle = () => {
-    autoCollapsed.current = false
     setCollapsed((c) => {
       try {
         localStorage.setItem(KEY, c ? '0' : '1')

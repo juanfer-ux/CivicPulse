@@ -28,20 +28,20 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 
 | Pair | Ratio | Use |
 |---|---|---|
-| `foreground` `#C1C1C8` on `background` `#18181B` | 9.9 | Normal text |
-| `foreground` on `card` `#1F1F23` | 9.2 | Text in cards and inputs |
-| `muted-foreground` `#A9A9B2` on page / on card | 7.6 / 7.0 | Supporting text |
-| `incident` `#E58C7D` on card | 6.9 | **All error text** |
-| `sidebar` on `brand-primary` `#E3E3E7` | 15.1 | Text on the primary button (owner, 2026-11-02): the label stays the dark `sidebar` / `neutral-900` |
-| `sidebar` on `brand-secondary` `#87DBC7` | 11.9 | Text on the primary button's hover |
-| `sidebar` on `primary` `#C1C1C8` | 10.8 | Text on a `primary` fill (the default Badge; the primary button has its own color now) (rule: text on a light fill uses the `sidebar` color) |
-| `sidebar` on `destructive` `#EE8688` | 7.7 | Dangerous buttons and badges now use dark `sidebar` text (light text on it was 1.7 and failed 4.5) |
-| `yellow-400` `#FFEE6C` on page / on card | 14.9 / 14.5 | Pending dots |
-| `orange-400` `#FF9F50` on page / on card | 8.7 / 8.4 | Reviewing dots |
-| `blue-400` `#495C8B` on page / on card | 2.7 / 2.6 | Approved dots (graphics only). 🟨 Below the 3:1 that WCAG 1.4.11 asks of graphics on the dark page; the owner chose this color on 2026-10-26 |
-| `red-400` `#EE8688` on page / on card | 7.1 / 6.9 | Rejected dots |
-| `closed` / `ring` `#737381` on page / on card | 3.8 / 3.7 | Focus ring: **graphics only, never text** |
-| `destructive` `#EE8688` as text on card | 6.9 | OK as text, but error text stays `incident` |
+| `foreground` `#C1C1C8` on `background` `#1F1F23` | 9.2 | Normal text |
+| `foreground` on `card` `#29292E` | 8.1 | Text in cards and inputs |
+| `muted-foreground` `#A9A9B2` on page / on card | 7.0 / 6.2 | Supporting text |
+| `incident` `#E58C7D` on card | 5.8 | **All error text** |
+| `sidebar` on `brand-primary` `#D9D9DE` | 13.4 | Text on the primary button (owner, 2026-11-02): the label stays the dark `sidebar` / `neutral-900` |
+| `sidebar` on `brand-secondary` `#87DBC7` | 11.7 | Text on the primary button's hover |
+| `sidebar` on `primary` `#C1C1C8` | 10.5 | Text on a `primary` fill (the default Badge; the primary button has its own color now) (rule: text on a light fill uses the `sidebar` color) |
+| `sidebar` on `destructive` `#EE8688` | 7.5 | Dangerous buttons and badges now use dark `sidebar` text (light text on it was 1.7 and failed 4.5) |
+| `yellow-400` `#FFEE6C` on page / on card | 13.8 / 12.2 | Pending dots |
+| `orange-400` `#FF9F50` on page / on card | 8.1 / 7.1 | Reviewing dots |
+| `blue-400` `#495C8B` on page / on card | 2.5 / 2.2 | Approved dots (graphics only). 🟨 Below the 3:1 that WCAG 1.4.11 asks of graphics on the dark page; the owner chose this color on 2026-10-26 |
+| `red-400` `#EE8688` on page / on card | 6.6 / 5.8 | Rejected dots |
+| `closed` / `ring` `#737381` on page / on card | 3.5 / 3.1 | Focus ring: **graphics only, never text** |
+| `destructive` `#EE8688` as text on card | 5.8 | OK as text, but error text stays `incident` |
 
 ## 🔎 Sign in audit (desktop 1440 × 900, WCAG 2.2 AA, 2026-10-24)
 Method: keyboard walk, computed styles and the real page in a browser, contrast math on the real video frames behind the text (27 samples over the 9 s loop), text-spacing and 320 px reflow tests. **Not done:** screen reader (VoiceOver, NVDA), other browsers, an automated tool (axe).

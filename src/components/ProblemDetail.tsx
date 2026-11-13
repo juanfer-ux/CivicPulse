@@ -37,7 +37,7 @@ export function ProblemDetail({
       role="region"
       data-float
       aria-label="Recurrence details"
-      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)] ${WIDE ? 'desk:right-(--col-right)' : 'desk:w-[400px]'} ${WIDE ? 'desk:bg-(--neutral-900)!' : ''}`}
+      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)] ${WIDE ? 'desk:right-(--col-right)' : 'desk:w-[400px]'} ${WIDE ? 'desk:bg-(--neutral-900)!' : ''}`}
     >
       {WIDE && (
         <>
@@ -101,13 +101,13 @@ function WideHeader({ problem, localityName, categoryName }: { problem: ProblemR
     <div className="flex items-center gap-3">
       <p className="text-body-medium leading-5">{categoryName ?? label(problem.category)}</p>
       <span className="h-3.5 w-px bg-(--neutral-500)" aria-hidden />
-      <p className="text-meta leading-5 text-muted-foreground">{problem.reference} · {localityName}</p>
+      <p className="text-meta leading-5 text-(--neutral-200)">{problem.reference} · {localityName}</p>
       {HEADER === '1' && <ProblemStatusPill status={problem.status} />}
     </div>
   )
   const title = (
-    <div className="flex min-w-0 flex-col gap-1">
-      <h2 className="text-heading text-[24px]! leading-[30px]">{problem.location_description}</h2>
+    <div className="flex min-w-0 flex-col gap-2">
+      <h2 className="text-subtitle text-[20px]! leading-[30px] text-(--neutral-100)">{problem.location_description}</h2>
       {category}
     </div>
   )
@@ -140,21 +140,27 @@ function WideHeader({ problem, localityName, categoryName }: { problem: ProblemR
   )
 }
 
-/** Option 3 (owner's drawing, 2026-11-08): the five numbers are not in the header; they stack at the top of the left column, above the occurrences history (ProblemTimelineCard). */
+/** The numbers at the top of the right column (Figma Recurrence Stats, owner 2026-11-12): a `neutral-900` box (6 px radius, 12 px padding and gap) with the "Last reported" strip (`indigo-800`, `indigo-200` text) and four tiles in two columns (`neutral-700`, 4 px radius, 12 / 16 padding, the label with its icon over a 24 px SemiBold number). */
 export function StatList({ problem }: { problem: ProblemRow }) {
+  const [occ, ret, rep, int, last] = stats(problem)
   return (
-    <dl className="hidden grid-cols-2 border-b border-(--neutral-500) desk:grid">
-      {stats(problem).map((x) => (
-        <div key={x.label} className="flex items-center gap-3 border-(--neutral-500) px-4 py-3 even:border-l nth-[n+3]:border-t last:col-span-2">
-          <span className="grid size-8 shrink-0 place-items-center rounded-sm bg-(--neutral-600)">
-            <x.Icon weight="regular" className="size-4 text-(--neutral-100)" aria-hidden />
-          </span>
-          <div className="flex flex-col gap-1">
-            <dt className="text-meta leading-none text-muted-foreground">{x.label}</dt>
-            <dd className="text-heading leading-none">{x.value}</dd>
+    <div className="hidden flex-col gap-3 rounded-md border border-(--neutral-900) bg-(--neutral-900) p-3 desk:flex">
+      <div className="flex items-center gap-2 rounded-sm bg-(--indigo-800) px-3 py-2 text-body-sm text-(--indigo-200)">
+        <last.Icon weight="regular" className="size-4 text-(--indigo-300)" aria-hidden />
+        <span className="flex-1">{last.label}</span>
+        <span className="text-body-sm-strong">{last.value}</span>
+      </div>
+      <dl className="grid grid-cols-2 gap-1">
+        {[occ, ret, rep, int].map((x, i) => (
+          <div key={x.label} className="flex flex-col gap-1.5 rounded-sm bg-(--neutral-700) px-4 py-3">
+            <dt className={`flex items-center gap-1 text-(--neutral-200) ${i < 2 ? 'text-body' : 'text-body-sm leading-4'}`}>
+              <x.Icon weight="regular" className="size-4 shrink-0 text-(--neutral-100)" aria-hidden />
+              {x.label}
+            </dt>
+            <dd className="text-heading text-[24px]! leading-5 text-(--neutral-100)">{x.value}</dd>
           </div>
-        </div>
-      ))}
-    </dl>
+        ))}
+      </dl>
+    </div>
   )
 }
