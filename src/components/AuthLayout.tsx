@@ -34,7 +34,7 @@ export function AuthLayout({ children, mobileLogo, footer }: { children: ReactNo
   )
 
   return (
-    <main className={cn('relative isolate flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-4 desk:flex-row desk:gap-0 desk:p-10', mobileLogo ? 'py-10' : 'py-4')}>
+    <main className={cn('relative isolate flex min-h-svh flex-col items-center justify-center gap-4 bg-(image:--screen-gradient) px-4 desk:flex-row desk:gap-0 desk:p-10', mobileLogo ? 'py-10' : 'py-4')}>
       <img src={authImage} alt="" fetchPriority="high" className="absolute inset-0 -z-20 size-full object-cover object-top" />
       <video
         ref={video}

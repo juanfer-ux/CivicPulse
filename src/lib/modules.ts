@@ -50,6 +50,18 @@ export const place = (list: Placed[], area: Area, type: ModuleType, target: stri
   return inArea.length > MAX_PER_AREA ? next.filter((p) => p !== inArea[0]) : next
 }
 
+/** Reads a saved layout (browser-only, per user: decision 0049); anything unreadable or no longer valid is dropped, so an old save can never break the screen. */
+export const parseLayout = (raw: string | null): { placed: Placed[]; follow: boolean } => {
+  try {
+    const d = JSON.parse(raw ?? '')
+    const ok = (p: Placed) => p && p.type in MODULES && fitsArea(p.type, p.area) && typeof p.pos === 'number' && (p.target === null || typeof p.target === 'string')
+    const placed: Placed[] = (Array.isArray(d.placed) ? d.placed : []).filter(ok).filter((p: Placed, i: number, a: Placed[]) => a.findIndex((q) => q.type === p.type) === i)
+    return { placed, follow: d.follow !== false }
+  } catch {
+    return { placed: [], follow: true }
+  }
+}
+
 /** What shows: with `follow` every placed module shows the open case; without it a module shows only while the case it was placed on is open. */
 export const isVisible = (p: Placed, follow: boolean, openId: string | null) => follow || p.target === openId
 export const inArea = (list: Placed[], area: Area, follow: boolean, openId: string | null) => list.filter((p) => p.area === area && isVisible(p, follow, openId)).sort((a, b) => a.pos - b.pos)

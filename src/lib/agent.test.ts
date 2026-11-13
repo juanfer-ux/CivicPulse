@@ -38,8 +38,10 @@ describe('plan (mock planner)', () => {
     expect(plan('Which locations have repeated parking obstruction reports?', localities)?.kind).toBe('recurring') // unchanged
   })
 
-  it('routes the two Worth investigating cards to the recurring investigation, each with its category', () => {
-    expect(WORTH_INVESTIGATING.map((c) => plan(c.question, localities))).toMatchObject([
+  it('routes the first two Worth investigating cards to the recurring investigation, each with its category, and the third to a plan too', () => {
+    expect(WORTH_INVESTIGATING).toHaveLength(3)
+    expect(plan(WORTH_INVESTIGATING[2].question, localities)).not.toBeNull()
+    expect(WORTH_INVESTIGATING.slice(0, 2).map((c) => plan(c.question, localities))).toMatchObject([
       { kind: 'recurring', category: 'illegal_dumping' },
       { kind: 'recurring', category: 'parking' },
     ])

@@ -1,12 +1,12 @@
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ArrowUp, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
-import { Badge } from '@/components/ui/badge'
+import { ArrowLineLeft, ArrowUp, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
+import { AgentHome } from '@/components/AgentHome'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ModuleOffer } from '@/components/modules/ModuleOffer'
-import { SUGGESTIONS, WORTH_INVESTIGATING, answer, type Answer, type Area } from '@/lib/agent'
+import { answer, type Answer, type Area } from '@/lib/agent'
 import { fetchLocalities } from '@/lib/incidents'
 
 // The charts (Recharts) are their own file, fetched right after the app loads so the first answer already has them; nothing is drawn while they load, never the plain bars.
@@ -16,7 +16,7 @@ const AnswerChart = lazy(loadChart)
 export type Turn = { question: string; result?: Answer; error?: string }
 
 /** `turns` are this conversation's questions and answers; the app keeps one list per conversation (the sidebar's Investigations). `onTurns` edits the conversation with this id, even if the person has switched to another one meanwhile. */
-export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea, recurrenceId = null, onOpenRecurrence }: { recurrenceId?: string | null; onOpenRecurrence?: (id: string) => void; chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
+export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea, recurrenceId = null, onOpenRecurrence, onCollapse }: { onCollapse?: () => void; recurrenceId?: string | null; onOpenRecurrence?: (id: string) => void; chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
   const setTurns = (edit: (t: Turn[]) => Turn[]) => onTurns(chatId, edit)
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
@@ -25,7 +25,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
   useEffect(() => void loadChart(), [])
 
   useEffect(() => {
-    end.current?.scrollIntoView({ block: 'end' })
+    if (turns.length) end.current?.scrollIntoView({ block: 'end' }) // not on the landing, which opens at its top
   }, [turns])
 
   async function ask(question: string) {
@@ -53,53 +53,24 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
 
   return (
     <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-0 max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
-      {/* On desktop the title row is as tall as the section header, so one line runs across the screen. */}
-      <div className={`flex items-center desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:px-8 ${turns.length === 0 ? 'desk:hidden' : ''}`}>
+      {/* The title row (owner's Figma, 2026-11-12): 60 px (8 px above and below the 44 px collapse button), 16 px at the sides, "Explore" in `label` / neutral-200, a `neutral-500` line under it, the collapse button (a 32 px ghost icon button) at its right. */}
+      <div className="flex items-center desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:border-(--neutral-500) desk:px-4">
         <CardHeader className="flex w-full flex-row items-center justify-between max-desk:mx-auto max-desk:max-w-[664px]">
-          <CardTitle asChild className="flex items-center gap-2 text-label">
-            <h2>
-              <Sparkle weight="fill" className="size-4" aria-hidden /> Investigate and Ask
-            </h2>
+          <CardTitle asChild className="text-label text-(--neutral-200)">
+            <h2>Explore</h2>
           </CardTitle>
+          {onCollapse && (
+            <Button size="icon" variant="ghost" aria-label="Collapse agent" title="Collapse agent" onClick={onCollapse} className="hidden size-8 desk:inline-flex">
+              <ArrowLineLeft weight="bold" className="size-4 text-(--neutral-100)" />
+            </Button>
+          )}
         </CardHeader>
       </div>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:p-8">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0">
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
-        <ScrollArea className="min-h-0 flex-1 desk:-mx-8" viewportClassName="[&>div]:!block">
-        <div className={`flex w-full flex-col gap-3 text-body-sm max-desk:mx-auto max-desk:max-w-[664px] desk:max-w-[728px] desk:px-8 ${turns.length === 0 ? 'desk:mx-auto' : ''}`}>
-          {turns.length === 0 && (
-            <div className="flex flex-col gap-10">
-              {/* The empty panel (owner's Figma, 2026-11-05), with Figma's auto layout limits: the whole content (cards, Quick questions) and the composer are at most 664 wide and centered (the greeting "Let’s take a look..." is hidden in Figma, so it is not shown), and the cards fill the width and wrap (each at least 250 wide). The title row is hidden on desktop until the first question. */}
-              <div className="@container flex flex-col gap-4">
-                <p className="font-display text-display-xs text-(--neutral-100)">Worth investigating</p>
-                <div className="flex flex-wrap items-start gap-4">
-                  {WORTH_INVESTIGATING.map((c) => (
-                    <button key={c.title} type="button" className="flex max-w-none min-w-[250px] flex-1 basis-0 @min-[516px]:max-w-[320px] cursor-pointer gap-3 overflow-hidden rounded-lg bg-(--neutral-700) px-2 py-3 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => void ask(c.question)}>
-                      <span className="h-[100px] max-w-[400px] min-w-[132px] flex-1 rounded-sm bg-(--neutral-500)" aria-hidden />
-                      <span className="flex min-w-0 flex-1 flex-col p-2">
-                        <span className="flex flex-col items-start gap-3">
-                          <Badge className="border-0 bg-(--neutral-500) px-1.5 text-(--neutral-100)">
-                            {c.category}
-                          </Badge>
-                          <span className="text-label-regular [overflow-wrap:anywhere] text-(--neutral-200)">{c.title}</span>
-                        </span>
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="flex max-w-[664px] flex-col gap-4">
-                <p className="font-display text-display-xs text-(--neutral-200)">Quick questions</p>
-                <div className="flex flex-col gap-1.5">
-                  {SUGGESTIONS.map((s) => (
-                    <Button key={s} variant="ghost" className="h-auto justify-start whitespace-normal rounded-none border-0 border-b border-(--neutral-400) p-3 text-left text-body-sm-medium text-(--neutral-200) hover:bg-(--neutral-700) hover:text-(--neutral-200)" onClick={() => void ask(s)}>
-                      {s}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+        <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
+        <div className="flex w-full flex-col gap-3 text-body-sm max-desk:mx-auto max-desk:max-w-[664px] desk:mx-auto desk:max-w-[816px] desk:gap-8 desk:px-12 desk:py-8">
+          {turns.length === 0 && <AgentHome ask={(q) => void ask(q)} />}
           {turns.map((t, i) => (
             <div key={i} className="flex flex-col gap-4">
               <Question text={t.question} />
@@ -111,9 +82,9 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           <div ref={end} />
         </div>
         </ScrollArea>
-        <form onSubmit={onSubmit} className={`flex w-full max-w-[664px] items-center gap-2 max-desk:mx-auto ${turns.length === 0 ? 'desk:mx-auto' : ''}`}>
+        <form onSubmit={onSubmit} className={`flex w-full max-w-[664px] items-center gap-2 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-12 desk:py-6 ${turns.length === 0 ? 'desk:max-w-[816px]' : 'desk:max-w-[760px]'}`}>
           <Input name="q" value={text} onChange={(e) => setText(e.target.value)} placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" />
-          <Button type="submit" size="icon" aria-label="Ask" className="bg-(--white) hover:bg-(--white)/90" disabled={busy || !text.trim()}>
+          <Button type="submit" size="icon" aria-label="Ask" className="bg-(--brand-primary) hover:bg-(--brand-primary)/90" disabled={busy || !text.trim()}>
             <ArrowUp aria-hidden />
           </Button>
         </form>

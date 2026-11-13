@@ -13,7 +13,7 @@ npm run build-storybook    # static copy in storybook-static/ (not committed)
 
 - **Packages (dev only):** `storybook`, `@storybook/react-vite`, `@chromatic-com/storybook`, and the `chromatic` CLI that was already there. No browser-test addon, no extra addons: the `storybook init` wizard adds Playwright and a Vitest browser project and rewrites `vite.config.ts`; that was removed on purpose.
 - **`.storybook/main.ts`:** finds `src/**/*.stories.ts(x)`; reuses `vite.config.ts`, so the `@` alias and Tailwind work as in the app.
-- **`.storybook/preview.tsx`:** imports `src/index.css` (tokens, fonts, text styles), wraps stories in the bold Phosphor `IconContext` like `main.tsx`, and uses the app's dark background (`#111113`, or `#18181B` for panels).
+- **`.storybook/preview.tsx`:** imports `src/index.css` (tokens, fonts, text styles), wraps stories in the bold Phosphor `IconContext` like `main.tsx`, and uses the app's dark background (`#18181B`, or `#1F1F23` for panels).
 - **Stories** sit beside the component: `button.stories.tsx` (every variant in every size, as in Figma) and `stat-card.stories.tsx` (the four trends). Titles follow the Figma pages: *Actions & inputs*, *Data display*, *Navigation & layout*, *Map & agent*, *Auth & brand*.
 
 ## Rules

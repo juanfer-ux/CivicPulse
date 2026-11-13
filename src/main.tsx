@@ -21,6 +21,14 @@ const GlowGallery = lazy(() => import('@/components/GlowGallery').then((m) => ({
 const LocalityGallery = lazy(() => import('@/components/LocalityGallery').then((m) => ({ default: m.LocalityGallery })))
 const HistoryGallery = lazy(() => import('@/components/HistoryGallery').then((m) => ({ default: m.HistoryGallery })))
 const SidebarListGallery = lazy(() => import('@/components/SidebarListGallery').then((m) => ({ default: m.SidebarListGallery })))
+const NotesGallery = lazy(() => import('@/components/NotesGallery').then((m) => ({ default: m.NotesGallery })))
+const AgentCollapseGallery = lazy(() => import('@/components/AgentCollapseGallery').then((m) => ({ default: m.AgentCollapseGallery })))
+const DockZonesGallery = lazy(() => import('@/components/DockZonesGallery').then((m) => ({ default: m.DockZonesGallery })))
+const ModuleOptionGallery = lazy(() => import('@/components/ModuleOptionGallery').then((m) => ({ default: m.ModuleOptionGallery })))
+const ModulesGallery = lazy(() => import('@/components/ModulesGallery').then((m) => ({ default: m.ModulesGallery })))
+const PhotoCarouselGallery = lazy(() => import('@/components/PhotoCarouselGallery').then((m) => ({ default: m.PhotoCarouselGallery })))
+const ReportExpandGallery = lazy(() => import('@/components/ReportExpandGallery').then((m) => ({ default: m.ReportExpandGallery })))
+const HeaderGallery = lazy(() => import('@/components/HeaderGallery').then((m) => ({ default: m.HeaderGallery })))
 const TimelineGallery = lazy(() => import('@/components/TimelineGallery').then((m) => ({ default: m.TimelineGallery })))
 
 // The gallery has no data, so it skips sign-in: open /#components.
@@ -31,6 +39,14 @@ const glow = location.hash === '#glow' // glow options for the map's outlines, m
 const locality = location.hash === '#locality' // locality outlines for the Stat Card
 const history = location.hash === '#history' // the rows of the occurrences history as three columns
 const sidebarLists = location.hash === '#sidebar' // ways to keep the sidebar's Recurrences and Incidents lists short
+const notes = location.hash === '#notes' // ways to show the notes under an agent answer as rows
+const agentCollapse = location.hash === '#agent-collapse' // ways to collapse the agent panel and bring it back
+const dockZones = location.hash === '#dock-zones' // docking zones of different ratios and places
+const moduleOptions = location.hash === '#module-options' // where the modules' apply-and-pin option lives
+const modules = location.hash === '#modules' // agent-offered modules, the dock and the Modules library
+const photoCarousel = location.hash === '#photo-carousel' // ways to show a report's photos in its open card
+const reportExpand = location.hash === '#report-expand' // opening a report from the map inside the recurrence
+const header = location.hash === '#header' // ways to lay out the Recurrence Panel as a wide header
 const timeline = location.hash === '#timeline' // ways to show a problem's history as a timeline
 
 createRoot(document.getElementById('root')!).render(
@@ -38,7 +54,39 @@ createRoot(document.getElementById('root')!).render(
     {/* Every Phosphor icon is the bold weight (owner, 2026-10-30) unless it asks for another (fill on the map badges, the buttons' sparkle and the bullet). */}
     <IconContext.Provider value={{ weight: 'bold' }}>
       <ErrorBoundary>
-        {sidebarLists ? (
+        {dockZones ? (
+          <Suspense fallback={null}>
+            <DockZonesGallery />
+          </Suspense>
+        ) : moduleOptions ? (
+          <Suspense fallback={null}>
+            <ModuleOptionGallery />
+          </Suspense>
+        ) : modules ? (
+          <Suspense fallback={null}>
+            <ModulesGallery />
+          </Suspense>
+        ) : photoCarousel ? (
+          <Suspense fallback={null}>
+            <PhotoCarouselGallery />
+          </Suspense>
+        ) : reportExpand ? (
+          <Suspense fallback={null}>
+            <ReportExpandGallery />
+          </Suspense>
+        ) : agentCollapse ? (
+          <Suspense fallback={null}>
+            <AgentCollapseGallery />
+          </Suspense>
+        ) : header ? (
+          <Suspense fallback={null}>
+            <HeaderGallery />
+          </Suspense>
+        ) : notes ? (
+          <Suspense fallback={null}>
+            <NotesGallery />
+          </Suspense>
+        ) : sidebarLists ? (
           <Suspense fallback={null}>
             <SidebarListGallery />
           </Suspense>

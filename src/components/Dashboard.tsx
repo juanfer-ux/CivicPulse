@@ -1,12 +1,12 @@
 import { titleCase } from '@/lib/titleCase'
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
-import { CaretDown, CaretLeft, CaretUp, ChatCircleDots, Sparkle, X } from '@phosphor-icons/react'
+import { CaretDown, CaretUp, ChatCircleDots, Sparkle, X } from '@phosphor-icons/react'
 import { ModuleDock } from '@/components/modules/ModuleDock'
 import { useModules } from '@/components/modules/ModulesProvider'
 import { pushOf } from '@/lib/modules'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
-import { localityShapes } from '@/lib/localityShape'
+import { buckets } from '@/lib/sparkline'
 import { trendOf, type Trend } from '@/lib/trend'
 
 /** DEMO (owner, 2026-11-05, released): the four cards show the four trend statuses, one each (Above, About, Below usual, Low reporting), whatever the data says, so the design can be reviewed. The incident data is synthetic anyway. Delete this line and `DEMO_TRENDS[i] ??` below to show the real trends again. */
@@ -79,12 +79,6 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   useEffect(() => {
     fetchDashboardData().then(setData, (e: Error) => setError(e.message))
   }, [])
-  // The outline of each locality for its Stat Card (owner, 2026-11-07): the boundaries load once, each shape fills a 72 px box.
-  const [shapes, setShapes] = useState<ReturnType<typeof localityShapes> | null>(null)
-  useEffect(() => {
-    fetch('/bogota-localities.geojson').then((r) => r.json()).then((d) => setShapes(localityShapes(d.features, 72, false)), () => setShapes(null))
-  }, [])
-
   useEffect(() => {
     fetchProblems().then(setProblems, () => setProblems([]))
     fetchLinkedIncidentIds().then(setLinked, () => setLinked(new Map()))
@@ -151,16 +145,17 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
     const all = data?.incidents ?? []
     const DAY = 86_400_000
     const end = Math.max(0, ...all.map((i) => Date.parse(i.occurred_at)))
-    const counts = new Map<number, { n: number; recent: number; before: number }>()
+    const counts = new Map<number, { n: number; recent: number; before: number; times: number[] }>()
     for (const i of all) {
-      const c = counts.get(i.locality_code) ?? { n: 0, recent: 0, before: 0 }
+      const c = counts.get(i.locality_code) ?? { n: 0, recent: 0, before: 0, times: [] }
       const age = (end - Date.parse(i.occurred_at)) / DAY
       c.n++
+      c.times.push(Date.parse(i.occurred_at))
       if (age < 30) c.recent++
       else if (age < 60) c.before++
       counts.set(i.locality_code, c)
     }
-    return [...counts].sort((a, b) => b[1].n - a[1].n).slice(0, 4)
+    return [...counts].sort((a, b) => b[1].n - a[1].n).slice(0, 4).map(([code, c]) => [code, { ...c, series: buckets(c.times, end) }] as const)
   }, [data])
 
   // Recurrences view: the same filters, applied to problems. Days means "reported in that window"; a problem has no incident status, it has its own.
@@ -337,7 +332,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
           categories={data.categories}
           counts={byGroup}
           problemCounts={hasProblems ? byProblemStatus : undefined}
-          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--map-pad)+var(--page-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+var(--page-pad))]'} desk:right-(--col-right) desk:left-(--col-left) desk:transition-[left] desk:duration-300`}
+          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:right-(--col-right) desk:left-(--col-left) desk:transition-[left] desk:duration-300`}
         />
       )}
 
@@ -366,14 +361,14 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         role="region"
         data-float
         aria-label="Busiest localities"
-        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-(--page-pad) overflow-y-auto desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--map-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--map-pad))]'}`}
+        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-2 overflow-y-auto desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--map-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--map-pad))]'}`}
       >
         {error ? (
           <p className="col-span-full text-incident">{error}</p>
         ) : !data ? (
           <p className="col-span-full text-muted-foreground">Loading…</p>
         ) : topLocalities.length ? (
-          topLocalities.map(([code, c], i) => <StatCard key={code} shape={shapes?.get(code)} label={localityName.get(code)} value={c.n} trend={DEMO_TRENDS[i] ?? trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
+          topLocalities.map(([code, c], i) => <StatCard key={code} series={c.series} label={localityName.get(code)} value={c.n} trend={DEMO_TRENDS[i] ?? trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
                 const on = filters.locality !== String(code)
                 setFilters({ ...filters, locality: on ? String(code) : '' })
                 if (on) onZoomLocality(code) // fly to the locality, wherever the map is now
@@ -387,17 +382,13 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         className={`${tab !== 'explore' ? 'flex' : 'hidden'} desk:transition-[width] desk:duration-300 min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:py-(--page-pad) desk:pr-(--page-pad) desk:pl-(--sidebar-gap)`}
       >
         {/* Outer container: the shared float padding (12 px) on every side (owner, 2026-11-06); the panel itself is this inner box. */}
-        <div data-float className="relative flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-r-lg desk:backdrop-blur-[32px] desk:bg-[color-mix(in_srgb,var(--neutral-900)_90%,transparent)] desk:p-0">
+        <div data-float className="relative flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-r-lg desk:backdrop-blur-[32px] desk:border-l-[0.5px] desk:border-l-(--neutral-400) desk:bg-(--neutral-900) desk:p-0">
           {agentOff ? (
             <button type="button" aria-label="Open agent" title="Open agent" onClick={() => onAgentOff(false)} className="hidden h-full w-full flex-col items-center gap-3 py-4 text-(--neutral-200) hover:text-(--neutral-100) desk:flex">
               <Sparkle className="size-4" />
               <span className="text-caption [writing-mode:vertical-rl]">Ask the agent</span>
             </button>
-          ) : (
-            <button type="button" aria-label="Collapse agent" title="Collapse agent" onClick={() => onAgentOff(true)} className="absolute top-3 right-3 z-10 hidden size-8 place-items-center rounded-sm text-(--neutral-200) hover:bg-(--neutral-700) hover:text-(--neutral-100) desk:grid">
-            <CaretLeft weight="regular" className="size-4" />
-          </button>
-          )}
+          ) : null /* the collapse button is in the agent panel's title row (InvestigatePanel) */}
           <div className={agentOff ? 'contents desk:hidden' : 'contents'}>{children}</div>
         </div>
       </div>

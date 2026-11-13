@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { COLUMN_PUSH, MAX_PER_AREA, canDock, fitsArea, inArea, insertPos, isVisible, place, pushOf, shapeFor, suggestedArea, type Placed } from '@/lib/modules'
+import { COLUMN_PUSH, MAX_PER_AREA, canDock, fitsArea, inArea, insertPos, isVisible, parseLayout, place, pushOf, shapeFor, suggestedArea, type Placed } from '@/lib/modules'
 
 describe('modules', () => {
   it('lights only the areas a module supports and suggests its first choice', () => {
@@ -60,5 +60,13 @@ describe('modules', () => {
     expect(pushOf([p], 'left', true, null, false)).toBe(COLUMN_PUSH)
     expect(pushOf([p], 'left', true, 'pr1', true)).toBe(0) // an open recurrence has its header on top and the columns under it
     expect(pushOf([p], 'right', true, null, false)).toBe(0) // nothing in the right column
+  })
+
+  it('reads a saved layout and drops anything invalid', () => {
+    const good = { area: 'right', type: 'numbers', target: 'pr1', pos: 1 }
+    const saved = JSON.stringify({ placed: [good, good, { area: 'top', type: 'numbers', target: null, pos: 1 }, { area: 'left', type: 'chart', target: null, pos: 1 }], follow: false })
+    expect(parseLayout(saved)).toEqual({ placed: [good], follow: false })
+    expect(parseLayout('not json')).toEqual({ placed: [], follow: true })
+    expect(parseLayout(null)).toEqual({ placed: [], follow: true })
   })
 })
