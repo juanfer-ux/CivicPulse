@@ -13,6 +13,18 @@ import { AuthProvider } from '@/lib/auth'
 const smoothing = new URLSearchParams(location.search).get('smoothing')
 if (smoothing && ['auto', 'none', 'antialiased', 'subpixel-antialiased'].includes(smoothing)) document.documentElement.style.setProperty('-webkit-font-smoothing', smoothing)
 
+const CategoryIconGallery = lazy(() => import('@/components/CategoryIconGallery').then((m) => ({ default: m.CategoryIconGallery })))
+const CategoryIconFamiliesGallery = lazy(() => import('@/components/CategoryIconFamiliesGallery').then((m) => ({ default: m.CategoryIconFamiliesGallery })))
+const categoryFamilies = location.hash === '#category-families' // other duotone icon families for the category cards
+const CoolIconsGallery = lazy(() => import('@/components/CategoryFamilyGallery').then((m) => ({ default: m.CoolIconsGallery })))
+const LucideExtendedGallery = lazy(() => import('@/components/CategoryFamilyGallery').then((m) => ({ default: m.LucideExtendedGallery })))
+const categoryCool = location.hash === '#category-coolicons' // one duotone family for the category cards: Coolicons
+const categoryLucide = location.hash === '#category-lucide' // one duotone family for the category cards: Lucide Extended
+const PhosphorGallery = lazy(() => import('@/components/PhosphorGallery').then((m) => ({ default: m.PhosphorGallery })))
+const phosphor = location.hash === '#phosphor' // every Phosphor icon, searchable
+const FiltersPanelGallery = lazy(() => import('@/components/FiltersPanelGallery').then((m) => ({ default: m.FiltersPanelGallery })))
+const filtersPanel = location.hash === '#filters-panel' // the Filters side panel
+const categoryIcons = location.hash === '#category-icons' // duotone icons for the category cards of the agent panel
 const App = lazy(() => import('./App.tsx'))
 const Gallery = lazy(() => import('@/components/Gallery').then((m) => ({ default: m.Gallery })))
 const ChartGallery = lazy(() => import('@/components/ChartGallery').then((m) => ({ default: m.ChartGallery })))
@@ -54,7 +66,31 @@ createRoot(document.getElementById('root')!).render(
     {/* Every Phosphor icon is the bold weight (owner, 2026-10-30) unless it asks for another (fill on the map badges, the buttons' sparkle and the bullet). */}
     <IconContext.Provider value={{ weight: 'bold' }}>
       <ErrorBoundary>
-        {dockZones ? (
+        {filtersPanel ? (
+          <Suspense fallback={null}>
+            <FiltersPanelGallery />
+          </Suspense>
+        ) : phosphor ? (
+          <Suspense fallback={null}>
+            <PhosphorGallery />
+          </Suspense>
+        ) : categoryCool ? (
+          <Suspense fallback={null}>
+            <CoolIconsGallery />
+          </Suspense>
+        ) : categoryLucide ? (
+          <Suspense fallback={null}>
+            <LucideExtendedGallery />
+          </Suspense>
+        ) : categoryFamilies ? (
+          <Suspense fallback={null}>
+            <CategoryIconFamiliesGallery />
+          </Suspense>
+        ) : categoryIcons ? (
+          <Suspense fallback={null}>
+            <CategoryIconGallery />
+          </Suspense>
+        ) : dockZones ? (
           <Suspense fallback={null}>
             <DockZonesGallery />
           </Suspense>

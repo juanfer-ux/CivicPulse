@@ -37,11 +37,31 @@ export function problemSizes(size: number) {
   return { circle: Math.round(PROBLEM_FAR.circle * k), iconPx: half2(PROBLEM_FAR.icon * k), badgeD: half2(PROBLEM_FAR.badge * k), alertOutline: half2(PROBLEM_FAR.alertOutline * k), up: PROBLEM_FAR.triangleUp * k }
 }
 
+/** Where the warning triangle's center sits from the circle's center, in screen px (y grows downward). Normally on the diagonal above the circle's upper right; an Active parking recurrence (`carStyle`, owner's Figma 2026-11-13) has it to the right, a little above the middle: (18.7, -8.5) at the farthest zoom and (25.4, -8) at the closest. */
+export function triangleOffset(size: number, carStyle = false) {
+  const { circle, up } = problemSizes(size)
+  if (!carStyle) {
+    const off = (circle / 2 + PROBLEM_FAR.badgeGap) / Math.SQRT2
+    return { x: off, y: -(off + up) }
+  }
+  const t = (circle - PROBLEM_FAR.circle) / (PROBLEM_FAR.circle * 1.5 - PROBLEM_FAR.circle)
+  return { x: 18.68 + (25.4 - 18.68) * t, y: -8.5 + 0.5 * t }
+}
+
+/** How far from a recurrence's point a tap still hits its body, in screen px (owner, 2026-11-13: more room between recurrences and the incidents beside them, so neither is hard to tap). A normal marker is its circle with its outline and a little over; an Active parking recurrence has no circle, only the car, so it is the car's half height and 2 px: smaller than the circle was. */
+export function bodyRadius(size: number, carStyle = false): number {
+  const { circle } = problemSizes(size)
+  return carStyle ? (circle * 0.75) / 2 + 2 : circle / 2 + PROBLEM_FAR.outline + 2
+}
+
+/** Inside this radius a tap always goes to the recurrence; between it and the body's edge the nearer of the recurrence and an incident under the tap wins (the 0.6 keeps the car's own middle for the car). */
+export const bodyCore = (size: number, carStyle = false) => bodyRadius(size, carStyle) * 0.6
+
 /** Is a tap at (dx, dy) screen px from a problem's point on its visible marker (the circle with its outline, or the warning triangle), and not just in the empty corners of its image? Taps outside it fall through to the incident next to it (owner, 2026-11-01). `size` is the image size at the current zoom. */
-export function hitsProblemMarker(dx: number, dy: number, size: number): boolean {
-  const { circle, badgeD, alertOutline, up } = problemSizes(size)
-  if (Math.hypot(dx, dy) <= circle / 2 + PROBLEM_FAR.outline + 2) return true
-  const off = (circle / 2 + PROBLEM_FAR.badgeGap) / Math.SQRT2
+export function hitsProblemMarker(dx: number, dy: number, size: number, carStyle = false): boolean {
+  const { badgeD, alertOutline } = problemSizes(size)
+  if (Math.hypot(dx, dy) <= bodyRadius(size, carStyle)) return true
+  const t = triangleOffset(size, carStyle)
   const half = badgeD / 2 + alertOutline
-  return Math.abs(dx - off) <= half && Math.abs(dy + off + up) <= half
+  return Math.abs(dx - t.x) <= half && Math.abs(dy - t.y) <= half
 }

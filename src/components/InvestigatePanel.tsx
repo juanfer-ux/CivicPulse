@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ArrowLineLeft, ArrowUp, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
+import { ArrowUp, SidebarSimple, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
 import { AgentHome } from '@/components/AgentHome'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -53,16 +53,16 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
 
   return (
     <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-0 max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
-      {/* The title row (owner's Figma, 2026-11-12): 60 px (8 px above and below the 44 px collapse button), 16 px at the sides, "Explore" in `label` / neutral-200, a `neutral-500` line under it, the collapse button (a 32 px ghost icon button) at its right. */}
-      <div className="flex items-center desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:border-(--neutral-500) desk:px-4">
+      {/* The title row (owner's Figma, 2026-11-12): 60 px (8 px above and below the 44 px collapse button), 16 px at the sides, "Explore" in `label` / neutral-200, a `neutral-500` line under it, the collapse control at its right: Figma's Sidebar Item Investigation instance, 40 × 44 px, 4 px radius, the `panel-left` icon at 20 px (`SidebarSimple`, regular), `neutral-600` on hover (owner, 2026-11-13; it was a 32 px ghost button with a 16 px arrow). */}
+      <div className={`flex items-center desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:border-(--neutral-500) ${turns.length === 0 ? 'desk:px-6' : 'desk:px-4'}`}> {/* 24 px at the sides on the landing, 16 in a conversation (owner's Figma, 2026-11-14) */}
         <CardHeader className="flex w-full flex-row items-center justify-between max-desk:mx-auto max-desk:max-w-[664px]">
           <CardTitle asChild className="text-label text-(--neutral-200)">
             <h2>Explore</h2>
           </CardTitle>
           {onCollapse && (
-            <Button size="icon" variant="ghost" aria-label="Collapse agent" title="Collapse agent" onClick={onCollapse} className="hidden size-8 desk:inline-flex">
-              <ArrowLineLeft weight="bold" className="size-4 text-(--neutral-100)" />
-            </Button>
+            <button type="button" aria-label="Collapse agent" title="Collapse agent" onClick={onCollapse} className="hidden h-11 w-10 shrink-0 cursor-pointer place-items-center rounded-sm text-(--neutral-100) outline-none hover:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50 desk:grid">
+              <SidebarSimple weight="regular" className="size-5" />
+            </button>
           )}
         </CardHeader>
       </div>

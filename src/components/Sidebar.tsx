@@ -227,9 +227,11 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
 
 const KEY = 'sidebar-collapsed'
 const COLLAPSED_W = 64
+/** Under 1,800 px the sidebar is collapsed (owner, 2026-11-13): on load and whenever the window drops under it, and it expands again the moment the window reaches 1,800 px; the toggle still opens or closes it by hand in between. */
+const NARROW = '(max-width: 1799.98px)'
 const read = () => {
   try {
-    return localStorage.getItem(KEY) !== '0'
+    return window.matchMedia?.(NARROW).matches || localStorage.getItem(KEY) !== '0'
   } catch {
     return true
   }
@@ -323,7 +325,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
-        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-[70px] justify-center bg-(--neutral-800)' : 'h-16 justify-between bg-(--neutral-700) px-2'}`}>
+        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-[58px] justify-center bg-(--black)' : 'h-16 justify-between bg-(--neutral-700) px-2'}`}>
           <Brand collapsed={collapsed} onToggle={onToggle} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
@@ -374,10 +376,10 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
           </>
         )}
       </div>
-      <div className={`flex shrink-0 flex-col border-t border-(--neutral-600) ${collapsed ? 'min-h-[85px] items-center justify-center' : 'py-3'}`}>
+      <div className={`flex shrink-0 flex-col border-t border-(--neutral-600) ${collapsed ? 'items-center justify-center py-5' : 'py-3'}`}>
         {collapsed ? (
           <>
-            <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} size="lg" title={name} />} />
+            <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} title={name} />} />
           </>
         ) : (
           <div className="flex items-center gap-3 py-1 pl-4 pr-5">
@@ -397,6 +399,14 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
 export function Sidebar(props: Chats) {
   const [collapsed, setCollapsed] = useState(read)
   const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia?.(NARROW) // jsdom (the tests) has no matchMedia
+    if (!mq) return
+    const on = (e: MediaQueryListEvent) => setCollapsed(e.matches)
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -419,6 +429,10 @@ export function Sidebar(props: Chats) {
   useLayoutEffect(() => {
     shownWidth.current = collapsed ? COLLAPSED_W : width
   })
+  useLayoutEffect(() => {
+    document.documentElement.style.setProperty('--sidebar-now', `${collapsed ? COLLAPSED_W : width}px`) // read by App for the agent panel's maximum width
+    window.dispatchEvent(new Event('sidebar-now'))
+  }, [collapsed, width])
   const changeWidth = (px: number) => {
     const w = clampWidth(px)
     setWidth(w)
@@ -445,7 +459,7 @@ export function Sidebar(props: Chats) {
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:m-(--page-pad) desk:mr-0 desk:block desk:rounded-l-lg ${collapsed ? 'bg-(--neutral-900)' : 'bg-(--neutral-700)'}`}>
+      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:m-(--page-pad) desk:mr-0 desk:block desk:rounded-l-lg ${collapsed ? 'border-r-[0.5px] border-r-(--neutral-700) bg-(--neutral-800)' : 'bg-(--neutral-700)'}`}>
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         <Menu_
           {...props}

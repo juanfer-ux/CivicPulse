@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA, hitsProblemMarker, problemSizes, zoomForCircle } from '@/lib/markerSizes'
+import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA, triangleOffset, bodyCore, bodyRadius, hitsProblemMarker, problemSizes, zoomForCircle } from '@/lib/markerSizes'
 
 // The owner's sizes for the incident squares (2026-10-30), by map zoom: 11 and below plain 8 px, 12 plain 10 px,
 // 13 square 24 px with a 12 px icon, 14 and above square 30 px with a 16 px icon. The selected ring is 10 px bigger.
@@ -63,5 +63,30 @@ describe('problem marker tap area', () => {
   it('the empty corners of the image do not', () => {
     expect(hitsProblemMarker(-50, -50, size)).toBe(false)
     expect(hitsProblemMarker(50, 50, size)).toBe(false)
+  })
+})
+
+describe('triangleOffset (the warning triangle beside the marker)', () => {
+  it('sits to the right, a little above the middle, for an Active parking recurrence (Figma 2026-11-13)', () => {
+    const far = triangleOffset(PROBLEM_CIRCLE_PX[0], true)
+    const near = triangleOffset(PROBLEM_CIRCLE_PX[PROBLEM_CIRCLE_PX.length - 1], true)
+    expect([far.x, far.y]).toEqual([18.68, -8.5])
+    expect(near.x).toBeCloseTo(25.4, 1)
+    expect(near.y).toBeCloseTo(-8, 1)
+  })
+  it('stays on the diagonal above the circle for the others', () => {
+    const t = triangleOffset(PROBLEM_CIRCLE_PX[0])
+    expect(t.x).toBeGreaterThan(0)
+    expect(t.y).toBeLessThan(-t.x)
+  })
+})
+
+describe('tap room between recurrences and incidents', () => {
+  it('an Active parking recurrence (the car, no circle) takes less room than a circle', () => {
+    const size = PROBLEM_CIRCLE_PX[0]
+    expect(bodyRadius(size, true)).toBeLessThan(bodyRadius(size))
+    expect(bodyCore(size, true)).toBeLessThan(bodyRadius(size, true))
+    expect(hitsProblemMarker(0, 0, size, true)).toBe(true)
+    expect(hitsProblemMarker(-(bodyRadius(size) - 1), 0, size, true)).toBe(false) // where the circle used to catch the tap
   })
 })
