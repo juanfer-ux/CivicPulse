@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { gsap } from 'gsap'
 import { mockChats } from '@/lib/mockChats'
 import { Dashboard, type Tab } from '@/components/Dashboard'
 import type { Area } from '@/lib/agent'
@@ -22,14 +23,39 @@ function useAgentWidth() {
 
 export default function App() {
   const [agentW, setAgentW] = useAgentWidth()
-  const mainRef = useRef<HTMLElement>(null)
-  const [areaW, setAreaW] = useState(() => window.innerWidth) // the width beside the sidebar, which changes when the sidebar does
+  const [agentOff, setAgentOff] = useState(false) // the agent panel is collapsed to a 44 px rail (owner's try, 2026-11-08; the composer bar was tried first); the panel stays mounted, so the conversation stays
+  const [view, setView] = useState({ win: window.innerWidth, sidebar: 0 }) // the window and the sidebar's width right now; the agent panel's maximum comes from them
   useEffect(() => {
-    const ro = new ResizeObserver(([e]) => setAreaW(e.contentRect.width))
-    ro.observe(mainRef.current!)
-    return () => ro.disconnect()
+    let first = true
+    const calc = () => {
+      const sidebar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-now')) || 0
+      if (first && sidebar) { first = false; instant.current = true } // the first real measure (the sidebar has reported) sets the width at once, no glide on load
+      setView({ win: window.innerWidth, sidebar })
+    }
+    calc()
+    window.addEventListener('resize', calc) // the window
+    window.addEventListener('sidebar-now', calc) // the sidebar opened, closed or was resized (sent by Sidebar; a size observer missed it)
+    return () => (window.removeEventListener('resize', calc), window.removeEventListener('sidebar-now', calc))
   }, [])
-  const maxW = agentMax(areaW)
+  const maxW = agentMax(view.win, view.sidebar) // the panel's right edge stops at the middle of the window (owner, 2026-11-13, final)
+  // The agent panel's width (`--agent-w` on <main>) moves with GSAP (owner, 2026-11-13): when the window or the sidebar change what it may be, it glides to the new width (0.3 s, power2.out, the sidebar's curve); while the handle is dragged it follows the pointer at once.
+  const mainRef = useRef<HTMLElement>(null)
+  const instant = useRef(true)
+  const target = agentOff ? 56 : Math.min(maxW, agentW ?? Math.max(AGENT_MIN, 0.345 * view.win + 12))
+  useLayoutEffect(() => {
+    const el = mainRef.current!
+    const was = parseFloat(el.style.getPropertyValue('--agent-w'))
+    if (instant.current || !was || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      instant.current = false
+      gsap.killTweensOf(el)
+      el.style.setProperty('--agent-w', `${target}px`)
+      return
+    }
+    const root = document.documentElement
+    root.dataset.resizing = '' // no CSS transition runs behind the tween (the map's chips and filters follow it every frame)
+    gsap.to(el, { '--agent-w': `${target}px`, duration: 0.3, ease: 'power2.out', overwrite: true, onComplete: () => delete root.dataset.resizing })
+  }, [target])
+  const drag = (px: number | null) => { instant.current = px !== null; setAgentW(px) }
   const [highlightIds, setHighlightIds] = useState<string[]>([])
   const [areas, setAreas] = useState<Area[]>([])
   const [spots, setSpots] = useState<string[][]>([]) // the answer is about specific spots (the incident ids of each): one radius around each, no locality outlines
@@ -96,7 +122,6 @@ export default function App() {
       .map((c) => ({ title: c.turns[0]?.question ?? 'Opened on the map', ids: idsOf(c) }))
       .filter((c) => c.ids.length),
   ]
-  const [agentOff, setAgentOff] = useState(false) // the agent panel is collapsed to a 44 px rail (owner's try, 2026-11-08; the composer bar was tried first); the panel stays mounted, so the conversation stays
   const [inspecting, setInspecting] = useState(false) // an incident or problem is open: the sidebar collapses (the 360 px panel overlays the map, which keeps its size; see Dashboard)
 
   return (
@@ -108,8 +133,8 @@ export default function App() {
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
       <Sidebar chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
       {/* The agent panel is always 30 % of the browser window width (30vw), no minimum or maximum (owner, 2026-11-08; it was clamp(550px, 38%, 680px), which kept the cards and the composer from breaking on narrow windows). */}
-      <main ref={mainRef} id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--agent-w': agentOff ? '56px' : agentW ? `${Math.min(maxW, agentW)}px` : `clamp(${AGENT_MIN}px, calc(34.5vw + 12px), ${maxW}px)`, '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
-        {!agentOff && <AgentResizer max={maxW} onChange={setAgentW} />}
+      <main ref={mainRef} id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
+        {!agentOff && <AgentResizer max={maxW} onChange={drag} />}
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
           <Dashboard highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} agentOff={agentOff} onAgentOff={setAgentOff} focus={focus} onRows={setRows} onSelection={setSelection}>

@@ -1,6 +1,6 @@
 import { titleCase } from '@/lib/titleCase'
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
-import { CaretDown, CaretUp, ChatCircleDots, Sparkle, X } from '@phosphor-icons/react'
+import { CaretDown, CaretUp, ChatCircleDots, SlidersHorizontal, Sparkle, X } from '@phosphor-icons/react'
 import { ModuleDock } from '@/components/modules/ModuleDock'
 import { useModules } from '@/components/modules/ModulesProvider'
 import { pushOf } from '@/lib/modules'
@@ -15,7 +15,9 @@ import { MediaGallery } from '@/components/MediaGallery'
 import { HEADER, ProblemDetail } from '@/components/ProblemDetail'
 import { ProblemTimelineCard } from '@/components/ProblemTimelineCard'
 import { Badge } from '@/components/ui/badge'
-import { FilterBar, MapTypeChips, NO_FILTERS, type Filters } from '@/components/FilterBar'
+import { MapTypeChips, NO_FILTERS, isFiltered, type Filters } from '@/components/FilterBar'
+import { FiltersPanel, filterCount } from '@/components/FiltersPanel'
+import { Chip } from '@/components/ui/chip'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -63,11 +65,22 @@ interface Props {
   children?: ReactNode
 }
 
+/** The Filters panel's way of opening (owner's test, 2026-11-14): true pushes the map and everything on it to the left like the menu sidebar does, false lays the panel over the map with a scrim. */
+const FILTERS_PUSH = true
+const FILTERS_W = 420
+
 export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, agentOff, onAgentOff, focus, onRows, onSelection, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
   const [filters, setFilters] = useState<Filters>(NO_FILTERS)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  useEffect(() => {
+    if (!filtersOpen) return
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setFiltersOpen(false)
+    document.addEventListener('keydown', esc)
+    return () => document.removeEventListener('keydown', esc)
+  }, [filtersOpen])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState(false) // mobile bottom sheet only
   // Recurrences (decision 0030). If the database does not have the layer yet, the list stays empty and the map shows incidents exactly as before.
@@ -186,6 +199,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   const recurrenceOpen = !!selectedProblem && !selectedId // an open incident hides the recurrence panel
   const dockW = modules.on ? pushOf(modules.placed, 'right', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
   const dockL = modules.on ? pushOf(modules.placed, 'left', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
+  const filtersPush = FILTERS_PUSH && filtersOpen ? FILTERS_W + 12 : 0 // the panel and the 12 px page padding after it, pushed from the right edge
   // The map holds the loose incidents plus, while a problem is open, that problem's own incidents (drawn as tiny dots around its marker).
   const problemIncidents = useMemo(() => (selectedProblem ? (problemDetail?.incidents ?? []) : []), [selectedProblem, problemDetail])
   const problemIncidentIds = useMemo(() => problemIncidents.map((i) => i.id), [problemIncidents])
@@ -279,7 +293,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   const mapBase = 'calc(var(--agent-w) + var(--panel-gap))'
   // Both detail panels float over the map (owner, 2026-11-05), so the map and the controls over it never move for them.
   return (
-    <div className="contents map-col" data-history={item?.kind === 'problem' && !shown.leaving && HEADER !== '3' ? '' : undefined} data-rp={item?.kind === 'problem' && !shown.leaving && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': `${dockW}px`, '--dock-l': `${dockL}px`, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
+    <div className="contents map-col" data-history={item?.kind === 'problem' && !shown.leaving && HEADER !== '3' ? '' : undefined} data-rp={item?.kind === 'problem' && !shown.leaving && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': `${dockW + filtersPush}px`, '--filters-push': `${filtersPush}px`, '--dock-l': `${dockL}px`, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -313,9 +327,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
       {/* Bottom left (owner, 2026-10-30): the Problems and Incidents toggles with their counts, merged with the old "Showing N" legend. Without the problems layer there is one plain count, as before. */}
       {data && (
         <div data-float className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-(--map-pad) desk:left-(--col-left) desk:transition-[left] desk:duration-300 desk:right-(--col-right) desk:pointer-events-none desk:[&>*]:pointer-events-auto">
-          {hasProblems ? (
-            !selected && !selectedProblem && <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
-          ) : (
+          {!hasProblems && (
             <p className="pointer-events-none rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200)">
               Showing {filtered.length} {filtered.length === 1 ? 'incident' : 'incidents'}
             </p>
@@ -323,17 +335,35 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         </div>
       )}
 
-      {/* Filter chips (Figma: Filter Bar): one row over the map, scrolling sideways when it does not fit; hidden while an incident is open. */}
+      {/* Recurrences and Incidents chips (owner, 2026-11-14): at the top left of the same row as the Filters button, where they were at the bottom left. */}
+      {hasProblems && !selected && !selectedProblem && (
+        <div data-float className={`fixed left-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:left-(--col-left) desk:transition-[left] desk:duration-300`}>
+          <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
+        </div>
+      )}
+
+      {/* The Filters button (owner, 2026-11-14): it replaces the chip bar and sits at the right of the same row; it opens the Filters side panel. Hidden while an incident is open, like the bar was. */}
       {!selected && !selectedProblem && data && (
-        <FilterBar
-          filters={filters}
-          onChange={setFilters}
-          localities={data.localities}
-          categories={data.categories}
-          counts={byGroup}
-          problemCounts={hasProblems ? byProblemStatus : undefined}
-          className={`fixed inset-x-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:right-(--col-right) desk:left-(--col-left) desk:transition-[left] desk:duration-300`}
-        />
+        <div data-float className={`fixed right-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:right-(--col-right)`}>
+          {isFiltered(filters) && (
+            <Chip icon={<X aria-hidden />} onClick={() => setFilters(NO_FILTERS)}>
+              Clear filters
+            </Chip>
+          )}
+          <Chip icon={<SlidersHorizontal aria-hidden />} count={filterCount(filters) || undefined} pressed={filterCount(filters) > 0} aria-expanded={filtersOpen} onClick={() => setFiltersOpen(true)}>
+            Filters
+          </Chip>
+        </div>
+      )}
+
+      {/* The Filters side panel (owner, 2026-11-14): from the right like Create user. FILTERS_PUSH (the owner's test) makes it a column that pushes the map and what floats on it to the left, like the menu sidebar; otherwise it lies over the map with a scrim. Escape or Close shut it. */}
+      {data && (
+        <>
+          {!FILTERS_PUSH && <div className={`absolute inset-0 z-40 bg-black/30 transition-opacity duration-300 ${filtersOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`} onClick={() => setFiltersOpen(false)} aria-hidden />}
+          <div className={`absolute inset-y-(--page-pad) right-(--page-pad) ${FILTERS_PUSH ? 'z-30' : 'z-40 shadow-lg'} overflow-hidden rounded-lg transition-transform duration-300 ease-out ${filtersOpen ? 'translate-x-0' : 'translate-x-[calc(100%+var(--page-pad))]'}`} aria-hidden={!filtersOpen} inert={!filtersOpen}>
+            <FiltersPanel filters={filters} onChange={setFilters} onClose={() => setFiltersOpen(false)} results={(showProblems ? problemsFiltered.length : 0) + (showIncidents ? filtered.length : 0)} localities={data.localities} categories={data.categories} counts={byGroup} problemCounts={hasProblems ? byProblemStatus : undefined} />
+          </div>
+        </>
       )}
 
       {/* Mobile: bottom sheet over the map. Desktop (1440 px and wider): `contents`, so the two columns float over the map. */}
