@@ -22,8 +22,8 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 const CATEGORY_ICON: Record<string, Icon> = { 'Obstructive Parking': CarSimple, 'Illegal Dumping': Trash, 'Damaged Infrastructure': Wrench }
 
 /** Figma Data_Card_Small / Data_Card_Medium: 6 px radius, `neutral-700` fill, 0.5 px `neutral-500` line, 8 px padding and a name in `body-sm`. */
-const dataCard = 'flex flex-col gap-1 rounded-md'
-const cardName = 'p-1 text-meta text-(--neutral-100)'
+const dataCard = 'flex flex-col gap-1 rounded-md border-[0.5px] border-(--neutral-500)' // Figma data cards (owner, 2026-11-15): no fill, a 0.5 px `neutral-500` line inside
+const cardName = 'p-1 text-meta text-(--neutral-200)'
 
 function Donut() {
   const R = 52.28 // the ring's middle radius: outer diameter 130.7, inner radius 60 % of it (the owner's Figma donut, 2026-11-12), in a 131 box (it was 140, owner's Figma 2026-11-14)
@@ -45,16 +45,19 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
       <h2 className="font-display text-display-md text-(--brand-primary)">Welcome back,</h2>
       <div className="flex flex-col gap-10">
         <Section title="Let's catch up">
-          <div className="flex flex-wrap gap-4"> {/* Figma CatchUp_Module2 (owner, 2026-11-14, latest): a wrapping row, 16 px both ways; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
-            <div className="flex min-w-[180px] flex-1 basis-0 flex-col gap-4">
-              {[0, 1].map((i) => (
-                <div key={i} className={`${dataCard} bg-(--neutral-700) p-2`}>
-                  <p className={cardName}>Data card name</p>
-                  <div className="h-[50px]" aria-hidden /> {/* Figma Data_Chart of the small card: its neutral-800 fill is hidden now (2026-11-14), the 50 px block stays */}
-                </div>
-              ))}
+          <div className="flex flex-wrap gap-x-4 gap-y-3"> {/* Figma CatchUp_Module2 (owner, 2026-11-15): a wrapping row, 16 px across and 12 px between wrapped rows; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
+            <div className="@container min-w-[180px] flex-1 basis-0">
+              {/* The two small cards stack in a column beside the medium card, and sit side by side once the group has the whole width, i.e. when the medium card has dropped below (owner, 2026-11-15; the panel at its minimum width) */}
+              <div className="flex flex-col gap-3 @min-[420px]:flex-row">
+                {[0, 1].map((i) => (
+                  <div key={i} className={`${dataCard} p-2 @min-[420px]:flex-1`}>
+                    <p className={cardName}>Data card name</p>
+                    <div className="h-[50px]" aria-hidden /> {/* Figma Data_Chart of the small card: its neutral-800 fill is hidden now (2026-11-14), the 50 px block stays */}
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className={`${dataCard} min-h-[218px] min-w-[372px] flex-1 basis-0 bg-(--neutral-800) p-2.5`}>
+            <div className={`${dataCard} min-h-[218px] min-w-[372px] flex-1 basis-0 p-2.5`}>
               <p className={cardName}>Today&apos;s top localities</p>
               <div className="flex flex-1 items-center justify-center gap-6 p-2"> {/* Figma Data_Chart: Fill in height and width, its content centered, 24 px between the donut and the legend (owner, 2026-11-14) */}
                 <div className="flex max-w-[164px] min-w-0 flex-1 basis-0 justify-center"> {/* Figma Graph: Fill, 164 px at most, centers the 131 px donut */}
@@ -63,12 +66,12 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
                     <Car weight="regular" className="absolute top-1/2 left-1/2 size-8 -translate-x-1/2 -translate-y-1/2 text-(--neutral-300)" aria-hidden />
                   </div>
                 </div>
-                <ul className="flex max-w-[240px] min-w-0 flex-1 basis-0 flex-col justify-center gap-1 px-2 text-body-sm"> {/* Figma Legend: Fill, 240 px at most, 8 px at its sides */}
+                <ul className="flex max-w-[240px] min-w-0 flex-1 basis-0 flex-col justify-between gap-1 self-stretch px-2 text-meta"> {/* Figma Legend (owner, 2026-11-15): Fill in width and height, 240 px at most, 8 px at its sides, its five rows spread from top to bottom (space between), each row `meta` 23 px high */}
                   {SHARE.map(([name, n], i) => (
                     <li key={name} className="flex items-center gap-2">
                       <span className="size-2 shrink-0 rounded-full bg-(--indigo-400)" style={{ opacity: STEPS[i] }} aria-hidden />
                       <span className="flex-1 truncate text-(--neutral-200)">{name}</span>
-                      <span className="text-(--neutral-100)">{n} · {Math.round((n / total) * 100)} %</span>
+                      <span className="text-meta-medium text-(--neutral-100)">{n} · {Math.round((n / total) * 100)} %</span> {/* meta-medium (13 Medium) since 2026-11-15; it was regular */}
                     </li>
                   ))}
                 </ul>
@@ -81,8 +84,8 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
             {WORTH_INVESTIGATING.map((c) => {
               const Icon = CATEGORY_ICON[c.title]
               return (
-                <button key={c.title} type="button" className="flex min-w-[120px] flex-1 cursor-pointer flex-wrap items-end gap-x-3 gap-y-2.5 rounded-md bg-(--neutral-800) p-2.5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(c.question)}> {/* Figma Category_Card2 (owner, 2026-11-14, latest): a `neutral-800` row with 6 px radius and 10 px padding, 12 px between the icon block (Fill, at least 48 px, 64 px high) and the name (96 px wide, at the bottom), 10 px between rows when it wraps */}
-                  <span className="grid h-16 min-w-12 flex-1 basis-0 place-items-center rounded-sm bg-(--neutral-900)">{Icon && <Icon weight="duotone" className="size-[25.6px] text-(--indigo-300)" aria-hidden />}</span>
+                <button key={c.title} type="button" className="flex min-w-[120px] flex-1 cursor-pointer flex-wrap items-end gap-x-3 gap-y-2.5 rounded-md bg-(--neutral-700) p-2.5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(c.question)}> {/* Figma Category_Card2 (owner, 2026-11-14, latest): a `neutral-800` row with 6 px radius and 10 px padding, 12 px between the icon block (Fill, at least 48 px, 64 px high) and the name (96 px wide, at the bottom), 10 px between rows when it wraps */}
+                  <span className="grid h-16 min-w-12 flex-1 basis-0 place-items-center rounded-sm bg-(--neutral-800)">{Icon && <Icon weight="duotone" className="size-[25.6px] text-(--indigo-300)" aria-hidden />}</span>
                   <span className="flex w-24 shrink-0 items-end self-stretch px-1 py-0.5 text-body-sm-medium text-(--neutral-100)">{c.title}</span>
                 </button>
               )

@@ -15,7 +15,7 @@ import { MediaGallery } from '@/components/MediaGallery'
 import { HEADER, ProblemDetail } from '@/components/ProblemDetail'
 import { ProblemTimelineCard } from '@/components/ProblemTimelineCard'
 import { Badge } from '@/components/ui/badge'
-import { MapTypeChips, NO_FILTERS, isFiltered, type Filters } from '@/components/FilterBar'
+import { MapTypeChips, NO_FILTERS, type Filters } from '@/components/FilterBar'
 import { FiltersPanel, filterCount } from '@/components/FiltersPanel'
 import { Chip } from '@/components/ui/chip'
 import { Button } from '@/components/ui/button'
@@ -313,12 +313,12 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         onSelect={select}
       />
 
-      {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. The banner keeps the whole top row; an open incident or recurrence panel sits below it (`--banner-offset`, owner, 2026-11-07). */}
+      {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. The banner sits under the filters row (owner, 2026-11-15; it was above the stat cards, then between them and the filters row); while an incident or recurrence is open the stat cards and filters are hidden, so it goes back to the top and the panel sits below it (`--banner-offset`, owner, 2026-11-07). */}
       {chatMode && (
-        <div data-float className="fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-4 bg-(--indigo-600) px-5 text-meta text-(--indigo-100) desk:absolute desk:top-(--map-pad) desk:right-(--col-right) desk:left-(--col-left) desk:inset-x-auto desk:rounded-sm">
-          <ChatCircleDots weight="fill" className="size-5 shrink-0 text-(--indigo-200)" aria-hidden />
+        <div data-float className={`fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-3 bg-(--indigo-600) px-2.5 text-meta text-(--indigo-100) desk:absolute ${selected || selectedProblem ? 'desk:top-(--map-pad)' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--control-default)+16px)]'} desk:right-(--col-right) desk:left-(--col-left) desk:inset-x-auto desk:rounded-md`}>
+          <span className="grid size-9 shrink-0 place-items-center"><ChatCircleDots weight="fill" className="size-5 text-(--indigo-200)" aria-hidden /></span>
           <span className="flex-1">While showing the agent's answer on the map, filters will narrow it down.</span>
-          <Button size="sm" variant="secondary" onClick={onClearHighlight}>
+          <Button variant="secondary" className="ring-[0.5px] ring-(--neutral-100)" onClick={onClearHighlight}> {/* Figma: the default 36 px size, a 0.5 px neutral-100 line outside, 16 px at the sides */}
             Clear agent results
           </Button>
         </div>
@@ -337,16 +337,16 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
 
       {/* Recurrences and Incidents chips (owner, 2026-11-14): at the top left of the same row as the Filters button, where they were at the bottom left. */}
       {hasProblems && !selected && !selectedProblem && (
-        <div data-float className={`fixed left-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:left-(--col-left) desk:transition-[left] desk:duration-300`}>
+        <div data-float className={`fixed left-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:left-(--col-left) desk:transition-[left] desk:duration-300`}>
           <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
         </div>
       )}
 
       {/* The Filters button (owner, 2026-11-14): it replaces the chip bar and sits at the right of the same row; it opens the Filters side panel. Hidden while an incident is open, like the bar was. */}
       {!selected && !selectedProblem && data && (
-        <div data-float className={`fixed right-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:right-(--col-right)`}>
-          {isFiltered(filters) && (
-            <Chip icon={<X aria-hidden />} onClick={() => setFilters(NO_FILTERS)}>
+        <div data-float className={`fixed right-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:right-(--col-right)`}>
+          {filterCount(filters) > 0 && ( // the Recurrences / Incidents toggles are not filters: switching them never shows Clear filters (owner, 2026-11-15)
+            <Chip icon={<X aria-hidden />} onClick={() => setFilters({ ...NO_FILTERS, types: filters.types })}>
               Clear filters
             </Chip>
           )}
@@ -391,7 +391,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         role="region"
         data-float
         aria-label="Busiest localities"
-        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-2 overflow-y-auto desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 desk:grid-cols-4 ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--answer-banner-h)+var(--map-pad)+var(--page-pad))]' : 'desk:top-[calc(var(--section-header-h)+var(--map-pad))]'}`}
+        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-2 overflow-y-auto desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 desk:grid-cols-4 desk:top-[calc(var(--section-header-h)+var(--map-pad))]`}
       >
         {error ? (
           <p className="col-span-full text-incident">{error}</p>

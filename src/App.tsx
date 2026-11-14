@@ -74,6 +74,7 @@ export default function App() {
   const pick = (id: number) => {
     setChats((cs) => cs.filter((c) => c.id === id || c.turns.length)) // an empty new investigation you leave is dropped
     setActiveId(id)
+    setAgentOff(false) // a conversation picked in the sidebar always opens the agent panel (owner, 2026-11-15)
     const last = chats.find((c) => c.id === id)?.turns.findLast((t) => t.result)?.result
     show(last?.highlightIds ?? [], last?.areas, last?.spots) // the map shows the answer of the last question of that conversation
   }
@@ -83,6 +84,7 @@ export default function App() {
       setChats((cs) => [...cs, { id, turns: [] }])
       setActiveId(id)
     }
+    setAgentOff(false) // Explore and a new investigation land on the agent's start, so the panel opens too
     show([])
   }
   // Recurrences (sidebar): the plus adds one to the list; there is no page for it yet.
@@ -115,6 +117,7 @@ export default function App() {
   const open = (kind: 'recurrence' | 'incident') => (id: string) => {
     const holder = idsOf(active).includes(id) ? active : [...chats].reverse().find((c) => idsOf(c).includes(id))
     if (holder && holder.id !== active.id) pick(holder.id)
+    setAgentOff(false) // so does a recurrence or an incident (owner, 2026-11-15): its conversation and the panel open together
     setFocus((f) => ({ kind, id, n: (f?.n ?? 0) + 1 }))
   }
   const chatItems = [
