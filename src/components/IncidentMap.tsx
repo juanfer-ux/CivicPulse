@@ -98,6 +98,8 @@ const PROBLEM_GLOW_ALPHA = 0.05 // the inner glow of a recurrence's ring (owner,
 const PROBLEM_GLOW_N = 16 // thin bands so no step shows (4 wide ones looked like rings)
 const PROBLEM_GLOW_BANDS = Array.from({ length: PROBLEM_GLOW_N }, (_, i) => [0.4 + (0.6 * i) / PROBLEM_GLOW_N, 0.4 + (0.6 * (i + 1)) / PROBLEM_GLOW_N]) // from the center, as fractions of the radius
 /** While a recurrence is open (owner, 2026-11-09) everything of the other recurrences (ring, fill, glow, marker, pulse, dots) is toned down to KEEP, like the other incidents when one incident is open; `sel` is the open recurrence's id. */
+/** The "open recurrence" while an incident (not a recurrence) is open: it matches no recurrence, so all of them are toned down. */
+const NO_PROBLEM = '\u0000none'
 const dimmed = (v: number, sel: string | null) => (sel ? ['case', ['==', ['get', 'id'], sel], v, v * KEEP] : v) as never
 const ringFill = (sel: string | null) => ['interpolate', ['linear'], ['zoom'], PROBLEM_ALPHA_ZOOM[0], dimmed(PROBLEM_FILL_ALPHA, sel), PROBLEM_ALPHA_ZOOM[1], dimmed(PROBLEM_FILL_ALPHA_NEAR, sel)] as never
 const ringStroke = (sel: string | null) => ['interpolate', ['linear'], ['zoom'], PROBLEM_ALPHA_ZOOM[0], dimmed(PROBLEM_RING_ALPHA, sel), PROBLEM_ALPHA_ZOOM[1], dimmed(PROBLEM_RING_ALPHA_NEAR, sel)] as never
@@ -694,14 +696,14 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
-    const sel = selectedProblemId
+    const sel = selectedProblemId ?? (selectedId ? NO_PROBLEM : null) // an open incident dims every recurrence too (owner, 2026-11-15): `sel` is then an id that matches none, so all of them are "the others"
     map.setPaintProperty('problem-radius-fill', 'circle-opacity', ringFill(sel))
     map.setPaintProperty('problem-radius-ring', 'circle-stroke-opacity', ringStroke(sel))
     PROBLEM_GLOW_BANDS.forEach((_, i) => map.setPaintProperty(`problem-radius-glow-${i}`, 'circle-stroke-opacity', dimmed(glowAlpha(i), sel)))
     map.setLayoutProperty('problem-markers', 'icon-image', problemImage(sel, hoverId))
     map.setPaintProperty('problem-incident-dots', 'circle-color', (sel ? (openReportId ? ['case', ['==', ['get', 'id'], openReportId], ['get', 'color'], ['get', 'dim']] : ['case', ['get', 'po'], ['get', 'color'], ['get', 'dim']]) : ['get', 'color']) as never)
     for (const [id, { el }] of pulses.current) el.style.opacity = sel && id !== sel ? String(KEEP) : ''
-  }, [ready, selectedProblemId, openReportId, problems, hoverId])
+  }, [ready, selectedProblemId, selectedId, openReportId, problems, hoverId])
 
   // Test (owner, 2026-10-30): opening an incident flies the camera to it with GSAP, easing the centre and the zoom together; any touch of the map stops it. Closing it flies back to where the map was before (a conscious decision to leave it).
   const home = useRef<{ lng: number; lat: number; zoom: number } | null>(null)

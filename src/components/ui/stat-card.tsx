@@ -43,7 +43,7 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
       {t && (
         <span className="flex w-full items-center gap-1.5 bg-(--neutral-700) px-2.5 py-1.5 text-meta text-(--neutral-100)">
           <t.Icon className="size-3.5 shrink-0" aria-hidden />
-          {t.text}
+          <span className="min-w-0 truncate" title={t.text}>{t.text}</span> {/* one line: in a narrow card "Low reporting*" wrapped and its second line was clipped (owner, 2026-11-15) */}
         </span>
       )}
     </Tag>
