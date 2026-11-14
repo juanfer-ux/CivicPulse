@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
-import { ArrowRight, Car, CarSimple, Trash, Wrench, type Icon } from '@phosphor-icons/react'
+import { useEffect, type ReactNode } from 'react'
+import { Car, CarSimple, Trash, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wrench, type Icon } from '@phosphor-icons/react'
 import { SUGGESTIONS, WORTH_INVESTIGATING } from '@/lib/agent'
 
 /** The agent panel's landing (owner's Figma, 2026-11-12: Agent Panel, Welcome_Module, CatchUp_Module, Worth-Investigating_Module, Quick Questions): a greeting and three sections, each a Welcome_Module with a title row and a caret that folds it. Data overview and the category pictures are still placeholders (Figma's numbers); the questions are real and ask the agent. */
@@ -9,9 +9,11 @@ const GAP = (2.3 / 360) * 2 * Math.PI * 52.28 // 2.3 degrees between slices, cen
 const total = SHARE.reduce((a, [, n]) => a + n, 0)
 
 /** A Welcome_Module of the panel (owner's Figma, 2026-11-12): its title, in `display-xs`, over its content. The two ghost buttons (a menu and a fold chevron) that the title row had are gone from the panel's modules, so the sections do not fold any more. */
+const TOPIC_ICON: Icon[] = [Warning, MapPin, Clock, ArrowsClockwise, Compass]
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="flex flex-col gap-4">
+    <section className="flex flex-col gap-5">
       <h3 className="font-display-semi text-display-xs text-(--neutral-200)">{title}</h3>
       {children}
     </section>
@@ -40,12 +42,22 @@ function Donut() {
 }
 
 export function AgentHome({ ask }: { ask: (q: string) => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName
+      if (e.metaKey || e.ctrlKey || e.altKey || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target as HTMLElement).isContentEditable) return
+      const q = SUGGESTIONS[Number(e.key) - 1]
+      if (q) ask(q)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [ask])
   return (
     <div className="flex flex-col gap-8">
       <h2 className="font-display text-display-md text-(--brand-primary)">Welcome back,</h2>
       <div className="flex flex-col gap-10">
         <Section title="Let's catch up">
-          <div className="flex flex-wrap gap-x-4 gap-y-3"> {/* Figma CatchUp_Module2 (owner, 2026-11-15): a wrapping row, 16 px across and 12 px between wrapped rows; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
+          <div className="flex flex-wrap items-center gap-3"> {/* Figma CatchUp_Module2 (owner, 2026-11-15, checked again later that day): a wrapping row, 12 px across and 12 px between wrapped rows, items centered; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
             <div className="@container min-w-[180px] flex-1 basis-0">
               {/* The two small cards stack in a column beside the medium card, and sit side by side once the group has the whole width, i.e. when the medium card has dropped below (owner, 2026-11-15; the panel at its minimum width) */}
               <div className="flex flex-col gap-3 @min-[420px]:flex-row">
@@ -57,7 +69,7 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
                 ))}
               </div>
             </div>
-            <div className={`${dataCard} min-h-[218px] min-w-[372px] flex-1 basis-0 p-2.5`}>
+            <div className={`${dataCard} min-h-[218px] min-w-[372px] flex-1 basis-0 gap-2 p-2.5`}>
               <p className={cardName}>Today&apos;s top localities</p>
               <div className="flex flex-1 items-center justify-center gap-6 p-2"> {/* Figma Data_Chart: Fill in height and width, its content centered, 24 px between the donut and the legend (owner, 2026-11-14) */}
                 <div className="flex max-w-[164px] min-w-0 flex-1 basis-0 justify-center"> {/* Figma Graph: Fill, 164 px at most, centers the 131 px donut */}
@@ -80,26 +92,35 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
           </div>
         </Section>
         <Section title="Recurrences to investigate">
-          <div className="flex flex-wrap gap-4"> {/* Figma Worth-Investigating_Module: a wrapping row, 16 px apart */}
+          <div className="flex gap-2.5"> {/* Figma Worth-Investigating_Module (2026-11-15): one row that no longer wraps, 10 px apart, cards Fill with a 120 px minimum */}
             {WORTH_INVESTIGATING.map((c) => {
               const Icon = CATEGORY_ICON[c.title]
               return (
-                <button key={c.title} type="button" className="flex min-w-[120px] flex-1 cursor-pointer flex-wrap items-end gap-x-3 gap-y-2.5 rounded-md bg-(--neutral-700) p-2.5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(c.question)}> {/* Figma Category_Card2 (owner, 2026-11-14, latest): a `neutral-800` row with 6 px radius and 10 px padding, 12 px between the icon block (Fill, at least 48 px, 64 px high) and the name (96 px wide, at the bottom), 10 px between rows when it wraps */}
-                  <span className="grid h-16 min-w-12 flex-1 basis-0 place-items-center rounded-sm bg-(--neutral-800)">{Icon && <Icon weight="duotone" className="size-[25.6px] text-(--indigo-300)" aria-hidden />}</span>
-                  <span className="flex w-24 shrink-0 items-end self-stretch px-1 py-0.5 text-body-sm-medium text-(--neutral-100)">{c.title}</span>
+                <button key={c.title} type="button" className="group flex min-w-[120px] flex-1 cursor-pointer flex-col items-start gap-4 rounded-md bg-(--neutral-700) p-3 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(c.question)}> {/* Figma Category_Card2 (owner, 2026-11-15): vertical, neutral-700, 6 px radius, 12 px padding, 16 px between the icon (24 px, top left) and the name (Fill width, Hug height, neutral-200, wraps) and the name; no inner block. Rollover (owner's try): neutral-600 and the icon turns filled */}
+                  {Icon && (
+                    <span className="grid size-6 place-items-center">
+                      <Icon weight="duotone" className="size-6 text-(--indigo-300) group-hover:hidden group-focus-visible:hidden" aria-hidden />
+                      <Icon weight="fill" className="hidden size-6 text-(--indigo-300) group-hover:block group-focus-visible:block" aria-hidden />
+                    </span>
+                  )}
+                  <span className="w-full max-w-[88px] text-body-sm-medium text-(--neutral-200)">{c.title}</span>
                 </button>
               )
             })}
           </div>
         </Section>
         <Section title="Quick sugestions">
-          <div className="flex flex-col gap-2">
-            {SUGGESTIONS.map((s) => (
-              <button key={s} type="button" className="flex w-full cursor-pointer gap-2 rounded-sm border border-(--neutral-700) p-2 text-left outline-none hover:bg-(--neutral-800) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(s)}>
-                <ArrowRight className="mt-1 size-3 shrink-0 text-(--neutral-300)" aria-hidden />
-                <span className="line-clamp-4 px-1 text-body-sm-medium text-(--neutral-200)">{s}</span>
-              </button>
-            ))}
+          <div className="flex flex-col rounded-md border border-(--neutral-700) p-1"> {/* Command list (owner, 2026-11-15, picked from fourteen layouts): all five questions as rows with a topic icon and a key hint; pressing 1 to 5 asks that question. Icons are made up. */}
+            {SUGGESTIONS.map((s, k) => {
+              const TopicIcon = TOPIC_ICON[k]
+              return (
+                <button key={s} type="button" className="group flex cursor-pointer items-center gap-3 rounded-sm p-2 text-left outline-none hover:bg-(--neutral-700) focus-visible:bg-(--neutral-700) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(s)}>
+                  <TopicIcon className="size-4 shrink-0 text-(--indigo-400) group-hover:text-(--indigo-200) group-focus-visible:text-(--indigo-200)" aria-hidden />
+                  <span className="flex-1 text-body-sm-medium text-(--neutral-200)">{s}</span>
+                  <kbd className="grid size-6 shrink-0 place-items-center rounded-xs bg-(--neutral-700) text-meta font-sans text-(--neutral-300)">{k + 1}</kbd>
+                </button>
+              )
+            })}
           </div>
         </Section>
       </div>

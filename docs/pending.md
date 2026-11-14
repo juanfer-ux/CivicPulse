@@ -49,3 +49,5 @@ The one list of what is not done yet, grouped by area. [handoff.md](handoff.md) 
 - [ ] **Old merged branches** on GitHub can be deleted on the owner's word.
 - [ ] **Docs of the local galleries:** `/#dock-zones` and `/#modules` still show the old fixed-zone layout; redraw with the three areas or retire them.
 - [ ] Open questions in [handoff.md](handoff.md) (Open items): sidebar logos, Safari cursor over markers.
+
+- **Hover states not in Figma yet (2026-11-15):** the category cards' rollover (neutral-600, filled icon) and the Quick suggestions rows' rollover (icon indigo-200) exist only in code; Figma's `Category_Card2` and `Quick Questions` have no hover state. The key hints are not ⌘ in code (browser keeps ⌘1–5).
