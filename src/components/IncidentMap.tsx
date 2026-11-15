@@ -554,14 +554,16 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         map.on('mouseleave', layer, () => setHover(null))
       }
       // The tapped report's pin floats at the top of its dot's stem instead of on the ground (owner, 2026-11-15): the 3D layer says how far up that is on screen
-      let lastLift = 0
+      let last = ''
       map.on('render', () => {
         const id = selectedIdRef.current
-        const lift = id ? carLayerRef.current?.dotLift(id) : undefined
-        const up = lift === undefined ? 0 : lift - (map.getZoom() >= 14 ? 15 : 12) // the pin sits on the stem's top, not centered on it: raised by its radius (owner, 2026-11-15: it looked too low)
-        if (Math.abs(up - lastLift) < 0.5) return
-        lastLift = up
-        map.setPaintProperty('incident-selected-pin', 'icon-translate', [0, up])
+        const l = id ? carLayerRef.current?.dotLift(id) : undefined
+        const dy = l ? l.y - (map.getZoom() >= 14 ? 15 : 12) : 0 // the pin sits on the stem's top, not centered on it: raised by its radius (owner, 2026-11-15)
+        const dx = l ? l.x : 0 // and it follows the stem's lean in perspective (owner's screenshot: the pin hung to the right of the stem's top)
+        const key = `${Math.round(dx)},${Math.round(dy)}`
+        if (key === last) return
+        last = key
+        map.setPaintProperty('incident-selected-pin', 'icon-translate', [dx, dy])
       })
       setReady(true)
     })

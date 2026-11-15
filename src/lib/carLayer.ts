@@ -62,8 +62,8 @@ const groundShader = (minY: number, h: number) => (shader: { vertexShader: strin
 /** A small stable number from an id (the same recurrence always gets the same turn). */
 const hash = (id: string) => [...id].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7)
 
-export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { badgeAt: (id: string) => BadgeSpot | undefined; dotLift: (id: string) => number | undefined } {
-  const lifts = new Map<string, number>() // how far above its dot (screen px, negative is up) the top of the dot's stem is
+export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { badgeAt: (id: string) => BadgeSpot | undefined; dotLift: (id: string) => { x: number; y: number } | undefined } {
+  const lifts = new Map<string, { x: number; y: number }>() // where the top of a dot's stem is, from the dot, on screen (px; y negative is up, x follows the stem's lean)
   const spots = new Map<string, BadgeSpot>()
   const badgeMats = new Map<string, SpriteMaterial>()
   const stripGeometry = new PlaneGeometry(1, 1).translate(0, 0.5, 0) // a strip standing on its bottom edge
@@ -328,7 +328,7 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
       for (const [id, st] of dotStems) {
         const ground = new Vector3(0, 0, 0).applyMatrix4(st.matrix).applyMatrix4(camera.projectionMatrix)
         const top = new Vector3(0, st.userData.h as number, 0).applyMatrix4(st.matrix).applyMatrix4(camera.projectionMatrix)
-        lifts.set(id, ((ground.y - top.y) / 2) * ch)
+        lifts.set(id, { x: ((top.x - ground.x) / 2) * cw, y: ((ground.y - top.y) / 2) * ch })
       }
       renderer.resetState()
       renderer.render(behind, camera)
