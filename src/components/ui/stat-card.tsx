@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Trend } from '@/lib/trend'
 import { ArrowDown, ArrowRight, ArrowUp, TrendDown } from '@phosphor-icons/react'
 import { sparkPoints } from '@/lib/sparkline'
@@ -14,7 +14,17 @@ const TREND = {
 export function StatCard({ label, value, trend, selected, onClick, series }: { label: ReactNode; value: ReactNode; trend?: Trend; selected?: boolean; onClick?: () => void; series?: number[] }) {
   const Tag = onClick ? 'button' : 'div'
   const t = trend && TREND[trend]
-  const g = series && sparkPoints(series, 112, 56)
+  // The line is drawn at its real pixel size (no stretched viewBox, no non-scaling stroke): a gradient on a stretched, non-scaling stroke looked crackled in Chrome (owner, 2026-11-15).
+  const box = useRef<HTMLSpanElement>(null)
+  const [w, setW] = useState(0)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setW(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [series])
+  const g = series && w > 0 ? sparkPoints(series, w, 56) : null
   return (
     <Tag
       className={`@container flex h-[156px] min-w-0 flex-col overflow-hidden rounded-lg border text-left enabled:hover:border-(--neutral-300) ${selected ? 'border-(--neutral-300)' : 'border-input'}`}
@@ -27,14 +37,25 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
             <span className="text-caption text-(--neutral-200)">Reports</span>
             <span className="text-stat text-(--neutral-100)">{value}</span>
           </span>
-          {g && (
+          {series && (
             <span className="hidden max-w-[164px] min-w-0 flex-1 basis-0 self-stretch px-4 @min-[140px]:block"> {/* Figma Graph (owner, 2026-11-15): 164 px at most, padding included */}
-              <span className="relative block h-full"> {/* Figma Vector 1 (owner, 2026-11-15, latest): Fill in width and height again, so the line is as long as the Graph's inner box (96.5 px in a 257 px card); the peak dot sits on its newest point */}
-                <svg viewBox="0 0 112 56" preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible" role="img" aria-label={`Peak: ${Math.max(...series!)} reports`}>
-                  <polyline points={g.pts.map((p) => p.join(',')).join(' ')} fill="none" stroke="var(--indigo-500)" strokeWidth="2.4" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                {/* the peak: a 6 px dot that keeps its size however long the line is (Figma: indigo-300) */}
-                <span className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--indigo-300)" style={{ left: `${(g.pts[g.peak][0] / 112) * 100}%`, top: `${(g.pts[g.peak][1] / 56) * 100}%` }} aria-hidden />
+              <span ref={box} className="relative block h-full"> {/* Figma Vector 1 (owner, 2026-11-15, latest): Fill in width and height, so the line is as long as the Graph's inner box (96.5 px in a 257 px card) */}
+                {g && (
+                  <>
+                    <div
+                      role="img"
+                      aria-label={`Peak: ${Math.max(...series!)} reports`}
+                      className="absolute inset-0"
+                      // Option 2 (owner, 2026-11-15): the line is a solid-color stroke used as a mask over a CSS gradient (indigo-500 for the first third, blending to indigo-300 at 93 %, solid after), because the SVG gradient stroke looked crackled. 2 px, flat ends, mitered corners, drawn at the real pixel size.
+                      style={{
+                        background: 'linear-gradient(90deg, var(--indigo-500) 33.2%, var(--indigo-300) 93.3%)',
+                        mask: `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="56"><polyline points="${g.pts.map((p) => p.join(',')).join(' ')}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/></svg>`)}") 0 0 / ${w}px 56px no-repeat`,
+                      }}
+                    />
+                    {/* the peak: a 6 px dot on the newest point (Figma: indigo-200 since 2026-11-15, it was indigo-300) */}
+                    <span className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--indigo-200)" style={{ left: g.pts[g.peak][0], top: g.pts[g.peak][1] }} aria-hidden />
+                  </>
+                )}
               </span>
             </span>
           )}

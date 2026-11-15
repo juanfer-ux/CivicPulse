@@ -285,7 +285,7 @@ function AccountMenu({ onSignOut, side, avatar }: { onSignOut: () => void; side:
           </Button>
           {/* The map credit (required by OpenStreetMap and CARTO) moved here from the map's corner on desktop (owner, 2026-11-09). */}
           <p className="border-t px-3 pt-2 pb-1 text-meta text-muted-foreground">
-            Map data © <a className="underline" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors, © <a className="underline" href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>
+            Map data © <a className="underline" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors, © <a className="underline" href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>. Car model “<a className="underline" href="https://sketchfab.com/3d-models/2022-honda-hr-v-ehev-e9128a46adc34e5e995ab7e8ad36339c" target="_blank" rel="noreferrer">2022 Honda HR-V e:Hev</a>” by tonielpro520 on Sketchfab, <a className="underline" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>, simplified for the map.
           </p>
         </div>
       )}

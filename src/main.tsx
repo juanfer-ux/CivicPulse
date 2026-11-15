@@ -23,6 +23,8 @@ const categoryLucide = location.hash === '#category-lucide' // one duotone famil
 const PhosphorGallery = lazy(() => import('@/components/PhosphorGallery').then((m) => ({ default: m.PhosphorGallery })))
 const phosphor = location.hash === '#phosphor' // every Phosphor icon, searchable
 const FiltersPanelGallery = lazy(() => import('@/components/FiltersPanelGallery').then((m) => ({ default: m.FiltersPanelGallery })))
+const WarningHeightGallery = lazy(() => import('@/components/WarningHeightGallery').then((m) => ({ default: m.WarningHeightGallery })))
+const warningGallery = location.hash === '#warning-gallery' // heights of the floating warning
 const filtersPanel = location.hash === '#filters-panel' // the Filters side panel
 const categoryIcons = location.hash === '#category-icons' // duotone icons for the category cards of the agent panel
 const App = lazy(() => import('./App.tsx'))
@@ -66,7 +68,7 @@ createRoot(document.getElementById('root')!).render(
     {/* Every Phosphor icon is the bold weight (owner, 2026-10-30) unless it asks for another (fill on the map badges, the buttons' sparkle and the bullet). */}
     <IconContext.Provider value={{ weight: 'bold' }}>
       <ErrorBoundary>
-        {filtersPanel ? (
+        {warningGallery ? <Suspense fallback={null}><WarningHeightGallery /></Suspense> : filtersPanel ? (
           <Suspense fallback={null}>
             <FiltersPanelGallery />
           </Suspense>

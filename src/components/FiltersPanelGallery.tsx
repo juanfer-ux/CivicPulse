@@ -40,7 +40,7 @@ export function FiltersPanelGallery() {
           </Button>
         </div>
         <div className={`absolute inset-y-0 right-0 transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`} aria-hidden={!open} inert={!open}>
-          <FiltersPanel filters={filters} onChange={setFilters} onClose={() => setOpen(false)} results={isFiltered(filters) ? 48 : 666} localities={LOCALITIES} categories={CATEGORIES} counts={{ pending: 120, reviewing: 80, approved: 300, rejected: 166 }} problemCounts={{ active: 6, monitoring: 4, resolved: 3, archived: 3 }} />
+          <FiltersPanel filters={filters} onChange={setFilters} onClose={() => setOpen(false)} results={isFiltered(filters) ? 48 : 666} localities={LOCALITIES} categories={CATEGORIES} facets={{ locality: Object.fromEntries(LOCALITIES.map((l) => [String(l.code), l.code % 4 === 0 ? 0 : 5])), category: { parking: 9, illegal_dumping: 0 }, days: { 7: 0, 30: 4, 90: 8, 0: 12 } }} counts={{ pending: 120, reviewing: 80, approved: 300, rejected: 166 }} problemCounts={{ active: 6, monitoring: 4, resolved: 3, archived: 3 }} />
         </div>
       </div>
     </main>

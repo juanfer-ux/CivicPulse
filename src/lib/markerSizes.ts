@@ -30,11 +30,27 @@ export function zoomForCircle(px: number): number {
 /** The zoom where each image takes over from the previous one: halfway between two sizes. */
 export const PROBLEM_SWITCH_ZOOMS = PROBLEM_CIRCLE_PX.slice(0, -1).map((px, i) => +zoomForCircle((px + PROBLEM_CIRCLE_PX[i + 1]) / 2).toFixed(3))
 
-/** The marker's sizes in screen px for one image size: PROBLEM_FAR scaled in proportion; the circle in whole pixels and the rest in half pixels (a whole number in the 2x image). `up` lifts the triangle above the diagonal so it overlaps the circle less vertically. */
-export function problemSizes(size: number) {
+/** Parking recurrences are a car with no circle (owner's Figma, 2026-11-15: Recurrence Marker, category=parking, all four statuses, upright, not turned). Figma draws it in three sizes; between them everything is interpolated by the car's height: car 28 / 38 / 44 px, warning triangle 18.6 / 24.8 / 34.1 px wide with a 2.18 / 2.91 / 4 px outline, its center (16, -1.9) / (20, 0.2) / (26, -3.75) px from the car's center (y grows downward). */
+const CAR = { h: [28, 38, 44], tri: [18.6, 24.8, 34.1], stroke: [2.18, 2.91, 4], x: [16, 20, 26], y: [-1.9, 0.2, -3.75] }
+const interp = (h: number, ys: number[]) => {
+  const i = h <= CAR.h[1] ? 0 : 1
+  const t = Math.min(1, Math.max(0, (h - CAR.h[i]) / (CAR.h[i + 1] - CAR.h[i])))
+  return ys[i] + (ys[i + 1] - ys[i]) * t
+}
+/** The car's height in screen px for one image size: 28 at the farthest zoom to 44 at the closest. */
+export function carHeight(size: number) {
+  const k = size / PROBLEM_CIRCLE_PX[0]
+  return 28 + (16 * (Math.round(PROBLEM_FAR.circle * k) - PROBLEM_FAR.circle)) / (PROBLEM_FAR.circle * 1.5 - PROBLEM_FAR.circle)
+}
+
+/** The marker's sizes in screen px for one image size: PROBLEM_FAR scaled in proportion; the circle in whole pixels and the rest in half pixels (a whole number in the 2x image). `up` lifts the triangle above the diagonal so it overlaps the circle less vertically. A parking recurrence (`carStyle`) has its own triangle size (Phosphor's Warning is 0.85 of its box wide). */
+export function problemSizes(size: number, carStyle = false) {
   const k = size / PROBLEM_CIRCLE_PX[0] // 1 at the farthest zoom, 1.5 at the closest
   const half2 = (n: number) => Math.round(n * 2) / 2
-  return { circle: Math.round(PROBLEM_FAR.circle * k), iconPx: half2(PROBLEM_FAR.icon * k), badgeD: half2(PROBLEM_FAR.badge * k), alertOutline: half2(PROBLEM_FAR.alertOutline * k), up: PROBLEM_FAR.triangleUp * k }
+  const base = { circle: Math.round(PROBLEM_FAR.circle * k), iconPx: half2(PROBLEM_FAR.icon * k), badgeD: half2(PROBLEM_FAR.badge * k), alertOutline: half2(PROBLEM_FAR.alertOutline * k), up: PROBLEM_FAR.triangleUp * k }
+  if (!carStyle) return base
+  const h = carHeight(size)
+  return { ...base, badgeD: half2(interp(h, CAR.tri) / 0.85), alertOutline: half2(interp(h, CAR.stroke)) }
 }
 
 /** Where the warning triangle's center sits from the circle's center, in screen px (y grows downward). Normally on the diagonal above the circle's upper right; an Active parking recurrence (`carStyle`, owner's Figma 2026-11-13) has it to the right, a little above the middle: (18.7, -8.5) at the farthest zoom and (25.4, -8) at the closest. */
@@ -44,14 +60,14 @@ export function triangleOffset(size: number, carStyle = false) {
     const off = (circle / 2 + PROBLEM_FAR.badgeGap) / Math.SQRT2
     return { x: off, y: -(off + up) }
   }
-  const t = (circle - PROBLEM_FAR.circle) / (PROBLEM_FAR.circle * 1.5 - PROBLEM_FAR.circle)
-  return { x: 18.68 + (25.4 - 18.68) * t, y: -8.5 + 0.5 * t }
+  const h = carHeight(size)
+  return { x: interp(h, CAR.x), y: interp(h, CAR.y) }
 }
 
 /** How far from a recurrence's point a tap still hits its body, in screen px (owner, 2026-11-13: more room between recurrences and the incidents beside them, so neither is hard to tap). A normal marker is its circle with its outline and a little over; an Active parking recurrence has no circle, only the car, so it is the car's half height and 2 px: smaller than the circle was. */
 export function bodyRadius(size: number, carStyle = false): number {
   const { circle } = problemSizes(size)
-  return carStyle ? (circle * 0.75) / 2 + 2 : circle / 2 + PROBLEM_FAR.outline + 2
+  return carStyle ? carHeight(size) / 2 + 2 : circle / 2 + PROBLEM_FAR.outline + 2
 }
 
 /** Inside this radius a tap always goes to the recurrence; between it and the body's edge the nearer of the recurrence and an incident under the tap wins (the 0.6 keeps the car's own middle for the car). */
@@ -59,7 +75,7 @@ export const bodyCore = (size: number, carStyle = false) => bodyRadius(size, car
 
 /** Is a tap at (dx, dy) screen px from a problem's point on its visible marker (the circle with its outline, or the warning triangle), and not just in the empty corners of its image? Taps outside it fall through to the incident next to it (owner, 2026-11-01). `size` is the image size at the current zoom. */
 export function hitsProblemMarker(dx: number, dy: number, size: number, carStyle = false): boolean {
-  const { badgeD, alertOutline } = problemSizes(size)
+  const { badgeD, alertOutline } = problemSizes(size, carStyle)
   if (Math.hypot(dx, dy) <= bodyRadius(size, carStyle)) return true
   const t = triangleOffset(size, carStyle)
   const half = badgeD / 2 + alertOutline

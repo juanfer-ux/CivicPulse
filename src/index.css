@@ -424,9 +424,9 @@
 
 /* The zoom control (owner, 2026-11-07; MapZoomControl.tsx): home, plus, a vertical slider, minus. It sits where MapLibre's own control was (77 px above the bottom, 14 px from the right) and rides above the history cards like it did. */
 .map-zoom { bottom: 77px; transition: bottom 0.3s, right 0.3s; }
-.map-col .map-zoom { right: calc(14px + var(--dock-w, 0px)); }
+.map-col .map-zoom { right: calc(14px + var(--dock-w, 0px) - var(--filters-push, 0px)); } /* the Filters panel (--filters-push, inside --dock-w) already narrows the map wrapper this control sits in, so it must not be counted twice: it stays at the map's right edge, next to the panel (owner's bug report, 2026-11-15) */
 @media (min-width: 90rem) { .map-col:not([data-history]) .map-zoom { bottom: var(--map-pad); } } /* the zoom control sits at the very bottom on desktop (owner, 2026-11-09): the on-map credit is gone from that corner */
-@media (min-width: 90rem) { .map-col[data-rp] .map-zoom { right: calc(var(--col-right) + 360px + 12px); } } /* a recurrence is open (owner, 2026-11-09): the history column is flush right and the zoom control sits inside the map, left of it */ /* the modules' right column (decision 0049) sits left of the zoom control */
+@media (min-width: 90rem) { .map-col[data-rp] .map-zoom { right: calc(var(--col-right) + 360px + 12px - var(--filters-push, 0px)); } } /* a recurrence is open (owner, 2026-11-09): the history column is flush right and the zoom control sits inside the map, left of it */ /* the modules' right column (decision 0049) sits left of the zoom control */
 @media (min-width: 90rem) { [data-history] .map-zoom { bottom: calc(77px + 384px); } }
 .zoom-slider { appearance: none; -webkit-appearance: none; writing-mode: vertical-lr; direction: rtl; width: 29px; height: 100%; margin: 0; background: transparent; cursor: pointer; }
 .zoom-slider::-webkit-slider-runnable-track { width: 2px; border-radius: 1px; background: var(--neutral-300); }
@@ -461,7 +461,7 @@
 
 /* MapLibre's own corner (zoom buttons, attribution) keeps 24 px from the edges like everything else over the map: its default margin is 10 px, so 14 more (owner, 2026-10-28). */
 .maplibregl-map .maplibregl-ctrl-bottom-right { padding: 0 14px 14px 0; }
-.map-col .maplibregl-map .maplibregl-ctrl-bottom-right { padding-right: calc(14px + var(--dock-w, 0px)); }
+.map-col .maplibregl-map .maplibregl-ctrl-bottom-right { padding-right: calc(14px + var(--dock-w, 0px) - var(--filters-push, 0px)); }
 /* While a problem is open the history card covers the bottom of the map (24 px margin + the card's fixed 360 px), so the zoom buttons and the attribution button ride above it (owner, 2026-11-05). */
 .maplibregl-map .maplibregl-ctrl-bottom-right { transition: bottom 0.3s; }
 @media (min-width: 90rem) { [data-history] .maplibregl-map .maplibregl-ctrl-bottom-right { bottom: 384px; } }

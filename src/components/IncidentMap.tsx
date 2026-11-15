@@ -4,8 +4,8 @@ import { gsap } from 'gsap'
 import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import { bodyCore, hitsProblemMarker } from '@/lib/markerSizes'
-import { PROBLEM_CIRCLE_PX, PROBLEM_SWITCH_ZOOMS, addBadges, addDots, addSelectedRing, addProblemMarkers, iconCategory, problemCircledId, selectedRingId } from '@/lib/markerIcons'
+import { bodyCore, bodyRadius, carHeight, problemSizes } from '@/lib/markerSizes'
+import { BADGE_FILL, PROBLEM_CIRCLE_PX, PROBLEM_SWITCH_ZOOMS, addBadges, badgeCanvas, addDots, addSelectedRing, addProblemMarkers, iconCategory, problemCircledId, selectedRingId } from '@/lib/markerIcons'
 import { labelPoint } from '@/lib/polygons'
 import { circleAround, circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
@@ -53,7 +53,7 @@ const MAX_ZOOM = 18
 const MIN_ZOOM = 11
 const NO_PROBLEMS: ProblemRow[] = []
 /** The recurrence marker's image by zoom; with `sel` (the open recurrence's id) every other recurrence gets the toned-down image (opaque, like the incidents'). An Active parking marker has no circle (owner's Figma, 2026-11-13) except while it is hovered (`hover`) or open (`sel`): then it gets the circled image (a test). */
-const problemImage = (sel: string | null, hover: string | null = null) => ['step', ['zoom'], ...PROBLEM_CIRCLE_PX.flatMap((px, i) => { const id = (dim: boolean) => ['concat', 'problem-', ['get', 'category'], dim ? '-dim-' : '-', ['get', 'status'], `-${px}`]; const base = sel ? ['case', ['==', ['get', 'id'], sel], id(false), id(true)] : id(false); const lit = ['all', ['==', ['get', 'category'], 'parking'], ['==', ['get', 'status'], 'active'], ['any', ['==', ['get', 'id'], sel ?? ''], ['==', ['get', 'id'], hover ?? '']]]; return [...(i ? [PROBLEM_SWITCH_ZOOMS[i - 1]] : []), sel || hover ? ['case', lit, problemCircledId(px), base] : base] })] as never
+const problemImage = (sel: string | null, hover: string | null = null, badge = false) => ['step', ['zoom'], ...PROBLEM_CIRCLE_PX.flatMap((px, i) => { const id = (dim: boolean) => ['concat', 'problem-', badge ? 'badge-' : '', ['get', 'category'], dim ? '-dim-' : '-', ['get', 'status'], `-${px}`]; const base = sel ? ['case', ['==', ['get', 'id'], sel], id(false), id(true)] : id(false); const lit = ['all', ['==', ['get', 'category'], 'parking'], ['==', ['get', 'status'], 'active'], ['any', ['==', ['get', 'id'], sel ?? ''], ['==', ['get', 'id'], hover ?? '']]]; return [...(i ? [PROBLEM_SWITCH_ZOOMS[i - 1]] : []), (sel || hover) && !badge ? ['case', lit, problemCircledId(px), base] : base] })] as never
 /** The plain square's image: one per size (step 0 below zoom 12, step 1 from 12); with `focus` (an expression) every incident but the focused one gets the toned-down image. */
 const dotImage = (focus?: unknown[]) => {
   const id = (step: number, dim: boolean) => ['concat', 'dot-', dim ? 'dim-' : '', ['get', 'group'], `-${step}`]
@@ -108,9 +108,9 @@ const PROBLEM_RING_BLUR = 0.01 // the ring's circle-blur (owner, 2026-11-01), re
 const PROBLEM_RADIUS_ZOOM = 11 // the radius shows from the start (owner, 2026-10-30; it faded in from zoom 12): the map's minimum zoom
 const PROBLEM_RADIUS_RAMP_ZOOM = 12 // below this it keeps its starting size on screen, and it grows from here
 const PROBLEM_RADIUS_FULL_ZOOM = 14 // and reaches the minimum size on screen here
-const PROBLEM_RADIUS_MIN_PX = 36 // from the full-opacity zoom it never draws smaller than this on screen (the marker is 20 px in radius)
+const PROBLEM_RADIUS_MIN_PX = 64 // from the full-opacity zoom it never draws smaller than this on screen (owner, 2026-11-15: it was 36, too small between zoom 13 and 15 once the car and its warning are bigger)
 const PROBLEM_RADIUS_START_PX = 72 // its size on screen up to the ramp zoom (owner, 2026-10-30: bigger at the start, it was 20, 48, then 60), shrinking to the minimum at zoom 14
-/** The recurrence ring's radius in px at each whole zoom (72 px up to zoom 12, shrinking to 36 at 14, then its real size of 60 m); the ring layers and the pulse both read it. */
+/** The recurrence ring's radius in px at each whole zoom (72 px up to zoom 12, shrinking to 64 at 14, staying there until its real size of 60 m is bigger, around zoom 16.3); the ring layers and the pulse both read it. */
 const PROBLEM_STOPS = Array.from({ length: 12 }, (_, k) => {
   const z = PROBLEM_RADIUS_ZOOM + k
   const floor = PROBLEM_RADIUS_START_PX + (PROBLEM_RADIUS_MIN_PX - PROBLEM_RADIUS_START_PX) * Math.min(1, Math.max(0, (z - PROBLEM_RADIUS_RAMP_ZOOM) / (PROBLEM_RADIUS_FULL_ZOOM - PROBLEM_RADIUS_RAMP_ZOOM)))
@@ -164,6 +164,8 @@ interface Props {
   /** Pixels at the map's left edge that a side panel covers (the map no longer shrinks for the panel): the camera keeps the target centered in the part that shows. */
   /** Incidents that belong to a problem, with its status: they draw as tiny dots in that status color (no pins) around the problem's marker, always from zoom 14 and at every zoom for the open problem. */
   dotStatusById?: Map<string, ProblemStatus>
+  /** Incident id -> the recurrence it is confirmed into: opening an incident highlights its recurrence and tones the others down (owner, 2026-11-15). */
+  problemOfIncident?: Map<string, string>
   /** Ids of the open problem's incidents: their dots show at every zoom. */
   problemIncidentIds?: string[]
 }
@@ -176,10 +178,19 @@ const MAX_CANVAS = (() => {
   return Math.min(Math.max(max, 4096), 16384)
 })()
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots = NO_SPOTS, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, openReportId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemIncidentIds = NO_IDS }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots = NO_SPOTS, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, openReportId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemOfIncident, problemIncidentIds = NO_IDS }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
+  const carsRef = useRef<{ id: string; lng: number; lat: number; status: string; kind: 'parking' | 'dumping' }[]>([]) // the 3D cars' places (parking recurrences)
+  const carLayerRef = useRef<ReturnType<typeof import('@/lib/carLayer').createCarLayer> | null>(null)
+  const dotsRef = useRef<{ id: string; lng: number; lat: number; color: string; open: boolean }[]>([]) // the report dots (they get stems in the 3D layer)
+  const carSelRef = useRef<string | null>(null) // the open recurrence: the other cars draw toned down
   const onSelectRef = useRef(onSelect)
+  const selectedIdRef = useRef<string | null>(selectedId)
+  const incidentsRef = useRef(incidents)
+  incidentsRef.current = incidents
+  const looseStem = useRef<{ id: string; lng: number; lat: number; color: string; open: boolean } | null>(null) // the tapped loose incident: it gets a stem like a recurrence's report
+  selectedIdRef.current = selectedId
   const onSelectProblemRef = useRef(onSelectProblem)
   const onFlightEndRef = useRef(onFlightEnd)
   const [ready, setReady] = useState(false)
@@ -194,7 +205,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
 
   useEffect(() => {
     if (!WEBGL2) return
-    const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: START_ZOOM, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, attributionControl: { compact: true }, canvasContextAttributes: { antialias: true }, pixelRatio: Math.max(2, window.devicePixelRatio), maxCanvasSize: [MAX_CANVAS, MAX_CANVAS] }) // (owner, 2026-10-30, edges looked crackled) antialias smooths the edges of lines, outlines and shapes, and pixelRatio draws the map at twice the screen's resolution on ordinary 1x screens, which the browser then shrinks smoothly; the marker images are drawn for pixelRatio 2
+    const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: START_ZOOM, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, attributionControl: { compact: true, customAttribution: 'Car model “<a href="https://sketchfab.com/3d-models/2022-honda-hr-v-ehev-e9128a46adc34e5e995ab7e8ad36339c" target="_blank" rel="noreferrer">2022 Honda HR-V e:Hev</a>” by tonielpro520, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>, simplified' }, canvasContextAttributes: { antialias: true }, pixelRatio: Math.max(2, window.devicePixelRatio), maxCanvasSize: [MAX_CANVAS, MAX_CANVAS] }) // (owner, 2026-10-30, edges looked crackled) antialias smooths the edges of lines, outlines and shapes, and pixelRatio draws the map at twice the screen's resolution on ordinary 1x screens, which the browser then shrinks smoothly; the marker images are drawn for pixelRatio 2
     // On first entry the container can still be settling its size when the map is created, so once the style has loaded we re-measure it and set the start view again, unless the person has already moved the map.
     let moved = false
     map.on('movestart', (e) => e.originalEvent && (moved = true))
@@ -285,13 +296,15 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         id: 'incidents',
         type: 'symbol',
         source: 'incidents',
-        maxzoom: BADGE_ZOOM,
+        // the plain dots stay at every zoom (owner, 2026-11-15): they no longer turn into icon badges
         layout: {
           'icon-image': dotImage(),
           // plain squares (owner, 2026-10-30): 8 px across below zoom 12, 10 px from 12 up to 13 (until the markers). Each size is its own image drawn at that size (PLAIN_PX), so the image is shown as it is, not shrunk.
           'icon-size': 1,
           'icon-allow-overlap': true,
           'icon-ignore-placement': true,
+          'icon-pitch-alignment': 'map', // every incident dot lies on the terrain and flattens with the tilt, not only a recurrence's (owner, 2026-11-15)
+          'icon-rotation-alignment': 'map',
         },
         paint: { 'icon-opacity': 0.85 },
       })
@@ -302,6 +315,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         source: 'incidents',
         filter: ['==', ['get', 'pi'], true],
         paint: {
+          'circle-pitch-alignment': 'map', // the report dots lie on the map and flatten with its tilt, like the recurrence ring (owner, 2026-11-15)
           'circle-radius': 5,
           'circle-color': ['get', 'color'],
           'circle-stroke-width': 1,
@@ -318,6 +332,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         source: 'incidents',
         minzoom: BADGE_ZOOM,
         layout: {
+          visibility: 'none', // the icon badges are gone (owner, 2026-11-15); the layer stays only so nothing else has to change
           'icon-image': badgeImage(),
           'icon-size': 1, // square markers (owner, 2026-10-30): 24 px from zoom 13, 30 px from 14 up (BADGE_STEPS); each size is its own image, shown as it is
           'icon-allow-overlap': true,
@@ -334,6 +349,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
           'icon-size': 1, // square markers (owner, 2026-10-30): 24 px from zoom 13, 30 px from 14 up (BADGE_STEPS); each size is its own image, shown as it is
           'icon-allow-overlap': true,
         },
+        paint: { 'icon-translate': [0, 0], 'icon-translate-anchor': 'viewport' }, // the tapped incident's pin rides up to the top of its stem (owner, 2026-11-15); set every frame below
       })
       // The agent's answer (owner, 2026-10-27): one incident radius per group of incidents instead of one ring per incident. Its size is in meters, so it is a real area at every zoom. It draws under the dots and pins.
       map.addSource('answer-radius', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
@@ -374,11 +390,11 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       const problemPx = (f: number) => ['interpolate', ['exponential', 2], ['zoom'], ...PROBLEM_STOPS.flatMap(([z, v]) => [z, v * f])] as never
       // The look is the owner's Figma Incident Radius (2026-10-30): a flat fill at 2.4 % and a ring, in the problem's status color; the ring is drawn 1 px at 20 % (the same brightness as the Figma 0.5 px at 35 %, without the crackle); from zoom 16 up the fill is 3.5 % and the ring 1 px at 50 % (reached evenly over zoom 14 to 16).
       map.addLayer(
-        { id: 'problem-radius-fill', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-color': ['get', 'color'], 'circle-opacity': ringFill(null) } },
+        { id: 'problem-radius-fill', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-pitch-alignment': 'map', 'circle-radius': problemPx(1), 'circle-color': ['get', 'color'], 'circle-opacity': ringFill(null) } },
         underLabels,
       )
       map.addLayer(
-        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-blur': PROBLEM_RING_BLUR, 'circle-stroke-width': PROBLEM_RING_PX, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': ringStroke(null) } },
+        { id: 'problem-radius-ring', type: 'circle', source: 'problem-radius', minzoom: PROBLEM_RADIUS_ZOOM, paint: { 'circle-pitch-alignment': 'map', 'circle-radius': problemPx(1), 'circle-opacity': 0, 'circle-blur': PROBLEM_RING_BLUR, 'circle-stroke-width': PROBLEM_RING_PX, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': ringStroke(null) } },
         underLabels,
       )
       // Inner glow (owner, 2026-11-07): the same stacked-strokes trick as the answer radius, inside the ring of every recurrence, strongest at the edge. A few static circle layers, nothing animated.
@@ -389,7 +405,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
             type: 'circle',
             source: 'problem-radius',
             minzoom: PROBLEM_RADIUS_ZOOM,
-            paint: { 'circle-radius': problemPx((from + to) / 2), 'circle-opacity': 0, 'circle-stroke-width': problemPx(to - from), 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': glowAlpha(i) },
+            paint: { 'circle-pitch-alignment': 'map', 'circle-radius': problemPx((from + to) / 2), 'circle-opacity': 0, 'circle-stroke-width': problemPx(to - from), 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': glowAlpha(i) },
           },
           underLabels,
         ),
@@ -440,12 +456,14 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
           // The selected incident is always a marker (see 'incident-selected-pin'); its ring is a square (owner, 2026-10-30) around it, at any zoom: 10 px bigger than the marker, 34 px across below zoom 14, 40 from 14.
           'icon-image': ['step', ['zoom'], selectedRingId(0), 14, selectedRingId(1)],
           'icon-size': 1,
+          'icon-pitch-alignment': 'map', // the selection ring lies on the terrain and flattens with the tilt (owner, 2026-11-15)
+          'icon-rotation-alignment': 'map',
           'icon-allow-overlap': true,
         },
       })
       // A strong glow only on the selected incident (owner, 2026-11-07; the selected recurrence marker has none, tried and removed the same day): two soft halos (a wide faint one and a tight bright one) in its own status color. A halo is a blurred stroke starting at the marker's edge, so the light shows around it (a plain blurred disc hides behind the marker). Their filter matches one feature, so they draw one shape; under every dot and marker.
       const haloLayer = (id: string, source: string, radius: unknown, width: number, opacity: number, blur: number) =>
-        map.addLayer({ id, type: 'circle', source, filter: ['==', ['get', 'id'], ''], paint: { 'circle-radius': radius as never, 'circle-opacity': 0, 'circle-stroke-width': width, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': opacity, 'circle-blur': blur } }, 'problem-incident-dots')
+        map.addLayer({ id, type: 'circle', source, filter: ['==', ['get', 'id'], ''], paint: { 'circle-pitch-alignment': 'map', 'circle-radius': radius as never, 'circle-opacity': 0, 'circle-stroke-width': width, 'circle-stroke-color': ['get', 'color'], 'circle-stroke-opacity': opacity, 'circle-blur': blur } }, 'problem-incident-dots')
       const INCIDENT_GLOW_ALPHA = 0.06 // owner, 2026-11-07: both halos at 0.06 (they were 0.7 and 1)
       haloLayer('incident-selected-glow', 'incidents', 17, 56, INCIDENT_GLOW_ALPHA, 0.8)
       haloLayer('incident-selected-glow-core', 'incidents', 17, 24, INCIDENT_GLOW_ALPHA, 0.7)
@@ -455,6 +473,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         id: 'problem-markers',
         type: 'symbol',
         source: 'problems',
+        filter: ['!=', ['get', 'category'], 'parking'], // dumping keeps one upright image (a parking recurrence is the two layers below)
         layout: {
           // The circle follows a smooth curve by zoom (28 px at zoom 12 and below, 32 at 13, 42 from 14; PROBLEM_CIRCLE_BY_ZOOM), drawn as one crisp image per 2 px (PROBLEM_CIRCLE_PX) so no image is ever shrunk by a fraction, which made the outlines look crackled (owner, 2026-10-30). Each image is centered on its circle, so no offset is needed.
           'icon-image': problemImage(null),
@@ -463,20 +482,56 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
           'symbol-sort-key': ['get', 'count'],
         },
       })
+      // A parking recurrence in three layers (owner's try, 2026-11-15): a real 3D car (custom layer 'problem-cars-3d', src/lib/carLayer.ts, added below), this invisible symbol layer that only catches taps and hovers, and the warning triangle, which stays upright and the same size beside the car. Both use the same image sizes and the same canvas, so they line up. The car points north on the ground for now (there is no heading in the data).
+      map.setPaintProperty('problem-markers', 'icon-opacity', 0) // every recurrence is a 3D model now (owner's dumping test, 2026-11-15); the dumping symbols stay only to catch hovers
+      map.addLayer({
+        id: 'problem-cars',
+        type: 'symbol',
+        source: 'problems',
+        layout: { 'icon-image': problemImage(null), 'icon-size': 1, 'icon-allow-overlap': true, 'symbol-sort-key': ['get', 'count'] },
+        paint: { 'icon-opacity': 0 }, // invisible: the 3D car below is what shows; this layer only catches taps and hovers
+      })
       // Layer order, top to bottom (owner, 2026-10-30; it was text on top): the problems, the selected incident's ring and pin, the incident markers and dots, then all the text (the basemap's names, then ours), the locality highlights (fill, outline, radius), and under them the rest of the basemap. Nothing draws over an incident or a problem, not even a street name. The basemap's text layers sit under our dots by default, so lift them first, then lift ours over them.
-      const ours = new Set(['incident-badges', 'incident-selected-pin', 'answer-areas-name', 'problem-markers'])
+      const ours = new Set(['incident-badges', 'incident-selected-pin', 'answer-areas-name', 'problem-markers', 'problem-cars'])
       for (const l of map.getStyle().layers) if (l.type === 'symbol' && !ours.has(l.id)) map.moveLayer(l.id)
-      for (const id of ['answer-areas-name', 'problem-incident-dots', 'incidents', 'incident-badges', 'incident-selected-pin', 'incident-selected', 'problem-markers']) map.moveLayer(id)
+      for (const id of ['answer-areas-name', 'problem-incident-dots', 'incidents', 'incident-badges', 'incident-selected-pin', 'incident-selected', 'problem-markers', 'problem-cars']) map.moveLayer(id)
+      const { createCarLayer } = await import('@/lib/carLayer')
+      const carLayer = createCarLayer({
+        urls: { parking: '/models/car.glb', pile: '/models/dump-rubble.glb' },
+        cars: () => carsRef.current,
+        dimmed: (id) => !!carSelRef.current && id !== carSelRef.current,
+        heightPx: (z) => carHeight(PROBLEM_CIRCLE_PX[PROBLEM_SWITCH_ZOOMS.filter((w) => z >= w).length]),
+        badge: (status, dim) => badgeCanvas(status, dim),
+        badgeFill: BADGE_FILL,
+        dots: () => {
+          const id = selectedIdRef.current
+          if (!id || dotsRef.current.some((d) => d.id === id)) return dotsRef.current
+          if (looseStem.current?.id !== id) {
+            const i = incidentsRef.current.find((x) => x.id === id)
+            looseStem.current = i ? { id, lng: i.lng, lat: i.lat, color: token(GROUPS[groupOf(i.status)].token), open: true } : null
+          }
+          return looseStem.current ? [...dotsRef.current, looseStem.current] : dotsRef.current
+        },
+        dotsZoom: DOTS_ZOOM,
+        selectedDot: () => selectedIdRef.current,
+        statusColor: (status) => token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token),
+        badgePx: (z) => problemSizes(PROBLEM_CIRCLE_PX[PROBLEM_SWITCH_ZOOMS.filter((w) => z >= w).length], true).badgeD * 0.85,
+      })
+      carLayerRef.current = carLayer
+      map.addLayer(carLayer, 'incident-selected-pin') // real 3D cars with their warning floating above (owner's try, 2026-11-15)
 
       // A click on an incident selects it; a click anywhere else on the map clears the selection.
       map.on('click', (e) => {
         // A problem counts only if the tap is on its visible circle or triangle, not in the empty corners of its image; a finger also gets a small box (12 px) around the tap to find the nearest incident (owner, 2026-11-01).
         const size = PROBLEM_CIRCLE_PX[PROBLEM_SWITCH_ZOOMS.filter((w) => map.getZoom() >= w).length]
-        const isCar = (f: maplibregl.MapGeoJSONFeature) => f.properties.category === 'parking' && f.properties.status === 'active'
-        const problem = map.queryRenderedFeatures(e.point, { layers: ['problem-markers'] }).find((f) => {
-          const at = map.project((f.geometry as unknown as { coordinates: [number, number] }).coordinates)
-          return hitsProblemMarker(e.point.x - at.x, e.point.y - at.y, size, isCar(f))
+        const isCar = (_f: maplibregl.MapGeoJSONFeature) => true // every recurrence is a 3D model with a floating warning now (a car, or a dumping pile), so the car-style hit areas apply to all
+        // a parking recurrence: its car, or the warning floating above it (that spot moves with the tilt, so the car layer says where it is)
+        const car = carsRef.current.find((c) => {
+          const at = map.project([c.lng, c.lat])
+          const b = carLayerRef.current?.badgeAt(c.id)
+          return Math.hypot(e.point.x - at.x, e.point.y - at.y) <= bodyRadius(size, true) || (!!b && Math.abs(e.point.x - b.x) <= b.half && Math.abs(e.point.y - b.y) <= b.half)
         })
+        const problem = (car ? ({ properties: { id: car.id, category: 'recurrence' }, geometry: { type: 'Point', coordinates: [car.lng, car.lat] } } as unknown as maplibregl.MapGeoJSONFeature) : undefined)
         const pad = window.matchMedia('(pointer: coarse)').matches ? 12 : 0
         const box: [[number, number], [number, number]] = [[e.point.x - pad, e.point.y - pad], [e.point.x + pad, e.point.y + pad]]
         const dist = (f: maplibregl.MapGeoJSONFeature) => {
@@ -488,15 +543,25 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         if (problem && !(hit && dist(problem) > bodyCore(size, isCar(problem)) && dist(hit) < dist(problem))) return onSelectProblemRef.current?.(String(problem.properties.id))
         onSelectRef.current(hit ? String(hit.properties.id) : null)
       })
-      for (const layer of ['incident-selected-pin', 'incidents', 'incident-badges', 'problem-incident-dots', 'problem-markers']) {
+      for (const layer of ['incident-selected-pin', 'incidents', 'incident-badges', 'problem-incident-dots', 'problem-markers', 'problem-cars']) {
         map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'))
         map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''))
       }
       // The small problem card follows the pointer over a problem, circle or marker, at any zoom.
-      for (const layer of ['problem-markers']) {
+      for (const layer of ['problem-markers', 'problem-cars']) {
         map.on('mousemove', layer, (e) => setHover(e.features?.[0] ? { id: String(e.features[0].properties.id), x: e.point.x, y: e.point.y } : null))
         map.on('mouseleave', layer, () => setHover(null))
       }
+      // The tapped report's pin floats at the top of its dot's stem instead of on the ground (owner, 2026-11-15): the 3D layer says how far up that is on screen
+      let lastLift = 0
+      map.on('render', () => {
+        const id = selectedIdRef.current
+        const lift = id ? carLayerRef.current?.dotLift(id) : undefined
+        const up = lift === undefined ? 0 : lift - (map.getZoom() >= 14 ? 15 : 12) // the pin sits on the stem's top, not centered on it: raised by its radius (owner, 2026-11-15: it looked too low)
+        if (Math.abs(up - lastLift) < 0.5) return
+        lastLift = up
+        map.setPaintProperty('incident-selected-pin', 'icon-translate', [0, up])
+      })
       setReady(true)
     })
     mapRef.current = map
@@ -517,6 +582,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     if (!ready || !map) return
     const highlight = new Set(highlightIds)
     const own = new Set(problemIncidentIds)
+    dotsRef.current = incidents.filter((i) => dotStatusById.has(i.id)).map((i) => ({ id: i.id, lng: i.lng, lat: i.lat, color: token(PROBLEM_STATUS[dotStatusById.get(i.id)!].token), open: own.has(i.id) }))
+    map.triggerRepaint()
     ;(map.getSource('incidents') as maplibregl.GeoJSONSource).setData({
       type: 'FeatureCollection',
       features: incidents.map((i) => {
@@ -536,6 +603,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
+    carsRef.current = problems.map((p) => ({ id: p.id, lng: p.lng, lat: p.lat, status: p.status, kind: iconCategory(p.category) === 'parking' ? 'parking' : 'dumping' }))
+    map.triggerRepaint()
     ;(map.getSource('problems') as maplibregl.GeoJSONSource).setData({
       type: 'FeatureCollection',
       features: problems.map((p) => ({
@@ -682,7 +751,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       el.style.setProperty('--c', token(PROBLEM_STATUS[p.status].token))
       el.style.setProperty('--d', `${(i * 1.3) % 5}s`)
       el.style.setProperty('--s', size())
-      have.set(p.id, { marker: new maplibregl.Marker({ element: el }).setLngLat([p.lng, p.lat]).addTo(map), el })
+      have.set(p.id, { marker: new maplibregl.Marker({ element: el, pitchAlignment: 'map', rotationAlignment: 'map' }).setLngLat([p.lng, p.lat]).addTo(map), el })
     })
     const onZoom = () => {
       const s = size()
@@ -696,14 +765,17 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
-    const sel = selectedProblemId ?? (selectedId ? NO_PROBLEM : null) // an open incident dims every recurrence too (owner, 2026-11-15): `sel` is then an id that matches none, so all of them are "the others"
+    const sel = (selectedId ? problemOfIncident?.get(selectedId) : undefined) ?? selectedProblemId ?? (selectedId ? NO_PROBLEM : null) // an open incident dims every recurrence too (owner, 2026-11-15): `sel` is then an id that matches none, so all of them are "the others"
     map.setPaintProperty('problem-radius-fill', 'circle-opacity', ringFill(sel))
     map.setPaintProperty('problem-radius-ring', 'circle-stroke-opacity', ringStroke(sel))
     PROBLEM_GLOW_BANDS.forEach((_, i) => map.setPaintProperty(`problem-radius-glow-${i}`, 'circle-stroke-opacity', dimmed(glowAlpha(i), sel)))
+    carSelRef.current = sel
+    map.triggerRepaint()
     map.setLayoutProperty('problem-markers', 'icon-image', problemImage(sel, hoverId))
+    map.setLayoutProperty('problem-cars', 'icon-image', problemImage(sel, hoverId))
     map.setPaintProperty('problem-incident-dots', 'circle-color', (sel ? (openReportId ? ['case', ['==', ['get', 'id'], openReportId], ['get', 'color'], ['get', 'dim']] : ['case', ['get', 'po'], ['get', 'color'], ['get', 'dim']]) : ['get', 'color']) as never)
     for (const [id, { el }] of pulses.current) el.style.opacity = sel && id !== sel ? String(KEEP) : ''
-  }, [ready, selectedProblemId, selectedId, openReportId, problems, hoverId])
+  }, [ready, selectedProblemId, selectedId, openReportId, problems, hoverId, problemOfIncident])
 
   // Test (owner, 2026-10-30): opening an incident flies the camera to it with GSAP, easing the centre and the zoom together; any touch of the map stops it. Closing it flies back to where the map was before (a conscious decision to leave it).
   const home = useRef<{ lng: number; lat: number; zoom: number } | null>(null)
