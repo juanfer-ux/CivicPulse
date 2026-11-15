@@ -183,7 +183,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
   const mapRef = useRef<maplibregl.Map | null>(null)
   const carsRef = useRef<{ id: string; lng: number; lat: number; status: string; kind: 'parking' | 'dumping' }[]>([]) // the 3D cars' places (parking recurrences)
   const carLayerRef = useRef<ReturnType<typeof import('@/lib/carLayer').createCarLayer> | null>(null)
-  const dotsRef = useRef<{ id: string; lng: number; lat: number; color: string; open: boolean }[]>([]) // the report dots (they get stems in the 3D layer)
+  const dotsRef = useRef<{ id: string; lng: number; lat: number; color: string; open: boolean; pid?: string }[]>([]) // the report dots (they get stems in the 3D layer)
   const carSelRef = useRef<string | null>(null) // the open recurrence: the other cars draw toned down
   const onSelectRef = useRef(onSelect)
   const selectedIdRef = useRef<string | null>(selectedId)
@@ -512,6 +512,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
           }
           return looseStem.current ? [...dotsRef.current, looseStem.current] : dotsRef.current
         },
+        dimDot: (d) => !!carSelRef.current && d.id !== selectedIdRef.current && d.pid !== carSelRef.current,
         dotsZoom: DOTS_ZOOM,
         selectedDot: () => selectedIdRef.current,
         statusColor: (status) => token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token),
@@ -582,7 +583,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     if (!ready || !map) return
     const highlight = new Set(highlightIds)
     const own = new Set(problemIncidentIds)
-    dotsRef.current = incidents.filter((i) => dotStatusById.has(i.id)).map((i) => ({ id: i.id, lng: i.lng, lat: i.lat, color: token(PROBLEM_STATUS[dotStatusById.get(i.id)!].token), open: own.has(i.id) }))
+    dotsRef.current = incidents.filter((i) => dotStatusById.has(i.id)).map((i) => ({ id: i.id, lng: i.lng, lat: i.lat, color: token(PROBLEM_STATUS[dotStatusById.get(i.id)!].token), open: own.has(i.id), pid: problemOfIncident?.get(i.id) }))
     map.triggerRepaint()
     ;(map.getSource('incidents') as maplibregl.GeoJSONSource).setData({
       type: 'FeatureCollection',
@@ -597,7 +598,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         }
       }),
     })
-  }, [ready, incidents, highlightIds, dotStatusById, problemIncidentIds])
+  }, [ready, incidents, highlightIds, dotStatusById, problemIncidentIds, problemOfIncident])
 
   // Recurrences: one marker each, whatever the zoom.
   useEffect(() => {

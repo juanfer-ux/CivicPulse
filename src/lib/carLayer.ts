@@ -18,7 +18,8 @@ export interface CarLayerOptions {
   badge: (status: string, dim: boolean) => HTMLCanvasElement // the warning triangle's picture (a square canvas)
   badgeFill: number // the share of that canvas the triangle's width takes
   badgePx: (zoom: number) => number // the triangle's width on screen
-  dots: () => { id: string; lng: number; lat: number; color: string; open: boolean }[] // the report dots of the recurrences, each gets a stem (owner, 2026-11-15)
+  dots: () => { id: string; lng: number; lat: number; color: string; open: boolean; pid?: string }[]
+  dimDot: (d: { id: string; pid?: string }) => boolean // a stem toned down while another incident or recurrence is open // the report dots of the recurrences, each gets a stem (owner, 2026-11-15)
   selectedDot: () => string | null // the tapped report: its stem draws in front of the other stems
   dotsZoom: number // the zoom from which every recurrence's dots show; the open recurrence's show at any zoom
   statusColor: (status: string) => string // the status color of the warning, for the line below it
@@ -82,6 +83,12 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
   }
   const dotStems = new Map<string, Group>()
   const stemMats = new Map<string, MeshBasicMaterial>()
+  const stemDims = new Map<string, MeshBasicMaterial>()
+  const stemDim = (color: string) => {
+    let m = stemDims.get(color)
+    if (!m) stemDims.set(color, (m = new MeshBasicMaterial({ color, side: DoubleSide, depthTest: false, transparent: true, vertexColors: true, opacity: 0.22 })))
+    return m
+  }
   const stemMat = (color: string) => {
     let m = stemMats.get(color)
     if (!m) stemMats.set(color, (m = new MeshBasicMaterial({ color, side: DoubleSide, depthTest: false, transparent: true, vertexColors: true })))
@@ -269,6 +276,7 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
           dotStems.set(d.id, st)
         }
         ;(st.children[0] as Mesh).renderOrder = d.id === o.selectedDot() ? 12 : 9
+        ;(st.children[0] as Mesh).material = o.dimDot(d) ? stemDim(d.color) : stemMat(d.color)
         const mc = MercatorCoordinate.fromLngLat([d.lng, d.lat], 0)
         const u = (40075016.686 * Math.cos((d.lat * Math.PI) / 180)) / (512 * 2 ** map.getZoom()) * mc.meterInMercatorCoordinateUnits() // one screen px, in map units
         const warnPx = (parkingT!.lift / parkingT!.length) * pxBase // the warning line's height in px
