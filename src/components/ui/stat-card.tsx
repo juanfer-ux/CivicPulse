@@ -22,13 +22,13 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
     >
       <span className="flex w-full flex-col gap-2 bg-(--neutral-900) px-3 pt-4 pb-5">
         <span className="truncate text-subtitle text-(--neutral-100)">{label}</span>
-        <span className="flex items-end justify-between gap-2">
+        <span className="flex min-h-14 items-end justify-between gap-2"> {/* 56 px as in Figma: the graph is 56 px high, so the row keeps it now that the number is 24 px high (stat style 32 / 24, 2026-11-15) */}
           <span className="flex flex-1 basis-0 flex-col gap-2">
             <span className="text-caption text-(--neutral-200)">Reports</span>
             <span className="text-stat text-(--neutral-100)">{value}</span>
           </span>
           {g && (
-            <span className="hidden min-w-0 flex-1 basis-0 self-stretch px-4 @min-[140px]:block">
+            <span className="hidden max-w-[164px] min-w-0 flex-1 basis-0 self-stretch px-4 @min-[140px]:block"> {/* Figma Graph (owner, 2026-11-15): 164 px at most, padding included */}
               <span className="relative block h-full">
                 <svg viewBox="0 0 112 56" preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible" role="img" aria-label={`Peak: ${Math.max(...series!)} reports`}>
                   <polyline points={g.pts.map((p) => p.join(',')).join(' ')} fill="none" stroke="var(--indigo-500)" strokeWidth="2.4" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
@@ -41,7 +41,7 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
         </span>
       </span>
       {t && (
-        <span className="flex w-full items-center gap-1.5 bg-(--neutral-700) px-2.5 py-1.5 text-meta text-(--neutral-100)">
+        <span className="flex w-full flex-1 items-center gap-1.5 bg-(--neutral-700) px-2.5 py-1.5 text-meta text-(--neutral-100)">
           <t.Icon className="size-3.5 shrink-0" aria-hidden />
           <span className="min-w-0 truncate" title={t.text}>{t.text}</span> {/* one line: in a narrow card "Low reporting*" wrapped and its second line was clipped (owner, 2026-11-15) */}
         </span>

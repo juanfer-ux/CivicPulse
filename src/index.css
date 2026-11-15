@@ -37,9 +37,9 @@
   --text-display-xs--font-weight: calc(400 + var(--display-weight-offset));
   --text-display-xs--line-height: 20px;
   --text-display-xs--letter-spacing: 0.01em;
-  --text-stat: 40px; /* Figma stat (2026-11-07): SemiBold 40 / 32, tracking -4 % (it was Bold 32 / 32, -2 %); the number in a Stat Card */
+  --text-stat: 28px; /* Figma stat (2026-11-15): SemiBold 28 / 24, tracking -4 % (earlier that day 32 / 24; 2026-11-07: 40 / 32; before that Bold 32 / 32, -2 %); the number in a Stat Card */
   --text-stat--font-weight: calc(600 + var(--weight-offset));
-  --text-stat--line-height: 32px;
+  --text-stat--line-height: 24px;
   --text-stat--letter-spacing: -0.04em;
   --text-heading: 20px;
   --text-heading--font-weight: calc(600 + var(--weight-offset));

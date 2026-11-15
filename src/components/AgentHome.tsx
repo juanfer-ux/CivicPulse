@@ -53,7 +53,7 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
     return () => document.removeEventListener('keydown', onKey)
   }, [ask])
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-10"> {/* Figma Dashboard (owner, checked 2026-11-15): 40 px between "Welcome back," and the modules (it was 32) */}
       <h2 className="font-display text-display-md text-(--brand-primary)">Welcome back,</h2>
       <div className="flex flex-col gap-10">
         <Section title="Let's catch up">
