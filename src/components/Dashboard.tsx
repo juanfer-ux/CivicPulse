@@ -292,6 +292,24 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   const item = shown.value
   const mapBase = 'calc(var(--agent-w) + var(--panel-gap))'
   // Both detail panels float over the map (owner, 2026-11-05), so the map and the controls over it never move for them.
+  const statCards = (
+    <>
+      {error ? (
+        <p className="col-span-full text-incident">{error}</p>
+      ) : !data ? (
+        <p className="col-span-full text-muted-foreground">Loading…</p>
+      ) : topLocalities.length ? (
+        topLocalities.map(([code, c], i) => <StatCard key={code} series={c.series} label={localityName.get(code)} value={c.n} trend={DEMO_TRENDS[i] ?? trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
+              const on = filters.locality !== String(code)
+              setFilters({ ...filters, locality: on ? String(code) : '' })
+              if (on) onZoomLocality(code) // fly to the locality, wherever the map is now
+            }} />)
+      ) : (
+        <p className="col-span-full text-muted-foreground">No incidents in your scope.</p>
+      )}
+    </>
+  )
+
   return (
     <div className="contents map-col" data-history={item?.kind === 'problem' && !shown.leaving && HEADER !== '3' ? '' : undefined} data-rp={item?.kind === 'problem' && !shown.leaving && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': `${dockW + filtersPush}px`, '--filters-push': `${filtersPush}px`, '--dock-l': `${dockL}px`, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
@@ -315,7 +333,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. The banner sits under the filters row (owner, 2026-11-15; it was above the stat cards, then between them and the filters row); while an incident or recurrence is open the stat cards and filters are hidden, so it goes back to the top and the panel sits below it (`--banner-offset`, owner, 2026-11-07). */}
       {chatMode && (
-        <div data-float className={`fixed inset-x-0 top-[53px] z-10 flex h-(--answer-banner-h) items-center gap-3 bg-(--indigo-600) px-2.5 text-meta text-(--indigo-100) desk:absolute ${selected || selectedProblem ? 'desk:top-(--map-pad)' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--control-default)+16px)]'} desk:right-(--col-right) desk:left-(--col-left) desk:inset-x-auto desk:rounded-md`}>
+        <div data-float className={`fixed inset-x-0 top-[53px] ${!selected && !selectedProblem ? 'md:max-desk:top-[221px]' : ''} z-10 flex h-(--answer-banner-h) items-center gap-3 bg-(--indigo-600) px-2.5 text-meta text-(--indigo-100) desk:absolute ${selected || selectedProblem ? 'desk:top-(--map-pad)' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--control-default)+16px)]'} desk:right-(--col-right) desk:left-(--col-left) desk:inset-x-auto desk:rounded-md`}>
           <span className="grid size-9 shrink-0 place-items-center"><ChatCircleDots weight="fill" className="size-5 text-(--indigo-200)" aria-hidden /></span>
           <span className="flex-1">While showing the agent's answer on the map, filters will narrow it down.</span>
           <Button variant="secondary" className="ring-[0.5px] ring-(--neutral-100)" onClick={onClearHighlight}> {/* Figma: the default 36 px size, a 0.5 px neutral-100 line outside, 16 px at the sides */}
@@ -337,14 +355,14 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
 
       {/* Recurrences and Incidents chips (owner, 2026-11-14): at the top left of the same row as the Filters button, where they were at the bottom left. */}
       {hasProblems && !selected && !selectedProblem && (
-        <div data-float className={`fixed left-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:left-(--col-left) desk:transition-[left] desk:duration-300`}>
+        <div data-float className={`fixed left-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} ${!selected && !selectedProblem ? (chatMode ? 'md:max-desk:top-[calc(221px+var(--answer-banner-h))]' : 'md:max-desk:top-[221px]') : ''} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:left-(--col-left) desk:transition-[left] desk:duration-300`}>
           <MapTypeChips filters={filters} onChange={setFilters} problemCount={problemsFiltered.length} incidentCount={filtered.length} />
         </div>
       )}
 
       {/* The Filters button (owner, 2026-11-14): it replaces the chip bar and sits at the right of the same row; it opens the Filters side panel. Hidden while an incident is open, like the bar was. */}
       {!selected && !selectedProblem && data && (
-        <div data-float className={`fixed right-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:right-(--col-right)`}>
+        <div data-float className={`fixed right-3 ${chatMode ? 'top-[calc(53px+var(--answer-banner-h))]' : 'top-[53px]'} ${!selected && !selectedProblem ? (chatMode ? 'md:max-desk:top-[calc(221px+var(--answer-banner-h))]' : 'md:max-desk:top-[221px]') : ''} z-10 flex items-center gap-2 desk:absolute desk:inset-x-auto ${chatMode ? 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px)]'} desk:right-(--col-right)`}>
           {filterCount(filters) > 0 && ( // the Recurrences / Incidents toggles are not filters: switching them never shows Clear filters (owner, 2026-11-15)
             <Chip icon={<X aria-hidden />} onClick={() => setFilters({ ...NO_FILTERS, types: filters.types })}>
               Clear filters
@@ -366,18 +384,24 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         </>
       )}
 
+      {/* Tablet (768 to 1,439 px, owner 2026-11-15): the stat cards float over the map in one row, above the filters row and the chips, like desktop. They cannot live in the bottom sheet below (its backdrop blur makes `fixed` relative to the sheet), so this is a second copy of the cards, shown on tablet only; the sheet's own copy is hidden there. */}
+      <div role="region" data-float aria-label="Busiest localities" className={`${selected || selectedProblem ? 'hidden' : 'hidden md:max-desk:grid'} fixed inset-x-3 top-[53px] z-10 grid-cols-4 gap-2`}>
+        {statCards}
+      </div>
+
       {/* Mobile: bottom sheet over the map. Desktop (1440 px and wider): `contents`, so the two columns float over the map. */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-10 flex flex-col gap-2 rounded-t-2xl border-t bg-sidebar/95 p-2 backdrop-blur desk:contents ${collapsed ? 'max-desk:[&>:not(:first-child)]:hidden' : 'h-[62svh]'}`}
+        className={`fixed inset-x-0 bottom-0 z-10 flex flex-col gap-2 rounded-t-2xl border-t bg-sidebar/95 p-2 backdrop-blur desk:contents ${collapsed ? 'max-desk:[&>:not(:first-child)]:hidden' : 'h-[62svh] md:max-desk:h-[50svh]'}`}
       >
-        <div className="flex shrink-0 gap-1 desk:hidden">
+        <div className="flex shrink-0 items-center gap-1 md:max-desk:justify-between desk:hidden">
+          <span className="hidden px-2 text-label text-(--neutral-200) md:max-desk:block">Explore</span> {/* tablet: the panel's own title row is hidden, so its title sits here, on the row of the collapse button (owner, 2026-11-15) */} {/* tablet (owner, 2026-11-15): no tabs, only the collapse button; the sheet always shows the agent (Explore) panel, 50 % of the screen high */}
           {(
             [
               ['explore', 'Explore'],
               ['ask', 'Investigate'],
             ] as const
           ).map(([t, text]) => (
-            <Button key={t} size="sm" className="flex-1" variant={tab === t && !collapsed ? 'secondary' : 'ghost'} onClick={() => pick(t)}>
+            <Button key={t} size="sm" className="flex-1 md:max-desk:hidden" variant={tab === t && !collapsed ? 'secondary' : 'ghost'} onClick={() => pick(t)}>
               {text}
             </Button>
           ))}
@@ -391,25 +415,13 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         role="region"
         data-float
         aria-label="Busiest localities"
-        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-2 overflow-y-auto desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 desk:grid-cols-4 desk:top-[calc(var(--section-header-h)+var(--map-pad))]`}
+        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid md:max-desk:hidden desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-2 overflow-y-auto desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 desk:grid-cols-4 desk:top-[calc(var(--section-header-h)+var(--map-pad))]`}
       >
-        {error ? (
-          <p className="col-span-full text-incident">{error}</p>
-        ) : !data ? (
-          <p className="col-span-full text-muted-foreground">Loading…</p>
-        ) : topLocalities.length ? (
-          topLocalities.map(([code, c], i) => <StatCard key={code} series={c.series} label={localityName.get(code)} value={c.n} trend={DEMO_TRENDS[i] ?? trendOf(c.recent, c.before)} selected={filters.locality === String(code)} onClick={() => {
-                const on = filters.locality !== String(code)
-                setFilters({ ...filters, locality: on ? String(code) : '' })
-                if (on) onZoomLocality(code) // fly to the locality, wherever the map is now
-              }} />)
-        ) : (
-          <p className="col-span-full text-muted-foreground">No incidents in your scope.</p>
-        )}
+        {statCards}
       </div>
 
       <div
-        className={`${tab !== 'explore' ? 'flex' : 'hidden'} desk:transition-[width] desk:duration-300 min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:py-(--page-pad) desk:pr-(--page-pad) desk:pl-(--sidebar-gap)`}
+        className={`${tab !== 'explore' ? 'flex' : 'hidden md:max-desk:flex'} desk:transition-[width] desk:duration-300 min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:py-(--page-pad) desk:pr-(--page-pad) desk:pl-(--sidebar-gap)`}
       >
         {/* Outer container: the shared float padding (12 px) on every side (owner, 2026-11-06); the panel itself is this inner box. */}
         <div data-float className="relative flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-r-lg desk:backdrop-blur-[32px] desk:border-l-[0.5px] desk:border-l-(--neutral-400) desk:bg-(--neutral-900) desk:p-0">

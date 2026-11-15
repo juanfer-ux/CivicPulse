@@ -141,8 +141,8 @@ export default function App() {
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
           <Dashboard highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} agentOff={agentOff} onAgentOff={setAgentOff} focus={focus} onRows={setRows} onSelection={setSelection}>
-            {/* Mobile: only shown on the Investigate tab. Desktop: always shown. */}
-            <div className={tab === 'ask' ? 'contents' : 'hidden desk:contents'}>
+            {/* Phone: only shown on the Investigate tab. Tablet (owner, 2026-11-15) and desktop: always shown; on tablet it is the bottom sheet, collapsible with the sheet's chevron. */}
+            <div className={tab === 'ask' ? 'contents' : 'hidden md:max-desk:contents desk:contents'}>
               <InvestigatePanel onCollapse={() => setAgentOff(true)} chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} recurrenceId={selection?.kind === 'recurrence' ? selection.id : null} onOpenRecurrence={open('recurrence')} />
             </div>
           </Dashboard>

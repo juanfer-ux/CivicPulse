@@ -51,3 +51,7 @@ The one list of what is not done yet, grouped by area. [handoff.md](handoff.md) 
 - [ ] Open questions in [handoff.md](handoff.md) (Open items): sidebar logos, Safari cursor over markers.
 
 - **Hover states not in Figma yet (2026-11-15):** the category cards' rollover (neutral-600, filled icon) and the Quick suggestions rows' rollover (icon indigo-200) exist only in code; Figma's `Category_Card2` and `Quick Questions` have no hover state. The key hints are not ⌘ in code (browser keeps ⌘1–5).
+
+- **Tablet (owner, 2026-11-15):** the stat cards are now one row of four with a 28 px number over the map (see the handoff). The rest of the tablet layout is still the mobile column and not designed; Figma has no tablet screen yet.
+
+- **Tablet is in code, not in Figma (2026-11-15):** floating stat cards in one row, the 50 % Explore sheet without tabs (title and chevron on one row), no gradient stroke, 800 px content and composer width. Figma still has no tablet screen; draw one before changing more.

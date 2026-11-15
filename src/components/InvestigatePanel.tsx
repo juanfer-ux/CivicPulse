@@ -52,9 +52,9 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
   }
 
   return (
-    <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-0 max-desk:gradient-border desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
+    <Card className="min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-0 max-md:gradient-border md:max-desk:rounded-none md:max-desk:border-0 md:max-desk:bg-transparent desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
       {/* The title row (owner's Figma, 2026-11-12): 60 px (8 px above and below the 44 px collapse button), 16 px at the sides, "Explore" in `label` / neutral-200, a `neutral-500` line under it, the collapse control at its right: Figma's Sidebar Item Investigation instance, 40 × 44 px, 4 px radius, the `panel-left` icon at 20 px (`SidebarSimple`, regular), `neutral-600` on hover (owner, 2026-11-13; it was a 32 px ghost button with a 16 px arrow). */}
-      <div className={`flex items-center desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:border-(--neutral-500) ${turns.length === 0 ? 'desk:px-6' : 'desk:px-4'}`}> {/* 24 px at the sides on the landing, 16 in a conversation (owner's Figma, 2026-11-14) */}
+      <div className={`flex items-center md:max-desk:hidden desk:h-(--agent-header-h) desk:shrink-0 desk:border-b desk:border-(--neutral-500) ${turns.length === 0 ? 'desk:px-6' : 'desk:px-4'}`}> {/* 24 px at the sides on the landing, 16 in a conversation (owner's Figma, 2026-11-14) */}
         <CardHeader className="flex w-full flex-row items-center justify-between max-desk:mx-auto max-desk:max-w-[664px]">
           <CardTitle asChild className="text-label text-(--neutral-200)">
             <h2>Explore</h2>
@@ -69,7 +69,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0">
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
         <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
-        <div className="flex w-full flex-col gap-3 text-body-sm max-desk:mx-auto max-desk:max-w-[664px] desk:mx-auto desk:max-w-[816px] desk:gap-8 desk:px-12 desk:py-8">
+        <div className="flex w-full flex-col gap-3 text-body-sm max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[816px] desk:gap-8 desk:px-12 desk:py-8">
           {turns.length === 0 && <AgentHome ask={(q) => void ask(q)} />}
           {turns.map((t, i) => (
             <div key={i} className="flex flex-col gap-4">
@@ -82,7 +82,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           <div ref={end} />
         </div>
         </ScrollArea>
-        <form onSubmit={onSubmit} className={`flex w-full max-w-[664px] items-center gap-2 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-12 desk:py-6 ${turns.length === 0 ? 'desk:max-w-[816px]' : 'desk:max-w-[760px]'}`}>
+        <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-12 desk:py-6 ${turns.length === 0 ? 'desk:max-w-[816px]' : 'desk:max-w-[760px]'}`}>
           <Input name="q" value={text} onChange={(e) => setText(e.target.value)} placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" />
           <Button type="submit" size="icon" aria-label="Ask" className="bg-(--brand-primary) hover:bg-(--brand-primary)/90" disabled={busy || !text.trim()}>
             <ArrowUp aria-hidden />
