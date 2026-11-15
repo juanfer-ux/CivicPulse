@@ -374,7 +374,7 @@ function ForecastCards() {
       {(Object.keys(SERIES) as (keyof typeof SERIES)[]).map((k) => (
         <div key={k} className="flex flex-col gap-1 rounded-sm bg-(--neutral-600) p-2">
           <span className="text-caption text-muted-foreground">{k}</span>
-          <span className="text-stat text-foreground">{SERIES[k][SERIES[k].length - 1]}</span>
+          <span className="font-display-semi text-stat text-foreground">{SERIES[k][SERIES[k].length - 1]}</span>
           <ChartContainer config={config} className="h-10 w-full">
             <LineChart data={SERIES[k].map((v, i) => ({ label: String(i), value: v }))}>
               <Line dataKey="value" isAnimationActive={false} type="monotone" stroke="var(--color-value)" strokeWidth={1.5} dot={false} />

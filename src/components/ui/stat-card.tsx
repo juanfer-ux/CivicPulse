@@ -35,7 +35,7 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
         <span className="flex min-h-14 items-end justify-between gap-2"> {/* 56 px as in Figma: the graph is 56 px high, so the row keeps it now that the number is 24 px high (stat style 32 / 24, 2026-11-15) */}
           <span className="flex flex-1 basis-0 flex-col gap-2">
             <span className="text-caption text-(--neutral-200)">Reports</span>
-            <span className="text-stat text-(--neutral-100)">{value}</span>
+            <span className="font-display-semi text-stat text-(--neutral-100)">{value}</span>
           </span>
           {series && (
             <span className="hidden max-w-[164px] min-w-0 flex-1 basis-0 self-stretch px-4 @min-[140px]:block"> {/* Figma Graph (owner, 2026-11-15): 164 px at most, padding included */}
