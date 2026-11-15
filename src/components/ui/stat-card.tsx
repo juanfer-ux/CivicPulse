@@ -29,7 +29,7 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
           </span>
           {g && (
             <span className="hidden max-w-[164px] min-w-0 flex-1 basis-0 self-stretch px-4 @min-[140px]:block"> {/* Figma Graph (owner, 2026-11-15): 164 px at most, padding included */}
-              <span className="relative block h-full">
+              <span className="relative block h-full"> {/* Figma Vector 1 (owner, 2026-11-15, latest): Fill in width and height again, so the line is as long as the Graph's inner box (96.5 px in a 257 px card); the peak dot sits on its newest point */}
                 <svg viewBox="0 0 112 56" preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible" role="img" aria-label={`Peak: ${Math.max(...series!)} reports`}>
                   <polyline points={g.pts.map((p) => p.join(',')).join(' ')} fill="none" stroke="var(--indigo-500)" strokeWidth="2.4" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
