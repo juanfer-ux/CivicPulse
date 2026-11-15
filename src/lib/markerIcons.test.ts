@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA, triangleOffset, bodyCore, bodyRadius, hitsProblemMarker, problemSizes, zoomForCircle } from '@/lib/markerSizes'
+import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA, carHeight, triangleOffset, bodyCore, bodyRadius, hitsProblemMarker, problemSizes, zoomForCircle } from '@/lib/markerSizes'
 
 // The owner's sizes for the incident squares (2026-10-30), by map zoom: 11 and below plain 8 px, 12 plain 10 px,
 // 13 square 24 px with a 12 px icon, 14 and above square 30 px with a 16 px icon. The selected ring is 10 px bigger.
@@ -67,12 +67,19 @@ describe('problem marker tap area', () => {
 })
 
 describe('triangleOffset (the warning triangle beside the marker)', () => {
-  it('sits to the right, a little above the middle, for an Active parking recurrence (Figma 2026-11-13)', () => {
+  it('sits to the right of a parking recurrence\'s car, at the Figma points: (16, -1.9) at 28 px, (26, -3.75) at 44 px (2026-11-15)', () => {
     const far = triangleOffset(PROBLEM_CIRCLE_PX[0], true)
     const near = triangleOffset(PROBLEM_CIRCLE_PX[PROBLEM_CIRCLE_PX.length - 1], true)
-    expect([far.x, far.y]).toEqual([18.68, -8.5])
-    expect(near.x).toBeCloseTo(25.4, 1)
-    expect(near.y).toBeCloseTo(-8, 1)
+    expect(carHeight(PROBLEM_CIRCLE_PX[0])).toBeCloseTo(28, 1)
+    expect(carHeight(PROBLEM_CIRCLE_PX[PROBLEM_CIRCLE_PX.length - 1])).toBeCloseTo(44, 1)
+    expect([far.x, far.y]).toEqual([16, -1.9])
+    expect(near.x).toBeCloseTo(26, 1)
+    expect(near.y).toBeCloseTo(-3.75, 1)
+  })
+  it('has its own triangle size: 18.6 px wide at the small car and 34.1 at the large one', () => {
+    const k = 0.85 // Phosphor's Warning is this share of its box wide
+    expect(problemSizes(PROBLEM_CIRCLE_PX[0], true).badgeD * k).toBeCloseTo(18.6, 0)
+    expect(problemSizes(PROBLEM_CIRCLE_PX[PROBLEM_CIRCLE_PX.length - 1], true).badgeD * k).toBeCloseTo(34.1, 0)
   })
   it('stays on the diagonal above the circle for the others', () => {
     const t = triangleOffset(PROBLEM_CIRCLE_PX[0])
@@ -82,7 +89,7 @@ describe('triangleOffset (the warning triangle beside the marker)', () => {
 })
 
 describe('tap room between recurrences and incidents', () => {
-  it('an Active parking recurrence (the car, no circle) takes less room than a circle', () => {
+  it('a parking recurrence (the car, no circle) takes less room than a circle', () => {
     const size = PROBLEM_CIRCLE_PX[0]
     expect(bodyRadius(size, true)).toBeLessThan(bodyRadius(size))
     expect(bodyCore(size, true)).toBeLessThan(bodyRadius(size, true))

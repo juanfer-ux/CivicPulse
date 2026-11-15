@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { Car, Trash } from '@phosphor-icons/react'
 import { GROUPS, PROBLEM_STATUS, type Group } from '@/lib/statusColors'
-import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_PX, PROBLEM_FAR, RING_EXTRA, problemSizes, triangleOffset } from '@/lib/markerSizes'
+import { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_PX, PROBLEM_FAR, RING_EXTRA, carHeight, problemSizes, triangleOffset } from '@/lib/markerSizes'
 import { KEEP, mix, token } from '@/lib/tokens'
 
 export { BADGE_STEPS, PLAIN_PX, PROBLEM_CIRCLE_BY_ZOOM, PROBLEM_CIRCLE_PX, PROBLEM_SIZE, PROBLEM_SWITCH_ZOOMS, RING_EXTRA, problemSizes } from '@/lib/markerSizes'
@@ -114,6 +114,8 @@ export async function addBadges(map: { addImage: AddImage }) {
 /** Recurrence marker (decision 0030; the owner's option F, 2026-11-01): a neutral-900 circle (neutral-700 until 2026-11-07) with a 1 px outline in the problem's status color (softened by 2 px of blur), the category icon in neutral-100 inside, and on its upper right a warning triangle in the status color with a 4 px neutral-900 outline. The sizes are in PROBLEM_FAR (markerSizes.ts), set at the farthest zoom and scaled in proportion for each image size (PROBLEM_CIRCLE_PX). The occurrence count is not drawn here: it shows in the card you get by hovering the problem. One image per category, status and size, each centered on the circle so the layer needs no offset. */
 /** The Active parking marker with its circle (owner's test, 2026-11-13): shown while the pointer is over it and while its recurrence is open. */
 export const problemCircledId = (px: number) => `problem-parking-active-circle-${px}`
+/** A parking recurrence is two images on two layers (owner's try, 2026-11-15): the car, which lies on the map and turns and tilts with it, and the warning triangle, which stays upright beside it (the car image has no triangle, the badge image has only the triangle; both share one canvas size so they line up). Dumping keeps one image. */
+export const problemBadgeId = (status: string, px: number, dim = false) => `problem-badge-parking${dim ? '-dim' : ''}-${status}-${px}`
 export const problemMarkerId = (category: string, status: string, px: number, dim = false) => `problem-${iconCategory(category)}${dim ? '-dim' : ''}-${status}-${px}`
 
 async function drawIcon(Icon: (typeof ICONS)[keyof typeof ICONS], color: string, size: number) {
@@ -132,13 +134,13 @@ const TRI_BODY = new Path2D('M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7
 const TRI_MARK = new Path2D('M120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z')
 
 /** `dim` is the toned-down image (owner, 2026-11-09), drawn while another recurrence is open: every color mixed toward the land color at KEEP, opaque, like the incidents' dim images (opacity would let the map show through). */
-async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], category: string, status: string, size: number, dim = false, circled = false) {
+async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], category: string, status: string, size: number, dim = false, circled = false, part: 'all' | 'body' | 'badge' = 'all') {
   const land = token('--map-background')
   const tone = (color: string) => (dim ? mix(color, land, KEEP) : color)
-  const { circle, iconPx, badgeD, alertOutline } = problemSizes(size)
+  const carFront = category === 'parking' // every status (owner's Figma, 2026-11-15; it was Active only)
+  const { circle, iconPx, badgeD, alertOutline } = problemSizes(size, carFront)
   const statusColor = tone(token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token))
   const outlineColor = tone(token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].outline)) // the 600 step (owner, 2026-11-07); the triangle keeps the 300 step
-  const carFront = category === 'parking' && status === 'active'
   const tri = triangleOffset(size, carFront) // the triangle's center from the circle's center (an Active parking recurrence has it at the right, owner's Figma 2026-11-13)
   const ringD = circled ? Math.floor(circle * 1.125) : circle // the hover circle is 1.5 times the car: 42, 56 and 64 px for the 28, 38 and 44 px cars (owner's Figma, 2026-11-13); the triangle stays where it is
   const half = Math.ceil(Math.max(ringD / 2 + PROBLEM_FAR.outline + PROBLEM_FAR.outlineBlur, Math.max(Math.abs(tri.x), Math.abs(tri.y)) + badgeD / 2 + alertOutline)) + 1 // screen px from the circle's center to the image edge, on every side
@@ -148,7 +150,7 @@ async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], category:
   c.width = c.height = side
   const g = c.getContext('2d')!
   const mid = side / 2
-  if (!carFront || circled) {
+  if (part !== 'badge' && (!carFront || circled)) {
     g.beginPath() // the circle, with its outline outside it: stroke twice as wide (with a soft edge), then paint the fill over the inner half
     g.arc(mid, mid, (ringD / 2) * PR, 0, Math.PI * 2)
     g.lineWidth = PROBLEM_FAR.outline * PR * 2
@@ -160,43 +162,77 @@ async function problemMarker(Icon: (typeof ICONS)[keyof typeof ICONS], category:
     g.fillStyle = tone(token('--neutral-900')) // the disc (owner, 2026-11-07; it was neutral-700)
     g.fill()
   }
-  if (icon) g.drawImage(icon, mid - (iconPx * PR) / 2, mid - (iconPx * PR) / 2, iconPx * PR, iconPx * PR)
+  if (part === 'badge') {
+    // the triangle only: the car is on the other layer
+  } else if (icon) g.drawImage(icon, mid - (iconPx * PR) / 2, mid - (iconPx * PR) / 2, iconPx * PR, iconPx * PR)
   else {
-    const h = circle * 0.75 * PR
+    const h = carHeight(size) * PR // the car's height (28 to 44 px by zoom), upright (owner's Figma, 2026-11-15; it was turned 35 degrees)
     g.save()
     g.translate(mid, mid)
-    g.rotate((-35 * Math.PI) / 180) // the car is turned 35 degrees counterclockwise (owner's Figma, 2026-11-13)
     g.translate(-(h * 24.26) / 44 / 2, -h / 2)
     g.scale(h / 44, h / 44)
-    g.lineJoin = 'round'
-    g.lineWidth = (2 * 2 * PR * 44) / h // a 2 px neutral-900 outline outside the car (it was 2.375): stroke twice as wide, then the fill covers the inner half
+    g.lineJoin = 'miter' // Figma: Miter joins
+    g.lineWidth = (2 * 2 * PR * 44) / h // a 2 px neutral-900 outline outside the car: stroke twice as wide, then the fill covers the inner half
     g.strokeStyle = tone(token('--neutral-900'))
     g.stroke(CAR_FRONT)
     g.fillStyle = tone(token('--brand-primary'))
     g.fill(CAR_FRONT, 'evenodd')
     g.restore()
   }
-  // the warning triangle: ...and a little higher, so it overlaps the circle less vertically
-  g.save()
-  g.translate(mid + tri.x * PR - (badgeD * PR) / 2, mid + tri.y * PR - (badgeD * PR) / 2)
-  g.scale((badgeD * PR) / 256, (badgeD * PR) / 256)
-  g.lineJoin = 'round'
-  g.lineWidth = (2 * alertOutline * 256) / badgeD
-  g.strokeStyle = tone(token('--neutral-900'))
-  g.stroke(TRI_BODY) // outline outside: stroke twice as wide, then the fill covers the inner half
-  g.fillStyle = statusColor
-  g.fill(TRI_BODY)
-  g.fillStyle = tone(token('--neutral-900'))
-  g.fill(TRI_MARK)
-  g.restore()
+  if (part !== 'body') {
+    // the warning triangle: ...and a little higher, so it overlaps the circle less vertically
+    g.save()
+    g.translate(mid + tri.x * PR - (badgeD * PR) / 2, mid + tri.y * PR - (badgeD * PR) / 2)
+    g.scale((badgeD * PR) / 256, (badgeD * PR) / 256)
+    g.lineJoin = 'round'
+    g.lineWidth = (2 * alertOutline * 256) / badgeD
+    g.strokeStyle = tone(token('--neutral-900'))
+    g.stroke(TRI_BODY) // outline outside: stroke twice as wide, then the fill covers the inner half
+    g.fillStyle = statusColor
+    g.fill(TRI_BODY)
+    g.fillStyle = tone(token('--neutral-900'))
+    g.fill(TRI_MARK)
+    g.restore()
+  }
   return g.getImageData(0, 0, side, side)
 }
 
+/** The warning triangle alone, centered on a square canvas (owner's 3D try, 2026-11-15: it floats above the 3D car as a sprite): the triangle fills 0.744 of the width (95 of 128 px) and its neutral-900 outline 8 px around it. `dim` is the toned-down version. */
+export const BADGE_FILL = 0.744
+export function badgeCanvas(status: string, dim = false, px = 128) {
+  const land = token('--map-background')
+  const tone = (color: string) => (dim ? mix(color, land, KEEP) : color)
+  const c = document.createElement('canvas')
+  c.width = c.height = px
+  const g = c.getContext('2d')!
+  const k = (0.875 * px) / 256
+  g.translate(px / 2 - 128 * k, px / 2 - 128 * k)
+  g.scale(k, k)
+  g.lineJoin = 'round'
+  g.lineWidth = (2 * 8 * (px / 128)) / k
+  g.strokeStyle = tone(token('--neutral-900'))
+  g.stroke(TRI_BODY)
+  g.fillStyle = tone(token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token))
+  g.fill(TRI_BODY)
+  g.fillStyle = tone(token('--neutral-900'))
+  g.fill(TRI_MARK)
+  return c
+}
+
 export async function addProblemMarkers(map: { addImage: AddImage }) {
-  await Promise.all(PROBLEM_CIRCLE_PX.map(async (px) => put(map, problemCircledId(px), await problemMarker(ICONS.parking, 'parking', 'active', px, false, true))))
+  await Promise.all(PROBLEM_CIRCLE_PX.map(async (px) => put(map, problemCircledId(px), await problemMarker(ICONS.parking, 'parking', 'active', px, false, true, 'body'))))
   await Promise.all(
     Object.entries(ICONS).flatMap(([category, Icon]) =>
-      Object.keys(PROBLEM_STATUS).flatMap((status) => PROBLEM_CIRCLE_PX.flatMap((px) => [false, true].map(async (dim) => put(map, problemMarkerId(category, status, px, dim), await problemMarker(Icon, category, status, px, dim))))),
+      Object.keys(PROBLEM_STATUS).flatMap((status) =>
+        PROBLEM_CIRCLE_PX.flatMap((px) =>
+          [false, true].flatMap((dim) => {
+            const parking = category === 'parking'
+            const body = async () => put(map, problemMarkerId(category, status, px, dim), await problemMarker(Icon, category, status, px, dim, false, parking ? 'body' : 'all'))
+            const badge = async () => put(map, problemBadgeId(status, px, dim), await problemMarker(Icon, category, status, px, dim, false, 'badge'))
+            return parking ? [body(), badge()] : [body()]
+          }),
+        ),
+      ),
     ),
   )
 }

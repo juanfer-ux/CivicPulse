@@ -55,3 +55,9 @@ The one list of what is not done yet, grouped by area. [handoff.md](handoff.md) 
 - **Tablet (owner, 2026-11-15):** the stat cards are now one row of four with a 28 px number over the map (see the handoff). The rest of the tablet layout is still the mobile column and not designed; Figma has no tablet screen yet.
 
 - **Tablet is in code, not in Figma (2026-11-15):** floating stat cards in one row, the 50 % Explore sheet without tabs (title and chevron on one row), no gradient stroke, 800 px content and composer width. Figma still has no tablet screen; draw one before changing more.
+
+- **Map rotate and tilt buttons not in Figma (2026-11-15):** the compass and tilt buttons under the home button of the map zoom control exist only in code (a try); decide whether to keep them, then draw them in Figma Map Zoom.
+
+- **3D parking cars (2026-11-15, a try):** if kept: a heading per recurrence, the hover circle back (or gone for good), removing the unused flat car images, a license note for the model in the credits, and the tilt buttons in Figma. If dropped: remove `three`, `carLayer.ts` and `public/models`.
+
+- **Before deploying the 3D markers (2026-11-15):** (1) the dumping model `day_183_garbage` (Sketchfab) has no credit yet: the owner must give its link for the author and license, then add it next to the HR-V credit (map ⓘ and account menu). (2) The Sketchfab page of the HR-V marks it as a reupload: check the original author. (3) Figma has none of this yet: the map rotate/tilt buttons, the 3D car and dumping bag, the floating warning with its 2 px line, the report-dot stems, the flat dots, the Filters counts and disabled options; draw them (Map & agent page) before changing more.

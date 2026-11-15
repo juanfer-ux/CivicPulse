@@ -17,6 +17,8 @@ import { ProblemTimelineCard } from '@/components/ProblemTimelineCard'
 import { Badge } from '@/components/ui/badge'
 import { MapTypeChips, NO_FILTERS, type Filters } from '@/components/FilterBar'
 import { FiltersPanel, filterCount } from '@/components/FiltersPanel'
+import { facetCounts, type FacetRow } from '@/lib/facets'
+import { PERIODS } from '@/components/FilterBar'
 import { Chip } from '@/components/ui/chip'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -192,6 +194,14 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
     return counts
   }, [problemsBeforeStatus])
 
+  // What each option of the Filters panel would leave on the map with every other filter kept (owner, 2026-11-15): an option that would leave nothing is switched off.
+  const facets = useMemo(() => {
+    const rows: FacetRow[] = []
+    if (showIncidents) for (const i of data?.incidents ?? []) if ((!answerIds || answerIds.has(i.id)) && (chatMode || !linked.has(i.id))) rows.push({ problem: false, locality: i.locality_code, category: i.category, at: Date.parse(i.occurred_at), group: groupOf(i.status) })
+    if (showProblems) for (const p of problems) rows.push({ problem: true, locality: p.locality_code, category: p.category, at: p.last_seen ? Date.parse(p.last_seen) : null, status: p.status })
+    return facetCounts(rows, filters, now, (data?.localities ?? []).map((l) => l.code), (data?.categories ?? []).map((c) => c.code), PERIODS.map((p) => p.days))
+  }, [data, answerIds, chatMode, linked, problems, showIncidents, showProblems, filters, now])
+
   const selectedProblem = showProblems ? (problemsFiltered.find((p) => p.id === selectedProblemId) ?? null) : null
   const problemDetail = detail && detail.id === selectedProblemId ? detail.data : null
   // The modules' right column (decision 0049, behind /?modules=1) pushes the map content: --dock-w feeds .map-col.
@@ -317,6 +327,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         incidents={mapIncidents}
         problems={showProblems ? problemsFiltered : undefined}
         problemIncidentIds={problemIncidentIds}
+        problemOfIncident={linked}
         selectedProblemId={selectedProblem?.id ?? null}
         openReportId={openReportId}
         dotStatusById={dotStatusById}
@@ -379,7 +390,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         <>
           {!FILTERS_PUSH && <div className={`absolute inset-0 z-40 bg-black/30 transition-opacity duration-300 ${filtersOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`} onClick={() => setFiltersOpen(false)} aria-hidden />}
           <div className={`absolute inset-y-(--page-pad) right-(--page-pad) ${FILTERS_PUSH ? 'z-30' : 'z-40 shadow-lg'} overflow-hidden rounded-lg transition-transform duration-300 ease-out ${filtersOpen ? 'translate-x-0' : 'translate-x-[calc(100%+var(--page-pad))]'}`} aria-hidden={!filtersOpen} inert={!filtersOpen}>
-            <FiltersPanel filters={filters} onChange={setFilters} onClose={() => setFiltersOpen(false)} results={(showProblems ? problemsFiltered.length : 0) + (showIncidents ? filtered.length : 0)} localities={data.localities} categories={data.categories} counts={byGroup} problemCounts={hasProblems ? byProblemStatus : undefined} />
+            <FiltersPanel filters={filters} onChange={setFilters} onClose={() => setFiltersOpen(false)} results={(showProblems ? problemsFiltered.length : 0) + (showIncidents ? filtered.length : 0)} localities={data.localities} categories={data.categories} facets={facets} counts={byGroup} problemCounts={hasProblems ? byProblemStatus : undefined} />
           </div>
         </>
       )}

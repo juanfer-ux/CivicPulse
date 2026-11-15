@@ -30,7 +30,7 @@ const Fieldset = ({ title, children }: { title: string; children: ReactNode }) =
 
 /**
  * The Filters side panel (owner, 2026-11-14): every map filter in one panel that slides in from the right like Create user (Figma Side Panel: 420 px, `neutral-900`, 32 px padding, a title in display-sm over a subtitle, a ghost Close button). Filters apply as they are ticked; the footer clears them or closes the panel with the number of results.
- * The status lists carry their counts (computed with every other filter applied) and follow what the map shows: recurrence statuses when recurrences are on, incident statuses when incidents are.
+ * Every option carries its count (computed with every other filter applied) and is switched off when that count is 0 (owner, 2026-11-15: nothing to select), unless it is already chosen, so it can still be undone. The status lists follow what the map shows: recurrence statuses when recurrences are on, incident statuses when incidents are.
  */
 export function FiltersPanel({
   filters,
@@ -39,6 +39,7 @@ export function FiltersPanel({
   results,
   localities,
   categories,
+  facets,
   counts,
   problemCounts,
 }: {
@@ -48,6 +49,8 @@ export function FiltersPanel({
   results: number
   localities: Locality[]
   categories: Category[]
+  /** What each locality, category and time window would leave with every other filter kept (`facetCounts`). */
+  facets: { locality: Record<string, number>; category: Record<string, number>; days: Record<string, number> }
   counts: Record<Group, number>
   problemCounts?: Record<ProblemStatus, number>
 }) {
@@ -68,19 +71,21 @@ export function FiltersPanel({
         <div className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5 text-label">
             Time
-            <Select value={String(filters.days)} onValueChange={(v) => set({ days: Number(v) })} options={PERIODS.map((p) => ({ value: String(p.days), label: p.label }))} aria-label="Time" />
+            <Select value={String(filters.days)} onValueChange={(v) => set({ days: Number(v) })} options={PERIODS.map((p) => ({ value: String(p.days), label: p.days ? `${p.label} (${facets.days[p.days] ?? 0})` : p.label, disabled: !!p.days && !facets.days[p.days] && p.days !== filters.days }))} aria-label="Time" />
           </label>
           <label className="flex flex-col gap-1.5 text-label">
             Localities
-            <Select value={filters.locality} onValueChange={(locality) => set({ locality })} options={[{ value: '', label: 'All localities' }, ...localities.map((l) => ({ value: String(l.code), label: l.name }))]} aria-label="Localities" />
+            <Select value={filters.locality} onValueChange={(locality) => set({ locality })} options={[{ value: '', label: 'All localities' }, ...localities.map((l) => ({ value: String(l.code), label: `${l.name} (${facets.locality[l.code] ?? 0})`, disabled: !facets.locality[l.code] && String(l.code) !== filters.locality }))]} aria-label="Localities" />
           </label>
         </div>
         <Fieldset title="Categories">
           {[...categories, ...PLANNED.filter((p) => !categories.some((c) => c.code === p.code))].map((c) => {
             const Icon = CATEGORY_ICON[c.code] ?? SquaresFour
             const planned = !categories.some((x) => x.code === c.code)
+            const n = facets.category[c.code] ?? 0
+            const on = filters.categories.includes(c.code)
             return (
-              <Check key={c.code} checked={filters.categories.includes(c.code)} disabled={planned} hint={planned ? 'Soon' : undefined} onChange={(on) => set({ categories: toggle(filters.categories, c.code, on) })}>
+              <Check key={c.code} checked={on} disabled={planned || (!n && !on)} hint={planned ? 'Soon' : String(n)} onChange={(on) => set({ categories: toggle(filters.categories, c.code, on) })}>
                 <span className="grid shrink-0 text-(--neutral-200) [&>svg]:size-4" aria-hidden>
                   <Icon />
                 </span>
@@ -92,7 +97,7 @@ export function FiltersPanel({
         {showProblems && (
           <Fieldset title="Recurrence status">
             {PROBLEM_STATUSES.map((s) => (
-              <Check key={s} checked={filters.problemStatuses.includes(s)} hint={String(problemCounts?.[s] ?? 0)} onChange={(on) => set({ problemStatuses: toggle(filters.problemStatuses, s, on) })}>
+              <Check key={s} checked={filters.problemStatuses.includes(s)} disabled={!problemCounts?.[s] && !filters.problemStatuses.includes(s)} hint={String(problemCounts?.[s] ?? 0)} onChange={(on) => set({ problemStatuses: toggle(filters.problemStatuses, s, on) })}>
                 <Warning weight="fill" className="size-4 shrink-0" style={{ color: `var(${PROBLEM_STATUS[s].token})` }} aria-hidden /> {/* the recurrence's warning triangle in its status color, as in the old status chip and on the map */}
                 {PROBLEM_STATUS[s].label}
               </Check>
@@ -102,7 +107,7 @@ export function FiltersPanel({
         {showIncidents && (
           <Fieldset title="Incident status">
             {(Object.keys(GROUPS) as Group[]).map((g) => (
-              <Check key={g} checked={filters.statuses.includes(g)} hint={String(counts[g])} onChange={(on) => set({ statuses: toggle(filters.statuses, g, on) })}>
+              <Check key={g} checked={filters.statuses.includes(g)} disabled={!counts[g] && !filters.statuses.includes(g)} hint={String(counts[g])} onChange={(on) => set({ statuses: toggle(filters.statuses, g, on) })}>
                 <span className="block size-3 shrink-0 rounded-full" style={{ background: `var(${GROUPS[g].swatch})` }} aria-hidden />
                 {GROUPS[g].label}
               </Check>

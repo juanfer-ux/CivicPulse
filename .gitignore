@@ -30,3 +30,4 @@ images/
 supabase/.temp/
 
 storybook-static
+models-source/

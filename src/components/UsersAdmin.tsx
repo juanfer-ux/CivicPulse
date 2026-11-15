@@ -248,7 +248,7 @@ function UserPanel({
       <div className="flex h-full flex-col gap-4 overflow-y-auto p-8">
         <div className="mb-6 flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-col gap-3">
-            <h2 className="truncate text-stat">{user.full_name || 'No name'}</h2>
+            <h2 className="truncate font-display-semi text-stat">{user.full_name || 'No name'}</h2>
             <p className="truncate text-body-sm text-muted-foreground">{user.email}</p>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
@@ -367,7 +367,7 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
       <form onSubmit={submit} className="flex h-full flex-col gap-4 overflow-y-auto p-8">
         <div className="mb-4 flex items-start justify-between gap-2">
           <div className="flex flex-col gap-3">
-            <h2 className="text-stat">Create user</h2>
+            <h2 className="font-display-semi text-stat">Create user</h2>
             <p className="text-body-sm text-muted-foreground">They get an email to set their own password.</p>
           </div>
           <Button type="button" variant="ghost" size="sm" onClick={onClose}>

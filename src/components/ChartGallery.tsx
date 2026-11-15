@@ -77,7 +77,7 @@ function MetricTile({ now, before, label }: { now: number; before: number; label
     <div className="flex flex-col gap-1">
       <span className="text-meta text-muted-foreground">{label}</span>
       <div className="flex items-baseline gap-3">
-        <span className="text-stat">{now}</span>
+        <span className="font-display-semi text-stat">{now}</span>
         <span className="text-body-sm text-muted-foreground">
           {change > 0 ? '+' : ''}
           {change} % vs {before} before
