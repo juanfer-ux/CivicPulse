@@ -19,14 +19,14 @@ export interface ZoomableMap {
 /** How far the map tilts when the tilt button is pressed (MapLibre's own limit is 60). */
 const TILT = 55
 
-const BTN = 'grid size-[29px] place-items-center text-(--neutral-200) hover:bg-(--neutral-400) active:bg-(--neutral-600) focus-visible:shadow-[inset_0_0_0_1.5px_var(--foreground)] disabled:opacity-50 disabled:hover:bg-transparent outline-none'
+const BTN = 'grid h-[29px] w-full place-items-center text-(--neutral-200) hover:bg-(--neutral-400) active:bg-(--neutral-600) focus-visible:shadow-[inset_0_0_0_1.5px_var(--foreground)] disabled:opacity-50 disabled:hover:bg-transparent outline-none'
 
 /**
  * The map's zoom control, like Google's (owner, 2026-11-07): a button that goes back to the default view, then plus, a vertical slider and minus.
  * The slider is a native range input, so the keyboard works (arrows, Home, End) and a screen reader hears "Zoom"; a tick marks the default zoom.
  * The slider is hidden on phones (pinch does it); the buttons stay. Same look as the old two-button control (Figma Map Zoom): neutral-500 fill, 4 px radius.
  */
-export function MapZoomControl({ map, min, max, home }: { map: ZoomableMap | null; min: number; max: number; home: { center: [number, number]; zoom: number } }) {
+export function MapZoomControl({ map, min, max, home }: { map: ZoomableMap | null; min: number; max: number; home: { center: [number, number]; zoom: number; pitch?: number; bearing?: number } }) {
   const [zoom, setZoom] = useState(home.zoom)
   const [view, setView] = useState({ bearing: 0, pitch: 0 })
   useEffect(() => {
@@ -42,9 +42,9 @@ export function MapZoomControl({ map, min, max, home }: { map: ZoomableMap | nul
   const still = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
   const tick = ((home.zoom - min) / (max - min)) * 100
   return (
-    <div className="map-zoom absolute right-[14px] z-10 flex flex-col gap-2">
-      <div className="flex flex-col overflow-hidden rounded-sm bg-(--neutral-500)">
-        <button type="button" className={BTN} aria-label="Back to the default view" title="Back to the default view" onClick={() => map?.flyTo({ ...home, bearing: 0, pitch: 0, duration: still ? 0 : 800 })}>
+    <div className="map-zoom absolute right-[14px] z-10 flex w-[29px] flex-col gap-2">
+      <div className="flex flex-col overflow-hidden rounded-sm bg-(--neutral-900)">
+        <button type="button" className={BTN} aria-label="Back to the default view" title="Back to the default view" onClick={() => map?.flyTo({ ...home, duration: still ? 0 : 800 })}>
           <House className="size-3.5" aria-hidden />
         </button>
         <button type="button" className={BTN} aria-label="Point north and level the map" title="Point north and level the map (right-drag the map to rotate and tilt it)" onClick={() => map?.easeTo?.({ bearing: 0, pitch: 0, duration: still ? 0 : 400 })}>
@@ -54,7 +54,7 @@ export function MapZoomControl({ map, min, max, home }: { map: ZoomableMap | nul
           <Stack className="size-3.5" aria-hidden />
         </button>
       </div>
-      <div className="flex flex-col overflow-hidden rounded-sm bg-(--neutral-500)">
+      <div className="flex flex-col overflow-hidden rounded-sm bg-(--neutral-900)">
         <button type="button" className={BTN} aria-label="Zoom in" title="Zoom in" disabled={zoom >= max - 0.01} onClick={() => map?.zoomIn()}>
           <Plus className="size-2.5" weight="bold" aria-hidden />
         </button>
@@ -75,7 +75,7 @@ export function MapZoomControl({ map, min, max, home }: { map: ZoomableMap | nul
           <Minus className="size-2.5" weight="bold" aria-hidden />
         </button>
       </div>
-      {import.meta.env.DEV && <span className="text-center text-caption text-(--neutral-300)" title="Map zoom (dev server only)">z {zoom.toFixed(2)}</span>} {/* the zoom number, only on the dev server (owner, 2026-11-15) */}
+      {import.meta.env.DEV && <span className="-mx-4 text-center text-caption text-(--neutral-300)" title="Map zoom (dev server only)">z {zoom.toFixed(2)}</span>} {/* the zoom number, only on the dev server (owner, 2026-11-15) */}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { SectionHeader } from '@/components/SectionHeader'
 import { RoleBadge } from '@/components/ui/role-badge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Field } from '@/components/ui/field'
 import { Select } from '@/components/ui/select'
 import { MultiSelect } from '@/components/MultiSelect'
@@ -110,7 +111,7 @@ export function UsersAdmin() {
               <Select className="w-auto!" aria-label="Filter by role" value={roleFilter} onValueChange={setRoleFilter} options={[{ value: '', label: 'All roles' }, ...ROLE_OPTIONS]} />
             </Field>
             <label className="flex h-(--control-default) items-center gap-2 text-body-sm">
-              <input type="checkbox" checked={pendingOnly} onChange={(e) => setPendingOnly(e.target.checked)} />
+              <Checkbox checked={pendingOnly} onCheckedChange={(v) => setPendingOnly(v === true)} />
               Pending only
             </label>
           </div>
@@ -275,12 +276,11 @@ function UserPanel({
         </label>
 
         <label className="flex items-center gap-2 text-body-sm">
-          <input
-            type="checkbox"
+          <Checkbox
             disabled={busy || isMe || !user.role}
             checked={user.is_active}
-            onChange={(e) => {
-              const is_active = e.target.checked
+            onCheckedChange={(v) => {
+              const is_active = v === true
               void save(() => updateProfile(user.id, { is_active }), { is_active }, is_active ? 'Account switched on.' : 'Account switched off.')
             }}
           />
@@ -311,7 +311,7 @@ function UserPanel({
                   {cats.length ? (
                     cats.map((c) => (
                       <label key={c.code} className="flex items-center gap-2 text-body-sm">
-                        <input type="checkbox" checked={user.categories.includes(c.code)} onChange={(e) => toggleCategory(c.code, e.target.checked)} />
+                        <Checkbox checked={user.categories.includes(c.code)} onCheckedChange={(v) => toggleCategory(c.code, v === true)} />
                         {c.name}
                       </label>
                     ))
@@ -413,7 +413,7 @@ function InvitePanel({ data, onClose, onInvited }: { data: AdminData; onClose: (
                   {cats.length ? (
                     cats.map((c) => (
                       <label key={c.code} className="flex items-center gap-2 text-body-sm">
-                        <input type="checkbox" checked={form.categories.includes(c.code)} onChange={(e) => toggleCategory(c.code, e.target.checked)} />
+                        <Checkbox checked={form.categories.includes(c.code)} onCheckedChange={(v) => toggleCategory(c.code, v === true)} />
                         {c.name}
                       </label>
                     ))

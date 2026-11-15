@@ -5,7 +5,7 @@ import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { bodyCore, bodyRadius, carHeight, problemSizes } from '@/lib/markerSizes'
-import { BADGE_FILL, PROBLEM_CIRCLE_PX, PROBLEM_SWITCH_ZOOMS, addBadges, badgeCanvas, addDots, addSelectedRing, addProblemMarkers, iconCategory, problemCircledId, selectedRingId } from '@/lib/markerIcons'
+import { BADGE_FILL, PROBLEM_CIRCLE_PX, PROBLEM_SWITCH_ZOOMS, addBadges, badgeCanvas, pinCanvas, addDots, addSelectedRing, addProblemMarkers, iconCategory, problemCircledId, selectedRingId } from '@/lib/markerIcons'
 import { labelPoint } from '@/lib/polygons'
 import { circleAround, circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
@@ -125,7 +125,8 @@ const problemRingPx = (zoom: number) => {
   return v0 + (v1 - v0) * ((2 ** (z - z0) - 1) / (2 ** (z1 - z0) - 1))
 }
 
-const BOGOTA: [number, number] = [-74.09, 4.65]
+/** The entry view and the home button's view (owner, 2026-11-15): the camera as the owner left it, tilted to 60° (MapLibre's maximum) and turned 28.6° to the left. */
+const START_VIEW = { center: [-74.09798, 4.65245] as [number, number], zoom: 11, pitch: 60, bearing: -28.56 }
 const NO_SPOTS: string[][] = []
 const SPOT_MIN_PX = 72 // radius on screen of a repeated location's circle at the farthest zoom (twice the recurrence ring's minimum; owner, 2026-11-08: bigger), so every spot is visible from the whole-city view
 const SPOT_MIN_M = 120 // and its real size when zoomed in (twice the recurrence's 60 m)
@@ -133,8 +134,6 @@ const SPOT_MIN_M = 120 // and its real size when zoomed in (twice the recurrence
 const spotGroups = (pts: (Incident)[], spots: string[][]) =>
   spots.length ? spots.map((ids) => pts.filter((i) => ids.includes(i.id))).filter((g) => g.length).map((g) => circleAround(g, SPOT_MIN_M)) : radiusGroups(pts)
 
-/** The map always opens here (owner's choice, 2026-10-26). */
-const START_ZOOM = 12
 
 // MapLibre needs WebGL2. Without it (GPU acceleration off, some VMs) we show a list instead of crashing.
 const WEBGL2 = !!document.createElement('canvas').getContext('webgl2')
@@ -178,16 +177,41 @@ const MAX_CANVAS = (() => {
   return Math.min(Math.max(max, 4096), 16384)
 })()
 
+type Stem = { id: string; lng: number; lat: number; color: string; open: boolean; pid?: string; pin?: { category: string; group: string } }
+const stemOf = (i: Incident, lng = i.lng, lat = i.lat): Stem => ({ id: i.id, lng, lat, color: token(GROUPS[groupOf(i.status)].token), open: true, pin: { category: i.category, group: groupOf(i.status) } })
+
+/** A stem and an open pin for what the agent's answer is about (owner, 2026-11-15): an answer about locations (spots) gets one per location, at the middle of its reports; any other answer, one per incident (up to 200). */
+function answerStems(ids: string[], incidents: Incident[], have: Stem[], spots: string[][]) {
+  const want = new Set(ids)
+  const hit = incidents.filter((i) => want.has(i.id))
+  if (spots.length) {
+    const reps = spots.flatMap((g) => {
+      const pts = hit.filter((i) => g.includes(i.id))
+      if (!pts.length) return []
+      const c = circleAround(pts, 0)
+      return [stemOf(pts[0], c.lng, c.lat)]
+    })
+    const repIds = new Set(reps.map((r) => r.id))
+    return [...have.filter((d) => !repIds.has(d.id)), ...reps]
+  }
+  const seen = new Set(have.map((d) => d.id))
+  return [...have, ...hit.filter((i) => !seen.has(i.id)).slice(0, 200).map((i) => stemOf(i))]
+}
+
 export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots = NO_SPOTS, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, openReportId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemOfIncident, problemIncidentIds = NO_IDS }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const carsRef = useRef<{ id: string; lng: number; lat: number; status: string; kind: 'parking' | 'dumping' }[]>([]) // the 3D cars' places (parking recurrences)
   const carLayerRef = useRef<ReturnType<typeof import('@/lib/carLayer').createCarLayer> | null>(null)
-  const dotsRef = useRef<{ id: string; lng: number; lat: number; color: string; open: boolean; pid?: string }[]>([]) // the report dots (they get stems in the 3D layer)
+  const dotsRef = useRef<{ id: string; lng: number; lat: number; color: string; open: boolean; pid?: string; pin?: { category: string; group: string } }[]>([]) // the report dots (they get stems in the 3D layer)
   const carSelRef = useRef<string | null>(null) // the open recurrence: the other cars draw toned down
   const onSelectRef = useRef(onSelect)
   const selectedIdRef = useRef<string | null>(selectedId)
   const incidentsRef = useRef(incidents)
+  const highlightRef = useRef(highlightIds)
+  highlightRef.current = highlightIds
+  const spotsRef = useRef(spots)
+  spotsRef.current = spots
   incidentsRef.current = incidents
   const looseStem = useRef<{ id: string; lng: number; lat: number; color: string; open: boolean } | null>(null) // the tapped loose incident: it gets a stem like a recurrence's report
   selectedIdRef.current = selectedId
@@ -205,7 +229,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
 
   useEffect(() => {
     if (!WEBGL2) return
-    const map = new maplibregl.Map({ container: container.current!, style: STYLE, center: BOGOTA, zoom: START_ZOOM, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, attributionControl: { compact: true, customAttribution: 'Car model “<a href="https://sketchfab.com/3d-models/2022-honda-hr-v-ehev-e9128a46adc34e5e995ab7e8ad36339c" target="_blank" rel="noreferrer">2022 Honda HR-V e:Hev</a>” by tonielpro520, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>, simplified' }, canvasContextAttributes: { antialias: true }, pixelRatio: Math.max(2, window.devicePixelRatio), maxCanvasSize: [MAX_CANVAS, MAX_CANVAS] }) // (owner, 2026-10-30, edges looked crackled) antialias smooths the edges of lines, outlines and shapes, and pixelRatio draws the map at twice the screen's resolution on ordinary 1x screens, which the browser then shrinks smoothly; the marker images are drawn for pixelRatio 2
+    const map = new maplibregl.Map({ container: container.current!, style: STYLE, ...START_VIEW, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, attributionControl: { compact: true, customAttribution: 'Car model “<a href="https://sketchfab.com/3d-models/2022-honda-hr-v-ehev-e9128a46adc34e5e995ab7e8ad36339c" target="_blank" rel="noreferrer">2022 Honda HR-V e:Hev</a>” by tonielpro520, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>, simplified' }, canvasContextAttributes: { antialias: true }, pixelRatio: Math.max(2, window.devicePixelRatio), maxCanvasSize: [MAX_CANVAS, MAX_CANVAS] }) // (owner, 2026-10-30, edges looked crackled) antialias smooths the edges of lines, outlines and shapes, and pixelRatio draws the map at twice the screen's resolution on ordinary 1x screens, which the browser then shrinks smoothly; the marker images are drawn for pixelRatio 2
     // On first entry the container can still be settling its size when the map is created, so once the style has loaded we re-measure it and set the start view again, unless the person has already moved the map.
     let moved = false
     map.on('movestart', (e) => e.originalEvent && (moved = true))
@@ -213,7 +237,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       map.resize()
       setFree(map)
       map.on('resize', () => setFree(map))
-      if (!moved) map.jumpTo({ center: BOGOTA, zoom: START_ZOOM })
+      if (!moved) map.jumpTo(START_VIEW)
       await addBadges(map)
       addDots(map)
       addSelectedRing(map)
@@ -263,6 +287,13 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
           if (l.id.includes('case')) map.setPaintProperty(l.id, 'line-blur', ROAD_BLUR)
         }
         if (l.type === 'symbol' && map.getPaintProperty(l.id, 'text-halo-width')) map.setPaintProperty(l.id, 'text-halo-color', token('--map-label-halo'))
+        // The names of the towns and cities around Bogotá were CARTO's near-white and outshone the data (owner, 2026-11-15): all of them in neutral-400. Bogotá's own locality names (place_suburbs) go the other way, to neutral-100, so the city reads brighter than its surroundings.
+        if (l.type === 'symbol' && l.id.startsWith('place_') && map.getPaintProperty(l.id, 'text-color')) map.setPaintProperty(l.id, 'text-color', token(l.id === 'place_suburbs' ? '--neutral-100' : '--neutral-400'))
+        // BOGOTÁ itself (the city label, place_city_r5) is always neutral-100 and always shown, even over other labels, so it never gets lost (owner, 2026-11-15).
+        if (l.id === 'place_city_r5') {
+          map.setPaintProperty(l.id, 'text-color', ['case', ['==', ['coalesce', ['get', 'name:es'], ['get', 'name']], 'Bogotá'], token('--neutral-100'), token('--neutral-400')])
+          map.setLayoutProperty(l.id, 'text-allow-overlap', true)
+        }
       }
       if (map.getLayer('building-top')) {
         map.setPaintProperty('building-top', 'fill-color', token('--map-buildings'))
@@ -365,6 +396,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
             type: 'circle',
             source: 'answer-radius',
             paint: {
+              'circle-pitch-alignment': 'map', // the agent answer's radius lies on the terrain too (owner, 2026-11-15)
               'circle-radius': px((from + to) / 2),
               'circle-opacity': 0,
               'circle-stroke-width': px(to - from),
@@ -380,7 +412,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
           id: 'answer-radius-ring',
           type: 'circle',
           source: 'answer-radius',
-          paint: { 'circle-radius': px(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': token('--map-answer-radius-ring') },
+          paint: { 'circle-pitch-alignment': 'map', 'circle-radius': px(1), 'circle-opacity': 0, 'circle-stroke-width': 1, 'circle-stroke-color': token('--map-answer-radius-ring') },
         },
         underLabels,
       )
@@ -505,14 +537,17 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         badgeFill: BADGE_FILL,
         dots: () => {
           const id = selectedIdRef.current
-          if (!id || dotsRef.current.some((d) => d.id === id)) return dotsRef.current
+          // the incidents the agent's answer is about get a stem each too (owner, 2026-11-15)
+          const answer = highlightRef.current.length ? answerStems(highlightRef.current, incidentsRef.current, dotsRef.current, spotsRef.current) : dotsRef.current
+          if (!id || answer.some((d) => d.id === id)) return answer
           if (looseStem.current?.id !== id) {
             const i = incidentsRef.current.find((x) => x.id === id)
             looseStem.current = i ? { id, lng: i.lng, lat: i.lat, color: token(GROUPS[groupOf(i.status)].token), open: true } : null
           }
-          return looseStem.current ? [...dotsRef.current, looseStem.current] : dotsRef.current
+          return looseStem.current ? [...answer, looseStem.current] : answer
         },
         dimDot: (d) => !!carSelRef.current && d.id !== selectedIdRef.current && d.pid !== carSelRef.current,
+        pinCanvas: (category, group) => pinCanvas(category, group as keyof typeof GROUPS),
         dotsZoom: DOTS_ZOOM,
         selectedDot: () => selectedIdRef.current,
         statusColor: (status) => token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token),
@@ -852,7 +887,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
   return (
     <div role="region" aria-label="Incident map" className="absolute top-0 right-0 bottom-14 left-0 desk:top-(--section-header-h) desk:right-(--filters-push,0px) desk:bottom-0 desk:overflow-hidden desk:transition-[right] desk:duration-300">
       <div ref={container} className="size-full" />
-      <MapZoomControl map={ready ? mapRef.current : null} min={MIN_ZOOM} max={MAX_ZOOM} home={{ center: BOGOTA, zoom: START_ZOOM }} />
+      <MapZoomControl map={ready ? mapRef.current : null} min={MIN_ZOOM} max={MAX_ZOOM} home={START_VIEW} />
       {hover && problems.some((p) => p.id === hover.id) && (
         <ProblemHoverCard
           problem={problems.find((p) => p.id === hover.id)!}

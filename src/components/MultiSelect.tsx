@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { CaretDown } from '@phosphor-icons/react'
 import { controlClass } from '@/lib/ui'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 
 export interface Option<T> {
   value: T
@@ -86,10 +87,9 @@ export function MultiSelect<T extends string | number>({
           <div className="overflow-y-auto p-1">
             {options.map((o) => (
               <label key={String(o.value)} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-body-sm hover:bg-muted">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={selected.includes(o.value)}
-                  onChange={(e) => onChange(e.target.checked ? [...selected, o.value] : selected.filter((v) => v !== o.value))}
+                  onCheckedChange={(on) => onChange(on === true ? [...selected, o.value] : selected.filter((v) => v !== o.value))}
                 />
                 {o.label}
               </label>
