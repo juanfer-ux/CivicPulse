@@ -93,6 +93,18 @@ async function badge(Icon: (typeof ICONS)[keyof typeof ICONS], fill: string, ink
   return g.getImageData(0, 0, side, side)
 }
 
+/** One incident marker (the pin with the category's icon) as a canvas, for the 3D layer's floating pins (owner, 2026-11-15): 30 px at screen size, drawn at 2x. */
+export async function pinCanvas(category: string, group: Group) {
+  const Icon = ICONS[iconCategory(category) as keyof typeof ICONS]
+  const ink = token(group === 'approved' ? '--neutral-100' : '--neutral-900')
+  const data = await badge(Icon, token(GROUPS[group].token), ink, token('--map-dot-outline'), 30, 16)
+  const c = document.createElement('canvas')
+  c.width = data.width
+  c.height = data.height
+  c.getContext('2d')!.putImageData(data, 0, 0)
+  return c
+}
+
 /** Adds every badge to the map. Icon ink is dark, except on Approved (a mid blue) where it is light. */
 export async function addBadges(map: { addImage: AddImage }) {
   const outline = token('--map-dot-outline')

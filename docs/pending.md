@@ -58,6 +58,8 @@ The one list of what is not done yet, grouped by area. [handoff.md](handoff.md) 
 
 - **Map rotate and tilt buttons not in Figma (2026-11-15):** the compass and tilt buttons under the home button of the map zoom control exist only in code (a try); decide whether to keep them, then draw them in Figma Map Zoom.
 
+- **Not in Figma yet (2026-11-15):** the map's entry view (zoom 11, 60°, bearing -28.56°) and the answer view's stems with open pins per location. (The place-name colors are in Figma since 2026-11-15, see below.)
+
 - **3D parking cars (2026-11-15, a try):** if kept: a heading per recurrence, the hover circle back (or gone for good), removing the unused flat car images, a license note for the model in the credits, and the tilt buttons in Figma. If dropped: remove `three`, `carLayer.ts` and `public/models`.
 
 - **Before deploying the 3D markers (2026-11-15):** (1) the dumping model `day_183_garbage` (Sketchfab) has no credit yet: the owner must give its link for the author and license, then add it next to the HR-V credit (map ⓘ and account menu). (2) The Sketchfab page of the HR-V marks it as a reupload: check the original author. (3) Figma has none of this yet: the map rotate/tilt buttons, the 3D car and dumping bag, the floating warning with its 2 px line, the report-dot stems, the flat dots, the Filters counts and disabled options; draw them (Map & agent page) before changing more.

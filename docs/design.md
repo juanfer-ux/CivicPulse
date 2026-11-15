@@ -51,7 +51,7 @@ The four Stat Card states, then chart options for the agent's answers (the curre
 
 **Occurrences history rows (owner, 2026-11-07):** three columns: a square tile with the source's initials, the source with its reference below, the date with the 24 h time below; roomy rows with full-width `neutral-600` dividers and a left-aligned date. Chosen in `/#history` (no sign-in), which stays for the other options (`src/components/HistoryGallery.tsx`); the real card is `ProblemTimelineCard.tsx`.
 
-**Zoom control (owner, 2026-11-07):** like Google's: a home button (back to the default view), plus, a vertical zoom slider and minus (`src/components/MapZoomControl.tsx`); the slider is hidden on phones. Replaces MapLibre's two-button control.
+**Zoom control (owner, 2026-11-07):** like Google's: a home button (back to the entry view: zoom 11, tilted 60° and turned 28.6° to the left, owner 2026-11-15), plus, a vertical zoom slider and minus (`src/components/MapZoomControl.tsx`); the slider is hidden on phones. Replaces MapLibre's two-button control.
 
 **Floating cards (owner, 2026-11-07):** every floating card over the map (Incident Panel, Recurrence Panel, Timeline and Occurrences History cards, the recurrence hover card) had the agent panel's look (`neutral-900` at 90 % with a 16 px background blur, no outline) until 2026-11-08; since then (owner) it is `neutral-700` at 95 % with a 1 px `neutral-900` outline and no background blur. The agent panel and the recurrence hover card keep the `neutral-900` look. The wide Recurrence Panel header (options 1 and 3 of the header test) has a solid `neutral-900` fill and the same outline.
 

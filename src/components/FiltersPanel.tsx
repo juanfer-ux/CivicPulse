@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { SquaresFour, Warning } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { CountBadge } from '@/components/ui/chip'
 import { Select } from '@/components/ui/select'
 import { CATEGORY_ICON, NO_FILTERS, PERIODS, PLANNED, typesOn, type Filters } from '@/components/FilterBar'
@@ -15,7 +16,7 @@ const toggle = <T,>(list: T[], v: T, on: boolean) => (on ? [...list, v] : list.f
 function Check({ checked, disabled, onChange, children, hint }: { checked: boolean; disabled?: boolean; onChange: (v: boolean) => void; children: ReactNode; hint?: string }) {
   return (
     <label className={`flex items-center gap-2 text-body-sm ${disabled ? 'cursor-not-allowed text-(--neutral-300)' : 'cursor-pointer text-(--neutral-100)'}`}>
-      <input type="checkbox" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} className="size-4 shrink-0 cursor-pointer rounded-[2px] accent-(--neutral-100) disabled:cursor-not-allowed" />
+      <Checkbox checked={checked} disabled={disabled} onCheckedChange={(v) => onChange(v === true)} />
       {children}
       {hint && (/^\d+$/.test(hint) ? <CountBadge className="ml-auto">{hint}</CountBadge> : <span className="ml-auto text-(--neutral-300)">{hint}</span>)} {/* a number is a count (the badge); "Soon" stays text */}
     </label>

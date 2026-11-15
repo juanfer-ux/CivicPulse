@@ -3,6 +3,7 @@ import { Plus, Sparkle } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Avatar } from '@/components/ui/avatar'
 import { RoleBadge } from '@/components/ui/role-badge'
 import { Select } from '@/components/ui/select'
@@ -122,6 +123,43 @@ function FiltersDemo() {
   )
 }
 
+function CheckboxDemo() {
+  const [on, setOn] = useState<boolean | 'indeterminate'>(true)
+  const rows: [string, Parameters<typeof Checkbox>[0]][] = [
+    ['Unchecked', { defaultChecked: false }],
+    ['Checked', { defaultChecked: true }],
+    ['Mixed', { checked: 'indeterminate' }],
+    ['Disabled', { disabled: true }],
+    ['Disabled, checked', { disabled: true, defaultChecked: true }],
+  ]
+  return (
+    <div className="flex flex-wrap items-start gap-8">
+      <div className="flex w-72 flex-col gap-3 rounded-lg border bg-card p-4">
+        <div className="text-subtitle">shadcn Checkbox · states</div>
+        {rows.map(([label, props]) => (
+          <label key={label} className="flex h-(--control-default) items-center gap-2 text-body-sm">
+            <Checkbox {...props} />
+            {label}
+          </label>
+        ))}
+        <label className="flex h-(--control-default) items-center gap-2 text-body-sm">
+          <Checkbox checked={on} onCheckedChange={setOn} />
+          Interactive (click me)
+        </label>
+      </div>
+      <div className="flex w-72 flex-col gap-3 rounded-lg border bg-card p-4">
+        <div className="text-subtitle">Now · the browser's own</div>
+        {['Unchecked', 'Checked'].map((label, i) => (
+          <label key={label} className="flex h-(--control-default) items-center gap-2 text-body-sm">
+            <input type="checkbox" defaultChecked={!!i} className="size-4 accent-(--neutral-100)" />
+            {label}
+          </label>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /** Component gallery: open `/#components`. Resize the window under 1,440 px to see the phone sizes. */
 export function Gallery() {
   return (
@@ -148,6 +186,10 @@ export function Gallery() {
 
       <Section title="Filters and search · labels above (Map filters card, Users search row)">
         <FiltersDemo />
+      </Section>
+
+      <Section title="Checkbox · shadcn (Radix) next to the browser's own">
+        <CheckboxDemo />
       </Section>
 
       <Section title="Button · variants and sizes">

@@ -18,7 +18,8 @@ export interface CarLayerOptions {
   badge: (status: string, dim: boolean) => HTMLCanvasElement // the warning triangle's picture (a square canvas)
   badgeFill: number // the share of that canvas the triangle's width takes
   badgePx: (zoom: number) => number // the triangle's width on screen
-  dots: () => { id: string; lng: number; lat: number; color: string; open: boolean; pid?: string }[]
+  dots: () => { id: string; lng: number; lat: number; color: string; open: boolean; pid?: string; pin?: { category: string; group: string } }[]
+  pinCanvas: (category: string, group: string) => Promise<HTMLCanvasElement> // the marker shown above a stem
   dimDot: (d: { id: string; pid?: string }) => boolean // a stem toned down while another incident or recurrence is open // the report dots of the recurrences, each gets a stem (owner, 2026-11-15)
   selectedDot: () => string | null // the tapped report: its stem draws in front of the other stems
   dotsZoom: number // the zoom from which every recurrence's dots show; the open recurrence's show at any zoom
@@ -194,7 +195,7 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
     },
     render(_gl, args) {
       const want = o.cars().filter((c) => templates[c.kind])
-      if (!want.length) return
+      if (!want.length && !o.dots().length) return // no recurrence cars, but the answer's stems still draw
       const ids = new Set(want.map((c) => c.id))
       for (const [id, g] of cars) if (!ids.has(id)) { scene.remove(g); cars.delete(id) }
       const pxBase = o.heightPx(map.getZoom()) * SCALE
@@ -272,6 +273,22 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
           strip.frustumCulled = false
           st.add(strip)
           st.userData = { rnd: 0.25 + 0.75 * ((hash(d.id) % 997) / 996) }
+          if (d.pin) {
+            // the answer's incidents show their marker above the stem, already open (owner, 2026-11-15)
+            const sprite = new Sprite(new SpriteMaterial({ transparent: true, depthTest: false, depthWrite: false }))
+            sprite.name = 'pin'
+            sprite.renderOrder = 13
+            sprite.frustumCulled = false
+            sprite.visible = false
+            st.add(sprite)
+            void o.pinCanvas(d.pin.category, d.pin.group).then((cv) => {
+              const t = new CanvasTexture(cv)
+              t.colorSpace = SRGBColorSpace
+              ;(sprite.material as SpriteMaterial).map = t
+              ;(sprite.material as SpriteMaterial).needsUpdate = true
+              sprite.visible = true
+            })
+          }
           behind.add(st)
           dotStems.set(d.id, st)
         }
@@ -288,6 +305,11 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
         strip.rotation.y = Math.atan2(eye.x, eye.z)
         strip.scale.set(2, h, 1)
         st.userData.h = h
+        const pin = st.getObjectByName('pin')
+        if (pin) {
+          pin.scale.set(30, 30, 1) // 30 screen px: the group is in screen-px units
+          pin.position.set(0, h + 15, 0)
+        }
         dotPos.push(new Vector3(mc.x, mc.y, 0))
       }
       // The map's depth range is huge compared with a car, so the car's own panels fought each other (white speckles). Tighten near and far around the cars on screen, which gives the depth buffer far more resolution.
