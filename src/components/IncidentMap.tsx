@@ -240,6 +240,17 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       for (const l of map.getStyle().layers) if (l.type === 'symbol' && l.id.startsWith('place_') && l.id !== 'place_suburbs' && l.id !== 'place_city_r5') map.setLayoutProperty(l.id, 'visibility', 'none')
       if (map.getLayer('place_city_r5')) map.setFilter('place_city_r5', ['all', map.getFilter('place_city_r5') ?? true, ['==', ['coalesce', ['get', 'name:es'], ['get', 'name']], 'Bogotá']] as never) // the city layer keeps only the name Bogotá
     })
+    // Street names, housenumbers and POI names only draw inside Bogotá (owner, 2026-11-16). The `within` filter tests each feature against the city outline, so the towns around it get no street names. The tiles still download; only drawing is skipped (a street that crosses the edge is not drawn either).
+    void fetch('/bogota-boundary.geojson').then((r) => r.json()).then((g: { features: { geometry: unknown }[] }) => {
+      const inside = ['within', g.features[0].geometry]
+      const apply = () => {
+        for (const l of map.getStyle().layers) {
+          if (l.type === 'symbol' && /^(roadname_|housenumber|poi_)/.test(l.id)) map.setFilter(l.id, ['all', map.getFilter(l.id) ?? true, inside] as never)
+        }
+      }
+      if (map.getLayer('roadname_minor')) apply() // the style may already be parsed when the outline arrives
+      else map.once('style.load', apply)
+    })
     map.on('load', async () => {
       map.resize()
       setFree(map)
