@@ -196,6 +196,8 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
         contact.position.set(0, size.y * 0.006, 0)
         return { model: new Group().add(root), length, height: size.y, width: size.x, front, side: side * size.x, lift: lift * size.y * LIFT_MULT, shadow, contact }
       }
+      // The three bags download together with the car and the first bag, so the pile is built once, complete (owner, 2026-11-16: a single big bag showed for a moment before the three swapped in).
+      const extrasP = o.urls.extraBags?.length ? Promise.all(o.urls.extraBags.map((u) => loader.loadAsync(u))) : Promise.resolve(null)
       void Promise.all([loader.loadAsync(o.urls.parking), loader.loadAsync(o.urls.pile)]).then(([car, pile]) => {
         prepare(car.scene)
         prepare(pile.scene, true)
@@ -238,13 +240,12 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
           templates.dumping = t // turned half a circle like the car, so that in its axes too east is -x and south is -z (shadows and the warning rely on it) // a dumping composition: just east of it and a little over its top
           m.triggerRepaint()
         }
-        build([pile.scene]) // the first bag alone until the others are in (and for good where they cannot load)
-        if (o.urls.extraBags?.length) {
-          void Promise.all(o.urls.extraBags.map((u) => loader.loadAsync(u))).then((extra) => {
-            for (const g of extra) prepare(g.scene) // no bag glow: these are not black plastic
-            build(extra.map((g) => g.scene)) // the three objects are the composition (owner, 2026-11-16: the concrete bin, the container and the unnamed heap); the first bag only shows until they load
-          }).catch(() => undefined)
-        }
+        // dumping markers wait for the whole pile; if the bags cannot load, the first bag alone stands in for good
+        void extrasP.then((extra) => {
+          if (!extra) return build([pile.scene])
+          for (const g of extra) prepare(g.scene) // no bag glow: these are not black plastic
+          build(extra.map((g) => g.scene)) // the three objects are the composition (owner, 2026-11-16: the concrete bin, the container and the unnamed heap)
+        }).catch(() => build([pile.scene]))
       })
     },
     render(_gl, args) {
