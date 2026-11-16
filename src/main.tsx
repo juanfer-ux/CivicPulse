@@ -25,6 +25,8 @@ const phosphor = location.hash === '#phosphor' // every Phosphor icon, searchabl
 const FiltersPanelGallery = lazy(() => import('@/components/FiltersPanelGallery').then((m) => ({ default: m.FiltersPanelGallery })))
 const WarningHeightGallery = lazy(() => import('@/components/WarningHeightGallery').then((m) => ({ default: m.WarningHeightGallery })))
 const warningGallery = location.hash === '#warning-gallery' // heights of the floating warning
+const DumpingModelsGallery = lazy(() => import('@/components/DumpingModelsGallery').then((m) => ({ default: m.DumpingModelsGallery })))
+const dumpingModels = location.hash === '#dumping-models' // the candidate 3D models for dumping, each in context
 const filtersPanel = location.hash === '#filters-panel' // the Filters side panel
 const categoryIcons = location.hash === '#category-icons' // duotone icons for the category cards of the agent panel
 const App = lazy(() => import('./App.tsx'))
@@ -46,6 +48,15 @@ const HeaderGallery = lazy(() => import('@/components/HeaderGallery').then((m) =
 const TimelineGallery = lazy(() => import('@/components/TimelineGallery').then((m) => ({ default: m.TimelineGallery })))
 
 // The gallery has no data, so it skips sign-in: open /#components.
+// Native scrollbars show only while their area scrolls (owner, 2026-11-15): mark the scrolling element for 0.6 s after each scroll event; index.css reads data-scrolling. Scroll events do not bubble, so listen in the capture phase.
+const scrollTimers = new WeakMap<Element, number>()
+document.addEventListener('scroll', (e) => {
+  const el = e.target instanceof Element ? e.target : document.documentElement
+  el.setAttribute('data-scrolling', '')
+  clearTimeout(scrollTimers.get(el))
+  scrollTimers.set(el, window.setTimeout(() => el.removeAttribute('data-scrolling'), 600))
+}, { capture: true, passive: true })
+
 const gallery = location.hash === '#components'
 const charts = location.hash === '#charts' // chart options for the agent's answers
 const scroll = location.hash === '#scroll' // scrollbar styles on the shadcn ScrollArea
@@ -68,7 +79,7 @@ createRoot(document.getElementById('root')!).render(
     {/* Every Phosphor icon is the bold weight (owner, 2026-10-30) unless it asks for another (fill on the map badges, the buttons' sparkle and the bullet). */}
     <IconContext.Provider value={{ weight: 'bold' }}>
       <ErrorBoundary>
-        {warningGallery ? <Suspense fallback={null}><WarningHeightGallery /></Suspense> : filtersPanel ? (
+        {dumpingModels ? <Suspense fallback={null}><DumpingModelsGallery /></Suspense> : warningGallery ? <Suspense fallback={null}><WarningHeightGallery /></Suspense> : filtersPanel ? (
           <Suspense fallback={null}>
             <FiltersPanelGallery />
           </Suspense>

@@ -2,14 +2,13 @@ import { activeRow, type Pick } from '@/lib/sidebarActive'
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
 import { useNoSelect } from '@/lib/useNoSelect'
-import { Check, CaretDown, CaretRight, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
+import { Check, CaretDown, CaretRight, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, FunnelSimple, SignOut, Sparkle, Warning, X } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ModulesSection } from '@/components/modules/ModulesSection'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useAuth } from '@/lib/auth'
 import { GROUPS, PROBLEM_STATUS, PROBLEM_STATUSES, type Group, type ProblemStatus } from '@/lib/statusColors'
@@ -17,13 +16,13 @@ import { shortName } from '@/lib/utils'
 
 type Chat = { id: number; title: string }
 /** The real recurrences and incidents the lists show (shaped by Dashboard, so this file stays free of Supabase); a click flies the map to the row (owner, 2026-11-06). */
-export type SidebarRecurrence = { id: string; title: string; status: ProblemStatus; reference: string; created?: number; updated?: number }
-export type SidebarIncident = { id: string; title: string; reference: string; group: Group; created?: number; updated?: number }
+export type SidebarRecurrence = { id: string; title: string; status: ProblemStatus; reference: string; locality?: string; created?: number; updated?: number }
+export type SidebarIncident = { id: string; title: string; reference: string; locality?: string; group: Group; created?: number; updated?: number }
 /** The items each conversation touched (the ids of its incidents and recurrences): the sidebar lists only these (owner, 2026-11-08). */
 export type ChatItems = { title: string; ids: string[] }[]
 /** What is open on the map (a click there or in this menu): its row is the highlighted one. */
 export type SidebarSelection = { kind: 'recurrence' | 'incident'; id: string }
-type Chats = { chats: Chat[]; activeId: number; exploring?: boolean; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void; chatItems?: ChatItems; recurrences?: SidebarRecurrence[]; incidents?: SidebarIncident[]; onOpenRecurrence?: (id: string) => void; onOpenIncident?: (id: string) => void; selected?: SidebarSelection | null }
+type Chats = { agentOff?: boolean; onToggleAgent?: () => void; chats: Chat[]; activeId: number; exploring?: boolean; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void; chatItems?: ChatItems; recurrences?: SidebarRecurrence[]; incidents?: SidebarIncident[]; onOpenRecurrence?: (id: string) => void; onOpenIncident?: (id: string) => void; selected?: SidebarSelection | null }
 
 /** The items of a section in its view: one list, or grouped by status, ordered as the view says. */
 function ViewList<T extends { id: string | number; created?: number; updated?: number }>({ items, view, group, order, labels, primary, row, limit }: { items: T[]; view: View; group: (t: T) => string; order: string[]; labels: Record<string, string>; primary: string; row: (t: T) => ReactNode; limit?: number }) {
@@ -43,7 +42,7 @@ function Groups<T extends { id: string | number }>({ items, group, order, labels
         .map((g) => [g, items.filter((t) => group(t) === g)] as const)
         .filter(([, l]) => l.length)
         .map(([g, l]) => (
-          <div key={g} className="flex flex-col gap-0.5">
+          <div key={g} className="flex flex-col gap-1">
             <Button variant="ghost" className="h-7 justify-start gap-1 px-1 text-caption-medium text-(--neutral-200) hover:bg-(--neutral-800) aria-expanded:bg-(--neutral-600)" aria-expanded={open.has(g)} onClick={() => toggle(g)}>
               {open.has(g) ? <CaretDown weight="bold" className="size-3" aria-hidden /> : <CaretRight weight="bold" className="size-3" aria-hidden />}
               {labels[g]} · {l.length}
@@ -57,7 +56,7 @@ function Groups<T extends { id: string | number }>({ items, group, order, labels
 
 
 /** The three row types of the sidebar (Figma 2026-11-05): Recurrence (warning icon in its status color), Incident (a dot in its status color) and Investigation. */
-type RecurrenceRow = { id: string | number; title: string; status: ProblemStatus; reference?: string }
+type RecurrenceRow = { id: string | number; title: string; status: ProblemStatus; reference?: string; locality?: string }
 
 /** Two-line row shared by Recurrence and Incident (Figma Sidebar Item Recurrence / Incident, 2026-11-12: 51 high, 6 left, 3 top, 8 bottom, 20 right; active = neutral-900, hover = neutral-600 (owner's Figma, 2026-11-12; hover was neutral-800), a 16 x 40 icon column with the 16 px icon 4 px below its top, 10 px to the text). */
 function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNode; title: string; sub: ReactNode; active?: boolean; tip: string; onClick: () => void }) {
@@ -157,7 +156,7 @@ function Section<T>({ title, count, items, addLabel, onAdd, pb = 'pb-3', row, ch
           {menu && <ViewMenu view={view} onChange={(v) => (setView(v), setMenu(false))} onClose={() => setMenu(false)} />}
         </div>
       </div>
-      <div className="flex flex-col gap-0.5 px-1">{children ? children(view) : row && (newest ? items : [...items].reverse()).slice(0, limit).map(row)}{empty && !items.length && <p className="px-2 pb-1 text-caption text-(--neutral-300)">{empty}</p>}</div>
+      <div className="flex flex-col gap-1 px-1">{children ? children(view) : row && (newest ? items : [...items].reverse()).slice(0, limit).map(row)}{empty && !items.length && <p className="px-2 pb-1 text-caption text-(--neutral-300)">{empty}</p>}</div>
     </div>
   )
 }
@@ -226,7 +225,7 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
 }
 
 const KEY = 'sidebar-collapsed'
-const COLLAPSED_W = 64
+const COLLAPSED_W = 56 // owner, 2026-11-16 (it was 64; the Figma file read at that moment still said 64)
 /** Under 1,800 px the sidebar is collapsed (owner, 2026-11-13): on load and whenever the window drops under it, and it expands again the moment the window reaches 1,800 px; the toggle still opens or closes it by hand in between. */
 const NARROW = '(max-width: 1799.98px)'
 const read = () => {
@@ -242,7 +241,7 @@ function Brand({ collapsed, onToggle }: { collapsed: boolean; onToggle?: () => v
   if (collapsed && onToggle)
     return (
       <Button variant="ghost" className="group size-11 p-0" aria-label="Expand menu" title="Expand menu" onClick={onToggle}>
-        <img src={mark} alt="" width={30.8} height={30.8} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
+        <img src={mark} alt="" width={34} height={34} className="shrink-0 group-hover:hidden group-focus-visible:hidden" /> {/* 34 px in the collapsed sidebar (owner's Figma, 2026-11-16; 30.8 before) */}
         <SidebarSimple weight="regular" className="hidden size-5 shrink-0 -scale-x-100 group-hover:block group-focus-visible:block" />
       </Button>
     )
@@ -266,10 +265,10 @@ function AccountMenu({ onSignOut, side, avatar }: { onSignOut: () => void; side:
   return (
     <div className="relative" onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
       {avatar ? (
-        // Collapsed sidebar (owner, 2026-10-30): the profile itself is the button, with a small down chevron badge on its top right so it reads as a menu. No extra height: the area stays as tall as the expanded one.
+        // Collapsed sidebar (owner, 2026-10-30): the profile itself is the button, with a small down chevron badge on its top right so it reads as a menu (the badge sticks out 8 px past the avatar's right edge, 4 px above it: owner's Figma, 2026-11-16). No extra height: the area stays as tall as the expanded one.
         <button type="button" aria-label="Account menu" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="group relative cursor-pointer rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
           {avatar}
-          <span className="absolute -top-1 -right-1 grid size-4 place-items-center rounded-full bg-(--neutral-500) text-(--neutral-100) ring-2 ring-(--neutral-900) group-hover:bg-(--white) group-hover:text-(--neutral-900) group-focus-visible:bg-(--white) group-focus-visible:text-(--neutral-900)">
+          <span className="absolute -top-2.5 -right-[7px] grid size-4 place-items-center rounded-full bg-(--neutral-500) text-(--neutral-100) ring-2 ring-(--neutral-900) group-hover:bg-(--white) group-hover:text-(--neutral-900) group-focus-visible:bg-(--white) group-focus-visible:text-(--neutral-900)">
             <CaretDown weight="bold" className="size-2.5" aria-hidden />
           </span>
         </button>
@@ -325,7 +324,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
-        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-[58px] justify-center bg-(--black)' : 'h-16 justify-between bg-(--neutral-700) px-2'}`}>
+        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-16 justify-center bg-(--neutral-900)' : 'h-16 justify-between bg-(--neutral-700) px-2'}`}>
           <Brand collapsed={collapsed} onToggle={onToggle} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
@@ -345,28 +344,27 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                 <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
                 Explore
               </Button>
-              <ModulesSection />
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
               <div className="flex flex-col gap-2.5 py-2">
                 <Section title="Recurrences" count={recurrences.length} items={recurrences} addLabel="New recurrence" onAdd={onNewCase} views pb="pb-2.5" empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
-                    <ViewList items={recurrences} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
+                    <ViewList items={recurrences} limit={3} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
                       <TwoLineItem key={c.id} active={act.kind === 'case' ? c.id === act.id : act.kind === 'recurrence' && c.id === act.id} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => (typeof c.id === 'string' ? noCase(onOpenRecurrence)(c.id) : setLocal({ kind: 'case', id: c.id, sel: selKey }))} title={c.title}
                         icon={<Warning weight="fill" className="size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
-                        sub={c.reference ? `${c.reference} · ${PROBLEM_STATUS[c.status].label}` : 'Not linked to a recurrence yet'} />
+                        sub={c.reference ? `${c.reference} · ${c.locality ?? PROBLEM_STATUS[c.status].label}` : 'Not linked to a recurrence yet'} />
                     )} />
                   )}
                 </Section>
                 <Section title="Incidents" count={incidentRows.length} items={incidentRows} addLabel="New incident" views empty="Nothing here yet. Incidents an answer points to, or that you open, appear here.">
                   {(view) => (
                     <ViewList items={incidentRows} limit={5} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
-                      <TwoLineItem key={i.id} active={act.kind === 'incident' && act.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => noCase(onOpenIncident)(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-2 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${GROUPS[i.group].label}`} />
+                      <TwoLineItem key={i.id} active={act.kind === 'incident' && act.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => noCase(onOpenIncident)(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-2 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${i.locality ?? GROUPS[i.group].label}`} />
                     )} />
                   )}
                 </Section>
                 <Section title="Investigations" limit={2} items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
-                  <Button key={c.key} variant="ghost" className={`h-7 items-center justify-start gap-2.5 py-1 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-600) ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900)' : ''}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
+                  <Button key={c.key} variant="ghost" className={`h-8 items-center justify-start gap-2.5 py-1.5 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-600) ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900)' : ''}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
                     <Chat weight="regular" className="size-4 shrink-0 text-(--neutral-200)" aria-hidden />
                     <span className="truncate">{c.title}</span>
                   </Button>
@@ -379,7 +377,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
       <div className={`flex shrink-0 flex-col border-t border-(--neutral-600) ${collapsed ? 'items-center justify-center py-5' : 'py-3'}`}>
         {collapsed ? (
           <>
-            <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} title={name} />} />
+            <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar size="sm" name={profile?.full_name || 'Signed in'} title={name} />} />
           </>
         ) : (
           <div className="flex items-center gap-3 py-1 pl-4 pr-5">
@@ -431,6 +429,7 @@ export function Sidebar(props: Chats) {
   })
   useLayoutEffect(() => {
     document.documentElement.style.setProperty('--sidebar-now', `${collapsed ? COLLAPSED_W : width}px`) // read by App for the agent panel's maximum width
+    document.documentElement.toggleAttribute('data-sidebar-collapsed', collapsed) // read by index.css: the agent panel drops its left border next to the collapsed rail
     window.dispatchEvent(new Event('sidebar-now'))
   }, [collapsed, width])
   const changeWidth = (px: number) => {
@@ -459,8 +458,14 @@ export function Sidebar(props: Chats) {
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:m-(--page-pad) desk:mr-0 desk:block desk:rounded-l-lg ${collapsed ? 'border-r-[0.5px] border-r-(--neutral-700) bg-(--neutral-800)' : 'bg-(--neutral-700)'}`}>
+      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:block ${collapsed ? 'bg-(--neutral-900) after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-[0.5px] after:bg-(--neutral-500) after:content-[""]' : 'bg-(--neutral-700)'}`}>
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
+        {collapsed && props.onToggleAgent && (
+          // owner's Figma, 2026-11-16: a 32 px ghost button over the collapsed column's right edge, 78 px from the top; it opens or collapses the agent panel
+          <Button type="button" size="icon" variant="ghost" aria-label={props.agentOff ? 'Open agent' : 'Collapse agent'} title={props.agentOff ? 'Open agent' : 'Collapse agent'} onClick={props.onToggleAgent} className="absolute top-[78px] -right-[15px] z-20 rounded border border-(--neutral-600) bg-(--neutral-900) hover:bg-(--neutral-700)">
+            <Sparkle aria-hidden />
+          </Button>
+        )}
         <Menu_
           {...props}
           collapsed={collapsed}

@@ -4,7 +4,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { ScrollArea as ScrollAreaPrimitive } from "radix-ui"
 
-/** The app's scrollbar (owner, 2026-11-05; 12 px since 2026-11-12, so the thumb is 4 px from the edge): 12 px grab area with a 4 px round thumb (6 px on hover), neutral-400 (neutral-300 on hover), always visible, no track (style G). Same look as the global CSS rule for native scrollbars. */
+/** The app's scrollbar (owner, 2026-11-05; 12 px since 2026-11-12, so the thumb is 4 px from the edge): 12 px grab area with a 4 px round thumb (6 px on hover), neutral-400 (neutral-300 on hover), no track (style G). Visible only while the person scrolls that area (owner, 2026-11-15; it was always visible): `type="scroll"`, fading out 0.6 s after the last wheel or drag. Same look as the global CSS rule for native scrollbars. */
 function ScrollArea({
   className,
   children,
@@ -13,7 +13,7 @@ function ScrollArea({
   viewportClassName,
   viewportRef,
   horizontal,
-  type = "always",
+  type = "scroll",
   ...props
 }: React.ComponentProps<typeof ScrollAreaPrimitive.Root> & { barClassName?: string; thumbClassName?: string; viewportClassName?: string; viewportRef?: React.Ref<HTMLDivElement>; horizontal?: boolean }) {
   return (
@@ -48,8 +48,9 @@ function ScrollBar({
       data-slot="scroll-area-scrollbar"
       data-orientation={orientation}
       orientation={orientation}
+      forceMount
       className={cn(
-        "flex touch-none p-[4px] transition-[color,padding] select-none hover:p-[3px] data-horizontal:h-3 data-horizontal:flex-col data-vertical:h-full data-vertical:w-3",
+        "flex touch-none p-[4px] transition-[color,padding,opacity] duration-300 select-none hover:p-[3px] data-[state=hidden]:pointer-events-none data-[state=hidden]:opacity-0 data-horizontal:h-3 data-horizontal:flex-col data-vertical:h-full data-vertical:w-3",
         className
       )}
       {...props}

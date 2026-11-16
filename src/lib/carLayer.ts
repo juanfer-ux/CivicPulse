@@ -10,7 +10,7 @@ import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js'
 export type SpotKind = 'parking' | 'dumping'
 export interface CarSpot { id: string; lng: number; lat: number; status: string; kind: SpotKind }
 export interface CarLayerOptions {
-  urls: { parking: string; pile: string } // the car, and the one garbage model a dumping recurrence piles up three times
+  urls: { parking: string; pile: string; extraBags?: string[] } // the car, the first garbage bag and, optionally, two more bags: a dumping recurrence is the three bags in one pile (if the extras do not load, it is the first bag alone)
   cars: () => CarSpot[]
   dimmed: (id: string) => boolean
   heightPx: (zoom: number) => number
@@ -29,21 +29,27 @@ export interface CarLayerOptions {
 export interface BadgeSpot { x: number; y: number; half: number }
 /** How high the warning floats, as a multiple of the old height (owner, 2026-11-15: "much higher"). Dev only: `?lift=` tries another value; /#warning-gallery shows the options. */
 const LIFT_MULT = import.meta.env.DEV ? Number(new URLSearchParams(location.search).get('lift')) || 4 : 4
+/** How high each status floats its warning, as a multiple of the car's height (owner, 2026-11-15): active 4x, monitoring 3x, resolved 2x. Archived is not set by the owner yet: it follows resolved. The base `LIFT_MULT` above (4, the active value) is what the templates are built with, so the factor here is the status's multiple over it. */
+const STATUS_LIFT: Record<string, number> = { active: 4, monitoring: 3, resolved: 2, archived: 2 }
+const liftOf = (status: string) => (STATUS_LIFT[status] ?? 4) / LIFT_MULT
+/** The cars are drawn this multiple of their original size (owner, 2026-11-15: 25 % bigger than the original, 1.25; a 0.25 quarter-size try was rolled back). Their warnings keep the height they had on screen, so the lift in model units is divided by it. */
+const CAR_SCALE = 1.875 // 1.25 x 1.5 (owner, 2026-11-16: everything 0.5x more)
 const LIFT = 2.2 // the warning floats at this many car heights above the ground (the roof is at 1)
 
 /** The car's size against the old flat car's curve (owner, 2026-11-15: 10 % bigger). */
 const SCALE = 1.2
 const SCALE_BADGE = 1.1 // the triangle grows with the car
-const DUMP_SCALE = 0.3 // a dumping composition is drawn this much bigger than a car on screen: it is low and wide, and its black bags are hard to see (owner, 2026-11-15: 1.5 first, 3 when it looked small, then back to 1.5, half, once the bags were big piles; then 0.75, half again, with one bag; then 0.3)
+const DUMP_SCALE = 1.35 // 0.9 x 1.5 (owner, 2026-11-16: everything 0.5x more) // halved on 2026-11-15 (owner: bags half size; 1.8 before, 0.6, 0.3 at the start; the warning height is copied from the car, so it does not move) // tripled again on 2026-11-15 (owner: still too small; the warning keeps its height, lift 0.85 / 3); 0.6 before, 0.3 until then // doubled on 2026-11-15 (owner: the bags 2x their size; the warning keeps its height, so the lift below is halved); it was 0.3 // a dumping composition is drawn this much bigger than a car on screen: it is low and wide, and its black bags are hard to see (owner, 2026-11-15: 1.5 first, 3 when it looked small, then back to 1.5, half, once the bags were big piles; then 0.75, half again, with one bag; then 0.3)
 const FRONT = Math.PI // the HR-V's front faces south in its own file (seen on screen), so turn it half a circle to point north at heading 0
 
 /** A radial blob (owner, 2026-11-15): first softer, then, with the lighting right, less blur: it stays dark to half way out, then falls to nothing over the outer fifth, so the ellipse has a defined edge. */
-function shadowTexture(): CanvasTexture {
+function shadowTexture(crisp = false): CanvasTexture {
   const c = document.createElement('canvas')
   c.width = c.height = 128
   const g = c.getContext('2d')!
   const r = g.createRadialGradient(64, 64, 0, 64, 64, 64)
-  for (const [t, a] of [[0, 0.14], [0.5, 0.13], [0.75, 0.08], [0.9, 0.025], [1, 0]]) r.addColorStop(t, `rgba(0,0,0,${a})`)
+  // crisp (the bags, owner 2026-11-15: near the ground a shadow is a sharp circle, the blur grows with the height): dark almost to the edge, falling to nothing over the last few percent
+  for (const [t, a] of crisp ? [[0, 0.14], [0.92, 0.13], [0.98, 0.05], [1, 0]] : [[0, 0.14], [0.5, 0.13], [0.75, 0.08], [0.9, 0.025], [1, 0]]) r.addColorStop(t, `rgba(0,0,0,${a})`)
   g.fillStyle = r
   g.fillRect(0, 0, 128, 128)
   return new CanvasTexture(c)
@@ -69,17 +75,17 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
   const badgeMats = new Map<string, SpriteMaterial>()
   const stripGeometry = new PlaneGeometry(1, 1).translate(0, 0.5, 0) // a strip standing on its bottom edge
   {
-    // a gradient along the line (owner, 2026-11-15): clear at the vehicle, solid at the warning
+    // a gradient along the line (owner, 2026-11-15): clear at the vehicle, 30 % opaque at the warning (50 % for a moment, solid before)
     const y = stripGeometry.getAttribute('position')
     const rgba = new Float32Array(y.count * 4)
-    for (let i = 0; i < y.count; i++) rgba.set([1, 1, 1, y.getY(i)], i * 4)
+    for (let i = 0; i < y.count; i++) rgba.set([1, 1, 1, 0.3 * y.getY(i)], i * 4)
     stripGeometry.setAttribute('color', new BufferAttribute(rgba, 4))
   }
-  const stripDown = new PlaneGeometry(1, 1).translate(0, 0.5, 0) // the dot stems fade the other way: solid at the dot, clear at the top
+  const stripDown = new PlaneGeometry(1, 1).translate(0, 0.5, 0) // the dot stems fade the other way: 30 % opaque at the dot (owner, 2026-11-15; it was solid), clear at the top
   {
     const y = stripDown.getAttribute('position')
     const rgba = new Float32Array(y.count * 4)
-    for (let i = 0; i < y.count; i++) rgba.set([1, 1, 1, 1 - y.getY(i)], i * 4)
+    for (let i = 0; i < y.count; i++) rgba.set([1, 1, 1, 0.3 * (1 - y.getY(i))], i * 4)
     stripDown.setAttribute('color', new BufferAttribute(rgba, 4))
   }
   const dotStems = new Map<string, Group>()
@@ -135,7 +141,8 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
       renderer.autoClear = false
       const loader = new GLTFLoader()
       /** Gives a loaded model's materials the look the car got: non-metallic, darker toward the ground, with a toned-down twin; normals are made when the file has none. */
-      const prepare = (root: Group) => {
+      const BAG_GLOW = 0.45 // the bags are black plastic and read dark on the dark map (owner, 2026-11-15: more light on them): their own texture added back as a glow, set when they load, before anything is drawn (changing a material that is already drawn crashed the renderer)
+      const prepare = (root: Group, glow = false) => {
         const pre = new Box3().setFromObject(root)
         root.traverse((n) => {
           const mesh = n as Mesh
@@ -145,9 +152,17 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
           mat.metalness = 0 // a metallic surface goes black without a reflection map, and the map has no sky to reflect
           mat.roughness = Math.max(mat.roughness, 0.5)
           mat.onBeforeCompile = groundShader(pre.min.y, pre.max.y - pre.min.y) // baked occlusion near the ground
+          if (glow) {
+            // a lit material gets a glow from its own texture; an unlit one (MeshBasicMaterial, which some of the bag files are) has no emissive at all and crashed the renderer when it was given one, so it is simply brightened
+            if (mat.isMeshStandardMaterial) {
+              if (mat.map) { mat.emissive = new Color(0xffffff); mat.emissiveMap = mat.map } else mat.emissive = new Color(mat.color)
+              mat.emissiveIntensity = BAG_GLOW
+            } else mat.color.multiplyScalar(1 + BAG_GLOW * 3)
+          }
           const d = mat.clone()
           d.onBeforeCompile = mat.onBeforeCompile
           d.color = new Color(mat.color).multiplyScalar(0.3) // the toned-down copy
+          if (glow && mat.isMeshStandardMaterial) d.emissiveIntensity = BAG_GLOW * 0.3
           dimOf.set(mat, d)
         })
       }
@@ -157,8 +172,8 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
         obj.position.y -= box.min.y
         return box.getSize(new Vector3())
       }
-      const blob = (w: number, l: number, opacity: number) => {
-        const flat = new Mesh(new PlaneGeometry(1, 1), new MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false, opacity }))
+      const blob = (w: number, l: number, opacity: number, crisp = false) => {
+        const flat = new Mesh(new PlaneGeometry(1, 1), new MeshBasicMaterial({ map: shadowTexture(crisp), transparent: true, depthWrite: false, opacity }))
         flat.rotation.x = -Math.PI / 2
         flat.scale.set(w, l, 1)
         const turned = new Group().add(flat)
@@ -166,31 +181,69 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
         return turned
       }
       /** Centers a model, measures it and gives it its shadows. */
-      const finish = (root: Group, front: number, side: number, lift: number): Template => {
+      const finish = (root: Group, front: number, side: number, lift: number, shadowRatio?: number, shadowAlpha = 1, crisp = false, round = false): Template => {
         const box = new Box3().setFromObject(root)
         const size = box.getSize(new Vector3())
         const mid = box.getCenter(new Vector3())
         root.position.set(-mid.x, -box.min.y, -mid.z)
         const length = Math.max(size.x, size.z)
         // the light comes from the north-west and above (the sun below), so a shadow falls to the south-east, further the higher the thing; in the model's own axes east is -x and south is -z (the car's front faces south in its file)
-        const shadow = blob(size.x * 1.9, length * 3.4, 1)
-        shadow.position.set(-0.4 * size.y * 1.9, size.y * 0.004, -0.6 * size.y * 1.9)
-        const contact = blob(size.x * 1.3, size.z * 1.2, 0.8) // a tight, darker contact shadow right under it (owner, 2026-11-15: "the car flies on top of the map")
+        const sh = shadowRatio ? shadowRatio * length : size.y // the shadow's height: a dumping composition borrows the car's height-to-length ratio, so its shadow falls like the car's (owner, 2026-11-15)
+        const shadow = round ? blob(length * 1.35, length * 1.35, shadowAlpha, crisp) : blob(size.x * 1.9, length * 3.4, shadowAlpha, crisp) // low things (the bags) throw a plain circle, not the car's long ellipse
+        shadow.position.set(-0.4 * sh * 1.9, sh * 0.004, -0.6 * sh * 1.9)
+        const contact = blob(size.x * 1.3, size.z * 1.2, 0.8 * shadowAlpha, crisp) // a tight, darker contact shadow right under it (owner, 2026-11-15: "the car flies on top of the map")
         contact.position.set(0, size.y * 0.006, 0)
         return { model: new Group().add(root), length, height: size.y, width: size.x, front, side: side * size.x, lift: lift * size.y * LIFT_MULT, shadow, contact }
       }
       void Promise.all([loader.loadAsync(o.urls.parking), loader.loadAsync(o.urls.pile)]).then(([car, pile]) => {
-        for (const g of [car, pile]) prepare(g.scene)
-        templates.parking = finish(car.scene, FRONT, 0, LIFT) // the car: east of it by 1.35 car widths (at most 0.45 of its length) and 2.2 car heights up
+        prepare(car.scene)
+        prepare(pile.scene, true)
+        templates.parking = finish(car.scene, FRONT, 0, LIFT / CAR_SCALE) // the car: east of it by 1.35 car widths (at most 0.45 of its length) and 2.2 car heights up
         // a dumping composition (owner, 2026-11-15: three heaped piles first, then "keep one bag"): one big pile, turned its own way per recurrence
-        const comp = new Group()
-        const heap = pile.scene.clone(true)
-        const sz = new Box3().setFromObject(heap).getSize(new Vector3())
-        heap.scale.setScalar(1 / Math.max(sz.x, sz.z))
-        seat(heap)
-        comp.add(heap)
-        templates.dumping = finish(comp, FRONT, 0, 1.7) // turned half a circle like the car, so that in its axes too east is -x and south is -z (shadows and the warning rely on it) // a dumping composition: just east of it and a little over its top
-        m.triggerRepaint()
+        // owner, 2026-11-16: every dumping recurrence is three objects in a tight triangle (first three bags, now the concrete bin, the trash container and the unnamed heap)
+        const bagOf = (scene: Group, footprint: number) => {
+          const bag = scene.clone(true)
+          const s = new Box3().setFromObject(bag).getSize(new Vector3())
+          bag.scale.setScalar(footprint / Math.max(s.x, s.y, s.z)) // by its biggest side, so a tall bin and a low heap come out similar
+          return bag
+        }
+        const build = (bags: Group[]) => {
+          const comp = new Group()
+          if (bags.length < 3) {
+            const heap = bagOf(bags[0], 1)
+            seat(heap)
+            comp.add(heap)
+          } else {
+            // each bag is centred on its own origin with its base at 0, so a pivot can turn it in place
+            const parts = bags.map((g) => {
+              const bag = bagOf(g, 0.5)
+              const box = new Box3().setFromObject(bag)
+              const mid = box.getCenter(new Vector3())
+              bag.position.set(-mid.x, -box.min.y, -mid.z)
+              return bag
+            })
+            // a triangle on the ground, the three centres 0.36 apart (a bag is 0.5 across, so they press against each other) (owner, 2026-11-15; first a row, before that one on top of two)
+            for (const [i, x, y, z, turn] of [[0, 0, 0, -0.208, 0.5], [1, -0.18, 0, 0.104, 2.2], [2, 0.18, 0, 0.104, 4.1]]) {
+              const pivot = new Group().add(parts[i])
+              pivot.rotation.y = turn
+              pivot.position.set(x, y, z)
+              comp.add(pivot)
+            }
+          }
+          for (const [id, g] of cars) if (g.userData.kind === 'dumping') (scene.remove(g), cars.delete(id)) // dumping markers already drawn are rebuilt from the new composition
+          const car = templates.parking! // the dumping marker copies the car's warning height and shadow (owner, 2026-11-15)
+          const t = finish(comp, FRONT, 0, 0, undefined, 0.15, true, true) // the bags shadows at 15 % strength (owner, 2026-11-15: lighter, then 15 %) and a crisp edge
+          t.lift = (car.lift / car.length) * CAR_SCALE * (t.length / DUMP_SCALE) // the same height on screen as the car's, whatever the pile's own size
+          templates.dumping = t // turned half a circle like the car, so that in its axes too east is -x and south is -z (shadows and the warning rely on it) // a dumping composition: just east of it and a little over its top
+          m.triggerRepaint()
+        }
+        build([pile.scene]) // the first bag alone until the others are in (and for good where they cannot load)
+        if (o.urls.extraBags?.length) {
+          void Promise.all(o.urls.extraBags.map((u) => loader.loadAsync(u))).then((extra) => {
+            for (const g of extra) prepare(g.scene) // no bag glow: these are not black plastic
+            build(extra.map((g) => g.scene)) // the three objects are the composition (owner, 2026-11-16: the concrete bin, the container and the unnamed heap); the first bag only shows until they load
+          }).catch(() => undefined)
+        }
       })
     },
     render(_gl, args) {
@@ -205,7 +258,7 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
       const tilt = new Matrix4().makeRotationX(Math.PI / 2)
       for (const c of want) {
         const t = templates[c.kind]!
-        const px = pxBase * (c.kind === 'dumping' ? DUMP_SCALE : 1)
+        const px = pxBase * (c.kind === 'dumping' ? DUMP_SCALE : CAR_SCALE)
         let g = cars.get(c.id)
         if (!g) {
           g = new Group()
@@ -241,10 +294,12 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
         sprite.material = badgeMat(c.status, dimmed)
         const wUnits = ((o.badgePx(map.getZoom()) * SCALE_BADGE) / o.badgeFill) * (t.length / px) // the triangle's width on screen, in the model's own units
         sprite.scale.set(wUnits, wUnits, 1)
-        sprite.position.set(-t.side, t.lift, 0)
+        const lift = t.lift * liftOf(c.status) // this status's warning height
+        g.userData.lift = lift
+        sprite.position.set(-t.side, lift, 0)
         const stem = g.getObjectByName('stem') as Group
         stem.position.set(0, t.height * 0.5, 0)
-        stem.scale.set((2 * t.length) / px, t.lift - 0.36 * wUnits - t.height * 0.5, 1) // 2 screen px wide (one px is length / px model units), as long as the climb up to the warning's bottom edge, so it does not show over the triangle (owner, 2026-11-15)
+        stem.scale.set((2 * t.length) / px, lift - 0.36 * wUnits - t.height * 0.5, 1) // 2 screen px wide (one px is length / px model units), as long as the climb up to the warning's bottom edge, so it does not show over the triangle (owner, 2026-11-15)
         stem.visible = !dimmed // east is -x in the model's axes
         const mc = MercatorCoordinate.fromLngLat([c.lng, c.lat], 0)
         const metersPerPx = (40075016.686 * Math.cos((c.lat * Math.PI) / 180)) / (512 * 2 ** map.getZoom())
@@ -296,7 +351,7 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
         ;(st.children[0] as Mesh).material = o.dimDot(d) ? stemDim(d.color) : stemMat(d.color)
         const mc = MercatorCoordinate.fromLngLat([d.lng, d.lat], 0)
         const u = (40075016.686 * Math.cos((d.lat * Math.PI) / 180)) / (512 * 2 ** map.getZoom()) * mc.meterInMercatorCoordinateUnits() // one screen px, in map units
-        const warnPx = (parkingT!.lift / parkingT!.length) * pxBase // the warning line's height in px
+        const warnPx = (parkingT!.lift / parkingT!.length) * pxBase * CAR_SCALE // the warning line's height in px
         const h = (warnPx / 2) * (d.id === o.selectedDot() ? 1 : (st.userData.rnd as number)) // the tapped report's stem is the tallest (owner, 2026-11-15), so its pin sits high, not among the other stems
         st.matrix.copy(view).multiply(new Matrix4().makeTranslation(mc.x, mc.y, 0)).multiply(new Matrix4().makeScale(u, -u, u)).multiply(tilt)
         st.matrixWorldNeedsUpdate = true
@@ -342,7 +397,7 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
       for (const [id, g] of cars) {
         if (!g.visible) { spots.delete(id); continue }
         const t = templates[g.userData.kind as SpotKind]!
-        const v = new Vector3(-t.side, t.lift, 0).applyMatrix4(g.matrix).applyMatrix4(camera.projectionMatrix)
+        const v = new Vector3(-t.side, (g.userData.lift as number | undefined) ?? t.lift, 0).applyMatrix4(g.matrix).applyMatrix4(camera.projectionMatrix)
         spots.set(id, { x: ((v.x + 1) / 2) * cw, y: ((1 - v.y) / 2) * ch, half: (o.badgePx(map.getZoom()) * SCALE_BADGE) / 2 + 4 })
       }
       // where the top of each dot's stem is, so the tapped incident's pin can ride up to it (owner, 2026-11-15)

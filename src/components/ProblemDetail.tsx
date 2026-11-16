@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+import { PanelMenuRow } from '@/components/modules/ModulesMenu'
 import { useRef } from 'react'
 import { ArrowsClockwise, Calendar, FileText, Stack, Wrench, X } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
@@ -62,6 +64,7 @@ export function ProblemDetail({
             <X />
           </Button>
         </header>
+        <PanelMenuRow kind="recurrence" className="-mx-4 border-y" />
         <ProblemStatusPill status={problem.status} />
         <dl className="grid grid-cols-[6rem_1fr] gap-x-3 gap-y-2 text-muted-foreground [&>dd]:text-body-sm-strong [&>dt]:text-body-sm-medium">
           <dt className="text-muted-foreground">Occurrences</dt>
@@ -94,6 +97,26 @@ export const stats = (p: ProblemRow) => [
   { Icon: Wrench, label: 'Interventions', value: String(p.interventions_n) },
   { Icon: Calendar, label: 'Last reported', value: p.last_seen ? day(p.last_seen) : '-' },
 ]
+
+/** The header of an open case (owner, 2026-11-15: the same for a recurrence and an incident): the big title, a line with the category and the reference, a status at the right and, under them, the menu row with the Modules button. The close button is placed by the panel, at its top right. */
+export function CaseHeader({ title, category, reference, locality, pill, kind }: { title: string; category: string; reference: string; locality: string | undefined; pill: ReactNode; kind: 'recurrence' | 'incident' }) {
+  return (
+    <>
+      <div className="flex items-start gap-4 pt-5 pr-[60px] pb-5 pl-5">
+        <div className="flex min-w-0 flex-col gap-2">
+          <h2 className="text-subtitle text-[20px]! leading-[30px] text-(--neutral-100)">{title}</h2>
+          <div className="flex items-center gap-3">
+            <p className="text-body-medium leading-5">{category}</p>
+            <span className="h-3.5 w-px bg-(--neutral-500)" aria-hidden />
+            <p className="text-meta leading-5 text-(--neutral-200)">{reference} · {locality}</p>
+          </div>
+        </div>
+        <div className="ml-auto flex items-start">{pill}</div>
+      </div>
+      <PanelMenuRow kind={kind} />
+    </>
+  )
+}
 
 /** Gallery options 1 and 3 (/#header) with the real data. */
 function WideHeader({ problem, localityName, categoryName }: { problem: ProblemRow; localityName: string | undefined; categoryName: string | undefined }) {
@@ -128,16 +151,7 @@ function WideHeader({ problem, localityName, categoryName }: { problem: ProblemR
         </div>
       </>
     )
-  return (
-    <>
-      <div className="flex items-start gap-4 pt-5 pr-[60px] pb-5 pl-5">
-        {title}
-        <div className="ml-auto flex items-start">
-          <ProblemStatusPill status={problem.status} />
-        </div>
-      </div>
-    </>
-  )
+  return <CaseHeader title={problem.location_description} category={categoryName ?? label(problem.category)} reference={problem.reference} locality={localityName} pill={<ProblemStatusPill status={problem.status} />} kind="recurrence" />
 }
 
 /** The numbers at the top of the right column (Figma Recurrence Stats, owner 2026-11-12): a `neutral-900` box (6 px radius, 12 px padding and gap) with the "Last reported" strip (`indigo-800`, `indigo-200` text) and four tiles in two columns (`neutral-700`, 4 px radius, 12 / 16 padding, the label with its icon over a 24 px SemiBold number). */

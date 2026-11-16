@@ -43,11 +43,14 @@ function Donut() {
 
 export function AgentHome({ ask }: { ask: (q: string) => void }) {
   useEffect(() => {
+    // Shift + 1 to 5 (owner, 2026-11-15; plain digits did nothing while the composer had focus, which is nearly always; Option was tried first, but not everyone reads its symbol). e.code, because Shift changes e.key (Shift+1 types !).
     const onKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement).tagName
-      if (e.metaKey || e.ctrlKey || e.altKey || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target as HTMLElement).isContentEditable) return
-      const q = SUGGESTIONS[Number(e.key) - 1]
-      if (q) ask(q)
+      if (!e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return
+      const q = SUGGESTIONS[Number(/^Digit([1-9])$/.exec(e.code)?.[1]) - 1]
+      if (q) {
+        e.preventDefault()
+        ask(q)
+      }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
@@ -110,14 +113,14 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
           </div>
         </Section>
         <Section title="Quick sugestions">
-          <div className="flex flex-col rounded-md border border-(--neutral-700) p-1"> {/* Command list (owner, 2026-11-15, picked from fourteen layouts): all five questions as rows with a topic icon and a key hint; pressing 1 to 5 asks that question. Icons are made up. */}
+          <div className="flex flex-col gap-2"> {/* Command list (owner, 2026-11-15, picked from fourteen layouts): all five questions as rows with a topic icon and a key hint; pressing 1 to 5 asks that question. Icons are made up. */}
             {SUGGESTIONS.map((s, k) => {
               const TopicIcon = TOPIC_ICON[k]
               return (
-                <button key={s} type="button" className="group flex cursor-pointer items-center gap-3 rounded-sm p-2 text-left outline-none hover:bg-(--neutral-700) focus-visible:bg-(--neutral-700) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(s)}>
-                  <TopicIcon className="size-4 shrink-0 text-(--indigo-400) group-hover:text-(--indigo-200) group-focus-visible:text-(--indigo-200)" aria-hidden />
+                <button key={s} type="button" className="group flex cursor-pointer items-center gap-3 rounded-sm bg-(--neutral-700) p-2 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(s)}>
+                  <TopicIcon className="size-5 shrink-0 text-(--neutral-300)" aria-hidden />
                   <span className="flex-1 text-body-sm-medium text-(--neutral-200)">{s}</span>
-                  <kbd className="grid size-6 shrink-0 place-items-center rounded-xs bg-(--neutral-700) text-meta font-sans text-(--neutral-300)">{k + 1}</kbd>
+                  <kbd className="grid h-6 min-w-6 shrink-0 place-items-center rounded-xs bg-(--neutral-800) px-1.5 text-meta font-sans whitespace-nowrap text-(--neutral-300)">Shift+{k + 1}</kbd>
                 </button>
               )
             })}

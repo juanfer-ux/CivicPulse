@@ -3,7 +3,7 @@ import { CaretDown, Check, ChartBar, ChartScatter, DotsSixVertical, GearSix, Has
 import { Button } from '@/components/ui/button'
 
 /**
- * Where the "Apply and pin modules across every recurrence and incident" option lives in the sidebar's Modules section (owner's idea, 2026-11-09: an icon that deploys the info, or a wheel). Dev-only gallery at /#module-options: four live mock sections, each with its own copy of the option (follow the open case, or stay with the case each module was placed on). The section title row has the same look as the sidebar's Recurrences / Incidents rows (title left, 32 px high, icon buttons right); the menu has the look of the sidebar's view menu. Nothing here touches the app.
+ * Where the "Apply and pin modules across every recurrence and incident" option lived in the sidebar's Modules section (that section is gone since 2026-11-15; the choice is in the header's Modules menu now; kept as history) (owner's idea, 2026-11-09: an icon that deploys the info, or a wheel). Dev-only gallery at /#module-options: four live mock sections, each with its own copy of the option (follow the open case, or stay with the case each module was placed on). The section title row has the same look as the sidebar's Recurrences / Incidents rows (title left, 32 px high, icon buttons right); the menu has the look of the sidebar's view menu. Nothing here touches the app.
  */
 
 const ROWS = [
