@@ -231,6 +231,9 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
 
   useEffect(() => {
     if (!WEBGL2) return
+    // Start the 3D code and the two models now, while the style and tiles download, instead of after 'load' (owner, 2026-11-16: slow map load). The models are only warmed into the HTTP cache; the 3D layer asks for them again later.
+    const carModule = import('@/lib/carLayer')
+    for (const u of ['/models/car.glb', '/models/dump-rubble.glb']) void fetch(u, { cache: 'force-cache' }).catch(() => {})
     const map = new maplibregl.Map({ container: container.current!, style: STYLE, ...START_VIEW, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, maxBounds: BOGOTA_BOUNDS, attributionControl: { compact: true, customAttribution: 'Car model “<a href="https://sketchfab.com/3d-models/2022-honda-hr-v-ehev-e9128a46adc34e5e995ab7e8ad36339c" target="_blank" rel="noreferrer">2022 Honda HR-V e:Hev</a>” by tonielpro520, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>, simplified' }, canvasContextAttributes: { antialias: true }, pixelRatio: Math.max(2, window.devicePixelRatio), maxCanvasSize: [MAX_CANVAS, MAX_CANVAS] }) // (owner, 2026-10-30, edges looked crackled) antialias smooths the edges of lines, outlines and shapes, and pixelRatio draws the map at twice the screen's resolution on ordinary 1x screens, which the browser then shrinks smoothly; the marker images are drawn for pixelRatio 2
     // On first entry the container can still be settling its size when the map is created, so once the style has loaded we re-measure it and set the start view again, unless the person has already moved the map.
     let moved = false
@@ -546,7 +549,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       const ours = new Set(['incident-badges', 'incident-selected-pin', 'answer-areas-name', 'problem-markers', 'problem-cars'])
       for (const l of map.getStyle().layers) if (l.type === 'symbol' && !ours.has(l.id)) map.moveLayer(l.id)
       for (const id of ['answer-areas-name', 'problem-incident-dots', 'incidents', 'incident-badges', 'incident-selected-pin', 'incident-selected', 'problem-markers', 'problem-cars']) map.moveLayer(id)
-      const { createCarLayer } = await import('@/lib/carLayer')
+      const { createCarLayer } = await carModule
       const carLayer = createCarLayer({
         urls: { parking: '/models/car.glb', pile: '/models/dump-rubble.glb', extraBags: ['/models-test/concrete_trash_bin.glb', '/models-test/trash_container.glb', '/models-test/unnamed_882c52.glb'] },
         cars: () => carsRef.current,
