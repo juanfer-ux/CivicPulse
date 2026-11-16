@@ -1,6 +1,7 @@
 import { MercatorCoordinate, type CustomLayerInterface, type Map as MapLibreMap } from 'maplibre-gl'
 import { BufferAttribute, Box3, DoubleSide, CanvasTexture, Color, DirectionalLight, Group, HemisphereLight, Matrix4, Mesh, MeshBasicMaterial, MeshStandardMaterial, PerspectiveCamera, PlaneGeometry, Scene, Sprite, SpriteMaterial, SRGBColorSpace, Vector3, WebGLRenderer, type Material } from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js' // the three extra bags are meshopt-compressed (1.7 MB instead of 14)
 import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js'
 
 /**
@@ -139,7 +140,7 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
       map = m
       renderer = new WebGLRenderer({ canvas: m.getCanvas(), context: gl, antialias: true })
       renderer.autoClear = false
-      const loader = new GLTFLoader()
+      const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
       /** Gives a loaded model's materials the look the car got: non-metallic, darker toward the ground, with a toned-down twin; normals are made when the file has none. */
       const BAG_GLOW = 0.45 // the bags are black plastic and read dark on the dark map (owner, 2026-11-15: more light on them): their own texture added back as a glow, set when they load, before anything is drawn (changing a material that is already drawn crashed the renderer)
       const prepare = (root: Group, glow = false) => {
