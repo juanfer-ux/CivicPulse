@@ -104,7 +104,7 @@ export default function App() {
   const [mockIds, setMockIds] = useState<Record<number, string[]>>({})
   const seeded = useRef(false)
   useEffect(() => {
-    if (seeded.current || !rows.incidents.length) return
+    if (seeded.current || !rows.incidents.length || !rows.recurrences.length) return // wait for both lists: the incidents can arrive before the recurrences, and seeding with none left the Recurrences list empty
     seeded.current = true
     const mocks = mockChats(rows.recurrences, rows.incidents)
     const first = 1001
