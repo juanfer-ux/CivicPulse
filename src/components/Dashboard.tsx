@@ -12,7 +12,7 @@ import { trendOf, type Trend } from '@/lib/trend'
 /** DEMO (owner, 2026-11-05, released): the four cards show the four trend statuses, one each (Above, About, Below usual, Low reporting), whatever the data says, so the design can be reviewed. The incident data is synthetic anyway. Delete this line and `DEMO_TRENDS[i] ??` below to show the real trends again. */
 const DEMO_TRENDS: Trend[] = ['above', 'about', 'below', 'low']
 import { MediaGallery } from '@/components/MediaGallery'
-import { HEADER, ProblemDetail } from '@/components/ProblemDetail'
+import { CaseHeader, HEADER, ProblemDetail } from '@/components/ProblemDetail'
 import { ProblemTimelineCard } from '@/components/ProblemTimelineCard'
 import { Badge } from '@/components/ui/badge'
 import { MapTypeChips, NO_FILTERS, type Filters } from '@/components/FilterBar'
@@ -21,7 +21,7 @@ import { facetCounts, type FacetRow } from '@/lib/facets'
 import { PERIODS } from '@/components/FilterBar'
 import { Chip } from '@/components/ui/chip'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   fetchDashboardData,
   groupOf,
@@ -209,7 +209,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   const recurrenceOpen = !!selectedProblem && !selectedId // an open incident hides the recurrence panel
   const dockW = modules.on ? pushOf(modules.placed, 'right', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
   const dockL = modules.on ? pushOf(modules.placed, 'left', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
-  const filtersPush = FILTERS_PUSH && filtersOpen ? FILTERS_W + 12 : 0 // the panel and the 12 px page padding after it, pushed from the right edge
+  const filtersPush = FILTERS_PUSH && filtersOpen ? FILTERS_W : 0 // the panel, flush with the window's right edge (no page padding around it since 2026-11-15)
   // The map holds the loose incidents plus, while a problem is open, that problem's own incidents (drawn as tiny dots around its marker).
   const problemIncidents = useMemo(() => (selectedProblem ? (problemDetail?.incidents ?? []) : []), [selectedProblem, problemDetail])
   const problemIncidentIds = useMemo(() => problemIncidents.map((i) => i.id), [problemIncidents])
@@ -279,10 +279,10 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   }
   useEffect(() => {
     onRows?.({
-      recurrences: [...problems].sort((a, b) => (b.last_seen ?? '').localeCompare(a.last_seen ?? '')).map((p) => ({ id: p.id, title: titleCase(p.title), status: p.status, reference: p.reference, created: Date.parse(p.first_seen ?? '') || 0, updated: Date.parse(p.last_seen ?? '') || 0 })),
-      incidents: (data?.incidents ?? []).map((i) => ({ id: i.id, title: i.title, reference: i.reference, group: groupOf(i.status), created: Date.parse(i.reported_at) || 0, updated: Date.parse(i.reported_at) || 0 })) // the data has no update time for incidents yet: reported_at stands for both,
+      recurrences: [...problems].sort((a, b) => (b.last_seen ?? '').localeCompare(a.last_seen ?? '')).map((p) => ({ id: p.id, title: titleCase(p.title), status: p.status, reference: p.reference, locality: localityName.get(p.locality_code), created: Date.parse(p.first_seen ?? '') || 0, updated: Date.parse(p.last_seen ?? '') || 0 })),
+      incidents: (data?.incidents ?? []).map((i) => ({ id: i.id, title: i.title, reference: i.reference, locality: localityName.get(i.locality_code), group: groupOf(i.status), created: Date.parse(i.reported_at) || 0, updated: Date.parse(i.reported_at) || 0 })) // the data has no update time for incidents yet: reported_at stands for both,
     })
-  }, [problems, data, onRows])
+  }, [problems, data, onRows, localityName])
   useEffect(() => {
     onSelection?.(selectedId ? { kind: 'incident', id: selectedId } : selectedProblemId ? { kind: 'recurrence', id: selectedProblemId } : null)
   }, [selectedId, selectedProblemId, onSelection])
@@ -379,7 +379,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
               Clear filters
             </Chip>
           )}
-          <Chip icon={<SlidersHorizontal aria-hidden />} count={filterCount(filters) || undefined} pressed={filterCount(filters) > 0} aria-expanded={filtersOpen} onClick={() => setFiltersOpen(true)}>
+          <Chip className="border-(--neutral-500)" icon={<SlidersHorizontal aria-hidden />} count={filterCount(filters) || undefined} pressed={filterCount(filters) > 0} aria-expanded={filtersOpen} onClick={() => setFiltersOpen(true)}>
             Filters
           </Chip>
         </div>
@@ -389,7 +389,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
       {data && (
         <>
           {!FILTERS_PUSH && <div className={`absolute inset-0 z-40 bg-black/30 transition-opacity duration-300 ${filtersOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`} onClick={() => setFiltersOpen(false)} aria-hidden />}
-          <div className={`absolute inset-y-(--page-pad) right-(--page-pad) ${FILTERS_PUSH ? 'z-30' : 'z-40 shadow-lg'} overflow-hidden rounded-lg transition-transform duration-300 ease-out ${filtersOpen ? 'translate-x-0' : 'translate-x-[calc(100%+var(--page-pad))]'}`} aria-hidden={!filtersOpen} inert={!filtersOpen}>
+          <div className={`absolute inset-y-0 right-0 ${FILTERS_PUSH ? 'z-30' : 'z-40 shadow-lg'} overflow-hidden transition-transform duration-300 ease-out ${filtersOpen ? 'translate-x-0' : 'translate-x-full'}`} aria-hidden={!filtersOpen} inert={!filtersOpen}>
             <FiltersPanel filters={filters} onChange={setFilters} onClose={() => setFiltersOpen(false)} results={(showProblems ? problemsFiltered.length : 0) + (showIncidents ? filtered.length : 0)} localities={data.localities} categories={data.categories} facets={facets} counts={byGroup} problemCounts={hasProblems ? byProblemStatus : undefined} />
           </div>
         </>
@@ -426,16 +426,16 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         role="region"
         data-float
         aria-label="Busiest localities"
-        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid md:max-desk:hidden desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-2 overflow-y-auto desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 desk:grid-cols-4 desk:top-[calc(var(--section-header-h)+var(--map-pad))]`}
+        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid md:max-desk:hidden desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-2 overflow-y-auto desk:gap-4 desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 desk:grid-cols-4 desk:top-[calc(var(--section-header-h)+var(--map-pad))]`}
       >
         {statCards}
       </div>
 
       <div
-        className={`${tab !== 'explore' ? 'flex' : 'hidden md:max-desk:flex'} desk:transition-[width] desk:duration-300 min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:py-(--page-pad) desk:pr-(--page-pad) desk:pl-(--sidebar-gap)`}
+        className={`${tab !== 'explore' ? 'flex' : 'hidden md:max-desk:flex'} desk:transition-[width] desk:duration-300 min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:pl-(--sidebar-gap)`}
       >
-        {/* Outer container: the shared float padding (12 px) on every side (owner, 2026-11-06); the panel itself is this inner box. */}
-        <div data-float className="relative flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:rounded-r-lg desk:backdrop-blur-[32px] desk:border-l-[0.5px] desk:border-l-(--neutral-400) desk:bg-(--neutral-900) desk:p-0">
+        {/* Outer container: no padding outside the panel any more (owner, 2026-11-15; it had the 12 px float padding since 2026-11-06): the sidebar and the agent panel touch the window's top, bottom and left edges. */}
+        <div data-float data-agent-panel className="relative flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:backdrop-blur-[32px] desk:border-l-[0.5px] desk:border-l-(--neutral-400) desk:border-r desk:border-r-(--neutral-400) desk:bg-(--neutral-900) desk:p-0">
           {agentOff ? (
             <button type="button" aria-label="Open agent" title="Open agent" onClick={() => onAgentOff(false)} className="hidden h-full w-full flex-col items-center gap-3 py-4 text-(--neutral-200) hover:text-(--neutral-100) desk:flex">
               <Sparkle className="size-4" />
@@ -469,7 +469,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         )
       )}
       </div>
-      <ModuleDock problems={problems} openProblemId={selectedProblem?.id ?? null} openDetail={problemDetail} openKind={item?.kind === 'incident' ? 'incident' : selectedProblem ? 'recurrence' : null} />
+      <ModuleDock problems={problems} openProblemId={item?.kind === 'incident' ? item.incident.id : selectedProblem?.id ?? null} openIncident={item?.kind === 'incident' ? item.incident : null} openDetail={problemDetail} openKind={item?.kind === 'incident' ? 'incident' : selectedProblem ? 'recurrence' : null} />
     </div>
   )
 }
@@ -484,22 +484,13 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
       role="region"
       data-float
       aria-label="Incident details"
-      className="max-h-[45%] shrink-0 overflow-auto bg-card/95 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[360px] desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]"
+      className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[360px] desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]"
     >
-      <CardHeader className="flex flex-row items-start justify-between gap-2">
-        <div>
-          <CardTitle asChild>
-            <h2>{incident.title}</h2>
-          </CardTitle>
-          <p className="text-meta text-muted-foreground">
-            {incident.reference} · {localityName}
-          </p>
-        </div>
-        <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose}>
-          <X />
-        </Button>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3 text-body-sm">
+      <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="absolute top-5 right-5 z-10">
+        <X />
+      </Button>
+      <CaseHeader title={incident.title} category={categoryName ?? label(incident.category)} reference={incident.reference} locality={localityName} pill={<Badge variant="secondary">{label(incident.status)}</Badge>} kind="incident" />
+      <CardContent className="flex flex-col gap-3 pt-4 text-body-sm">
         <div className="flex flex-wrap gap-1">
           <Badge variant="secondary">{label(incident.status)}</Badge>
           {incident.uncertainty_flags.map((f) => (

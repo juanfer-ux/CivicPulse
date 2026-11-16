@@ -43,7 +43,7 @@ export function MapZoomControl({ map, min, max, home }: { map: ZoomableMap | nul
   const tick = ((home.zoom - min) / (max - min)) * 100
   return (
     <div className="map-zoom absolute right-[14px] z-10 flex w-[29px] flex-col gap-2">
-      <div className="flex flex-col overflow-hidden rounded-sm bg-(--neutral-900)">
+      <div className="flex flex-col overflow-hidden rounded-sm border border-(--neutral-500) bg-(--neutral-900)">
         <button type="button" className={BTN} aria-label="Back to the default view" title="Back to the default view" onClick={() => map?.flyTo({ ...home, duration: still ? 0 : 800 })}>
           <House className="size-3.5" aria-hidden />
         </button>
@@ -54,7 +54,7 @@ export function MapZoomControl({ map, min, max, home }: { map: ZoomableMap | nul
           <Stack className="size-3.5" aria-hidden />
         </button>
       </div>
-      <div className="flex flex-col overflow-hidden rounded-sm bg-(--neutral-900)">
+      <div className="flex flex-col overflow-hidden rounded-sm border border-(--neutral-500) bg-(--neutral-900)">
         <button type="button" className={BTN} aria-label="Zoom in" title="Zoom in" disabled={zoom >= max - 0.01} onClick={() => map?.zoomIn()}>
           <Plus className="size-2.5" weight="bold" aria-hidden />
         </button>

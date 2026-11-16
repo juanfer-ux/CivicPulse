@@ -1,5 +1,5 @@
 /**
- * Modules (decision 0049; owner 2026-11-09): read-only panels (a recurrence's timeline, its numbers) the operator drags from the sidebar's Modules section, or accepts from the agent's offer, into one of three docking areas on the map: a column on the left, a column on the right and a strip along the bottom. Pure data and rules, no Supabase and no React, so tests can import it. Behind the `?modules=1` switch until the owner approves.
+ * Modules (decision 0049; owner 2026-11-09): read-only panels (a recurrence's timeline, its numbers) the operator drags from the Modules menu in the open case's header, or accepts from the agent's offer, into one of three docking areas on the map: a column on the left, a column on the right and a strip along the bottom. Pure data and rules, no Supabase and no React, so tests can import it. Behind the `?modules=1` switch until the owner approves.
  *
  * How an area lays its modules out (owner's drawing, 2026-11-09): the bottom strip divides its width equally (one module fills it, two share it 50 / 50); a column keeps each module at its natural height and, when they do not fit, the modules already there shrink to make room (the right column also holds the recurrence's history, which shrinks first).
  */
@@ -8,10 +8,14 @@ export type Area = 'left' | 'right' | 'bottom'
 export type Shape = '4:4' | '4:3' | '4:2'
 
 /** Which areas a module can dock in (first choice first) and what it shows. */
-export const MODULES: Record<ModuleType, { title: string; areas: Area[]; about: 'recurrence' }> = {
+/** `about`: the timeline is for a recurrence only; the numbers are for a recurrence or an incident (owner, 2026-11-15). */
+export const MODULES: Record<ModuleType, { title: string; areas: Area[]; about: 'recurrence' | 'any' }> = {
   timeline: { title: 'Recurrence timeline', areas: ['bottom', 'right', 'left'], about: 'recurrence' },
-  numbers: { title: 'Numbers', areas: ['right', 'left', 'bottom'], about: 'recurrence' },
+  numbers: { title: 'Numbers', areas: ['right', 'left', 'bottom'], about: 'any' },
 }
+
+/** The modules the open case offers (the Modules menu in its header): a recurrence gets both, an incident only the numbers. */
+export const modulesFor = (kind: 'recurrence' | 'incident') => (Object.keys(MODULES) as ModuleType[]).filter((t) => MODULES[t].about === 'any' || kind === 'recurrence')
 
 export const COLUMN_W = 360 // px: a column's width (the recurrence's right column is 360 too)
 export const DOCK_GAP = 12

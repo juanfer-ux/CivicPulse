@@ -27,7 +27,7 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
   const g = series && w > 0 ? sparkPoints(series, w, 56) : null
   return (
     <Tag
-      className={`@container flex h-[156px] min-w-0 flex-col overflow-hidden rounded-lg border text-left enabled:hover:border-(--neutral-300) ${selected ? 'border-(--neutral-300)' : 'border-input'}`}
+      className={`@container flex h-[156px] min-w-0 flex-col overflow-hidden rounded-lg border text-left enabled:hover:border-(--neutral-300) ${selected ? 'border-(--neutral-300)' : 'border-transparent'}`}
       {...(onClick ? { type: 'button' as const, onClick, 'aria-pressed': !!selected } : {})}
     >
       <span className="flex w-full flex-col gap-2 bg-(--neutral-900) px-3 pt-4 pb-5">

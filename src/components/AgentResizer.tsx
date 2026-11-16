@@ -1,8 +1,8 @@
 import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { useNoSelect } from '@/lib/useNoSelect'
 
-/** The agent panel's minimum from the owner's Figma (Agent Panel: min 600, it was 650 until 2026-11-13) plus the 12 px that `--agent-w` adds to the panel. The maximum puts the panel's right edge at the exact middle of the window (owner, 2026-11-13), see `agentMax`; never below the minimum. FINAL (owner, 2026-11-13): do not change this rule again. */
-export const AGENT_MIN = 612
+/** The agent panel's minimum from the owner's Figma (Agent Panel: min 600, it was 650 until 2026-11-13); `--agent-w` is the panel's visible width since the 12 px page padding around it was removed (owner, 2026-11-15; it was 612 for 600 visible). The maximum puts the panel's right edge at the exact middle of the window (owner, 2026-11-13), see `agentMax`; never below the minimum. FINAL (owner, 2026-11-13): do not change this rule again. */
+export const AGENT_MIN = 600
 const EDGE = 0 // px between the handle and the panel's visible right edge, inside its padding (owner, 2026-11-13)
 /** The panel you see ends at the middle of the window: half the window minus the sidebar's width at that moment (the sidebar's 12 px margin and the panel's 12 px gap cancel out). */
 export const agentMax = (windowW: number, sidebarW: number) => Math.max(AGENT_MIN, Math.round(windowW / 2 - sidebarW))
@@ -15,12 +15,11 @@ export function AgentResizer({ max, onChange }: { max: number; onChange: (px: nu
   const ref = useRef<HTMLDivElement>(null)
   const clamp = (px: number) => Math.round(Math.min(max, Math.max(AGENT_MIN, px)))
   const left = () => ref.current!.parentElement!.getBoundingClientRect().left
-  const pad = () => parseFloat(getComputedStyle(ref.current!).getPropertyValue('--page-pad')) || 0 // the panel's visible right edge is this far inside `--agent-w`
   const set = (px: number) => { const v = clamp(px); setNow(v); onChange(v) }
-  const current = () => ref.current!.getBoundingClientRect().right - left() + pad() + EDGE
+  const current = () => ref.current!.getBoundingClientRect().right - left() + EDGE
 
   const down = (e: PointerEvent<HTMLDivElement>) => { e.currentTarget.setPointerCapture(e.pointerId); setDragging(true) }
-  const move = (e: PointerEvent<HTMLDivElement>) => { if (dragging) set(e.clientX - left() + pad() + EDGE) }
+  const move = (e: PointerEvent<HTMLDivElement>) => { if (dragging) set(e.clientX - left() + EDGE) }
   const key = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'ArrowLeft') set(current() - 16)
     else if (e.key === 'ArrowRight') set(current() + 16)
@@ -47,7 +46,7 @@ export function AgentResizer({ max, onChange }: { max: number; onChange: (px: nu
       onPointerCancel={() => setDragging(false)}
       onKeyDown={key}
       onDoubleClick={() => { setNow(0); onChange(null) }}
-      style={{ left: `calc(var(--agent-w) - var(--page-pad) - ${EDGE}px)` }}
+      style={{ left: `calc(var(--agent-w) - ${EDGE}px)` }}
       className="group absolute inset-y-0 z-40 hidden w-3 -translate-x-full cursor-col-resize touch-none select-none outline-none desk:block"
     >
       <div className={`ml-auto h-full w-0.5 transition-colors group-hover:bg-ai-border group-focus-visible:bg-ai-border ${dragging ? 'bg-ai-border' : 'bg-transparent'}`} />

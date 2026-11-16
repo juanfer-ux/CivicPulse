@@ -41,7 +41,7 @@ export default function App() {
   // The agent panel's width (`--agent-w` on <main>) moves with GSAP (owner, 2026-11-13): when the window or the sidebar change what it may be, it glides to the new width (0.3 s, power2.out, the sidebar's curve); while the handle is dragged it follows the pointer at once.
   const mainRef = useRef<HTMLElement>(null)
   const instant = useRef(true)
-  const target = agentOff ? 56 : Math.min(maxW, agentW ?? Math.max(AGENT_MIN, 0.345 * view.win + 12))
+  const target = agentOff ? 56 : Math.min(maxW, agentW ?? Math.max(AGENT_MIN, 0.345 * view.win))
   useLayoutEffect(() => {
     const el = mainRef.current!
     const was = parseFloat(el.style.getPropertyValue('--agent-w'))
@@ -134,7 +134,7 @@ export default function App() {
         Skip to main content
       </a>
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
-      <Sidebar chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
+      <Sidebar agentOff={agentOff} onToggleAgent={() => setAgentOff((o) => !o)} chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
       {/* The agent panel is always 30 % of the browser window width (30vw), no minimum or maximum (owner, 2026-11-08; it was clamp(550px, 38%, 680px), which kept the cards and the composer from breaking on narrow windows). */}
       <main ref={mainRef} id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
         {!agentOff && <AgentResizer max={maxW} onChange={drag} />}

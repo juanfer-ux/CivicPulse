@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, type CSSProperties, type ReactNode } from 'r
 import { DotsSixVertical, X } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { BOTTOM_H, COLUMN_MIN_H, COLUMN_NATURAL_H, COLUMN_PUSH, COLUMN_W, DOCK_GAP, MODULES, fitsArea, inArea, shapeFor, suggestedArea, type Area, type Placed } from '@/lib/modules'
+import type { Incident } from '@/lib/incidents'
 import type { ProblemDetailData, ProblemRow } from '@/lib/problems'
 import { useModules } from '@/components/modules/ModulesProvider'
 
@@ -12,7 +13,7 @@ const LABEL: Record<Area, string> = { left: 'Left column', right: 'Right column'
 /**
  * The three docking areas on the map (decision 0049, behind /?modules=1; the owner's drawing of 2026-11-09): a column on the left, a column on the right and a strip along the bottom. While a module is dragged the areas show: the ones it fits light up, the others fade, its first choice says "Suggested". A docked module is a floating card in its area. The bottom strip divides its width equally; a column keeps each module at its natural height and, when they do not fit, they shrink (the right column also holds the recurrence's history card, which gives way first). With a recurrence open the columns sit under its header and do not push the map content; without one they do (`--dock-w` and `--dock-l`, set by Dashboard, folded into `.map-col`). Desktop only for now.
  */
-export function ModuleDock({ problems, openProblemId, openDetail, openKind }: { problems: ProblemRow[]; openProblemId: string | null; openDetail: ProblemDetailData | null; openKind: 'recurrence' | 'incident' | null }) {
+export function ModuleDock({ problems, openProblemId, openDetail, openKind, openIncident }: { problems: ProblemRow[]; openProblemId: string | null; openDetail: ProblemDetailData | null; openKind: 'recurrence' | 'incident' | null; openIncident: Incident | null }) {
   const { on, placed, follow, drag, message, setOpen, remove, setRightSlot, startDrag } = useModules()
   const recurrenceOpen = openKind === 'recurrence'
   useEffect(() => setOpen({ id: openProblemId, kind: openKind }), [openProblemId, openKind, setOpen])
@@ -25,6 +26,7 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind }: { 
   const card = (m: Placed, area: Area) => {
     const id = follow ? openProblemId : m.target
     const problem = id ? problems.find((p) => p.id === id) : undefined
+    const incident = !problem && id && openIncident?.id === id ? openIncident : undefined // an incident's numbers (the only module an incident offers)
     const { title } = MODULES[m.type]
     const style: CSSProperties = area === 'bottom' ? { flex: '1 1 0' } : { flex: `0 1 ${COLUMN_NATURAL_H}px`, minHeight: COLUMN_MIN_H }
     return (
@@ -35,7 +37,7 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind }: { 
             <DotsSixVertical className="size-3.5 shrink-0 text-(--neutral-300)" aria-hidden />
             <h3 className="flex-1 truncate text-caption-medium text-(--neutral-200)">
               {title}
-              {problem ? ` · ${problem.reference}` : ''}
+              {problem ? ` · ${problem.reference}` : incident ? ` · ${incident.reference}` : ''}
             </h3>
           </div>
           <Button size="icon" variant="ghost" aria-label={`Close ${title}`} className="size-6" onPointerDown={(e) => e.stopPropagation()} onClick={() => remove(m)}>
@@ -43,11 +45,11 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind }: { 
           </Button>
         </div>
         <div className="min-h-0 flex-1 overflow-hidden">
-          {!problem ? (
-            <p className="grid h-full place-items-center text-center text-meta text-muted-foreground">Open a recurrence to fill this module.</p>
+          {!problem && !(incident && m.type === 'numbers') ? (
+            <p className="grid h-full place-items-center text-center text-meta text-muted-foreground">{m.type === 'numbers' ? 'Open a recurrence or an incident to fill this module.' : 'Open a recurrence to fill this module.'}</p>
           ) : (
             <Suspense fallback={<p className="text-meta text-muted-foreground">Loading…</p>}>
-              {m.type === 'numbers' ? <NumbersModule problem={problem} shape={shapeFor(area)} /> : <TimelineModule problem={problem} openDetail={problem.id === openProblemId ? openDetail : null} />}
+              {m.type === 'numbers' ? <NumbersModule problem={problem} incident={incident} shape={shapeFor(area)} /> : problem && <TimelineModule problem={problem} openDetail={problem.id === openProblemId ? openDetail : null} />}
             </Suspense>
           )}
         </div>
@@ -69,7 +71,7 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind }: { 
   const column = (area: 'left' | 'right', list: Placed[]) => {
     const hasSlot = area === 'right' && recurrenceOpen
     if (!list.length && !drag && !hasSlot) return null
-    const edge = area === 'left' ? { left: recurrenceOpen ? 'var(--col-left)' : 'calc(var(--map-left) - var(--page-pad) + var(--group-gap))' } : { right: recurrenceOpen ? 'var(--col-right)' : 'var(--map-pad)' }
+    const edge = area === 'left' ? { left: recurrenceOpen ? 'var(--col-left)' : 'calc(var(--map-left) + var(--group-gap))' } : { right: recurrenceOpen ? 'var(--col-right)' : 'var(--map-pad)' }
     // The bottom strip keeps its full width (owner, 2026-11-09): with a recurrence open the left column stops above it instead of pushing it aside.
     const lift = area === 'left' && recurrenceOpen && (bottom.length || drag) ? BOTTOM_H + DOCK_GAP : 0
     // Top to bottom by pos; the recurrence's history card is an item with pos 0, so a module dropped on its upper half goes above it.

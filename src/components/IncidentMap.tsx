@@ -48,7 +48,7 @@ const INCIDENT_ZOOM = 15
 const PROBLEM_ZOOM = 18
 const DOTS_ZOOM = 14 // from here every problem's incidents show as dots
 /** The closest the map zooms (owner, 2026-10-30). The basemap has no more detail past zoom 15, so more zoom only stretches it. */
-const MAX_ZOOM = 18
+const MAX_ZOOM = 23 // owner, 2026-11-15 (it was 18)
 /** The map cannot zoom out past this (owner, 2026-10-30: zoom 11): Bogotá and its surroundings, no further. */
 const MIN_ZOOM = 11
 const NO_PROBLEMS: ProblemRow[] = []
@@ -287,12 +287,14 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
           if (l.id.includes('case')) map.setPaintProperty(l.id, 'line-blur', ROAD_BLUR)
         }
         if (l.type === 'symbol' && map.getPaintProperty(l.id, 'text-halo-width')) map.setPaintProperty(l.id, 'text-halo-color', token('--map-label-halo'))
-        // The names of the towns and cities around Bogotá were CARTO's near-white and outshone the data (owner, 2026-11-15): all of them in neutral-400. Bogotá's own locality names (place_suburbs) go the other way, to neutral-100, so the city reads brighter than its surroundings.
-        if (l.type === 'symbol' && l.id.startsWith('place_') && map.getPaintProperty(l.id, 'text-color')) map.setPaintProperty(l.id, 'text-color', token(l.id === 'place_suburbs' ? '--neutral-100' : '--neutral-400'))
-        // BOGOTÁ itself (the city label, place_city_r5) is always neutral-100 and always shown, even over other labels, so it never gets lost (owner, 2026-11-15).
-        if (l.id === 'place_city_r5') {
-          map.setPaintProperty(l.id, 'text-color', ['case', ['==', ['coalesce', ['get', 'name:es'], ['get', 'name']], 'Bogotá'], token('--neutral-100'), token('--neutral-400')])
-          map.setLayoutProperty(l.id, 'text-allow-overlap', true)
+        // Place names (owner, 2026-11-15): every town, village and city name OUTSIDE Bogotá is hidden at every zoom. What stays is Bogotá's own locality names (place_suburbs, neutral-100) and the city name BOGOTÁ (the place_city_r5 layer, filtered to that one name; neutral-100 and always shown, even over other labels, so it is never lost).
+        if (l.type === 'symbol' && l.id.startsWith('place_')) {
+          if (l.id === 'place_suburbs') map.setPaintProperty(l.id, 'text-color', token('--neutral-100'))
+          else if (l.id === 'place_city_r5') {
+            map.setFilter(l.id, ['all', map.getFilter(l.id) ?? true, ['==', ['coalesce', ['get', 'name:es'], ['get', 'name']], 'Bogotá']] as never)
+            map.setPaintProperty(l.id, 'text-color', token('--neutral-100'))
+            map.setLayoutProperty(l.id, 'text-allow-overlap', true)
+          } else map.setLayoutProperty(l.id, 'visibility', 'none')
         }
       }
       if (map.getLayer('building-top')) {
@@ -529,7 +531,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       for (const id of ['answer-areas-name', 'problem-incident-dots', 'incidents', 'incident-badges', 'incident-selected-pin', 'incident-selected', 'problem-markers', 'problem-cars']) map.moveLayer(id)
       const { createCarLayer } = await import('@/lib/carLayer')
       const carLayer = createCarLayer({
-        urls: { parking: '/models/car.glb', pile: '/models/dump-rubble.glb' },
+        urls: { parking: '/models/car.glb', pile: '/models/dump-rubble.glb', extraBags: ['/models-test/concrete_trash_bin.glb', '/models-test/trash_container.glb', '/models-test/unnamed_882c52.glb'] },
         cars: () => carsRef.current,
         dimmed: (id) => !!carSelRef.current && id !== carSelRef.current,
         heightPx: (z) => carHeight(PROBLEM_CIRCLE_PX[PROBLEM_SWITCH_ZOOMS.filter((w) => z >= w).length]),

@@ -31,3 +31,6 @@ supabase/.temp/
 
 storybook-static
 models-source/
+
+# local 3D model tryouts for /#dumping-models (not ours to redistribute)
+public/models-test

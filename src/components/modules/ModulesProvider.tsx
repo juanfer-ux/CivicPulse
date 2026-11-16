@@ -3,7 +3,7 @@ import { useAuth } from '@/lib/auth'
 import { MODULES, MODULES_ON, canDock, insertPos, parseLayout, place, type Area, type ModuleType, type Placed } from '@/lib/modules'
 
 /**
- * The modules' shared state (decision 0049, behind /?modules=1): what is docked where, the follow / stay option, the drag in progress and the case that is open. The sidebar's Modules section starts a drag; the dock (in Dashboard) shows the zones and takes the drop. The docked modules and the follow / stay choice are saved in the browser per user (`modules:v1:<user id>`), so a reload brings them back. Safe to use without the provider (tests): everything is off.
+ * The modules' shared state (decision 0049, behind /?modules=1): what is docked where, the follow / stay option, the drag in progress and the case that is open. The Modules menu in the open case's header starts a drag; the dock (in Dashboard) shows the zones and takes the drop. The docked modules and the follow / stay choice are saved in the browser per user (`modules:v1:<user id>`), so a reload brings them back. Safe to use without the provider (tests): everything is off.
  */
 type Drag = { type: ModuleType; x: number; y: number }
 type Open = { id: string | null; kind: 'recurrence' | 'incident' | null }
