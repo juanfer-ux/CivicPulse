@@ -128,6 +128,8 @@ const problemRingPx = (zoom: number) => {
 /** The entry view and the home button's view (owner, 2026-11-15): the camera as the owner left it, tilted to 60° (MapLibre's maximum) and turned 28.6° to the left. */
 /** Bogotá's outline plus a margin, centered on START_VIEW (owner, 2026-11-16: the map loaded too slowly): the map never asks for tiles beyond it, so nothing outside the city is downloaded or can be panned to. */
 const BOGOTA_BOUNDS: [[number, number], [number, number]] = [[-74.27, 4.42], [-73.926, 4.884]]
+/** The basemap's land layers: painted with --map-land, or hidden while LAND_ON is false. */
+const LAND_LAYERS = ['background', 'landcover', 'landuse', 'landuse_residential', 'park_national_park', 'park_nature_reserve']
 const START_VIEW = { center: [-74.09798, 4.65245] as [number, number], zoom: 11, pitch: 60, bearing: -28.56 }
 const NO_SPOTS: string[][] = []
 const SPOT_MIN_PX = 72 // radius on screen of a repeated location's circle at the farthest zoom (twice the recurrence ring's minimum; owner, 2026-11-08: bigger), so every spot is visible from the whole-city view
@@ -239,6 +241,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     map.once('style.load', () => {
       for (const l of map.getStyle().layers) if (l.type === 'symbol' && l.id.startsWith('place_') && l.id !== 'place_suburbs' && l.id !== 'place_city_r5') map.setLayoutProperty(l.id, 'visibility', 'none')
       if (map.getLayer('place_city_r5')) map.setFilter('place_city_r5', ['all', map.getFilter('place_city_r5') ?? true, ['==', ['coalesce', ['get', 'name:es'], ['get', 'name']], 'Bogotá']] as never) // the city layer keeps only the name Bogotá
+      // The land is hidden now too (owner, 2026-11-16: the map showed CARTO's black background until 'load'), so the screen gradient behind the map shows from the first frame.
+      if (!LAND_ON) for (const id of LAND_LAYERS) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none')
     })
     map.on('load', async () => {
       map.resize()
@@ -254,7 +258,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         if (l.type === 'symbol' && JSON.stringify(l.layout?.['text-field']).includes('name:en')) map.setLayoutProperty(l.id, 'text-field', ['coalesce', ['get', 'name:es'], ['get', 'name']])
       }
       // Land, parks and background (Figma map/land). LAND_ON is false for now (owner, 2026-10-26): the land layers are hidden, as if invisible, and the page color shows through. Set it to true to paint them with --map-land.
-      for (const id of ['background', 'landcover', 'landuse', 'landuse_residential', 'park_national_park', 'park_nature_reserve']) {
+      for (const id of LAND_LAYERS) {
         if (!map.getLayer(id)) continue
         if (LAND_ON) map.setPaintProperty(id, id === 'background' ? 'background-color' : 'fill-color', token('--map-land'))
         else map.setLayoutProperty(id, 'visibility', 'none')
