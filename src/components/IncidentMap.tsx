@@ -235,6 +235,11 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     // On first entry the container can still be settling its size when the map is created, so once the style has loaded we re-measure it and set the start view again, unless the person has already moved the map.
     let moved = false
     map.on('movestart', (e) => e.originalEvent && (moved = true))
+    // Names outside Bogotá are hidden as soon as the style is parsed, before the first frame (owner, 2026-11-16: they flashed until 'load', which fires after the first tiles are drawn). The full restyle below still runs on 'load'.
+    map.once('style.load', () => {
+      for (const l of map.getStyle().layers) if (l.type === 'symbol' && l.id.startsWith('place_') && l.id !== 'place_suburbs' && l.id !== 'place_city_r5') map.setLayoutProperty(l.id, 'visibility', 'none')
+      if (map.getLayer('place_city_r5')) map.setFilter('place_city_r5', ['all', map.getFilter('place_city_r5') ?? true, ['==', ['coalesce', ['get', 'name:es'], ['get', 'name']], 'Bogotá']] as never) // the city layer keeps only the name Bogotá
+    })
     map.on('load', async () => {
       map.resize()
       setFree(map)
@@ -293,7 +298,6 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         if (l.type === 'symbol' && l.id.startsWith('place_')) {
           if (l.id === 'place_suburbs') map.setPaintProperty(l.id, 'text-color', token('--neutral-100'))
           else if (l.id === 'place_city_r5') {
-            map.setFilter(l.id, ['all', map.getFilter(l.id) ?? true, ['==', ['coalesce', ['get', 'name:es'], ['get', 'name']], 'Bogotá']] as never)
             map.setPaintProperty(l.id, 'text-color', token('--neutral-100'))
             map.setLayoutProperty(l.id, 'text-allow-overlap', true)
           } else map.setLayoutProperty(l.id, 'visibility', 'none')
