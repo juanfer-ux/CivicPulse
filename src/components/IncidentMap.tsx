@@ -126,6 +126,8 @@ const problemRingPx = (zoom: number) => {
 }
 
 /** The entry view and the home button's view (owner, 2026-11-15): the camera as the owner left it, tilted to 60° (MapLibre's maximum) and turned 28.6° to the left. */
+/** Bogotá's outline plus a margin, centered on START_VIEW (owner, 2026-11-16: the map loaded too slowly): the map never asks for tiles beyond it, so nothing outside the city is downloaded or can be panned to. */
+const BOGOTA_BOUNDS: [[number, number], [number, number]] = [[-74.27, 4.42], [-73.926, 4.884]]
 const START_VIEW = { center: [-74.09798, 4.65245] as [number, number], zoom: 11, pitch: 60, bearing: -28.56 }
 const NO_SPOTS: string[][] = []
 const SPOT_MIN_PX = 72 // radius on screen of a repeated location's circle at the farthest zoom (twice the recurrence ring's minimum; owner, 2026-11-08: bigger), so every spot is visible from the whole-city view
@@ -229,10 +231,15 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
 
   useEffect(() => {
     if (!WEBGL2) return
-    const map = new maplibregl.Map({ container: container.current!, style: STYLE, ...START_VIEW, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, attributionControl: { compact: true, customAttribution: 'Car model “<a href="https://sketchfab.com/3d-models/2022-honda-hr-v-ehev-e9128a46adc34e5e995ab7e8ad36339c" target="_blank" rel="noreferrer">2022 Honda HR-V e:Hev</a>” by tonielpro520, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>, simplified' }, canvasContextAttributes: { antialias: true }, pixelRatio: Math.max(2, window.devicePixelRatio), maxCanvasSize: [MAX_CANVAS, MAX_CANVAS] }) // (owner, 2026-10-30, edges looked crackled) antialias smooths the edges of lines, outlines and shapes, and pixelRatio draws the map at twice the screen's resolution on ordinary 1x screens, which the browser then shrinks smoothly; the marker images are drawn for pixelRatio 2
+    const map = new maplibregl.Map({ container: container.current!, style: STYLE, ...START_VIEW, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, maxBounds: BOGOTA_BOUNDS, attributionControl: { compact: true, customAttribution: 'Car model “<a href="https://sketchfab.com/3d-models/2022-honda-hr-v-ehev-e9128a46adc34e5e995ab7e8ad36339c" target="_blank" rel="noreferrer">2022 Honda HR-V e:Hev</a>” by tonielpro520, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>, simplified' }, canvasContextAttributes: { antialias: true }, pixelRatio: Math.max(2, window.devicePixelRatio), maxCanvasSize: [MAX_CANVAS, MAX_CANVAS] }) // (owner, 2026-10-30, edges looked crackled) antialias smooths the edges of lines, outlines and shapes, and pixelRatio draws the map at twice the screen's resolution on ordinary 1x screens, which the browser then shrinks smoothly; the marker images are drawn for pixelRatio 2
     // On first entry the container can still be settling its size when the map is created, so once the style has loaded we re-measure it and set the start view again, unless the person has already moved the map.
     let moved = false
     map.on('movestart', (e) => e.originalEvent && (moved = true))
+    // Names outside Bogotá are hidden as soon as the style is parsed, before the first frame (owner, 2026-11-16: they flashed until 'load', which fires after the first tiles are drawn). The full restyle below still runs on 'load'.
+    map.once('style.load', () => {
+      for (const l of map.getStyle().layers) if (l.type === 'symbol' && l.id.startsWith('place_') && l.id !== 'place_suburbs' && l.id !== 'place_city_r5') map.setLayoutProperty(l.id, 'visibility', 'none')
+      if (map.getLayer('place_city_r5')) map.setFilter('place_city_r5', ['all', map.getFilter('place_city_r5') ?? true, ['==', ['coalesce', ['get', 'name:es'], ['get', 'name']], 'Bogotá']] as never) // the city layer keeps only the name Bogotá
+    })
     map.on('load', async () => {
       map.resize()
       setFree(map)
@@ -291,7 +298,6 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         if (l.type === 'symbol' && l.id.startsWith('place_')) {
           if (l.id === 'place_suburbs') map.setPaintProperty(l.id, 'text-color', token('--neutral-100'))
           else if (l.id === 'place_city_r5') {
-            map.setFilter(l.id, ['all', map.getFilter(l.id) ?? true, ['==', ['coalesce', ['get', 'name:es'], ['get', 'name']], 'Bogotá']] as never)
             map.setPaintProperty(l.id, 'text-color', token('--neutral-100'))
             map.setLayoutProperty(l.id, 'text-allow-overlap', true)
           } else map.setLayoutProperty(l.id, 'visibility', 'none')
