@@ -555,7 +555,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       for (const id of ['answer-areas-name', 'problem-incident-dots', 'incidents', 'incident-badges', 'incident-selected-pin', 'incident-selected', 'problem-markers', 'problem-cars']) map.moveLayer(id)
       const { createCarLayer } = await carModule
       const carLayer = createCarLayer({
-        urls: { parking: '/models/car.glb', pile: '/models/dump-rubble.glb', extraBags: ['/models-test/concrete_trash_bin.glb', '/models-test/trash_container.glb', '/models-test/unnamed_882c52.glb'] },
+        urls: { parking: '/models/car.glb', pile: '/models/dump-rubble.glb', extraBags: ['/models/concrete_trash_bin.glb', '/models/trash_container.glb', '/models/unnamed_882c52.glb'] },
         cars: () => carsRef.current,
         dimmed: (id) => !!carSelRef.current && id !== carSelRef.current,
         heightPx: (z) => carHeight(PROBLEM_CIRCLE_PX[PROBLEM_SWITCH_ZOOMS.filter((w) => z >= w).length]),
