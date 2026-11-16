@@ -458,7 +458,7 @@ export function Sidebar(props: Chats) {
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative hidden shrink-0 desk:block ${collapsed ? 'bg-(--neutral-900) after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-[0.5px] after:bg-(--neutral-500) after:content-[""]' : 'bg-(--neutral-700)'}`}>
+      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative z-40 hidden shrink-0 desk:block ${collapsed ? 'bg-(--neutral-900) after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-[0.5px] after:bg-(--neutral-500) after:content-[""]' : 'bg-(--neutral-700)'}`}>
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         {collapsed && props.onToggleAgent && (
           // owner's Figma, 2026-11-16: a 32 px ghost button over the collapsed column's right edge, 78 px from the top; it opens or collapses the agent panel
