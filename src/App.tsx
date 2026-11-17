@@ -92,13 +92,19 @@ export default function App() {
   }, [selection, opened, active.id])
   // The mocked conversations for the demo (src/lib/mockChats.ts): seeded once the rows are loaded, so clicking one opens a real conversation in the agent panel.
   const [mockIds, setMockIds] = useState<Record<number, string[]>>({})
-  const seeded = useRef(false)
+  const seededWith = useRef<number | null>(null) // how many recurrences the mock conversations were built with; null = not built yet
   useEffect(() => {
-    if (seeded.current || !rows.incidents.length || !rows.recurrences.length) return // wait for both lists: the incidents can arrive before the recurrences, and seeding with none left the Recurrences list empty
-    seeded.current = true
+    // Built as soon as the incidents are in (owner, 2026-11-17: the Incidents list waited for the slower recurrences and took very long), and built once more when the recurrences arrive, so the Recurrences list fills too.
+    const n = rows.recurrences.length
+    if (!rows.incidents.length || (seededWith.current !== null && (seededWith.current > 0 || n === 0))) return
+    seededWith.current = n
     const mocks = mockChats(rows.recurrences, rows.incidents)
     const first = 1001
-    setChats((cs) => [...cs, ...mocks.map((m, k) => ({ id: first + k, turns: m.turns }))])
+    const turnsOf = new Map(mocks.map((m, k) => [first + k, m.turns]))
+    setChats((cs) => {
+      const have = new Set(cs.map((c) => c.id))
+      return [...cs.map((c) => (turnsOf.has(c.id) ? { ...c, turns: turnsOf.get(c.id)! } : c)), ...[...turnsOf].filter(([id]) => !have.has(id)).map(([id, turns]) => ({ id, turns }))]
+    })
     setMockIds(Object.fromEntries(mocks.map((m, k) => [first + k, m.ids])))
   }, [rows])
   // The sidebar always lists every conversation's items (owner, 2026-11-08: switching conversations must not change the lists); what was opened from the map belongs to the conversation that was open then.
