@@ -17,7 +17,7 @@ import { ProblemTimelineCard } from '@/components/ProblemTimelineCard'
 import { Badge } from '@/components/ui/badge'
 import { MapTypeChips, NO_FILTERS, type Filters } from '@/components/FilterBar'
 import { FiltersPanel, filterCount } from '@/components/FiltersPanel'
-import { facetCounts, type FacetRow } from '@/lib/facets'
+import { facetCounts, statusHides, type FacetRow } from '@/lib/facets'
 import { PERIODS } from '@/components/FilterBar'
 import { Chip } from '@/components/ui/chip'
 import { Button } from '@/components/ui/button'
@@ -119,8 +119,10 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   // One map for both (owner, 2026-10-30): problems are always markers, incidents are dots or pins, and an incident a problem already stands for is not drawn twice.
   // While an agent answer is on the map only its incidents show (they are incidents, linked or not); without the problems layer in the database it is the incident map as before.
   const hasProblems = problems.length > 0
-  const showProblems = hasProblems && !chatMode && (!filters.types.length || filters.types.includes('problems'))
-  const showIncidents = !hasProblems || chatMode || !filters.types.length || filters.types.includes('incidents')
+  const typeProblems = hasProblems && !chatMode && (!filters.types.length || filters.types.includes('problems'))
+  const typeIncidents = !hasProblems || chatMode || !filters.types.length || filters.types.includes('incidents')
+  const showProblems = typeProblems && !statusHides(filters, true) // a status chosen for the other kind only (owner, 2026-11-16) hides this kind
+  const showIncidents = typeIncidents && !statusHides(filters, false)
   useEffect(() => {
     if (!showProblems) setSelectedProblemId(null) // eslint-disable-line react-hooks/set-state-in-effect
   }, [showProblems])
@@ -197,10 +199,10 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   // What each option of the Filters panel would leave on the map with every other filter kept (owner, 2026-11-15): an option that would leave nothing is switched off.
   const facets = useMemo(() => {
     const rows: FacetRow[] = []
-    if (showIncidents) for (const i of data?.incidents ?? []) if ((!answerIds || answerIds.has(i.id)) && (chatMode || !linked.has(i.id))) rows.push({ problem: false, locality: i.locality_code, category: i.category, at: Date.parse(i.occurred_at), group: groupOf(i.status) })
-    if (showProblems) for (const p of problems) rows.push({ problem: true, locality: p.locality_code, category: p.category, at: p.last_seen ? Date.parse(p.last_seen) : null, status: p.status })
+    if (typeIncidents) for (const i of data?.incidents ?? []) if ((!answerIds || answerIds.has(i.id)) && (chatMode || !linked.has(i.id))) rows.push({ problem: false, locality: i.locality_code, category: i.category, at: Date.parse(i.occurred_at), group: groupOf(i.status) })
+    if (typeProblems) for (const p of problems) rows.push({ problem: true, locality: p.locality_code, category: p.category, at: p.last_seen ? Date.parse(p.last_seen) : null, status: p.status })
     return facetCounts(rows, filters, now, (data?.localities ?? []).map((l) => l.code), (data?.categories ?? []).map((c) => c.code), PERIODS.map((p) => p.days))
-  }, [data, answerIds, chatMode, linked, problems, showIncidents, showProblems, filters, now])
+  }, [data, answerIds, chatMode, linked, problems, typeIncidents, typeProblems, filters, now])
 
   const selectedProblem = showProblems ? (problemsFiltered.find((p) => p.id === selectedProblemId) ?? null) : null
   const problemDetail = detail && detail.id === selectedProblemId ? detail.data : null

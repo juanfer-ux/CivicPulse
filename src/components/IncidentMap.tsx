@@ -130,7 +130,7 @@ const problemRingPx = (zoom: number) => {
 const BOGOTA_BOUNDS: [[number, number], [number, number]] = [[-74.27, 4.42], [-73.926, 4.884]]
 /** The basemap's land layers: painted with --map-land, or hidden while LAND_ON is false. */
 const LAND_LAYERS = ['background', 'landcover', 'landuse', 'landuse_residential', 'park_national_park', 'park_nature_reserve']
-const START_VIEW = { center: [-74.09798, 4.65245] as [number, number], zoom: 11, pitch: 60, bearing: -28.56 }
+const START_VIEW = { center: [-74.09798, 4.65245] as [number, number], zoom: 11.6, pitch: 60, bearing: -28.56 } // zoom 11.6 (owner, 2026-11-16; it was 11)
 const NO_SPOTS: string[][] = []
 const SPOT_MIN_PX = 72 // radius on screen of a repeated location's circle at the farthest zoom (twice the recurrence ring's minimum; owner, 2026-11-08: bigger), so every spot is visible from the whole-city view
 const SPOT_MIN_M = 120 // and its real size when zoomed in (twice the recurrence's 60 m)

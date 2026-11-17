@@ -20,8 +20,12 @@ export interface FacetFilters {
 }
 const DAY = 86_400_000
 
-/** The same rules the map applies: locality, categories, a time window, then the statuses of its own kind. */
+/** Status filters choose a kind (owner, 2026-11-16): only incident statuses chosen shows only incidents, only recurrence statuses shows only recurrences, both kinds chosen shows both. */
+export const statusHides = (f: Pick<FacetFilters, 'statuses' | 'problemStatuses'>, problem: boolean) => (problem ? !!f.statuses.length && !f.problemStatuses.length : !!f.problemStatuses.length && !f.statuses.length)
+
+/** The same rules the map applies: locality, categories, a time window, the kind the statuses choose, then the statuses of its own kind. */
 export function matches(r: FacetRow, f: FacetFilters, now: number): boolean {
+  if (statusHides(f, r.problem)) return false
   if (f.locality && r.locality !== Number(f.locality)) return false
   if (f.categories.length && !f.categories.includes(r.category)) return false
   if (f.days && !(r.at !== null && r.at >= now - f.days * DAY)) return false
