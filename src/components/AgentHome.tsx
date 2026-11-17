@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { Car, CarSimple, Trash, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wrench, type Icon } from '@phosphor-icons/react'
 import { SUGGESTIONS, WORTH_INVESTIGATING } from '@/lib/agent'
+import { useAuth } from '@/lib/auth'
 
 /** The agent panel's landing (owner's Figma, 2026-11-12: Agent Panel, Welcome_Module, CatchUp_Module, Worth-Investigating_Module, Quick Questions): a greeting and three sections, each a Welcome_Module with a title row and a caret that folds it. Data overview and the category pictures are still placeholders (Figma's numbers); the questions are real and ask the agent. */
 /** The Quick suggestions section and its Shift + 1 to 5 keys (owner, 2026-11-16: switched off for now). Set to true to bring them back. */
@@ -43,7 +44,8 @@ function Donut() {
   )
 }
 
-export function AgentHome({ ask, composer }: { ask: (q: string) => void; composer: ReactNode }) {
+export function AgentHome({ ask }: { ask: (q: string) => void }) {
+  const first = useAuth().profile?.full_name?.trim().split(/\s+/)[0] // the greeting names the person (owner's Figma, 2026-11-17: "Welcome back Peter,")
   useEffect(() => {
     if (!QUICK_SUGGESTIONS_ON) return
     // Shift + 1 to 5 (owner, 2026-11-15; plain digits did nothing while the composer had focus, which is nearly always; Option was tried first, but not everyone reads its symbol). e.code, because Shift changes e.key (Shift+1 types !).
@@ -59,11 +61,11 @@ export function AgentHome({ ask, composer }: { ask: (q: string) => void; compose
     return () => document.removeEventListener('keydown', onKey)
   }, [ask])
   return (
-    <div className="flex flex-col gap-8"> {/* Figma Dashboard (owner, 2026-11-16, latest): 32 px between the group and the composer (it was 64) */}
+    <div className="flex flex-col"> {/* Figma Dashboard (owner, 2026-11-17): fills the body with one group inside; the composer is no longer here, it is pinned at the bottom of the panel */}
       <div className="flex flex-col gap-16 px-2.5 py-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
       <div className="flex flex-wrap items-center justify-between gap-x-9 gap-y-2"> {/* Figma Welcome Message (owner, 2026-11-16, latest): "Welcome back," at the left and the place at the right, space between, 36 px apart, centered on each other */}
-        <h2 className="font-display text-display-md text-(--brand-primary)">Welcome back,</h2>
-        <p className="flex items-center gap-2 font-display-semi text-display-xs whitespace-nowrap text-(--neutral-200)"> {/* Figma (latest): `map-pin` regular 18 px `neutral-300`, 8 px, then "Bogotá, Colombia" in display-xs (16 / 20) `neutral-200`; it was display-sm `neutral-100` */}
+        <h2 className="font-display text-display-md text-(--brand-primary)">Welcome back{first ? ` ${first}` : ''},</h2>
+        <p className="flex items-center gap-2 text-body whitespace-nowrap text-(--neutral-200)"> {/* Figma (latest): `map-pin` regular 18 px `neutral-300`, 8 px, then "Bogotá, Colombia" in display-xs (16 / 20) `neutral-200`; it was display-sm `neutral-100` */}
           <MapPin weight="regular" className="size-[18px] text-(--neutral-300)" aria-hidden />
           Bogotá, Colombia
         </p>
@@ -110,7 +112,7 @@ export function AgentHome({ ask, composer }: { ask: (q: string) => void; compose
               {WORTH_INVESTIGATING.map((c) => {
                 const Icon = CATEGORY_ICON[c.title]
                 return (
-                  <button key={c.title} type="button" className="group flex min-w-[120px] flex-1 cursor-pointer flex-col items-start gap-4 rounded-md bg-(--neutral-700) p-3 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(c.question)}> {/* Figma Category_Card2 (owner, 2026-11-15): vertical, neutral-700, 6 px radius, 12 px padding, 16 px between the icon (24 px, top left) and the name (Fill width, Hug height, neutral-200, wraps) and the name; no inner block. Rollover (owner's try): neutral-600 and the icon turns filled */}
+                  <button key={c.title} type="button" className="group flex min-w-[120px] flex-1 cursor-pointer flex-col items-start justify-end gap-4 rounded-md bg-(--neutral-700) p-3 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(c.question)}> {/* Figma Category_Card2 (owner, 2026-11-15): vertical, neutral-700, 6 px radius, 12 px padding, 16 px between the icon (24 px, top left) and the name (Fill width, Hug height, neutral-200, wraps) and the name; no inner block. Rollover (owner's try): neutral-600 and the icon turns filled */}
                     {Icon && (
                       <span className="grid size-6 place-items-center">
                         <Icon weight="duotone" className="size-6 text-(--indigo-300) group-hover:hidden group-focus-visible:hidden" aria-hidden />
@@ -142,7 +144,6 @@ export function AgentHome({ ask, composer }: { ask: (q: string) => void; compose
         </div>
       </div>
       </div>
-      {composer}
     </div>
   )
 }

@@ -21,7 +21,7 @@
   --text-display-lg--font-weight: calc(200 + var(--display-weight-offset));
   --text-display-lg--line-height: 56px;
   --text-display-lg--letter-spacing: 0;
-  --text-display-md: 24px; /* Figma 2026-11-12: the agent panel's greeting, Zalando Sans Expanded Regular 24 / 28, tracking 1 % (it was 28 / 28) */
+  --text-display-md: 32px; /* Figma 2026-11-17: the agent panel's greeting, Zalando Sans Expanded Regular 32 with a 28 px line, tracking 1 % (it was 24 / 28) */
   --text-display-md--font-weight: calc(400 + var(--display-weight-offset));
   --text-display-md--line-height: 28px;
   --text-display-md--letter-spacing: 0.01em;
