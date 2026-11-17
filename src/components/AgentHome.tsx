@@ -3,6 +3,8 @@ import { Car, CarSimple, Trash, Warning, MapPin, Clock, ArrowsClockwise, Compass
 import { SUGGESTIONS, WORTH_INVESTIGATING } from '@/lib/agent'
 
 /** The agent panel's landing (owner's Figma, 2026-11-12: Agent Panel, Welcome_Module, CatchUp_Module, Worth-Investigating_Module, Quick Questions): a greeting and three sections, each a Welcome_Module with a title row and a caret that folds it. Data overview and the category pictures are still placeholders (Figma's numbers); the questions are real and ask the agent. */
+/** The Quick suggestions section and its Shift + 1 to 5 keys (owner, 2026-11-16: switched off for now). Set to true to bring them back. */
+const QUICK_SUGGESTIONS_ON = false
 const SHARE: [string, number][] = [['Chapinero', 62], ['Suba', 52], ['Kennedy', 43], ['Engativá', 36], ['Others', 61]] // placeholder: Figma's numbers until the data comes from the incidents
 const STEPS = [1, 0.85, 0.7, 0.55, 0.4] // indigo-400, fading from the biggest slice
 const GAP = (2.3 / 360) * 2 * Math.PI * 52.28 // 2.3 degrees between slices, centered on the cut (Figma arcs: -88.9 to -3.3, then -1 to 70.4, ...)
@@ -23,8 +25,8 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 /** The category cards' icons (owner's Figma, 2026-11-14): Phosphor duotone, 25.6 px, `indigo-300`, on a `neutral-900` block. */
 const CATEGORY_ICON: Record<string, Icon> = { 'Obstructive Parking': CarSimple, 'Illegal Dumping': Trash, 'Damaged Infrastructure': Wrench }
 
-/** Figma Data_Card_Small / Data_Card_Medium: 6 px radius, `neutral-700` fill, 0.5 px `neutral-500` line, 8 px padding and a name in `body-sm`. */
-const dataCard = 'flex flex-col gap-1 rounded-md border-[0.5px] border-(--neutral-500)' // Figma data cards (owner, 2026-11-15): no fill, a 0.5 px `neutral-500` line inside
+/** Figma Data_Card_Small / Data_Card_Medium: 6 px radius, `neutral-900` fill, 0.5 px `neutral-600` line, 8 px padding and a name in `body-sm`. */
+const dataCard = 'flex flex-col gap-1 rounded-md border-[0.5px] border-(--neutral-600) bg-(--neutral-900)' // Figma data cards (owner, 2026-11-16): a `neutral-900` fill again (it was none since 2026-11-15) and a 0.5 px `neutral-600` line inside (it was `neutral-500`)
 const cardName = 'p-1 text-meta text-(--neutral-200)'
 
 function Donut() {
@@ -43,6 +45,7 @@ function Donut() {
 
 export function AgentHome({ ask }: { ask: (q: string) => void }) {
   useEffect(() => {
+    if (!QUICK_SUGGESTIONS_ON) return
     // Shift + 1 to 5 (owner, 2026-11-15; plain digits did nothing while the composer had focus, which is nearly always; Option was tried first, but not everyone reads its symbol). e.code, because Shift changes e.key (Shift+1 types !).
     const onKey = (e: KeyboardEvent) => {
       if (!e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return
@@ -118,20 +121,22 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
             })}
           </div>
         </Section>
-        <Section title="Quick sugestions">
-          <div className="flex flex-col gap-2"> {/* Command list (owner, 2026-11-15, picked from fourteen layouts): all five questions as rows with a topic icon and a key hint; pressing 1 to 5 asks that question. Icons are made up. */}
-            {SUGGESTIONS.map((s, k) => {
-              const TopicIcon = TOPIC_ICON[k]
-              return (
-                <button key={s} type="button" className="group flex cursor-pointer items-center gap-3 rounded-sm bg-(--neutral-700) p-2 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(s)}>
-                  <TopicIcon className="size-5 shrink-0 text-(--neutral-300)" aria-hidden />
-                  <span className="flex-1 text-body-sm-medium text-(--neutral-200)">{s}</span>
-                  <kbd className="grid h-6 min-w-6 shrink-0 place-items-center rounded-xs bg-(--neutral-800) px-1.5 text-meta font-sans whitespace-nowrap text-(--neutral-300)">Shift+{k + 1}</kbd>
-                </button>
-              )
-            })}
-          </div>
-        </Section>
+        {QUICK_SUGGESTIONS_ON && (
+          <Section title="Quick sugestions">
+            <div className="flex flex-col gap-2"> {/* Command list (owner, 2026-11-15, picked from fourteen layouts): all five questions as rows with a topic icon and a key hint; pressing 1 to 5 asks that question. Icons are made up. */}
+              {SUGGESTIONS.map((s, k) => {
+                const TopicIcon = TOPIC_ICON[k]
+                return (
+                  <button key={s} type="button" className="group flex cursor-pointer items-center gap-3 rounded-sm bg-(--neutral-700) p-2 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(s)}>
+                    <TopicIcon className="size-5 shrink-0 text-(--neutral-300)" aria-hidden />
+                    <span className="flex-1 text-body-sm-medium text-(--neutral-200)">{s}</span>
+                    <kbd className="grid h-6 min-w-6 shrink-0 place-items-center rounded-xs bg-(--neutral-800) px-1.5 text-meta font-sans whitespace-nowrap text-(--neutral-300)">Shift+{k + 1}</kbd>
+                  </button>
+                )
+              })}
+            </div>
+          </Section>
+        )}
       </div>
     </div>
   )
