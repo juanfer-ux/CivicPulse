@@ -41,7 +41,7 @@ export default function App() {
   // The agent panel's width (`--agent-w` on <main>) moves with GSAP (owner, 2026-11-13): when the window or the sidebar change what it may be, it glides to the new width (0.3 s, power2.out, the sidebar's curve); while the handle is dragged it follows the pointer at once.
   const mainRef = useRef<HTMLElement>(null)
   const instant = useRef(true)
-  const target = agentOff ? 56 : Math.min(maxW, agentW ?? Math.max(AGENT_MIN, 0.345 * view.win))
+  const target = agentOff ? 56 : Math.min(maxW, agentW ?? maxW) // no saved width: the panel opens at its maximum, the middle of the window, so it is wider with the sidebar collapsed (owner, 2026-11-16; it was 0.345 of the window)
   useLayoutEffect(() => {
     const el = mainRef.current!
     const was = parseFloat(el.style.getPropertyValue('--agent-w'))
