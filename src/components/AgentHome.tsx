@@ -60,7 +60,7 @@ export function AgentHome({ ask, composer }: { ask: (q: string) => void; compose
   }, [ask])
   return (
     <div className="flex flex-col gap-8"> {/* Figma Dashboard (owner, 2026-11-16, latest): 32 px between the group and the composer (it was 64) */}
-      <div className="flex flex-col gap-16 p-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
+      <div className="flex flex-col gap-16 px-2.5 py-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
       <div className="flex flex-wrap items-center justify-between gap-x-9 gap-y-2"> {/* Figma Welcome Message (owner, 2026-11-16, latest): "Welcome back," at the left and the place at the right, space between, 36 px apart, centered on each other */}
         <h2 className="font-display text-display-md text-(--brand-primary)">Welcome back,</h2>
         <p className="flex items-center gap-2 font-display-semi text-display-xs whitespace-nowrap text-(--neutral-200)"> {/* Figma (latest): `map-pin` regular 18 px `neutral-300`, 8 px, then "Bogotá, Colombia" in display-xs (16 / 20) `neutral-200`; it was display-sm `neutral-100` */}
@@ -68,7 +68,7 @@ export function AgentHome({ ask, composer }: { ask: (q: string) => void; compose
           Bogotá, Colombia
         </p>
       </div>
-      <div className="flex flex-col gap-6"> {/* Figma Frame 2147225871: "Let's catch up" and the modules, 24 px apart; the greeting is 64 px above them, the group has 16 px all round (688 px wide) */}
+      <div className="flex flex-col gap-8"> {/* Figma Frame 2147225871 (owner, 2026-11-16, latest): "Let's catch up" and the modules, 32 px apart (it was 24); the greeting is 64 px above them, the group has 16 px above and below and 10 at the sides (700 px wide) */}
       <Section title="Let's catch up">
           <div className="flex flex-wrap items-center gap-3"> {/* Figma CatchUp_Module2 (owner, 2026-11-15, checked again later that day): a wrapping row, 12 px across and 12 px between wrapped rows, items centered; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
             <div className="@container min-w-[180px] flex-1 basis-0">
