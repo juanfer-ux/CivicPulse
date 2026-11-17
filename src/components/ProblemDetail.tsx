@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { PanelMenuRow } from '@/components/modules/ModulesMenu'
-import { useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { ArrowsClockwise, Calendar, FileText, Stack, Wrench, X } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -32,6 +32,20 @@ export function ProblemDetail({
 }) {
   const panel = useRef<HTMLDivElement>(null)
   useRestoreFocus(panel)
+  // The right column (the history and the modules docked there) starts under this header, 12 px below it (owner, 2026-11-16: the header grew a Modules row and the column, placed 96 px down, overlapped it), so the header's real height goes to the dock as --case-header-h.
+  useLayoutEffect(() => {
+    const el = panel.current
+    if (!el) return
+    const root = document.documentElement
+    const set = () => root.style.setProperty('--case-header-h', `${el.getBoundingClientRect().height}px`)
+    set()
+    const ro = new ResizeObserver(set)
+    ro.observe(el)
+    return () => {
+      ro.disconnect()
+      root.style.removeProperty('--case-header-h')
+    }
+  }, [])
   return (
     <Card
       ref={panel}
