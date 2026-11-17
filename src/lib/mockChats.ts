@@ -9,7 +9,7 @@ export interface MockChat {
 }
 
 const TIME = ['12–4 AM', '4–8 AM', '8 AM–12 PM', '12–4 PM', '4–8 PM', '8 PM–12 AM']
-const LIMITS = ['This conversation is a mock-up for the demo: nothing was asked of the data.']
+const LIMITS: string[] = [] // the "This conversation is a mock-up for the demo" note is gone (owner, 2026-11-17); the owner will place that copy elsewhere
 
 export function mockChats(recs: Rec[], incs: Inc[]): MockChat[] {
   const used = new Set<string>()

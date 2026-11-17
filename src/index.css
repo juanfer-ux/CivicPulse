@@ -86,15 +86,15 @@
   --text-body-sm: var(--fs-body-sm);
   --text-body-sm--font-weight: calc(400 + var(--weight-offset));
   --text-body-sm--line-height: var(--lh-body-sm);
-  --text-body-sm--letter-spacing: 0.014em; /* Figma 2026-11-05: 1.4 % (it was 2 %, then 0 %, 0.5 %, 1 %) */
+  --text-body-sm--letter-spacing: 0.02em; /* Figma 2026-11-17: 2 % (it was 1.4 % since 2026-11-05) */
   --text-body-sm-medium: var(--fs-body-sm);
   --text-body-sm-medium--font-weight: calc(500 + var(--weight-offset));
   --text-body-sm-medium--line-height: var(--lh-body-sm-md);
-  --text-body-sm-medium--letter-spacing: 0.014em; /* Figma 2026-11-05: 1.4 % (all three body-sm styles) */
+  --text-body-sm-medium--letter-spacing: 0.02em; /* Figma 2026-11-17: 2 % (it was 1.4 %) */
   --text-body-sm-strong: var(--fs-body-sm);
   --text-body-sm-strong--font-weight: calc(600 + var(--weight-offset));
   --text-body-sm-strong--line-height: var(--lh-body-sm-md);
-  --text-body-sm-strong--letter-spacing: 0.014em; /* Figma 2026-11-05: 1.4 % (all three body-sm styles) */
+  --text-body-sm-strong--letter-spacing: 0.02em; /* Figma 2026-11-17: 2 % (it was 1.4 %) */
   /* Default body is 14 px on desktop (Figma: body, body-medium, body-strong); body-sm is the 13 px one used so far. */
   --text-body: var(--fs-body);
   --text-body--font-weight: calc(400 + var(--weight-offset));
@@ -107,7 +107,7 @@
   --text-body-strong: var(--fs-body);
   --text-body-strong--font-weight: calc(600 + var(--weight-offset));
   --text-body-strong--line-height: var(--lh-body-strong);
-  --text-body-strong--letter-spacing: 0.01em;
+  --text-body-strong--letter-spacing: 0.02em; /* Figma 2026-11-17: 2 % (it was 1 %) */
   --text-meta: var(--fs-meta);
   --text-meta--font-weight: calc(400 + var(--weight-offset));
   --text-meta--line-height: var(--lh-meta);

@@ -157,7 +157,7 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, o
   const link = shown && result.areas?.length ? { onFocus: onFocusArea, onPick: onZoomArea } : {}
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-muted-foreground">{result.text}</p>
+      {result.bars.length === 0 && <p className="text-muted-foreground">{result.text}</p>}
       {result.bars.length > 0 && (
         <div className="w-full max-w-(--chart-max-w)"> {/* charts and graphs in the conversation are narrower than the text column (owner, 2026-11-15) */}
           {result.chart ? (
@@ -169,6 +169,7 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, o
           )}
         </div>
       )}
+      {result.bars.length > 0 && <p className="text-muted-foreground">{result.text}</p>} {/* an answer with a chart or bars: the text goes under the graphic, every time (owner, 2026-11-17) */}
       {result.evidence.map((e) => (
         <details key={e.tool + e.scope} className="text-meta text-muted-foreground">
           <summary className="cursor-pointer">Evidence: {e.incidentCount} Incidents</summary>
@@ -188,6 +189,7 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, o
           </dl>
         </details>
       ))}
+      {result.limitations.length > 0 && (
       <ul className="flex flex-col text-meta text-muted-foreground">
         {result.limitations.map((l, i) => (
           <li key={l} className="flex items-start gap-3 border-b border-(--neutral-600) py-2.5 last:border-b-0">
@@ -196,6 +198,7 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, o
           </li>
         ))}
       </ul>
+      )}
       {result.offers?.map((o) => (
         <ModuleOffer key={`${o.type}-${o.problemId}`} offer={o} />
       ))}
