@@ -233,14 +233,14 @@ function Brand({ collapsed, onToggle }: { collapsed: boolean; onToggle?: () => v
   if (collapsed && onToggle)
     return (
       <Button variant="ghost" className="group size-11 p-0" aria-label="Expand menu" title="Expand menu" onClick={onToggle}>
-        <img src={mark} alt="" width={37.57} height={37.57} className="shrink-0 group-hover:hidden group-focus-visible:hidden" /> {/* 37.57 px in the collapsed sidebar (owner's Figma, 2026-11-17; 34 on 2026-11-16, 30.8 before) */}
+        <img src={mark} alt="" width={42.94} height={42.94} className="shrink-0 group-hover:hidden group-focus-visible:hidden" /> {/* 42.94 px in the collapsed sidebar (owner's Figma, 2026-11-17, latest; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before) */}
         <SidebarSimple weight="regular" className="hidden size-5 shrink-0 -scale-x-100 group-hover:block group-focus-visible:block" />
       </Button>
     )
   return (
-    <div className={`flex items-center gap-[7.05px] ${collapsed ? '' : 'pl-[6.47px]'}`}>
-      <img src={mark} alt="" width={34.05} height={34.05} className="shrink-0" />
-      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={139.15} height={10.57} className="shrink-0" />}
+    <div className={`flex items-center gap-[8.05px]`}>
+      <img src={mark} alt="" width={38.92} height={38.92} className="shrink-0" />
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={159} height={12.07} className="shrink-0" />}
     </div>
   )
 }
@@ -316,7 +316,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
-        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-16 justify-center bg-(--neutral-900)' : 'h-16 justify-between bg-(--neutral-700) px-2'}`}>
+        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-17 justify-between bg-(--neutral-700) px-2.5'}`}>
           <Brand collapsed={collapsed} onToggle={onToggle} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
