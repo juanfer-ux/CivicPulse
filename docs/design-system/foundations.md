@@ -37,7 +37,7 @@ Each class sets size, line height and weight together, so a component never need
 | body-sm-strong | 13 / 20 (spacing 2 % since 2026-11-17; before: 1.4 %, 0 % earlier that day, was 2 % until 2026-11-05) | **16 / 24** | 600 | Small body, strong | `text-body-sm-strong` |
 | meta | 13 / 23 (line was 21 until 2026-11-05) | **14 / 20** | 400 | Secondary info | `text-meta` |
 | meta-medium | 13 / 23 (spacing 1.4 %, was 2 %; line was 21) | **14 / 20** | 500 (Figma Medium) | Table headers and the agent's suggested questions (Figma 2026-11-02; it was documented as 12 / 16, 500 and the code used `text-meta` plus `font-medium`) | `text-meta-medium` |
-| caption | 12.5 / 16 (spacing 2.4 %) | **12 / 16** | 400 | Small tags and fine print, regular (new 2026-11-05; the name used to mean the Medium style) | `text-caption` |
+| caption | 12 / 16 (spacing 4 % since 2026-11-17, it was 2.4 %) | **12 / 16** | 400 | Small tags and fine print, regular (new 2026-11-05; the name used to mean the Medium style) | `text-caption` |
 | caption-medium | 12.5 / 16 (spacing 2.4 %) | **12 / 16** | 500 | Chips, counts, the sidebar email, the auth footer, photo counts (this was `caption` until 2026-11-05) | `text-caption-medium` |
 | caption-strong | 12.5 / 12 (spacing 2.4 %) | **12 / 12** | 600 (Figma SemiBold) | Badge labels (new 2026-11-02); line height 12 since Figma 2026-11-07 (was 16) | `text-caption-strong` |
 | section-label | 11 / 16 (spacing 18 %) | 11 / 16 | 700 (Figma Bold) | Uppercase title above a group of sidebar items (Investigations); color `neutral-200`, like the plus buttons beside it (new 2026-10-28) | `text-section-label` + `uppercase` |
