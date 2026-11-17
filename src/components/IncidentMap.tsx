@@ -32,9 +32,13 @@ const freePadding = (map: maplibregl.Map) => {
     if (r.width === 0 || r.height === 0 || r.bottom < box.top || r.top > box.bottom) continue
     if (r.left > box.left + box.width * 0.6 && r.height > box.height * 0.3) p.right = Math.max(p.right, box.right - r.left + pad) // a tall box on the right: the modules' column (decision 0049)
     else if (r.right < box.left + box.width * 0.6 && r.height > box.height * 0.4) p.left = Math.max(p.left, r.right - box.left + pad) // a tall box on the left: the panels
+    else if (r.height > box.height * 0.4) p.right = Math.max(p.right, box.right - r.left + pad) // a tall box that is neither on the left nor against the right edge: the incident panel, not a top band (owner, 2026-11-17: counted as one, it set a 690 px top padding, and with the 60° pitch the map then loaded about 1,500 tiles instead of about 50)
     else if (r.top - box.top < box.height / 2) p.top = Math.max(p.top, r.bottom - box.top + pad) // stat cards, filters, banner
     else p.bottom = Math.max(p.bottom, box.bottom - r.top + pad) // chips, timeline
   }
+  // A big top or bottom padding with the tilted camera makes the map cover the whole horizon (about 1,500 tiles, 17,000 draw calls a frame, frames of 0.3 to 3 s): never more than 30 % of the height.
+  p.top = Math.min(p.top, box.height * 0.3)
+  p.bottom = Math.min(p.bottom, box.height * 0.3)
   return p
 }
 /** Re-reads the panel width: it can change (dragged) without the map's own size changing. */
