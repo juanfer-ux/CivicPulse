@@ -8,10 +8,12 @@ import { Input } from '@/components/ui/input'
 export function Composer({ value, onChange, busy }: { value: string; onChange: (v: string) => void; busy: boolean }) {
   return (
     <div className="flex min-w-0 flex-1 items-center gap-2 desk:-m-2 desk:rounded-full desk:bg-(--neutral-900) desk:p-2 desk:transition-shadow desk:focus-within:shadow-[0_0_17.7px_color-mix(in_oklab,var(--indigo-200)_39%,transparent)]"> {/* Figma `style=active` (owner, 2026-11-16, latest): while the field has focus the pill keeps its `neutral-900` fill and gets a 17.7 px glow, `indigo-200` at 39 % (it was 24 %); no border (Figma's 1 px outside `indigo-500` stroke is switched off) */}
-      <Input name="q" value={value} onChange={(e) => onChange(e.target.value)} placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" className="desk:h-8 desk:rounded-full desk:focus-visible:border-(--neutral-400) desk:focus-visible:ring-0" /> {/* in the active pill the field keeps its `neutral-400` line and has no focus ring of its own */}
-      <Button type="submit" size="icon" aria-label="Ask" className="bg-(--brand-primary) hover:bg-(--brand-primary)/90 desk:size-8 desk:rounded-full" disabled={busy || !value.trim()}>
-        <ArrowUp aria-hidden />
-      </Button>
+      <div className="relative min-w-0 flex-1"> {/* the send button sits inside the field, at its right end (owner, 2026-11-17): a 24 px round button 4 px from the edge, the text keeps clear of it */}
+        <Input name="q" value={value} onChange={(e) => onChange(e.target.value)} placeholder="What would you like to investigate?" aria-label="Investigate and Ask" autoComplete="off" className="pr-10 desk:h-8 desk:rounded-full desk:focus-visible:border-(--neutral-400) desk:focus-visible:ring-0" /> {/* in the active pill the field keeps its `neutral-400` line and has no focus ring of its own */}
+        <Button type="submit" size="icon" aria-label="Ask" className="absolute top-1/2 right-1 size-6 -translate-y-1/2 rounded-full bg-(--brand-primary) hover:bg-(--brand-primary)/90" disabled={busy || !value.trim()}>
+          <ArrowUp className="size-3.5" aria-hidden />
+        </Button>
+      </div>
     </div>
   )
 }
