@@ -651,18 +651,23 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     if (!ready || !map) return
     const highlight = new Set(highlightIds)
     const own = new Set(problemIncidentIds)
-    dotsRef.current = incidents.filter((i) => dotStatusById.has(i.id)).map((i) => ({ id: i.id, lng: i.lng, lat: i.lat, color: token(PROBLEM_STATUS[dotStatusById.get(i.id)!].token), open: own.has(i.id), pid: problemOfIncident?.get(i.id) }))
+    // Each color is read from the page once per update, not once per incident (owner, 2026-11-17: a click on a sidebar incident was slow; a thousand `getComputedStyle` calls per update added up).
+    const tokens = new Map<string, string>()
+    const tk = (name: string) => tokens.get(name) ?? (tokens.set(name, token(name)), tokens.get(name)!)
+    const dims = new Map<string, string>()
+    const dimOf = (color: string) => dims.get(color) ?? (dims.set(color, mix(color, tk('--map-background'), KEEP)), dims.get(color)!)
+    dotsRef.current = incidents.filter((i) => dotStatusById.has(i.id)).map((i) => ({ id: i.id, lng: i.lng, lat: i.lat, color: tk(PROBLEM_STATUS[dotStatusById.get(i.id)!].token), open: own.has(i.id), pid: problemOfIncident?.get(i.id) }))
     map.triggerRepaint()
     ;(map.getSource('incidents') as maplibregl.GeoJSONSource).setData({
       type: 'FeatureCollection',
       features: incidents.map((i) => {
         const ps = dotStatusById.get(i.id)
         const pi = !!ps
-        const color = ps ? token(PROBLEM_STATUS[ps].token) : token(GROUPS[groupOf(i.status)].token)
+        const color = ps ? tk(PROBLEM_STATUS[ps].token) : tk(GROUPS[groupOf(i.status)].token)
         return {
           type: 'Feature',
           geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
-          properties: { id: i.id, color, dim: mix(color, token('--map-background'), KEEP), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id), pi, po: own.has(i.id) },
+          properties: { id: i.id, color, dim: dimOf(color), group: groupOf(i.status), icon: iconCategory(i.category), hl: highlight.has(i.id), pi, po: own.has(i.id) },
         }
       }),
     })
