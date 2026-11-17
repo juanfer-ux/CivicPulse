@@ -61,10 +61,10 @@ export function AgentHome({ ask, composer }: { ask: (q: string) => void; compose
   return (
     <div className="flex flex-col gap-8"> {/* Figma Dashboard (owner, 2026-11-16, latest): 32 px between the group and the composer (it was 64) */}
       <div className="flex flex-col gap-16 p-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
-      <div className="flex flex-wrap items-start justify-between gap-x-9 gap-y-2"> {/* Figma Welcome Message (owner, 2026-11-16): "Welcome back," at the left and the place at the right, space between, 36 px apart */}
+      <div className="flex flex-wrap items-center justify-between gap-x-9 gap-y-2"> {/* Figma Welcome Message (owner, 2026-11-16, latest): "Welcome back," at the left and the place at the right, space between, 36 px apart, centered on each other */}
         <h2 className="font-display text-display-md text-(--brand-primary)">Welcome back,</h2>
-        <p className="flex items-center gap-2 font-display-semi text-display-sm whitespace-nowrap text-(--neutral-100)"> {/* Figma: `map-pin` regular 18 px `neutral-200`, 8 px, then "Bogotá, Colombia" in display-sm `neutral-100` */}
-          <MapPin weight="regular" className="size-[18px] text-(--neutral-200)" aria-hidden />
+        <p className="flex items-center gap-2 font-display-semi text-display-xs whitespace-nowrap text-(--neutral-200)"> {/* Figma (latest): `map-pin` regular 18 px `neutral-300`, 8 px, then "Bogotá, Colombia" in display-xs (16 / 20) `neutral-200`; it was display-sm `neutral-100` */}
+          <MapPin weight="regular" className="size-[18px] text-(--neutral-300)" aria-hidden />
           Bogotá, Colombia
         </p>
       </div>
