@@ -3,15 +3,15 @@ import type { Trend } from '@/lib/trend'
 import { ArrowDown, ArrowRight, ArrowUp, TrendDown } from '@phosphor-icons/react'
 import { sparkPoints } from '@/lib/sparkline'
 
-/** The strip under the number (Figma Stat Trend, owner, 2026-11-17, second pass): a 20 px circle with a 1 px line inside and no fill, a 12 px arrow in the same color, and a label in `caption-medium`; each trend has its own tones. The arrows are up, right, down and the falling trend (Figma draws them so; its component shows the right arrow and the down arrow through rotated copies). */
+/** The trend mark (Figma Stat Trend `above`, owner, 2026-11-17, fourth pass): just the 14 px arrow in a 24 px box at the right of the name, `red-400` for above; the circle is gone. Figma only redrew `above`; the other three keep their old outlined strip there, so their arrow tones are their old label tones. */
 const TREND = {
-  above: { Icon: ArrowUp, text: 'Above usual', circle: 'border-(--red-300)', icon: 'text-(--red-300)', label: 'text-(--red-400)' },
-  about: { Icon: ArrowRight, text: 'About usual', circle: 'border-(--blue-200)', icon: 'text-(--blue-200)', label: 'text-(--blue-300)' },
-  low: { Icon: TrendDown, text: 'Low reporting', circle: 'border-(--yellow-300)', icon: 'text-(--yellow-300)', label: 'text-(--yellow-500)' },
-  below: { Icon: ArrowDown, text: 'Below usual', circle: 'border-(--green-400)', icon: 'text-(--green-400)', label: 'text-(--green-500)' },
+  above: { Icon: ArrowUp, text: 'Above usual', icon: 'text-(--red-400)' },
+  about: { Icon: ArrowRight, text: 'About usual', icon: 'text-(--blue-300)' },
+  low: { Icon: TrendDown, text: 'Low reporting', icon: 'text-(--yellow-500)' },
+  below: { Icon: ArrowDown, text: 'Below usual', icon: 'text-(--green-500)' },
 } as const
 
-/** A number with its name (Figma Stat Card, owner's rebuild 2026-11-17): 16 px padding, 12 px between the name, the number row and the trend strip, 143 px high (it was 156 with a 1 px border and a grey strip); the number (stat style 42 / 32) and the graph (48 px high, 12 px on its right, with the peak dot) share the row 40 px apart, bottom aligned; hover or selected is a 2 px `neutral-400` ring outside the card. The "Reports" caption over the number is gone. */
+/** A number with its name (Figma Stat Card, owner's seventh look 2026-11-17): a `neutral-900` fill, an 8 px radius, 16 px padding all round and 16 px between the header (the name and the 24 px trend mark) and the number row, 121 px high; the number row is 49 px high, its items centered: the number (stat style, now 28 / 28, `brand-primary`) with the "Reports" caption under it, spread top and bottom, and a 32 px graph (8 px on its right, the peak dot), 40 px apart; hover or selected is a 2 px `neutral-600` ring outside the card, so the grid that holds the cards must not clip it (`desk:overflow-visible` in `Dashboard.tsx`). */
 export function StatCard({ label, value, trend, selected, onClick, series }: { label: ReactNode; value: ReactNode; trend?: Trend; selected?: boolean; onClick?: () => void; series?: number[] }) {
   const Tag = onClick ? 'button' : 'div'
   const t = trend && TREND[trend]
@@ -25,17 +25,28 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
     ro.observe(el)
     return () => ro.disconnect()
   }, [series])
-  const g = series && w > 0 ? sparkPoints(series, w, 48) : null
+  const g = series && w > 0 ? sparkPoints(series, w, 32) : null
   return (
     <Tag
-      className={`@container flex min-w-0 flex-col gap-3 rounded-lg bg-(--neutral-900) p-4 text-left enabled:hover:shadow-[0_0_0_2px_var(--neutral-400)] ${selected ? 'shadow-[0_0_0_2px_var(--neutral-400)]' : ''}`}
+      className={`@container flex min-w-0 flex-col gap-4 rounded-[4px] bg-(--neutral-900) px-4 pt-4 pb-5 text-left shadow-[inset_0_0_0_1px_var(--neutral-800)] enabled:hover:shadow-[0_0_0_2px_var(--neutral-600)] ${selected ? "shadow-[0_0_0_2px_var(--neutral-600)]" : ""}`}
       {...(onClick ? { type: 'button' as const, onClick, 'aria-pressed': !!selected } : {})}
     >
-      <span className="truncate text-subtitle text-(--neutral-100)">{label}</span>
-      <span className="flex min-h-12 items-end gap-10">
-          <span className="flex flex-1 basis-0 items-end font-display-semi text-stat text-(--neutral-100)">{value}</span>
+      <span className="flex h-6 items-center justify-between gap-2">
+        <span className="truncate text-subtitle text-(--neutral-100)">{label}</span>
+        {t && (
+          <span className="grid size-6 shrink-0 place-items-center" title={t.text}>
+            <t.Icon className={`size-3.5 ${t.icon}`} aria-hidden />
+            <span className="sr-only">{t.text}</span>
+          </span>
+        )}
+      </span>
+      <span className="flex h-[49px] items-center gap-10">
+          <span className="flex flex-1 basis-0 flex-col justify-between self-stretch">
+            <span className="font-display-semi text-stat text-(--brand-primary)">{value}</span>
+            <span className="text-meta text-(--neutral-300)">Reports</span>
+          </span>
           {series && (
-            <span className="hidden min-w-0 flex-1 basis-0 self-stretch pr-3 @min-[140px]:block"> {/* Figma Graph (owner, 2026-11-15): 164 px at most, padding included */}
+            <span className="hidden h-8 min-w-0 flex-1 basis-0 pr-2 @min-[140px]:block"> {/* Figma Graph (owner, 2026-11-15): 164 px at most, padding included */}
               <span ref={box} className="relative block h-full"> {/* Figma Vector 1 (owner, 2026-11-15, latest): Fill in width and height, so the line is as long as the Graph's inner box (96.5 px in a 257 px card) */}
                 {g && (
                   <>
@@ -57,14 +68,6 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
             </span>
           )}
       </span>
-      {t && (
-        <span className="flex items-center gap-2 text-caption-medium"> {/* Figma Stat Trend: a 20 px circle, a 14 px icon, the label; one line */}
-          <span className={`grid size-5 shrink-0 place-items-center rounded-full border ${t.circle}`}>
-            <t.Icon className={`size-3 ${t.icon}`} aria-hidden />
-          </span>
-          <span className={`min-w-0 truncate ${t.label}`} title={t.text}>{t.text}</span>
-        </span>
-      )}
     </Tag>
   )
 }
