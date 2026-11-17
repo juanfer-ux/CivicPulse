@@ -86,8 +86,8 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </div>
         </ScrollArea>
         </div>
-        <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-12 desk:py-6 ${turns.length === 0 ? 'desk:max-w-[816px]' : 'desk:max-w-[760px]'}`}>
-          <Composer value={text} onChange={setText} busy={busy} pill={turns.length === 0} />
+        <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-12 desk:py-6 desk:max-w-[816px]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
+          <Composer value={text} onChange={setText} busy={busy} />
         </form>
       </CardContent>
     </Card>
