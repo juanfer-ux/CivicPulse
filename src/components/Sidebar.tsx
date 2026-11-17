@@ -225,7 +225,7 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
 }
 
 const KEY = 'sidebar-collapsed'
-const COLLAPSED_W = 56 // owner, 2026-11-16 (it was 64; the Figma file read at that moment still said 64)
+const COLLAPSED_W = 60 // owner's Figma, 2026-11-16 (it was 56, and 64 before)
 /** Under 1,800 px the sidebar is collapsed (owner, 2026-11-13): on load and whenever the window drops under it, and it expands again the moment the window reaches 1,800 px; the toggle still opens or closes it by hand in between. */
 const NARROW = '(max-width: 1799.98px)'
 const read = () => {
@@ -303,7 +303,7 @@ function MobileBrand() {
 }
 
 /** The menu itself, as in Figma Sidebar (2026-10-29): a 70 px header with the logo and the collapse button, the Investigations and Cases groups, and at the bottom the account row. Used by the desktop column and the phone slide-out. */
-function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, onNewCase, recurrences: real = [], incidents = [], chatItems = [], onOpenRecurrence, onOpenIncident, selected, onToggle }: Chats & { collapsed: boolean; onToggle?: () => void }) {
+function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, onNewCase, recurrences: real = [], incidents = [], chatItems = [], onOpenRecurrence, onOpenIncident, selected, onToggle, agentOff, onToggleAgent }: Chats & { collapsed: boolean; onToggle?: () => void }) {
   const { profile, session, signOut } = useAuth()
   const name = shortName(profile?.full_name) || 'Signed in'
   const email = session?.user?.email
@@ -332,6 +332,17 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
             </Button>
           )}
         </div>
+        {collapsed && onToggleAgent && (
+          // owner's Figma, 2026-11-16: under the 64 px header, 16 px down, a column of 32 px ghost buttons (1 px `neutral-600` line, `neutral-900` fill, 4 px radius, `sparkle` fill 16 px); the first opens or collapses the agent panel; the second is Figma's, with no action yet.
+          <div className="flex flex-col items-center gap-6 pt-4">
+            <Button type="button" size="icon" variant="ghost" aria-label={agentOff ? 'Open agent' : 'Collapse agent'} title={agentOff ? 'Open agent' : 'Collapse agent'} onClick={onToggleAgent} className="size-8 rounded border border-(--neutral-600) bg-(--neutral-900) hover:bg-(--neutral-700)">
+              <Sparkle weight="fill" className="size-4" aria-hidden />
+            </Button>
+            <Button type="button" size="icon" variant="ghost" aria-label="Agent shortcut" title="Agent shortcut" className="size-8 rounded border border-(--neutral-600) bg-(--neutral-900) hover:bg-(--neutral-700)"> {/* Figma's second button (owner, 2026-11-16: "include it"); what it does is not decided, so it has no action yet */}
+              <Sparkle weight="fill" className="size-4" aria-hidden />
+            </Button>
+          </div>
+        )}
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
@@ -459,12 +470,6 @@ export function Sidebar(props: Chats) {
       {/* Desktop: a column on the left, expanded or icons only. */}
       <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative z-40 hidden shrink-0 desk:block ${collapsed ? 'bg-(--neutral-900) after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-[0.5px] after:bg-(--neutral-600) after:content-[""]' : 'bg-(--neutral-700)'}`}>
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
-        {collapsed && props.onToggleAgent && (
-          // owner's Figma, 2026-11-16: a 32 px ghost button over the collapsed column's right edge, 78 px from the top; it opens or collapses the agent panel
-          <Button type="button" size="icon" variant="ghost" aria-label={props.agentOff ? 'Open agent' : 'Collapse agent'} title={props.agentOff ? 'Open agent' : 'Collapse agent'} onClick={props.onToggleAgent} className="absolute top-[78px] -right-[15px] z-20 rounded border border-(--neutral-600) bg-(--neutral-900) hover:bg-(--neutral-700)">
-            <Sparkle aria-hidden />
-          </Button>
-        )}
         <Menu_
           {...props}
           collapsed={collapsed}
