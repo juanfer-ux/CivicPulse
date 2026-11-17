@@ -43,7 +43,7 @@ function Donut() {
   )
 }
 
-export function AgentHome({ ask }: { ask: (q: string) => void }) {
+export function AgentHome({ ask, composer }: { ask: (q: string) => void; composer: ReactNode }) {
   useEffect(() => {
     if (!QUICK_SUGGESTIONS_ON) return
     // Shift + 1 to 5 (owner, 2026-11-15; plain digits did nothing while the composer had focus, which is nearly always; Option was tried first, but not everyone reads its symbol). e.code, because Shift changes e.key (Shift+1 types !).
@@ -59,7 +59,8 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
     return () => document.removeEventListener('keydown', onKey)
   }, [ask])
   return (
-    <div className="flex flex-col gap-10"> {/* Figma Dashboard (owner, checked 2026-11-15): 40 px between "Welcome back," and the modules (it was 32) */}
+    <div className="flex flex-col gap-16"> {/* Figma Dashboard (owner, 2026-11-16): 64 px between "Welcome back,", "Let's catch up" and the composer with its modules (it was 40, and 32 before) */}
+      <div className="flex flex-col gap-6 px-2.5 py-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
       <div className="flex flex-wrap items-start justify-between gap-x-9 gap-y-2"> {/* Figma Welcome Message (owner, 2026-11-16): "Welcome back," at the left and the place at the right, space between, 36 px apart */}
         <h2 className="font-display text-display-md text-(--brand-primary)">Welcome back,</h2>
         <p className="flex items-center gap-2 font-display-semi text-display-sm whitespace-nowrap text-(--neutral-100)"> {/* Figma: `map-pin` regular 18 px `neutral-200`, 8 px, then "Bogotá, Colombia" in display-sm `neutral-100` */}
@@ -67,8 +68,7 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
           Bogotá, Colombia
         </p>
       </div>
-      <div className="flex flex-col gap-10">
-        <Section title="Let's catch up">
+      <Section title="Let's catch up">
           <div className="flex flex-wrap items-center gap-3"> {/* Figma CatchUp_Module2 (owner, 2026-11-15, checked again later that day): a wrapping row, 12 px across and 12 px between wrapped rows, items centered; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
             <div className="@container min-w-[180px] flex-1 basis-0">
               {/* The two small cards stack in a column beside the medium card, and sit side by side once the group has the whole width, i.e. when the medium card has dropped below (owner, 2026-11-15; the panel at its minimum width) */}
@@ -103,41 +103,44 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
             </div>
           </div>
         </Section>
-        <Section title="Recurrences to investigate">
-          <div className="flex gap-2.5"> {/* Figma Worth-Investigating_Module (2026-11-15): one row that no longer wraps, 10 px apart, cards Fill with a 120 px minimum */}
-            {WORTH_INVESTIGATING.map((c) => {
-              const Icon = CATEGORY_ICON[c.title]
-              return (
-                <button key={c.title} type="button" className="group flex min-w-[120px] flex-1 cursor-pointer flex-col items-start gap-4 rounded-md bg-(--neutral-700) p-3 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(c.question)}> {/* Figma Category_Card2 (owner, 2026-11-15): vertical, neutral-700, 6 px radius, 12 px padding, 16 px between the icon (24 px, top left) and the name (Fill width, Hug height, neutral-200, wraps) and the name; no inner block. Rollover (owner's try): neutral-600 and the icon turns filled */}
-                  {Icon && (
-                    <span className="grid size-6 place-items-center">
-                      <Icon weight="duotone" className="size-6 text-(--indigo-300) group-hover:hidden group-focus-visible:hidden" aria-hidden />
-                      <Icon weight="fill" className="hidden size-6 text-(--indigo-300) group-hover:block group-focus-visible:block" aria-hidden />
-                    </span>
-                  )}
-                  <span className="w-full max-w-[88px] text-body-sm-medium text-(--neutral-200)">{c.title}</span>
-                </button>
-              )
-            })}
-          </div>
-        </Section>
-        {QUICK_SUGGESTIONS_ON && (
-          <Section title="Quick sugestions">
-            <div className="flex flex-col gap-2"> {/* Command list (owner, 2026-11-15, picked from fourteen layouts): all five questions as rows with a topic icon and a key hint; pressing 1 to 5 asks that question. Icons are made up. */}
-              {SUGGESTIONS.map((s, k) => {
-                const TopicIcon = TOPIC_ICON[k]
+        <div className="flex flex-col gap-10">
+          <Section title="Recurrences to investigate">
+            <div className="flex gap-2.5"> {/* Figma Worth-Investigating_Module (2026-11-15): one row that no longer wraps, 10 px apart, cards Fill with a 120 px minimum */}
+              {WORTH_INVESTIGATING.map((c) => {
+                const Icon = CATEGORY_ICON[c.title]
                 return (
-                  <button key={s} type="button" className="group flex cursor-pointer items-center gap-3 rounded-sm bg-(--neutral-700) p-2 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(s)}>
-                    <TopicIcon className="size-5 shrink-0 text-(--neutral-300)" aria-hidden />
-                    <span className="flex-1 text-body-sm-medium text-(--neutral-200)">{s}</span>
-                    <kbd className="grid h-6 min-w-6 shrink-0 place-items-center rounded-xs bg-(--neutral-800) px-1.5 text-meta font-sans whitespace-nowrap text-(--neutral-300)">Shift+{k + 1}</kbd>
+                  <button key={c.title} type="button" className="group flex min-w-[120px] flex-1 cursor-pointer flex-col items-start gap-4 rounded-md bg-(--neutral-700) p-3 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(c.question)}> {/* Figma Category_Card2 (owner, 2026-11-15): vertical, neutral-700, 6 px radius, 12 px padding, 16 px between the icon (24 px, top left) and the name (Fill width, Hug height, neutral-200, wraps) and the name; no inner block. Rollover (owner's try): neutral-600 and the icon turns filled */}
+                    {Icon && (
+                      <span className="grid size-6 place-items-center">
+                        <Icon weight="duotone" className="size-6 text-(--indigo-300) group-hover:hidden group-focus-visible:hidden" aria-hidden />
+                        <Icon weight="fill" className="hidden size-6 text-(--indigo-300) group-hover:block group-focus-visible:block" aria-hidden />
+                      </span>
+                    )}
+                    <span className="w-full max-w-[88px] text-body-sm-medium text-(--neutral-200)">{c.title}</span>
                   </button>
                 )
               })}
             </div>
           </Section>
-        )}
+          {QUICK_SUGGESTIONS_ON && (
+            <Section title="Quick sugestions">
+              <div className="flex flex-col gap-2"> {/* Command list (owner, 2026-11-15, picked from fourteen layouts): all five questions as rows with a topic icon and a key hint; pressing 1 to 5 asks that question. Icons are made up. */}
+                {SUGGESTIONS.map((s, k) => {
+                  const TopicIcon = TOPIC_ICON[k]
+                  return (
+                    <button key={s} type="button" className="group flex cursor-pointer items-center gap-3 rounded-sm bg-(--neutral-700) p-2 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(s)}>
+                      <TopicIcon className="size-5 shrink-0 text-(--neutral-300)" aria-hidden />
+                      <span className="flex-1 text-body-sm-medium text-(--neutral-200)">{s}</span>
+                      <kbd className="grid h-6 min-w-6 shrink-0 place-items-center rounded-xs bg-(--neutral-800) px-1.5 text-meta font-sans whitespace-nowrap text-(--neutral-300)">Shift+{k + 1}</kbd>
+                    </button>
+                  )
+                })}
+              </div>
+            </Section>
+          )}
+        </div>
       </div>
+      {composer}
     </div>
   )
 }
