@@ -57,7 +57,13 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
   }, [ask])
   return (
     <div className="flex flex-col gap-10"> {/* Figma Dashboard (owner, checked 2026-11-15): 40 px between "Welcome back," and the modules (it was 32) */}
-      <h2 className="font-display text-display-md text-(--brand-primary)">Welcome back,</h2>
+      <div className="flex flex-wrap items-start justify-between gap-x-9 gap-y-2"> {/* Figma Welcome Message (owner, 2026-11-16): "Welcome back," at the left and the place at the right, space between, 36 px apart */}
+        <h2 className="font-display text-display-md text-(--brand-primary)">Welcome back,</h2>
+        <p className="flex items-center gap-2 font-display-semi text-display-sm whitespace-nowrap text-(--neutral-100)"> {/* Figma: `map-pin` regular 18 px `neutral-200`, 8 px, then "Bogotá, Colombia" in display-sm `neutral-100` */}
+          <MapPin weight="regular" className="size-[18px] text-(--neutral-200)" aria-hidden />
+          Bogotá, Colombia
+        </p>
+      </div>
       <div className="flex flex-col gap-10">
         <Section title="Let's catch up">
           <div className="flex flex-wrap items-center gap-3"> {/* Figma CatchUp_Module2 (owner, 2026-11-15, checked again later that day): a wrapping row, 12 px across and 12 px between wrapped rows, items centered; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}

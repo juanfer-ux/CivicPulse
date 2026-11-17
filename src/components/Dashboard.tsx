@@ -435,7 +435,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         className={`${tab !== 'explore' ? 'flex' : 'hidden md:max-desk:flex'} desk:transition-[width] desk:duration-300 min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:pl-(--sidebar-gap)`}
       >
         {/* Outer container: no padding outside the panel any more (owner, 2026-11-15; it had the 12 px float padding since 2026-11-06): the sidebar and the agent panel touch the window's top, bottom and left edges. */}
-        <div data-float data-agent-panel className="relative flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:backdrop-blur-[32px] desk:border-l-[0.5px] desk:border-l-(--neutral-400) desk:border-r desk:border-r-(--neutral-400) desk:bg-(--neutral-900) desk:p-0">
+        <div data-float data-agent-panel className="relative flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:backdrop-blur-[32px] desk:border-r desk:border-r-(--neutral-400) desk:bg-(--neutral-900) desk:p-0">
           {agentOff ? (
             <button type="button" aria-label="Open agent" title="Open agent" onClick={() => onAgentOff(false)} className="hidden h-full w-full flex-col items-center gap-3 py-4 text-(--neutral-200) hover:text-(--neutral-100) desk:flex">
               <Sparkle className="size-4" />
