@@ -32,7 +32,7 @@ const freePadding = (map: maplibregl.Map) => {
     if (r.width === 0 || r.height === 0 || r.bottom < box.top || r.top > box.bottom) continue
     if (r.left > box.left + box.width * 0.6 && r.height > box.height * 0.3) p.right = Math.max(p.right, box.right - r.left + pad) // a tall box on the right: the modules' column (decision 0049)
     else if (r.right < box.left + box.width * 0.6 && r.height > box.height * 0.4) p.left = Math.max(p.left, r.right - box.left + pad) // a tall box on the left: the panels
-    else if (r.height > box.height * 0.4) p.right = Math.max(p.right, box.right - r.left + pad) // a tall box that is neither on the left nor against the right edge: the incident panel, not a top band (owner, 2026-11-17: counted as one, it set a 690 px top padding, and with the 60° pitch the map then loaded about 1,500 tiles instead of about 50)
+    else if (r.height > box.height * 0.4) p.left = Math.max(p.left, r.right - box.left + pad) // a tall box that reaches past the 60 % line but is not against the right edge: the incident panel, which sits beside the agent panel: the free area starts after it, so the incident is centered in what is left to the right (owner, 2026-11-17). It used to count as a top band: a 690 px top padding, which with the 60° pitch made the map load about 1,500 tiles instead of about 50
     else if (r.top - box.top < box.height / 2) p.top = Math.max(p.top, r.bottom - box.top + pad) // stat cards, filters, banner
     else p.bottom = Math.max(p.bottom, box.bottom - r.top + pad) // chips, timeline
   }
