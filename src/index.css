@@ -37,7 +37,7 @@
   --text-display-xs--font-weight: calc(400 + var(--display-weight-offset));
   --text-display-xs--line-height: 20px;
   --text-display-xs--letter-spacing: 0.01em;
-  --text-stat: 40px; /* Figma stat (2026-11-15, latest): Zalando Sans SemiExpanded SemiBold 40 / 32, tracking -2 % (it was Manrope SemiBold 28 / 24, -4 % for a while; 40 / 32 -4 % on 2026-11-07); the number in a Stat Card. Used with `font-display-semi`. */
+  --text-stat: 42px; /* Figma stat (2026-11-17): Zalando Sans SemiExpanded SemiBold 42 / 32, tracking -2 % (it was 40 / 32) */
   --text-stat--font-weight: calc(600 + var(--display-weight-offset));
   --text-stat--line-height: 32px;
   --text-stat--letter-spacing: -0.02em;
@@ -228,7 +228,7 @@
 :root {
   --radius: 0.5rem;
   --section-header-h: 0px; /* the map has no header (owner, 2026-10-28; it was 70px), so the map and filters start at the top */
-  --stat-row-h: 156px; /* height of the row of Stat Cards over the map (100 top: 16 + 24 label + 8 + 32 value + 20; + 35 trend strip, Figma 2026-11-07; + the 2 half-pixel borders, which a standard-density screen draws as 1 px each); the filters start below it. It was 117 and had drifted since the meta line height became 23 */
+  --stat-row-h: 143px; /* height of the row of Stat Cards over the map (Figma Stat Card, owner 2026-11-17: 16 padding + 19 name + 12 + 48 number row + 12 + 20 trend + 16 padding; it was 156) */
   --panel-gap: 0px; /* no space between the sidebar, the agent panel and the map on desktop: they touch and a right-side line divides them (owner, 2026-10-30, branch flush-dividers) */
   --chart-max-w: 480px; /* the widest a chart or graph in the agent's conversation may be (owner, 2026-11-15; the text column is 720 px): one rule for every chart type, change it here once */
   --page-pad: 12px; /* THE layout rule (owner, 2026-11-06): 12 px around the page and around everything that floats on the map (stat cards, filters, chips, detail panels). Change it here once. */
