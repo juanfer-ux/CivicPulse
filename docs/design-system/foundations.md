@@ -113,6 +113,15 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 56 | `yellow-100` | `#FEFBE4` | none | Yellow scale step, new (2026-10-31); same idea as the neutrals, not used on screen yet |
 | 57 | `brand-primary` | `#E3E3E7` | none | **Brand primary** (owner, 2026-11-02): the primary button's background. The label and icon on it stay `neutral-900` (15.1:1) |
 | 58 | `brand-secondary` | `#87DBC7` | none | **Brand secondary** (owner, 2026-11-02): the primary button's hover. The label on it stays `neutral-900` (11.9:1) |
+| 59 | `green-900` | `#0D2615` | none | Green scale step, new (2026-11-17): the red scale's saturation and lightness at hue 140; same idea as the neutrals, not used on screen yet |
+| 60 | `green-800` | `#214A2F` | none | Green scale step, new (2026-11-17): the red scale's saturation and lightness at hue 140; same idea as the neutrals, not used on screen yet |
+| 61 | `green-700` | `#35734A` | none | Green scale step, new (2026-11-17): the red scale's saturation and lightness at hue 140; same idea as the neutrals, not used on screen yet |
+| 62 | `green-600` | `#4C9E68` | none | Green scale step, new (2026-11-17): the red scale's saturation and lightness at hue 140; same idea as the neutrals, not used on screen yet |
+| 63 | `green-500` | `#66C786` | none | Green scale step, new (2026-11-17): the red scale's saturation and lightness at hue 140; same idea as the neutrals, not used on screen yet |
+| 64 | `green-400` | `#87EEA9` | none | Green scale step, new (2026-11-17): the red scale's saturation and lightness at hue 140; same idea as the neutrals, not used on screen yet |
+| 65 | `green-300` | `#A6F7C1` | none | Green scale step, new (2026-11-17): the red scale's saturation and lightness at hue 140; same idea as the neutrals, not used on screen yet |
+| 66 | `green-200` | `#C6FBD8` | none | Green scale step, new (2026-11-17): the red scale's saturation and lightness at hue 140; same idea as the neutrals, not used on screen yet |
+| 67 | `green-100` | `#E7FEEE` | none | Green scale step, new (2026-11-17): the red scale's saturation and lightness at hue 140; same idea as the neutrals, not used on screen yet |
 
 Names say what a color is (family and lightness: neutrals are always 100–900 and listed 900 first; higher number = darker), not where it is used ([decision 0020](../decisions/0020-generic-color-names.md)). Components keep using the usage names; each one points at one of the 16.
 

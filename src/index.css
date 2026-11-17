@@ -296,6 +296,16 @@
   --yellow-300: #FFF398;
   --yellow-200: #FEF7C3;
   --yellow-100: #FEFBE4;
+  /* Green scale (owner's ask, 2026-11-17; Figma green-900 to green-100): the red scale's saturation and lightness at hue 140, same idea as the neutrals; not used on screen yet. */
+  --green-900: #0D2615;
+  --green-800: #214A2F;
+  --green-700: #35734A;
+  --green-600: #4C9E68;
+  --green-500: #66C786;
+  --green-400: #87EEA9;
+  --green-300: #A6F7C1;
+  --green-200: #C6FBD8;
+  --green-100: #E7FEEE;
   /* Brand colors (owner, 2026-11-02; Figma brand-primary and brand-secondary): the primary button's background, and its hover. Not aliases of other colors. */
   --brand-primary: #D9D9DE; /* Figma (2026-11-12); it was #E3E3E7 */
   --brand-secondary: #87DBC7;
