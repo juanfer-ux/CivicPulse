@@ -31,10 +31,10 @@ Each class sets size, line height and weight together, so a component never need
 | button-sm | 13 / 24 (spacing 1.4 %; was 1.8 % until 2026-11-06 and 13.5 / 2.2 % until 2026-11-05) | **16 / 24** | 600 | Text in small Button | `text-button-sm` |
 | body | 14 / 24 (spacing 2.2 %; line was 22 until 2026-11-05) | **16 / 24** | 400 | Default paragraph text (new; not used by a screen yet) | `text-body` |
 | body-medium | 14 / 24 (spacing 2 %) | **16 / 24** | 500 | Default body, medium | `text-body-medium` |
-| body-strong | 14 / 20 (spacing 1 %; Figma 2026-11-06) | **16 / 24** | 600 | Default body, strong | `text-body-strong` |
-| body-sm | 13 / 22 (spacing 1.4 %, was 2 % until 2026-11-05) | **16 / 24** | 400 | Paragraphs, inputs, table cells (this was `body` until 2026-10-23; 13 px since 2026-11-05, it was the fractional 13.5) | `text-body-sm` |
-| body-sm-medium | 13 / 23 (line was 22; spacing 1.4 %, 0.5 % earlier that day, was 2 % until 2026-11-05) | **16 / 24** | 500 | Small body, medium (spacing was 4 % from 2026-11-02 to 2026-11-05, and 2 % before) | `text-body-sm-medium` |
-| body-sm-strong | 13 / 23 (line was 22; spacing 1.4 %, 0 % earlier that day, was 2 % until 2026-11-05) | **16 / 24** | 600 | Small body, strong | `text-body-sm-strong` |
+| body-strong | 14 / 20 (spacing 2 % since 2026-11-17, it was 1 %) | **16 / 24** | 600 | Default body, strong | `text-body-strong` |
+| body-sm | 13 / 20 (spacing 2 % again since 2026-11-17, 1.4 % from 2026-11-05) | **16 / 24** | 400 | Paragraphs, inputs, table cells (this was `body` until 2026-10-23; 13 px since 2026-11-05, it was the fractional 13.5) | `text-body-sm` |
+| body-sm-medium | 13 / 20 (spacing 2 % since 2026-11-17; before: 1.4 %, 0.5 % earlier that day, was 2 % until 2026-11-05) | **16 / 24** | 500 | Small body, medium (spacing was 4 % from 2026-11-02 to 2026-11-05, and 2 % before) | `text-body-sm-medium` |
+| body-sm-strong | 13 / 20 (spacing 2 % since 2026-11-17; before: 1.4 %, 0 % earlier that day, was 2 % until 2026-11-05) | **16 / 24** | 600 | Small body, strong | `text-body-sm-strong` |
 | meta | 13 / 23 (line was 21 until 2026-11-05) | **14 / 20** | 400 | Secondary info | `text-meta` |
 | meta-medium | 13 / 23 (spacing 1.4 %, was 2 %; line was 21) | **14 / 20** | 500 (Figma Medium) | Table headers and the agent's suggested questions (Figma 2026-11-02; it was documented as 12 / 16, 500 and the code used `text-meta` plus `font-medium`) | `text-meta-medium` |
 | caption | 12.5 / 16 (spacing 2.4 %) | **12 / 16** | 400 | Small tags and fine print, regular (new 2026-11-05; the name used to mean the Medium style) | `text-caption` |
