@@ -312,6 +312,11 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
           if (l.id.includes('case')) map.setPaintProperty(l.id, 'line-blur', ROAD_BLUR)
         }
         if (l.type === 'symbol' && map.getPaintProperty(l.id, 'text-halo-width')) map.setPaintProperty(l.id, 'text-halo-color', token('--map-label-halo'))
+        // House numbers (owner, 2026-11-16: hard to read at high zoom): CARTO's dim grey with a dark outline sat on our building tops; now `neutral-200` with no outline.
+        if (l.id === 'housenumber') {
+          map.setPaintProperty(l.id, 'text-color', token('--neutral-200'))
+          map.setPaintProperty(l.id, 'text-halo-width', 0)
+        }
         // Place names (owner, 2026-11-15): every town, village and city name OUTSIDE Bogotá is hidden at every zoom. What stays is Bogotá's own locality names (place_suburbs, neutral-100) and the city name BOGOTÁ (the place_city_r5 layer, filtered to that one name; neutral-100 and always shown, even over other labels, so it is never lost).
         if (l.type === 'symbol' && l.id.startsWith('place_')) {
           if (l.id === 'place_suburbs') map.setPaintProperty(l.id, 'text-color', token('--neutral-100'))
