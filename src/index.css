@@ -381,9 +381,6 @@
   --col-right: calc(var(--map-pad) + var(--dock-w, 0px) + (100% - var(--col-l) - var(--map-pad) - var(--dock-w, 0px) - var(--col-w)) / 2);
 }
 
-/* With the sidebar collapsed to its rail, which has its own right border, the agent panel's left border goes (owner, 2026-11-16): one line between them, not two. */
-:root[data-sidebar-collapsed] [data-agent-panel] { border-left-width: 0; }
-
 @utility gradient-border {
   position: relative;
   border-color: transparent;

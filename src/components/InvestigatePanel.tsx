@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { SidebarSimple, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
+import { PictureInPicture, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
 import { AgentHome } from '@/components/AgentHome'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -55,15 +55,15 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
     <Card className="isolate min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-0 max-md:gradient-border md:max-desk:rounded-none md:max-desk:border-0 md:max-desk:bg-transparent desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
       {/* Dotted texture (owner, 2026-11-15; whole panel 2026-11-16): a dot every 8 px (about 2 px wide), colored by a gradient from neutral-900 at the top to neutral-600 at the bottom, made by masking the gradient with the dots; behind everything, from the top of the panel to the bottom (title row, chat and composer), not only the chat area. */}
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,var(--neutral-900),var(--neutral-600))]" style={{ maskImage: 'radial-gradient(#000 1px, transparent 1.5px)', maskSize: '8px 8px', WebkitMaskImage: 'radial-gradient(#000 1px, transparent 1.5px)', WebkitMaskSize: '8px 8px' }} />
-      {/* The title row (owner's Figma, 2026-11-12): 60 px (8 px above and below the 44 px collapse button), 16 px at the sides, "Explore" in `label` / neutral-200, a `neutral-500` line under it, the collapse control at its right: Figma's Sidebar Item Investigation instance, 40 × 44 px, 4 px radius, the `panel-left` icon at 20 px (`SidebarSimple`, regular), `neutral-600` on hover (owner, 2026-11-13; it was a 32 px ghost button with a 16 px arrow). */}
-      <div className={`flex items-center md:max-desk:hidden desk:shrink-0 desk:border-b desk:border-(--neutral-500) ${turns.length === 0 ? 'desk:h-16 desk:px-10' : 'desk:h-(--agent-header-h) desk:px-4'}`}> {/* landing: 64 px high, 40 at the sides; conversation: 60, 16 (owner's Figma, 2026-11-16) */}
+      {/* The title row (owner's Figma, 2026-11-12): 60 px (8 px above and below the 44 px collapse button), 16 px at the sides, "Explore" in `label` / neutral-200, no line under it (owner, 2026-11-16: Figma has none; it was a 0.5 px `neutral-500` line), the collapse control at its right: Figma's Sidebar Item Investigation instance, 40 × 44 px, 4 px radius, the `picture-in-picture` icon at 20 px (`PictureInPicture`, regular; owner, 2026-11-16, a try: it was `Minus`, a minimize dash, and before that `panel-left`), `neutral-600` on hover (owner, 2026-11-13; it was a 32 px ghost button with a 16 px arrow). */}
+      <div className={`flex items-center md:max-desk:hidden desk:shrink-0 ${turns.length === 0 ? 'desk:h-16 desk:px-10' : 'desk:h-(--agent-header-h) desk:px-4'}`}> {/* landing: 64 px high, 40 at the sides; conversation: 60, 16 (owner's Figma, 2026-11-16) */}
         <CardHeader className="flex w-full flex-row items-center justify-between max-desk:mx-auto max-desk:max-w-[664px]">
           <CardTitle asChild className="text-label text-(--neutral-200)">
             <h2>Explore</h2>
           </CardTitle>
           {onCollapse && (
             <button type="button" aria-label="Collapse agent" title="Collapse agent" onClick={onCollapse} className="hidden h-11 w-10 shrink-0 cursor-pointer place-items-center rounded-sm text-(--neutral-100) outline-none hover:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50 desk:grid">
-              <SidebarSimple weight="regular" className="size-5" />
+              <PictureInPicture weight="regular" className="size-5" />
             </button>
           )}
         </CardHeader>
