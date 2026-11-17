@@ -71,7 +71,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0">
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
         <div className="relative min-h-0 flex-1">
-        <ScrollArea className="relative h-full" viewportClassName="[&>div]:!block">
+        <ScrollArea className="relative h-full" viewportClassName={turns.length === 0 ? '[&>div]:!flex [&>div]:min-h-full [&>div]:flex-col [&>div]:justify-center' : '[&>div]:!block'}> {/* the landing's content is centered vertically in the panel (Figma Conversation body: centered both ways; owner, 2026-11-16), a conversation starts at the top */}
         <div className="flex w-full flex-col gap-3 text-body-sm max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[816px] desk:gap-8 desk:px-12 desk:py-8">
           {turns.length === 0 && (
             <AgentHome
