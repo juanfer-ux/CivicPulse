@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { Sidebar } from '@/components/Sidebar'
 
 // Radix ScrollArea (the lists) needs ResizeObserver, which jsdom lacks.
@@ -11,6 +11,7 @@ vi.mock('@/lib/auth', () => ({
 }))
 
 const baseProps = {
+  initialCollapsed: false, // the sidebar starts collapsed; these tests need its lists and "+" buttons in the DOM
   chats: [{ id: 1, title: 'Existing investigation' }],
   activeId: 1,
   onPick: vi.fn(),
@@ -23,10 +24,6 @@ const baseProps = {
 }
 
 describe('Sidebar — creating investigations and cases', () => {
-  // The sidebar starts collapsed (icons only) unless localStorage says otherwise; expand it so the
-  // Investigations/Cases lists and their "+" buttons are actually in the DOM for these tests.
-  beforeEach(() => localStorage.setItem('sidebar-collapsed', '0'))
-
   it('creates a new investigation', async () => {
     const user = userEvent.setup()
     const onNew = vi.fn()
@@ -126,8 +123,6 @@ describe('Sidebar — creating investigations and cases', () => {
 
 // Regression tests for today's accessibility audit.
 describe('Sidebar — accessibility regressions', () => {
-  beforeEach(() => localStorage.setItem('sidebar-collapsed', '0'))
-
   it('the account menu is a proper ARIA menu button (not just an expanded div)', async () => {
     const user = userEvent.setup()
     render(<Sidebar {...baseProps} />)

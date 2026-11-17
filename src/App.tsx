@@ -3,23 +3,13 @@ import { gsap } from 'gsap'
 import { mockChats } from '@/lib/mockChats'
 import { Dashboard, type Tab } from '@/components/Dashboard'
 import type { Area } from '@/lib/agent'
-import { AGENT_MIN, agentMax, AgentResizer } from '@/components/AgentResizer'
+import { agentMax, AgentResizer } from '@/components/AgentResizer'
 import { InvestigatePanel, type Turn } from '@/components/InvestigatePanel'
 import { ModulesProvider } from '@/components/modules/ModulesProvider'
 import { Sidebar, type SidebarIncident, type SidebarRecurrence, type SidebarSelection } from '@/components/Sidebar'
 
-const AGENT_KEY = 'agent-width'
-/** The agent panel's width on desktop: automatic (a share of the window) until the owner drags the handle, then that width, kept in this browser. Always between Figma's minimum and half the width beside the sidebar. */
-function useAgentWidth() {
-  const [w, setW] = useState<number | null>(() => {
-    try { const v = Number(localStorage.getItem(AGENT_KEY)); return v >= AGENT_MIN ? v : null } catch { return null }
-  })
-  const change = (px: number | null) => {
-    setW(px)
-    try { if (px) localStorage.setItem(AGENT_KEY, String(px)); else localStorage.removeItem(AGENT_KEY) } catch { /* works without storage */ }
-  }
-  return [w, change] as const
-}
+/** The agent panel's width on desktop: its maximum until the handle is dragged, then that width for this visit only (owner, 2026-11-16: nothing is saved, so every load starts at the maximum). */
+const useAgentWidth = () => useState<number | null>(null)
 
 export default function App() {
   const [agentW, setAgentW] = useAgentWidth()

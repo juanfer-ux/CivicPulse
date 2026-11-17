@@ -224,17 +224,9 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
   )
 }
 
-const KEY = 'sidebar-collapsed'
 const COLLAPSED_W = 60 // owner's Figma, 2026-11-16 (it was 56, and 64 before)
-/** Under 1,800 px the sidebar is collapsed (owner, 2026-11-13): on load and whenever the window drops under it, and it expands again the moment the window reaches 1,800 px; the toggle still opens or closes it by hand in between. */
+/** The sidebar always starts collapsed (owner, 2026-11-16: it was collapsed under 1,800 px, or by what was saved in this browser). Dropping under 1,800 px collapses it; it never expands by itself, the toggle does. */
 const NARROW = '(max-width: 1799.98px)'
-const read = () => {
-  try {
-    return window.matchMedia?.(NARROW).matches || localStorage.getItem(KEY) !== '0'
-  } catch {
-    return true
-  }
-}
 
 /** Collapsed, the logo mark is the expand button: on hover or focus it swaps for the panel icon (owner, 2026-10-30). */
 function Brand({ collapsed, onToggle }: { collapsed: boolean; onToggle?: () => void }) {
@@ -405,14 +397,14 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   )
 }
 
-export function Sidebar(props: Chats) {
-  const [collapsed, setCollapsed] = useState(read)
+export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // initialCollapsed only lets the tests start expanded
+  const [collapsed, setCollapsed] = useState(props.initialCollapsed ?? true)
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
     const mq = window.matchMedia?.(NARROW) // jsdom (the tests) has no matchMedia
     if (!mq) return
-    const on = (e: MediaQueryListEvent) => setCollapsed(e.matches)
+    const on = (e: MediaQueryListEvent) => e.matches && setCollapsed(true)
     mq.addEventListener('change', on)
     return () => mq.removeEventListener('change', on)
   }, [])
@@ -454,11 +446,6 @@ export function Sidebar(props: Chats) {
 
   const toggle = () => {
     setCollapsed((c) => {
-      try {
-        localStorage.setItem(KEY, c ? '0' : '1')
-      } catch {
-        /* works without storage */
-      }
       return !c
     })
   }
