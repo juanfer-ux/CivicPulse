@@ -121,7 +121,7 @@
   --text-caption: var(--fs-caption);
   --text-caption--font-weight: calc(400 + var(--weight-offset));
   --text-caption--line-height: 16px;
-  --text-caption--letter-spacing: 0.024em; /* Figma: 2.4 % */
+  --text-caption--letter-spacing: 0.04em; /* Figma 2026-11-17: 4 % (it was 2.4 %) */
   --text-caption-medium: var(--fs-caption);
   --text-caption-medium--font-weight: calc(500 + var(--weight-offset));
   --text-caption-medium--line-height: 16px;
