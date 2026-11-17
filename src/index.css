@@ -86,15 +86,15 @@
   --text-body-sm: var(--fs-body-sm);
   --text-body-sm--font-weight: calc(400 + var(--weight-offset));
   --text-body-sm--line-height: var(--lh-body-sm);
-  --text-body-sm--letter-spacing: 0.02em; /* Figma 2026-11-17: 2 % (it was 1.4 % since 2026-11-05) */
+  --text-body-sm--letter-spacing: 0.03em; /* Figma 2026-11-17: 2 % (it was 1.4 % since 2026-11-05) */
   --text-body-sm-medium: var(--fs-body-sm);
   --text-body-sm-medium--font-weight: calc(500 + var(--weight-offset));
   --text-body-sm-medium--line-height: var(--lh-body-sm-md);
-  --text-body-sm-medium--letter-spacing: 0.02em; /* Figma 2026-11-17: 2 % (it was 1.4 %) */
+  --text-body-sm-medium--letter-spacing: 0.03em; /* Figma 2026-11-17: 2 % (it was 1.4 %) */
   --text-body-sm-strong: var(--fs-body-sm);
   --text-body-sm-strong--font-weight: calc(600 + var(--weight-offset));
   --text-body-sm-strong--line-height: var(--lh-body-sm-md);
-  --text-body-sm-strong--letter-spacing: 0.02em; /* Figma 2026-11-17: 2 % (it was 1.4 %) */
+  --text-body-sm-strong--letter-spacing: 0.03em; /* Figma 2026-11-17: 2 % (it was 1.4 %) */
   /* Default body is 14 px on desktop (Figma: body, body-medium, body-strong); body-sm is the 13 px one used so far. */
   --text-body: var(--fs-body);
   --text-body--font-weight: calc(400 + var(--weight-offset));
@@ -111,20 +111,20 @@
   --text-meta: var(--fs-meta);
   --text-meta--font-weight: calc(400 + var(--weight-offset));
   --text-meta--line-height: var(--lh-meta);
-  --text-meta--letter-spacing: 0.02em;
+  --text-meta--letter-spacing: 0.03em;
   /* Figma meta-medium (2026-11-02): the meta size in Medium, for table headers and the agent's suggested questions (it was documented as 12 / 16, 500). */
   --text-meta-medium: var(--fs-meta);
   --text-meta-medium--font-weight: calc(500 + var(--weight-offset));
   --text-meta-medium--line-height: var(--lh-meta);
-  --text-meta-medium--letter-spacing: 0.014em; /* Figma 2026-11-05: 1.4 % (it was 2 %) */
+  --text-meta-medium--letter-spacing: 0.03em; /* Figma 2026-11-05: 1.4 % (it was 2 %) */
   /* Figma caption family (2026-11-05): the same 12 / 16 size in three weights, named like body and meta: caption (Regular), caption-medium (Medium; it was called caption until 2026-11-05) and caption-strong (SemiBold). */
   --text-caption: var(--fs-caption);
   --text-caption--font-weight: calc(400 + var(--weight-offset));
   --text-caption--line-height: 16px;
-  --text-caption--letter-spacing: 0.04em; /* Figma 2026-11-17: 4 % (it was 2.4 %) */
+  --text-caption--letter-spacing: 0.05em; /* Figma 2026-11-17: 4 % (it was 2.4 %) */
   --text-caption-medium: var(--fs-caption);
   --text-caption-medium--font-weight: calc(500 + var(--weight-offset));
-  --text-caption-medium--line-height: 16px;
+  --text-caption-medium--line-height: 17px;
   --text-caption-medium--letter-spacing: 0.024em;
   /* Figma caption-strong (2026-11-02): the caption size in SemiBold, for Badge and chip labels. */
   --text-caption-strong: var(--fs-caption);

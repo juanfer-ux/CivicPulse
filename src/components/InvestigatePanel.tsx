@@ -69,16 +69,16 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </CardHeader>
       </div>
       {turns.length === 0 && (
-        <div className="hidden shrink-0 items-center justify-center gap-4 bg-(--neutral-700) py-3 desk:flex"> {/* Figma landing, under the title row (owner, 2026-11-17): a 44 px strip, `neutral-700`, a `sparkle` fill icon (20 px, `neutral-200`) and a note in `caption` `brand-primary` (owner's Figma, 2026-11-17, latest: it was 36 px, `neutral-800`, `neutral-300` and `neutral-200`); the conversation has none */}
+        <div className="hidden shrink-0 items-center justify-center gap-4 bg-(--neutral-700) py-4 desk:flex"> {/* Figma landing, under the title row (owner, 2026-11-17): a 44 px strip, `neutral-700`, a `sparkle` fill icon (20 px, `neutral-200`) and a note in `caption` `brand-primary` (owner's Figma, 2026-11-17, latest: it was 36 px, `neutral-800`, `neutral-300` and `neutral-200`); the conversation has none */}
           <Sparkle weight="fill" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
-          <p className="text-caption text-(--brand-primary)">CivicPulse AI connects related reports into patterns. You review before anything is sent to the specific authorities</p>
+          <p className="text-body-sm text-(--brand-primary)">CivicPulse AI groups related reports into patterns. Nothing goes to the authorities until you’ve reviewed it.</p>
         </div>
       )}
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0">
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
         <div className="relative min-h-0 flex-1">
         <ScrollArea className="relative h-full" viewportClassName={turns.length === 0 ? '[&>div]:!flex [&>div]:min-h-full [&>div]:flex-col [&>div]:justify-center' : '[&>div]:!block'}> {/* the landing's group is centered vertically between the strip and the composer (owner, 2026-11-17, with a screenshot; Figma's body is centered both ways); taller content scrolls from the top; a conversation starts at the top */}
-        <div className="flex w-full flex-col gap-3 text-body-sm max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[816px] desk:gap-8 desk:px-12 desk:py-8">
+        <div className="flex w-full flex-col gap-3 text-body max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[816px] desk:gap-8 desk:px-12 desk:py-8">
           {turns.length === 0 && <AgentHome ask={(q) => void ask(q)} />}
           {turns.map((t, i) => (
             <div key={i} className="flex flex-col gap-4">

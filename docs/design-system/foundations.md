@@ -32,13 +32,13 @@ Each class sets size, line height and weight together, so a component never need
 | body | 14 / 24 (spacing 2.2 %; line was 22 until 2026-11-05) | **16 / 24** | 400 | Default paragraph text (new; not used by a screen yet) | `text-body` |
 | body-medium | 14 / 24 (spacing 2 %) | **16 / 24** | 500 | Default body, medium | `text-body-medium` |
 | body-strong | 14 / 20 (spacing 2 % since 2026-11-17, it was 1 %) | **16 / 24** | 600 | Default body, strong | `text-body-strong` |
-| body-sm | 13 / 20 (spacing 2 % again since 2026-11-17, 1.4 % from 2026-11-05) | **16 / 24** | 400 | Paragraphs, inputs, table cells (this was `body` until 2026-10-23; 13 px since 2026-11-05, it was the fractional 13.5) | `text-body-sm` |
-| body-sm-medium | 13 / 20 (spacing 2 % since 2026-11-17; before: 1.4 %, 0.5 % earlier that day, was 2 % until 2026-11-05) | **16 / 24** | 500 | Small body, medium (spacing was 4 % from 2026-11-02 to 2026-11-05, and 2 % before) | `text-body-sm-medium` |
-| body-sm-strong | 13 / 20 (spacing 2 % since 2026-11-17; before: 1.4 %, 0 % earlier that day, was 2 % until 2026-11-05) | **16 / 24** | 600 | Small body, strong | `text-body-sm-strong` |
-| meta | 13 / 23 (line was 21 until 2026-11-05) | **14 / 20** | 400 | Secondary info | `text-meta` |
-| meta-medium | 13 / 23 (spacing 1.4 %, was 2 %; line was 21) | **14 / 20** | 500 (Figma Medium) | Table headers and the agent's suggested questions (Figma 2026-11-02; it was documented as 12 / 16, 500 and the code used `text-meta` plus `font-medium`) | `text-meta-medium` |
-| caption | 12 / 16 (spacing 4 % since 2026-11-17, it was 2.4 %) | **12 / 16** | 400 | Small tags and fine print, regular (new 2026-11-05; the name used to mean the Medium style) | `text-caption` |
-| caption-medium | 12.5 / 16 (spacing 2.4 %) | **12 / 16** | 500 | Chips, counts, the sidebar email, the auth footer, photo counts (this was `caption` until 2026-11-05) | `text-caption-medium` |
+| body-sm | 13 / 20 (spacing 3 % since 2026-11-17 latest; 2 % earlier that day, 1.4 % from 2026-11-05) | **16 / 24** | 400 | Paragraphs, inputs, table cells (this was `body` until 2026-10-23; 13 px since 2026-11-05, it was the fractional 13.5) | `text-body-sm` |
+| body-sm-medium | 13 / 20 (spacing 3 % since 2026-11-17 latest; 2 % before that; earlier: 1.4 %, 0.5 % earlier that day, was 2 % until 2026-11-05) | **16 / 24** | 500 | Small body, medium (spacing was 4 % from 2026-11-02 to 2026-11-05, and 2 % before) | `text-body-sm-medium` |
+| body-sm-strong | 13 / 20 (spacing 3 % since 2026-11-17 latest; 2 % before that; earlier: 1.4 %, 0 % earlier that day, was 2 % until 2026-11-05) | **16 / 24** | 600 | Small body, strong | `text-body-sm-strong` |
+| meta | 13 / 23 (spacing 3 % since 2026-11-17, it was 2 %; line was 21 until 2026-11-05) | **14 / 20** | 400 | Secondary info | `text-meta` |
+| meta-medium | 13 / 23 (spacing 3 % since 2026-11-17, it was 1.4 % and 2 % before; line was 21) | **14 / 20** | 500 (Figma Medium) | Table headers and the agent's suggested questions (Figma 2026-11-02; it was documented as 12 / 16, 500 and the code used `text-meta` plus `font-medium`) | `text-meta-medium` |
+| caption | 12 / 16 (spacing 5 % since 2026-11-17 latest, 4 % earlier that day, it was 2.4 %) | **12 / 16** | 400 | Small tags and fine print, regular (new 2026-11-05; the name used to mean the Medium style) | `text-caption` |
+| caption-medium | 12 / 17 (line 17 since 2026-11-17, it was 16; spacing 2.4 %) | **12 / 16** | 500 | Chips, counts, the sidebar email, the auth footer, photo counts (this was `caption` until 2026-11-05) | `text-caption-medium` |
 | caption-strong | 12.5 / 12 (spacing 2.4 %) | **12 / 12** | 600 (Figma SemiBold) | Badge labels (new 2026-11-02); line height 12 since Figma 2026-11-07 (was 16) | `text-caption-strong` |
 | section-label | 11 / 16 (spacing 18 %) | 11 / 16 | 700 (Figma Bold) | Uppercase title above a group of sidebar items (Investigations); color `neutral-200`, like the plus buttons beside it (new 2026-10-28) | `text-section-label` + `uppercase` |
 

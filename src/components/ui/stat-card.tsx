@@ -28,7 +28,7 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
   const g = series && w > 0 ? sparkPoints(series, w, 32) : null
   return (
     <Tag
-      className={`@container flex min-w-0 flex-col gap-4 rounded-[4px] bg-(--neutral-900) px-4 pt-4 pb-5 text-left shadow-[inset_0_0_0_1px_var(--neutral-800)] enabled:hover:shadow-[0_0_0_2px_var(--neutral-600)] ${selected ? "shadow-[0_0_0_2px_var(--neutral-600)]" : ""}`}
+      className={`@container flex min-w-0 flex-col gap-4 rounded-[4px] bg-(--neutral-900) px-4 pt-4 pb-5 text-left shadow-[inset_0_0_0_1px_var(--neutral-600)] enabled:hover:shadow-[0_0_0_2px_var(--neutral-500)] ${selected ? "shadow-[0_0_0_2px_var(--neutral-500)]" : ""}`}
       {...(onClick ? { type: 'button' as const, onClick, 'aria-pressed': !!selected } : {})}
     >
       <span className="flex h-6 items-center justify-between gap-2">
