@@ -76,6 +76,8 @@ const LAND_ON = false
 const BOGOTA_OUTLINE_ON = false
 // Very subtle softness on the roads and their outlines, in pixels (owner, 2026-10-26). 0 = sharp.
 const ROAD_BLUR = 0.6
+/** The softness fades out between zoom 11.6 (the start view) and 12.5 (owner, 2026-11-17: measured in the owner's Chrome, a blurred road layer cost about 540 ms per frame at zoom 13 and 15 on a 2x canvas, and 25 to 30 ms with no blur; at the start view it is cheap). */
+const ROAD_BLUR_BY_ZOOM = ['interpolate', ['linear'], ['zoom'], 11.6, ROAD_BLUR, 12.5, 0] as never
 /** Pixels per meter at zoom 0 around Bogotá (512 px tiles), for the answer radius. */
 const METERS_TO_PX_Z0 = 1 / (78271.517 * Math.cos((4.65 * Math.PI) / 180))
 /** Same for the building outlines, in pixels. */
@@ -283,7 +285,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         const c = l.type === 'line' ? map.getPaintProperty(l.id, 'line-color') : null
         if (typeof c === 'string' && roads[c]) {
           map.setPaintProperty(l.id, 'line-color', roads[c])
-          map.setPaintProperty(l.id, 'line-blur', ROAD_BLUR)
+          map.setPaintProperty(l.id, 'line-blur', ROAD_BLUR_BY_ZOOM)
         }
       }
       // Rivers and lakes (Figma map/water, map/waterway).
@@ -309,7 +311,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
           // Road outlines are the "case" layers: CARTO's #232323 ones are the major roads, the rest (#1a1a1a) tunnels, minor roads and bridges.
           const name = lines[l.id] ?? (l.id.includes('case') ? (old.includes('#232323') ? '--map-road-outlines' : '--map-road-outlines-minor') : null)
           if (name) map.setPaintProperty(l.id, 'line-color', token(name))
-          if (l.id.includes('case')) map.setPaintProperty(l.id, 'line-blur', ROAD_BLUR)
+          if (l.id.includes('case')) map.setPaintProperty(l.id, 'line-blur', ROAD_BLUR_BY_ZOOM)
         }
         if (l.type === 'symbol' && map.getPaintProperty(l.id, 'text-halo-width')) map.setPaintProperty(l.id, 'text-halo-color', token('--map-label-halo'))
         // House numbers (owner, 2026-11-16: hard to read at high zoom): CARTO's dim grey with a dark outline sat on our building tops; now `neutral-200` with no outline.
