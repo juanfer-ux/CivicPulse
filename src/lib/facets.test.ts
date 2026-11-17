@@ -21,8 +21,11 @@ describe('facetCounts', () => {
     const c = facetCounts(rows, { ...none, locality: '2' }, NOW, [1, 2], ['parking', 'illegal_dumping'], [7, 0])
     expect(c.category.illegal_dumping).toBe(0)
   })
-  it('a status filter of one kind does not hide the other kind', () => {
-    const c = facetCounts(rows, { ...none, statuses: ['approved'] }, NOW, [1, 2], ['parking'], [0])
-    expect(c.category.parking).toBe(1) // only the recurrence: the pending incident is not approved
+  it('a status chosen for one kind shows only that kind (owner, 2026-11-16); both kinds chosen show both', () => {
+    const only = (f: Partial<FacetFilters>) => facetCounts(rows, { ...none, ...f }, NOW, [1, 2], ['parking'], [0]).category.parking
+    expect(only({ statuses: ['approved'] })).toBe(0) // the recurrence is hidden and the pending incident is not approved
+    expect(only({ statuses: ['pending'] })).toBe(1) // just the pending incident
+    expect(only({ problemStatuses: ['active'] })).toBe(1) // just the recurrence, the incident is hidden
+    expect(only({ statuses: ['pending'], problemStatuses: ['active'] })).toBe(2) // both kinds chosen: both show
   })
 })
