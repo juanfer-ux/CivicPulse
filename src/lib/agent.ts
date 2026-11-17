@@ -293,7 +293,7 @@ function unsupported(): Answer {
       'and suggest an area for human review tomorrow evening.',
     bars: [],
     evidence: [],
-    limitations: ['I do not guess: if the data cannot support a question, I say so.'],
+    limitations: [],
     highlightIds: [],
   }
 }
