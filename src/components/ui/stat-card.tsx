@@ -3,12 +3,12 @@ import type { Trend } from '@/lib/trend'
 import { ArrowDown, ArrowRight, ArrowUp, TrendDown } from '@phosphor-icons/react'
 import { sparkPoints } from '@/lib/sparkline'
 
-/** The strip under the number (Figma Stat Trend, owner, 2026-11-17): a 20 px circle with a 14 px icon and a label in `caption-medium`, each trend with its own colors. `about` and `below` keep the old arrows: Figma still draws them with the up arrow, which looks unfinished. */
+/** The strip under the number (Figma Stat Trend, owner, 2026-11-17, second pass): a 20 px circle with a 1 px line inside and no fill, a 12 px arrow in the same color, and a label in `caption-medium`; each trend has its own tones. The arrows are up, right, down and the falling trend (Figma draws them so; its component shows the right arrow and the down arrow through rotated copies). */
 const TREND = {
-  above: { Icon: ArrowUp, text: 'Above usual', circle: 'bg-(--red-800)', icon: 'text-(--red-200)', label: 'text-(--red-400)' },
-  about: { Icon: ArrowRight, text: 'About usual', circle: 'bg-(--blue-600)', icon: 'text-(--neutral-100)', label: 'text-(--blue-300)' },
-  low: { Icon: TrendDown, text: 'Low reporting', circle: 'bg-(--yellow-700)', icon: 'text-(--yellow-300)', label: 'text-(--yellow-500)' },
-  below: { Icon: ArrowDown, text: 'Below usual', circle: 'bg-(--blue-600)', icon: 'text-(--neutral-100)', label: 'text-(--green-500)' },
+  above: { Icon: ArrowUp, text: 'Above usual', circle: 'border-(--red-300)', icon: 'text-(--red-300)', label: 'text-(--red-400)' },
+  about: { Icon: ArrowRight, text: 'About usual', circle: 'border-(--blue-200)', icon: 'text-(--blue-200)', label: 'text-(--blue-300)' },
+  low: { Icon: TrendDown, text: 'Low reporting', circle: 'border-(--yellow-300)', icon: 'text-(--yellow-300)', label: 'text-(--yellow-500)' },
+  below: { Icon: ArrowDown, text: 'Below usual', circle: 'border-(--green-400)', icon: 'text-(--green-400)', label: 'text-(--green-500)' },
 } as const
 
 /** A number with its name (Figma Stat Card, owner's rebuild 2026-11-17): 16 px padding, 12 px between the name, the number row and the trend strip, 143 px high (it was 156 with a 1 px border and a grey strip); the number (stat style 42 / 32) and the graph (48 px high, 12 px on its right, with the peak dot) share the row 40 px apart, bottom aligned; hover or selected is a 2 px `neutral-400` ring outside the card. The "Reports" caption over the number is gone. */
@@ -59,8 +59,8 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
       </span>
       {t && (
         <span className="flex items-center gap-2 text-caption-medium"> {/* Figma Stat Trend: a 20 px circle, a 14 px icon, the label; one line */}
-          <span className={`grid size-5 shrink-0 place-items-center rounded-full ${t.circle}`}>
-            <t.Icon className={`size-3.5 ${t.icon}`} aria-hidden />
+          <span className={`grid size-5 shrink-0 place-items-center rounded-full border ${t.circle}`}>
+            <t.Icon className={`size-3 ${t.icon}`} aria-hidden />
           </span>
           <span className={`min-w-0 truncate ${t.label}`} title={t.text}>{t.text}</span>
         </span>
