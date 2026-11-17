@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { PictureInPicture, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
+import { PictureInPicture, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
 import { AgentHome } from '@/components/AgentHome'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -68,21 +68,18 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           )}
         </CardHeader>
       </div>
+      {turns.length === 0 && (
+        <div className="hidden shrink-0 items-center justify-center gap-4 bg-(--neutral-700) py-3 desk:flex"> {/* Figma landing, under the title row (owner, 2026-11-17): a 44 px strip, `neutral-700`, a `sparkle` fill icon (20 px, `neutral-200`) and a note in `caption` `brand-primary` (owner's Figma, 2026-11-17, latest: it was 36 px, `neutral-800`, `neutral-300` and `neutral-200`); the conversation has none */}
+          <Sparkle weight="fill" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
+          <p className="text-caption text-(--brand-primary)">CivicPulse AI connects related reports into patterns. You review before anything is sent to the specific authorities</p>
+        </div>
+      )}
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0">
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
         <div className="relative min-h-0 flex-1">
-        <ScrollArea className="relative h-full" viewportClassName={turns.length === 0 ? '[&>div]:!flex [&>div]:min-h-full [&>div]:flex-col [&>div]:justify-center' : '[&>div]:!block'}> {/* the landing's content is centered vertically in the panel (Figma Conversation body: centered both ways; owner, 2026-11-16), a conversation starts at the top */}
+        <ScrollArea className="relative h-full" viewportClassName={turns.length === 0 ? '[&>div]:!flex [&>div]:min-h-full [&>div]:flex-col [&>div]:justify-center' : '[&>div]:!block'}> {/* the landing's group is centered vertically between the strip and the composer (owner, 2026-11-17, with a screenshot; Figma's body is centered both ways); taller content scrolls from the top; a conversation starts at the top */}
         <div className="flex w-full flex-col gap-3 text-body-sm max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[816px] desk:gap-8 desk:px-12 desk:py-8">
-          {turns.length === 0 && (
-            <AgentHome
-              ask={(q) => void ask(q)}
-              composer={
-                <form onSubmit={onSubmit} className="flex w-full items-center gap-2 py-6"> {/* Figma Chat Area on the landing (owner, 2026-11-16): inside the content, 24 px above and below, the Composer 720 px wide */}
-                  <Composer value={text} onChange={setText} busy={busy} />
-                </form>
-              }
-            />
-          )}
+          {turns.length === 0 && <AgentHome ask={(q) => void ask(q)} />}
           {turns.map((t, i) => (
             <div key={i} className="flex flex-col gap-4">
               <Question text={t.question} />
@@ -95,11 +92,9 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </div>
         </ScrollArea>
         </div>
-        {turns.length > 0 && (
-          <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-12 desk:py-6 desk:max-w-[816px]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
-            <Composer value={text} onChange={setText} busy={busy} />
-          </form>
-        )}
+        <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-12 desk:py-6 desk:max-w-[816px]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
+          <Composer value={text} onChange={setText} busy={busy} />
+        </form>
       </CardContent>
     </Card>
   )
