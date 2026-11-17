@@ -65,12 +65,12 @@ function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNo
     if (active) row.current?.scrollIntoView?.({ block: 'nearest' }) // the open one is always in view, under the sticky section title (scroll-mt-10)
   }, [active])
   return (
-    <Button ref={row} variant="ghost" className={`scroll-mt-10 h-[51px] pt-[3px] pb-2 items-start justify-start gap-2.5 pl-[5px] pr-[19px] hover:bg-(--neutral-600) ${active ? 'bg-(--neutral-900)' : ''}`} title={tip} aria-current={active || undefined} onClick={onClick}>
-      <span className={`flex h-10 w-4 shrink-0 items-start justify-center pt-1`}>{icon}</span>
-      <span className={`flex h-10 justify-center min-w-0 flex-col text-left`}>
-        <span className="flex min-w-0 flex-col gap-0.5">
+    <Button ref={row} variant="ghost" className={`scroll-mt-10 h-[60px] items-start justify-start gap-3 p-2 pr-5 ${active ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} title={tip} aria-current={active || undefined} onClick={onClick}>
+      <span className={`flex h-10 w-4 shrink-0 items-start justify-center pt-0.5`}>{icon}</span>
+      <span className={`flex h-11 justify-center min-w-0 flex-col text-left`}>
+        <span className="flex min-w-0 flex-col gap-1">
           <span className="truncate text-body-sm text-(--neutral-100)">{title}</span>
-          <span className="truncate text-caption text-(--neutral-200)">{sub}</span>
+          <span className="flex h-5 items-center truncate text-caption text-(--neutral-200)">{sub}</span>
         </span>
       </span>
     </Button>
@@ -120,7 +120,7 @@ function ViewMenu({ view, onChange, onClose }: { view: View; onChange: (v: View)
 }
 
 /** One sidebar section (Figma Recurrences / Incidents / Investigations): a title row with its own view button and plus, then the list. Each section has its own view. Recurrences and Incidents (`views`) get the view menu; Investigations just flips newest and oldest. */
-function Section<T>({ title, count, items, addLabel, onAdd, pb = 'pb-3', row, children, empty, views, limit }: { limit?: number; title: string; count?: number; items: T[]; addLabel: string; onAdd?: () => void; pb?: string; row?: (t: T) => ReactNode; children?: (view: View) => ReactNode; empty?: string; views?: boolean }) {
+function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row, children, empty, views, limit }: { limit?: number; title: string; items: T[]; addLabel: string; onAdd?: () => void; pb?: string; row?: (t: T) => ReactNode; children?: (view: View) => ReactNode; empty?: string; views?: boolean }) {
   const [view, setView] = useState<View>(DEFAULT_VIEW)
   const [menu, setMenu] = useState(false)
   const newest = view.newest
@@ -136,9 +136,9 @@ function Section<T>({ title, count, items, addLabel, onAdd, pb = 'pb-3', row, ch
     return () => io.disconnect()
   }, [])
   return (
-    <div className={`flex flex-col gap-2 px-2 pt-2 ${pb}`}>
+    <div className={`flex flex-col gap-4 px-2 pt-2 ${pb}`}>
       <div ref={head} className={`sticky -top-px z-10 flex h-8 items-center gap-2.5 border-b-[1px] bg-(--neutral-700) pr-1.5 pl-2.5 ${stuck ? 'border-(--neutral-600)' : 'border-transparent'}`}>
-        <p className="flex-1 text-caption-medium text-(--neutral-200)">{title}{count !== undefined && <span className="text-(--neutral-300)"> · {count}</span>}</p>
+        <p className="flex-1 text-caption-medium text-(--neutral-300)">{title}</p>
         {/* Figma "Actions": the view and plus buttons side by side with no gap (2 x 32 px). */}
         <div className="relative flex">
           {views ? (
@@ -233,14 +233,14 @@ function Brand({ collapsed, onToggle }: { collapsed: boolean; onToggle?: () => v
   if (collapsed && onToggle)
     return (
       <Button variant="ghost" className="group size-11 p-0" aria-label="Expand menu" title="Expand menu" onClick={onToggle}>
-        <img src={mark} alt="" width={34} height={34} className="shrink-0 group-hover:hidden group-focus-visible:hidden" /> {/* 34 px in the collapsed sidebar (owner's Figma, 2026-11-16; 30.8 before) */}
+        <img src={mark} alt="" width={37.57} height={37.57} className="shrink-0 group-hover:hidden group-focus-visible:hidden" /> {/* 37.57 px in the collapsed sidebar (owner's Figma, 2026-11-17; 34 on 2026-11-16, 30.8 before) */}
         <SidebarSimple weight="regular" className="hidden size-5 shrink-0 -scale-x-100 group-hover:block group-focus-visible:block" />
       </Button>
     )
   return (
-    <div className={`flex items-center gap-[6.4px] ${collapsed ? '' : 'pl-[5.85px]'}`}>
-      <img src={mark} alt="" width={30.8} height={30.8} className="shrink-0" />
-      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={125.9} height={9.56} className="shrink-0" />}
+    <div className={`flex items-center gap-[7.05px] ${collapsed ? '' : 'pl-[6.47px]'}`}>
+      <img src={mark} alt="" width={34.05} height={34.05} className="shrink-0" />
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={139.15} height={10.57} className="shrink-0" />}
     </div>
   )
 }
@@ -343,14 +343,14 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                 <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-800) border-(--neutral-400) text-body-sm" />
               </div>
               {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
-              <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--neutral-100) hover:bg-(--neutral-600) ${act.kind === 'explore' ? 'bg-(--neutral-900)' : ''}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
+              <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--neutral-100) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
                 <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
                 Explore
               </Button>
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
               <div className="flex flex-col gap-2.5 py-2">
-                <Section title="Recurrences" count={recurrences.length} items={recurrences} addLabel="New recurrence" onAdd={onNewCase} views pb="pb-2.5" empty="Nothing here yet. Ask the agent, or open a marker on the map.">
+                <Section title="Recurrences" items={recurrences} addLabel="New recurrence" onAdd={onNewCase} views pb="pb-2.5" empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
                     <ViewList items={recurrences} limit={3} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
                       <TwoLineItem key={c.id} active={act.kind === 'case' ? c.id === act.id : act.kind === 'recurrence' && c.id === act.id} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => (typeof c.id === 'string' ? noCase(onOpenRecurrence)(c.id) : setLocal({ kind: 'case', id: c.id, sel: selKey }))} title={c.title}
@@ -359,7 +359,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                     )} />
                   )}
                 </Section>
-                <Section title="Incidents" count={incidentRows.length} items={incidentRows} addLabel="New incident" views empty="Nothing here yet. Incidents an answer points to, or that you open, appear here.">
+                <Section title="Incidents" items={incidentRows} addLabel="New incident" views empty="Nothing here yet. Incidents an answer points to, or that you open, appear here.">
                   {(view) => (
                     <ViewList items={incidentRows} limit={5} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
                       <TwoLineItem key={i.id} active={act.kind === 'incident' && act.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => noCase(onOpenIncident)(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-2 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${i.locality ?? GROUPS[i.group].label}`} />
@@ -367,7 +367,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                   )}
                 </Section>
                 <Section title="Investigations" limit={2} items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
-                  <Button key={c.key} variant="ghost" className={`h-8 items-center justify-start gap-2.5 py-1.5 pl-1.5 pr-5 text-body-sm hover:bg-(--neutral-600) ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900)' : ''}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
+                  <Button key={c.key} variant="ghost" className={`h-9 items-center justify-start gap-4 p-2 pr-5 text-body-sm ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
                     <Chat weight="regular" className="size-4 shrink-0 text-(--neutral-200)" aria-hidden />
                     <span className="truncate">{c.title}</span>
                   </Button>

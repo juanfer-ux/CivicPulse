@@ -58,6 +58,7 @@ Rules:
 - Styles and the reasons: [docs/design.md](docs/design.md) (Scrollbars) and the gallery at `/#scroll`. If you change the style, change `ScrollArea`, the CSS rule in `index.css`, the docs and the gallery together.
 
 ## Figma component pages (this project)
+- **No hover on the active item (owner, 2026-11-17).** An item that is already active or selected (sidebar row, tab, menu item, list row) never changes on hover: give it the active fill and keep the same fill on hover (`hover:bg-<active>`). Hover applies only to inactive items. Check it on every selectable list you build or touch, in code and in Figma (no hover variant for the active state).
 - Components live on the five family pages (Actions & inputs, Data display, Navigation & layout, Map & agent, Auth & brand), grouped under the separator page `——— Components ———` (index in [docs/design-system/README.md](docs/design-system/README.md)); frames are laid out in one horizontal row.
 - **Every component family page has the background `#3D3D43`** (the pages between the `——— Components ———` separator and Screens), existing and any new one. When creating a components page, set it right away.
 
