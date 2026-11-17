@@ -16,8 +16,8 @@ const TOPIC_ICON: Icon[] = [Warning, MapPin, Clock, ArrowsClockwise, Compass]
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="flex flex-col gap-5">
-      <h3 className="font-display-semi text-display-xs text-(--neutral-200)">{title}</h3>
+    <section className="flex flex-col gap-6">
+      <h3 className="font-display-semi text-display-xs text-(--neutral-100)">{title}</h3>
       {children}
     </section>
   )
@@ -64,7 +64,7 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
     <div className="flex flex-col"> {/* Figma Dashboard (owner, 2026-11-17): fills the body with one group inside; the composer is no longer here, it is pinned at the bottom of the panel */}
       <div className="flex flex-col gap-16 px-2.5 py-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
       <div className="flex flex-wrap items-center justify-between gap-x-9 gap-y-2"> {/* Figma Welcome Message (owner, 2026-11-16, latest): "Welcome back," at the left and the place at the right, space between, 36 px apart, centered on each other */}
-        <h2 className="font-display text-display-md text-(--brand-primary)">Welcome back{first ? ` ${first}` : ''},</h2>
+        <h2 className="font-display text-display-md text-(--neutral-100)">Welcome back{first ? ` ${first}` : ''},</h2>
         <p className="flex items-center gap-2 text-body whitespace-nowrap text-(--neutral-200)"> {/* Figma (latest): `map-pin` regular 18 px `neutral-300`, 8 px, then "Bogotá, Colombia" in display-xs (16 / 20) `neutral-200`; it was display-sm `neutral-100` */}
           <MapPin weight="regular" className="size-[18px] text-(--neutral-300)" aria-hidden />
           Bogotá, Colombia
@@ -79,7 +79,7 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
                 {[0, 1].map((i) => (
                   <div key={i} className={`${dataCard} p-2 @min-[420px]:flex-1`}>
                     <p className={cardName}>Data card name</p>
-                    <div className="h-[50px]" aria-hidden /> {/* Figma Data_Chart of the small card: its neutral-800 fill is hidden now (2026-11-14), the 50 px block stays */}
+                    <div className="h-[49px]" aria-hidden /> {/* Figma Data_Chart of the small card: its neutral-800 fill is hidden now (2026-11-14), the 50 px block stays */}
                   </div>
                 ))}
               </div>
