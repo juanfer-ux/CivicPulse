@@ -86,10 +86,12 @@ export function groupOf(status: IncidentStatus): Group {
 /** A code as text in Title Case: "human_rejected" is "Human Rejected". */
 export const label = (value: string) => titleCase(value.replace(/_/g, ' '))
 
+const INCIDENT_COLUMNS = 'id, reference, title, description, locality_code, lat, lng, location_description, occurred_at, reported_at, vehicle_type, category, obstruction_subtype, subtype, ai_classification, ai_confidence, uncertainty_flags, validation_status, status, outcome, is_synthetic'
+
 /** RLS decides which rows come back: a user only receives incidents in their scope. */
 async function loadDashboardData() {
   const [incidents, localities, categories] = await Promise.all([
-    supabase.from('incidents').select('*').order('occurred_at', { ascending: false }).limit(1000),
+    supabase.from('incidents').select(INCIDENT_COLUMNS).order('occurred_at', { ascending: false }).limit(1000), // only what the screens use: no plate, evidence metadata, assignee or created_at (speed check, 2026-11-17)
     supabase.from('localities').select('code, name').order('code'),
     supabase.from('incident_categories').select('code, name').eq('active', true).order('code'),
   ])
