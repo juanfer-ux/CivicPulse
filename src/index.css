@@ -86,15 +86,15 @@
   --text-body-sm: var(--fs-body-sm);
   --text-body-sm--font-weight: calc(400 + var(--weight-offset));
   --text-body-sm--line-height: var(--lh-body-sm);
-  --text-body-sm--letter-spacing: 0.03em; /* Figma 2026-11-17: 2 % (it was 1.4 % since 2026-11-05) */
+  --text-body-sm--letter-spacing: 0.04em; /* Figma 2026-11-17: 2 % (it was 1.4 % since 2026-11-05) */
   --text-body-sm-medium: var(--fs-body-sm);
   --text-body-sm-medium--font-weight: calc(500 + var(--weight-offset));
   --text-body-sm-medium--line-height: var(--lh-body-sm-md);
-  --text-body-sm-medium--letter-spacing: 0.03em; /* Figma 2026-11-17: 2 % (it was 1.4 %) */
+  --text-body-sm-medium--letter-spacing: 0.04em; /* Figma 2026-11-17: 2 % (it was 1.4 %) */
   --text-body-sm-strong: var(--fs-body-sm);
   --text-body-sm-strong--font-weight: calc(600 + var(--weight-offset));
   --text-body-sm-strong--line-height: var(--lh-body-sm-md);
-  --text-body-sm-strong--letter-spacing: 0.03em; /* Figma 2026-11-17: 2 % (it was 1.4 %) */
+  --text-body-sm-strong--letter-spacing: 0.04em; /* Figma 2026-11-17: 2 % (it was 1.4 %) */
   /* Default body is 14 px on desktop (Figma: body, body-medium, body-strong); body-sm is the 13 px one used so far. */
   --text-body: var(--fs-body);
   --text-body--font-weight: calc(400 + var(--weight-offset));
@@ -235,7 +235,7 @@
   --sidebar-gap: 0px; /* the only exception: the space between the sidebar and the agent panel */
   --map-pad: 20px; /* the inside padding of the map area (owner, 2026-11-06): page-pad + 4 px, between the map's edges and the stat cards, filters, banner, chips, detail and history cards */
   --group-gap: 32px; /* the space between the panels group (sidebar + agent panel) and what floats on the map (stat cards, filters, chips, detail panels) */
-  --agent-header-h: 60px; /* height of the agent panel's title row in a conversation (owner's Figma, 2026-11-12: 8 px above and below the 44 px collapse button; the landing has no title row) */
+  --agent-header-h: 68px; /* height of the agent panel's title row in a conversation (owner's Figma, 2026-11-12: 8 px above and below the 44 px collapse button; the landing has no title row) */
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
   /* The whole palette is these 58 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
@@ -321,7 +321,7 @@
   --foreground: var(--neutral-100);
   --ai: var(--neutral-900); /* the agent panel's background (owner, 2026-10-29; it was neutral-800) */
   --ai-border: var(--indigo-400);
-  --answer-banner-h: 52px; /* 52 since 2026-11-15 (Figma Answer Banner: 8 px, the 36 px button, 8 px; radius 6, 10 px at the sides, 12 px gaps); */ /* conversation banner height (Figma Answer Banner: 56 since 2026-11-06, a floating rounded box (radius 4) that respects --page-pad; 48 from 2026-11-05, 8 px padding around the 32 px button; it was 44 from 2026-10-28 and 38 before); the filters and the stats card move down by this much while it shows */
+  --answer-banner-h: 44px; /* 44 since 2026-11-17 (Figma Answer Banner: 4 px, the 36 px icon cell, 4 px; fill indigo-800, radius 4, 8 px at the sides); it was 52 */ /* 52 since 2026-11-15 (Figma Answer Banner: 8 px, the 36 px button, 8 px; radius 6, 10 px at the sides, 12 px gaps); */ /* conversation banner height (Figma Answer Banner: 56 since 2026-11-06, a floating rounded box (radius 4) that respects --page-pad; 48 from 2026-11-05, 8 px padding around the 32 px button; it was 44 from 2026-10-28 and 38 before); the filters and the stats card move down by this much while it shows */
   --ai-banner: var(--indigo-700); /* conversation banner background and the answer rings on the map, light text on it. Figma indigo-700 (map/banner is its alias) */
   --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
   --warning: var(--yellow-300);

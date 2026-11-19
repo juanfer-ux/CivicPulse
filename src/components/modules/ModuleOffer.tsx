@@ -19,7 +19,7 @@ export function ModuleOffer({ offer }: { offer: Offer }) {
   const docked = placed.some((p) => p.type === 'timeline')
   if (state === 'dismissed') {
     return (
-      <Button size="sm" variant="ghost" className="self-start" onClick={() => setState('offer')}>
+      <Button size="sm" variant="outline" className="self-start border-[0.5px] border-(--neutral-400) bg-(--neutral-900) px-3" onClick={() => setState('offer')}>
         Offer the timeline again
       </Button>
     )

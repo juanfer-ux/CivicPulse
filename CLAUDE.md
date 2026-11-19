@@ -49,6 +49,9 @@ Rules:
 ## Map column (every floating panel on the map)
 - **Everything that floats on the map sits inside one column, at most 1,400 px wide and centered** (owner, 2026-11-09): stat cards, filters, chips, answer banner, Incident and Recurrence panels, history cards, the Recurrence header and left column. One rule in `src/index.css` (`.map-col`, on Dashboard's root) sets `--col-left` and `--col-right`; position a floating panel with `desk:left-(--col-left)` / `desk:right-(--col-right)` and never give it its own max width or centering. The map tools (home, compass, tilt, zoom) and the attribution button follow the column's right edge too (owner, 2026-11-15; before, they stayed 14 px from the map's edge): they line up with the stat cards and the Filters button, also while the Filters panel is open. Details: [docs/design.md](docs/design.md) (Layout).
 
+## Viewports of 1,600 px or below (owner, 2026-11-17)
+- The agent panel's maximum is 920 px at 1,600 px or below, 1,100 up to 2,100 and 1,250 above 2,100 (`agentMaxFor`); and, with the sidebar and the agent panel both expanded, opening the filters collapses the sidebar until the filters close or apply. Details: [docs/handoff.md](docs/handoff.md).
+
 ## Charts in the conversation
 - **Every chart or graph the agent shows in the conversation is at most `--chart-max-w` wide (480 px, owner 2026-11-15; the text column is 720 px)**, left-aligned under the answer text. One wrapper in `InvestigatePanel.tsx` (`AnswerView`) applies it to every chart type, so a new chart gets it for free; change the number only in `src/index.css`. Details: [docs/design.md](docs/design.md).
 

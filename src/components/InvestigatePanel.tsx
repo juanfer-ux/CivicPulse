@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { PictureInPicture, Sparkle, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
+import { CaretDown, MapPin, PictureInPicture, SidebarSimple, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
+import mark from '@/assets/logo-mark.svg'
 import { AgentHome } from '@/components/AgentHome'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -54,26 +55,46 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
   return (
     <Card className="isolate min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-0 max-md:gradient-border md:max-desk:rounded-none md:max-desk:border-0 md:max-desk:bg-transparent desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
       {/* Dotted texture (owner, 2026-11-15; whole panel 2026-11-16): a dot every 8 px (about 2 px wide), colored by a gradient from neutral-900 at the top to neutral-600 at the bottom, made by masking the gradient with the dots; behind everything, from the top of the panel to the bottom (title row, chat and composer), not only the chat area. */}
+        {turns.length === 0 && (
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"> {/* Figma Star (owner's Figma, 2026-11-17, it replaced the ellipse): a four-pointed star, 502 x 502, centered, 305 px below the panel's bottom edge (so only its top points show), a gradient at about 50 degrees from `indigo-400` (10 %) through `red-300` (61 %) to `yellow-300`, 40 % opacity, blurred 120 in Figma (60 px in CSS); the landing only, it goes once a conversation starts; behind the dots and everything else */}
+          <svg viewBox="0 0 502 502" className="absolute -bottom-[305px] left-1/2 size-[502px] -translate-x-1/2 opacity-40 blur-[60px]">
+            <defs>
+              <linearGradient id="agent-star" x1="0" y1="0" x2="0.64" y2="0.77">
+                <stop offset="0.1" stopColor="var(--indigo-400)" />
+                <stop offset="0.61" stopColor="var(--red-300)" />
+                <stop offset="1" stopColor="var(--yellow-300)" />
+              </linearGradient>
+            </defs>
+            <path fill="url(#agent-star)" d="M 0 0 L 70.65 41.67 C 181.92 107.31 320.07 107.31 431.34 41.67 L 502 0 L 460.32 70.65 C 394.68 181.92 394.68 320.07 460.32 431.34 L 502 502 L 431.34 460.32 C 320.07 394.68 181.92 394.68 70.65 460.32 L 0 502 L 41.67 431.34 C 107.31 320.07 107.31 181.92 41.67 70.65 L 0 0 Z" />
+          </svg>
+        </div>
+        )}
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,var(--neutral-900),var(--neutral-600))]" style={{ maskImage: 'radial-gradient(#000 1px, transparent 1.5px)', maskSize: '8px 8px', WebkitMaskImage: 'radial-gradient(#000 1px, transparent 1.5px)', WebkitMaskSize: '8px 8px' }} />
       {/* The title row (owner's Figma, 2026-11-12): 60 px (8 px above and below the 44 px collapse button), 16 px at the sides, "Explore" in `label` / neutral-200, a 0.5 px `neutral-600` line under it (owner, 2026-11-16: removed, put back, then set to `neutral-600` like the sidebar line; Figma has none right now), the collapse control at its right: Figma's Sidebar Item Investigation instance, 40 × 44 px, 4 px radius, the `picture-in-picture` icon at 20 px (`PictureInPicture`, regular; owner, 2026-11-16, a try: it was `Minus`, a minimize dash, and before that `panel-left`), `neutral-600` on hover (owner, 2026-11-13; it was a 32 px ghost button with a 16 px arrow). */}
-      <div className={`flex items-center md:max-desk:hidden desk:shrink-0 desk:border-b desk:border-(--neutral-600) ${turns.length === 0 ? 'desk:h-16 desk:px-10' : 'desk:h-(--agent-header-h) desk:px-4'}`}> {/* landing: 64 px high, 40 at the sides; conversation: 60, 16 (owner's Figma, 2026-11-16) */}
-        <CardHeader className="flex w-full flex-row items-center justify-between max-desk:mx-auto max-desk:max-w-[664px]">
-          <CardTitle asChild className="text-label text-(--neutral-200)">
-            <h2>Explore</h2>
-          </CardTitle>
-          {onCollapse && (
-            <button type="button" aria-label="Collapse agent" title="Collapse agent" onClick={onCollapse} className="hidden h-11 w-10 shrink-0 cursor-pointer place-items-center rounded-sm text-(--neutral-100) outline-none hover:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50 desk:grid">
-              <PictureInPicture weight="regular" className="size-5" />
-            </button>
-          )}
-        </CardHeader>
-      </div>
-      {turns.length === 0 && (
-        <div className="hidden shrink-0 items-center justify-center gap-4 bg-(--neutral-700) py-4 desk:flex"> {/* Figma landing, under the title row (owner, 2026-11-17): a 44 px strip, `neutral-700`, a `sparkle` fill icon (20 px, `neutral-200`) and a note in `caption` `brand-primary` (owner's Figma, 2026-11-17, latest: it was 36 px, `neutral-800`, `neutral-300` and `neutral-200`); the conversation has none */}
-          <Sparkle weight="fill" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
-          <p className="text-body-sm text-(--brand-primary)">CivicPulse AI groups related reports into patterns. Nothing goes to the authorities until you’ve reviewed it.</p>
+      <div className={`flex items-center md:max-desk:hidden desk:shrink-0 desk:border-b-[0.5px] desk:border-(--neutral-600) ${turns.length === 0 ? 'desk:h-17' : 'desk:h-(--agent-header-h)'}`}> {/* Figma title row (owner, 2026-11-17, latest): 68 px high, two cells side by side: a 44 px cell with the expand button (40 x 44, 2 px at the sides; invisible while the sidebar is expanded, so nothing moves) and the rest, 16 px in, with a 0.5 px `neutral-600` line at its left and under both; the rest holds the title, the collapse button and a 40 px empty space at the right. The conversation's Figma row still has the older layout. */}
+        <div className="hidden h-full w-16 shrink-0 items-center justify-center border-r-[0.5px] border-(--neutral-700) px-3 py-2 [:root[data-sidebar-collapsed]_&]:desk:flex"> {/* Figma "Logo (collapsed) container" (owner's Figma, 2026-11-17): while the sidebar is collapsed it is gone, and the logo mark sits here, a 40 px button that expands it; while the sidebar is open the container is not drawn */}
+          <button type="button" aria-label="Expand menu" title="Expand menu" onClick={() => window.dispatchEvent(new Event('sidebar-expand'))} className="group grid size-10 shrink-0 cursor-pointer place-items-center rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+            <img src={mark} alt="" width={40} height={40} className="group-hover:hidden group-focus-visible:hidden" /> {/* the rollover is kept (owner, 2026-11-17): on hover or focus the logo swaps for the panel icon, mirrored, as it did in the collapsed sidebar */}
+            <SidebarSimple weight="regular" className="hidden size-5 -scale-x-100 group-hover:block group-focus-visible:block" aria-hidden />
+          </button>
         </div>
-      )}
+        <div className="flex h-full flex-1 items-center">
+          <CardHeader className="flex w-full flex-row items-center gap-2.5 max-desk:mx-auto max-desk:max-w-[664px] desk:px-8"> {/* Figma title row (owner's Figma, 2026-11-17): 32 px at the sides, "Explore" (fills), the place (map-pin, "Bogotá, Colombia", a chevron; no menu yet) and the collapse button */}
+            <CardTitle asChild className="flex-1 text-label text-(--neutral-200)">
+              <h2>Explore</h2>
+            </CardTitle>
+            <span className="hidden items-center gap-2 px-4 text-body-sm text-(--neutral-200) desk:flex">
+              <span className="flex items-center gap-1"><MapPin weight="regular" className="size-3.5" aria-hidden />Bogotá, Colombia</span>
+              <CaretDown weight="regular" className="size-[18px]" aria-hidden />
+            </span>
+            {onCollapse && (
+              <button type="button" aria-label="Collapse agent" title="Collapse agent" onClick={onCollapse} className="hidden h-11 w-10 shrink-0 cursor-pointer place-items-center rounded-sm text-(--neutral-100) outline-none hover:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50 desk:grid">
+                <PictureInPicture weight="regular" className="size-5" />
+              </button>
+            )}
+          </CardHeader>
+        </div>
+      </div>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0">
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
         <div className="relative min-h-0 flex-1">
@@ -81,7 +102,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         <div className="flex w-full flex-col gap-3 text-body max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[816px] desk:gap-8 desk:px-12 desk:py-8">
           {turns.length === 0 && <AgentHome ask={(q) => void ask(q)} />}
           {turns.map((t, i) => (
-            <div key={i} className="flex flex-col gap-4">
+            <div key={i} className="flex flex-col gap-4 desk:gap-5"> {/* 20 px between a question and its answer on desktop (owner's Figma, 2026-11-17; it was 16) */}
               <Question text={t.question} />
               {!t.result && !t.error && <p className="text-muted-foreground">Querying…</p>}
               {t.error && <p className="text-incident">{t.error}</p>}
@@ -92,8 +113,9 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </div>
         </ScrollArea>
         </div>
-        <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-12 desk:py-6 desk:max-w-[816px]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
+        <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:flex-row desk:flex-col desk:items-stretch desk:gap-3 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-12 desk:py-6 desk:max-w-[816px]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
           <Composer value={text} onChange={setText} busy={busy} />
+          {turns.length === 0 && <p className="hidden text-center text-caption-strong text-(--neutral-200) desk:block">Civic Pulse AI may not be 100% accurate and shouldn&apos;t be considered legal advice. <span className="underline">Terms of service</span></p>} {/* Figma landing (owner, 2026-11-17): a note under the composer, 12 px away, `caption-strong` / `neutral-200`, the last words underlined (no link yet) */}
         </form>
       </CardContent>
     </Card>
@@ -198,7 +220,7 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, o
         <ModuleOffer key={`${o.type}-${o.problemId}`} offer={o} />
       ))}
       {result.highlightIds.length > 0 && (
-        <Button size="sm" variant="ghost" className="self-start" onClick={() => onToggle(!shown)}>
+        <Button size="sm" variant="outline" className="self-start border-[0.5px] border-(--neutral-400) bg-(--neutral-900) px-3" onClick={() => onToggle(!shown)}> {/* answer actions are outline small buttons (owner's Figma, 2026-11-17) */}
           {shown ? 'Clear map highlight' : 'Show on map'}
         </Button>
       )}

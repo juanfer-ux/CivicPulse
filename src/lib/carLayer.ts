@@ -34,13 +34,13 @@ const LIFT_MULT = import.meta.env.DEV ? Number(new URLSearchParams(location.sear
 const STATUS_LIFT: Record<string, number> = { active: 4, monitoring: 3, resolved: 2, archived: 2 }
 const liftOf = (status: string) => (STATUS_LIFT[status] ?? 4) / LIFT_MULT
 /** The cars are drawn this multiple of their original size (owner, 2026-11-15: 25 % bigger than the original, 1.25; a 0.25 quarter-size try was rolled back). Their warnings keep the height they had on screen, so the lift in model units is divided by it. */
-const CAR_SCALE = 1.875 // 1.25 x 1.5 (owner, 2026-11-16: everything 0.5x more)
+const CAR_SCALE = 1.40625 // 1.875 x 0.75 (owner, 2026-11-17: 0.25x smaller); 1.25 x 1.5 before (owner, 2026-11-16: everything 0.5x more)
 const LIFT = 2.2 // the warning floats at this many car heights above the ground (the roof is at 1)
 
 /** The car's size against the old flat car's curve (owner, 2026-11-15: 10 % bigger). */
 const SCALE = 1.2
 const SCALE_BADGE = 1.1 // the triangle grows with the car
-const DUMP_SCALE = 1.35 // 0.9 x 1.5 (owner, 2026-11-16: everything 0.5x more) // halved on 2026-11-15 (owner: bags half size; 1.8 before, 0.6, 0.3 at the start; the warning height is copied from the car, so it does not move) // tripled again on 2026-11-15 (owner: still too small; the warning keeps its height, lift 0.85 / 3); 0.6 before, 0.3 until then // doubled on 2026-11-15 (owner: the bags 2x their size; the warning keeps its height, so the lift below is halved); it was 0.3 // a dumping composition is drawn this much bigger than a car on screen: it is low and wide, and its black bags are hard to see (owner, 2026-11-15: 1.5 first, 3 when it looked small, then back to 1.5, half, once the bags were big piles; then 0.75, half again, with one bag; then 0.3)
+const DUMP_SCALE = 1.51875 // 1.0125 x 1.5 (owner, 2026-11-17: the yellow container and every bag model 0.5x bigger; it was 1.35 x 0.75 first, the cars' 0.25x smaller); 0.9 x 1.5 (owner, 2026-11-16: everything 0.5x more) // halved on 2026-11-15 (owner: bags half size; 1.8 before, 0.6, 0.3 at the start; the warning height is copied from the car, so it does not move) // tripled again on 2026-11-15 (owner: still too small; the warning keeps its height, lift 0.85 / 3); 0.6 before, 0.3 until then // doubled on 2026-11-15 (owner: the bags 2x their size; the warning keeps its height, so the lift below is halved); it was 0.3 // a dumping composition is drawn this much bigger than a car on screen: it is low and wide, and its black bags are hard to see (owner, 2026-11-15: 1.5 first, 3 when it looked small, then back to 1.5, half, once the bags were big piles; then 0.75, half again, with one bag; then 0.3)
 const FRONT = Math.PI // the HR-V's front faces south in its own file (seen on screen), so turn it half a circle to point north at heading 0
 
 /** A radial blob (owner, 2026-11-15): first softer, then, with the lighting right, less blur: it stays dark to half way out, then falls to nothing over the outer fifth, so the ellipse has a defined edge. */
@@ -218,8 +218,8 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
             comp.add(heap)
           } else {
             // each bag is centred on its own origin with its base at 0, so a pivot can turn it in place
-            const parts = bags.map((g) => {
-              const bag = bagOf(g, 0.5)
+            const parts = bags.map((g, i) => {
+              const bag = bagOf(g, [0.375, 0.5, 0.75][i]) // owner, 2026-11-17: the can with the blue lid (0, `concrete_trash_bin`) x 0.75 (0.25x smaller), the yellow container (1) as it was, the black bags (2, `unnamed_882c52`) x 1.5 (0.5x bigger)
               const box = new Box3().setFromObject(bag)
               const mid = box.getCenter(new Vector3())
               bag.position.set(-mid.x, -box.min.y, -mid.z)
