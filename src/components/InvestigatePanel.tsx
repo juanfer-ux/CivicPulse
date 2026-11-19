@@ -25,10 +25,10 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
   const end = useRef<HTMLDivElement>(null)
   const star = useRef<SVGSVGElement>(null)
   const onLanding = turns.length === 0
-  // The star glow breathes (owner, 2026-11-17): its opacity eases from 0.4 down to 0.32 (20 % less) and back, 3.5 s each way, forever; still with reduced motion. It lives only on the landing, so the loop stops when a conversation starts.
+  // The star glow breathes (owner, 2026-11-17): its opacity eases from 0.4 down to 0.12 and back, 3 s each way, forever (0.32 was almost invisible, owner 2026-11-17); still with reduced motion. It lives only on the landing, so the loop stops when a conversation starts.
   useEffect(() => {
     if (!onLanding || !star.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const tween = gsap.fromTo(star.current, { opacity: 0.4 }, { opacity: 0.32, duration: 3.5, ease: 'sine.inOut', repeat: -1, yoyo: true })
+    const tween = gsap.fromTo(star.current, { opacity: 0.4 }, { opacity: 0.12, duration: 3, ease: 'sine.inOut', repeat: -1, yoyo: true })
     return () => { tween.kill() }
   }, [onLanding])
 
