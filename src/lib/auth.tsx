@@ -1,3 +1,5 @@
+import { warmDashboardData } from '@/lib/incidents'
+import { warmProblems } from '@/lib/problems'
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { arrivedByRecovery, supabase } from '@/lib/supabase'
@@ -54,6 +56,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const userId = session?.user.id
+  useEffect(() => {
+    if (!userId) return
+    warmDashboardData() // the dashboard's reads start now, not after the profile, the permissions and the app chunk (speed check, 2026-11-17)
+    warmProblems()
+  }, [userId])
   useEffect(() => {
     if (!userId) return
     let stale = false

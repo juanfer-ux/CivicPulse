@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { take, warm } from '@/lib/warm'
 import { polishIncident, type Incident } from '@/lib/incidents'
 import { sentenceCase, titleCase } from '@/lib/titleCase'
 import type { ProblemStatus } from '@/lib/statusColors'
@@ -25,7 +26,7 @@ export interface ProblemRow {
 }
 
 /** Every problem the signed-in user may see. Throws when the problems layer is not in the database yet (the caller then shows incidents only). */
-export async function fetchProblems(): Promise<ProblemRow[]> {
+async function loadProblems(): Promise<ProblemRow[]> {
   const [problems, stats] = await Promise.all([
     supabase.from('problems').select('id, reference, title, category, locality_code, lat, lng, location_description, status').is('merged_into', null),
     supabase.from('problem_stats').select('problem_id, occurrences_n, recurrences_n, reports_n, interventions_n, uncertain_n, first_seen, last_seen, quiet'),
@@ -53,11 +54,15 @@ export async function fetchProblems(): Promise<ProblemRow[]> {
 
 /** Ids of the incidents a problem already stands for (confirmed links): the map hides them, the problem represents them. Throws when the layer is not in the database yet. */
 /** Incident id -> the problem it is confirmed into. */
-export async function fetchLinkedIncidentIds(): Promise<Map<string, string>> {
+async function loadLinkedIncidentIds(): Promise<Map<string, string>> {
   const { data, error } = await supabase.from('incident_current_link').select('incident_id, problem_id').eq('state', 'confirmed')
   if (error) throw error
   return new Map((data ?? []).map((r) => [r.incident_id as string, r.problem_id as string]))
 }
+
+export const fetchProblems = () => take('problems', loadProblems)
+export const fetchLinkedIncidentIds = () => take('linked', loadLinkedIncidentIds)
+export const warmProblems = () => (warm('problems', loadProblems), warm('linked', loadLinkedIncidentIds))
 
 export interface OccurrenceRow {
   occurrence_id: string

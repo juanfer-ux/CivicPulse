@@ -1,5 +1,6 @@
 import { sentenceCase, titleCase } from '@/lib/titleCase'
 import { supabase } from '@/lib/supabase'
+import { take, warm } from '@/lib/warm'
 import type { Group } from '@/lib/statusColors'
 
 export type IncidentStatus =
@@ -86,7 +87,7 @@ export function groupOf(status: IncidentStatus): Group {
 export const label = (value: string) => titleCase(value.replace(/_/g, ' '))
 
 /** RLS decides which rows come back: a user only receives incidents in their scope. */
-export async function fetchDashboardData() {
+async function loadDashboardData() {
   const [incidents, localities, categories] = await Promise.all([
     supabase.from('incidents').select('*').order('occurred_at', { ascending: false }).limit(1000),
     supabase.from('localities').select('code, name').order('code'),
@@ -101,6 +102,9 @@ export async function fetchDashboardData() {
     categories: (categories.data as Category[]).map((c) => ({ ...c, name: titleCase(c.name) })),
   }
 }
+
+export const fetchDashboardData = () => take('dashboard', loadDashboardData)
+export const warmDashboardData = () => warm('dashboard', loadDashboardData)
 
 export async function fetchLocalities() {
   const { data, error } = await supabase.from('localities').select('code, name').order('code')
