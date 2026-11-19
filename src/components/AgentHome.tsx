@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from 'react'
 import { Car, CarSimple, Sparkle, Trash, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wrench, type Icon } from '@phosphor-icons/react'
 import { SUGGESTIONS, WORTH_INVESTIGATING } from '@/lib/agent'
 import { useAuth } from '@/lib/auth'
+import { Alert } from '@/components/ui/alert'
 
 /** The agent panel's landing (owner's Figma, 2026-11-12: Agent Panel, Welcome_Module, CatchUp_Module, Worth-Investigating_Module, Quick Questions): a greeting and three sections, each a Welcome_Module with a title row and a caret that folds it. Data overview and the category pictures are still placeholders (Figma's numbers); the questions are real and ask the agent. */
 /** The Quick suggestions section and its Shift + 1 to 5 keys (owner, 2026-11-16: switched off for now). Set to true to bring them back. */
@@ -17,17 +18,17 @@ const TOPIC_ICON: Icon[] = [Warning, MapPin, Clock, ArrowsClockwise, Compass]
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-6">
-      <h3 className="font-display-semi text-display-xs text-(--neutral-100)">{title}</h3>
+      <h3 className="font-display-semi text-display-xs text-(--neutral-200)">{title}</h3>
       {children}
     </section>
   )
 }
 
-/** The category cards' icons (owner's Figma, 2026-11-14): Phosphor duotone, 25.6 px, `indigo-300`, on a `neutral-900` block. */
+/** The category cards' icons (owner's Figma, 2026-11-14): Phosphor duotone, 25.6 px, `neutral-100` since 2026-11-17 (it was `indigo-300`), on a `neutral-900` block. */
 const CATEGORY_ICON: Record<string, Icon> = { 'Obstructive Parking': CarSimple, 'Illegal Dumping': Trash, 'Damaged Infrastructure': Wrench }
 
 /** Figma Data_Card_Small / Data_Card_Medium: 6 px radius, `neutral-900` fill, 0.5 px `neutral-600` line, 8 px padding and a name in `body-sm`. */
-const dataCard = 'flex flex-col gap-1 rounded-md border-[0.5px] border-(--neutral-600) bg-(--neutral-900)' // Figma data cards (owner, 2026-11-16): a `neutral-900` fill again (it was none since 2026-11-15) and a 0.5 px `neutral-600` line inside (it was `neutral-500`)
+const dataCard = 'flex flex-col gap-1 rounded-md border-[0.5px] border-(--neutral-700) bg-(--neutral-900)' // Figma data cards (owner, 2026-11-16): a `neutral-900` fill again (it was none since 2026-11-15) and a 0.5 px `neutral-600` line inside (it was `neutral-500`)
 const cardName = 'p-1 text-meta text-(--neutral-200)'
 
 function Donut() {
@@ -61,20 +62,16 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
     return () => document.removeEventListener('keydown', onKey)
   }, [ask])
   return (
-    <div className="flex flex-col gap-16"> {/* Figma Conversation body (owner, 2026-11-17): the summary card, then the dashboard, 64 px apart */}
-      <div className="hidden items-center gap-4 rounded-sm bg-(--indigo-800) px-3 py-4 desk:flex"> {/* Figma Summary row (owner, 2026-11-17): it moved from a strip under the title row into the body: a 720 px card, `indigo-800`, 4 px radius, 12 px at the sides and 16 above and below, a `sparkle` fill icon (`indigo-300`) and the note in `body-sm` / `brand-primary`, which may wrap */}
-        <span className="flex items-center gap-4 px-2">
-          <Sparkle weight="fill" className="size-5 shrink-0 text-(--indigo-300)" aria-hidden />
-          <p className="text-body-sm text-(--brand-primary)">CivicPulse AI groups related reports into patterns. Nothing goes to the authorities until you’ve reviewed it.</p>
-        </span>
-      </div>
-      <div className="flex flex-col gap-12 px-2.5 py-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
-      <div className="flex flex-col gap-4"> {/* Figma Frame 2147225884 (owner, 2026-11-17): the greeting, then "You're ready to investigate and coordinate incident response" in `display-sm` / `neutral-200`, 16 px apart; the place text left the header */}
+    <div className="flex flex-1 flex-col gap-10"> {/* Figma Conversation body (owner, 2026-11-17, latest): the summary card, then the dashboard, 40 px apart (it was 64) */}
+      <Alert variant="info" icon={<Sparkle weight="fill" className="size-5 text-(--indigo-300)" aria-hidden />} className="mx-auto hidden max-w-[700px] desk:flex"> {/* Figma Alert, variant info (owner, 2026-11-17): the summary card, 700 px at most and centered; the icon is `indigo-300` (below) */}
+        CivicPulse AI groups related reports into patterns. Nothing goes to the authorities until you’ve reviewed it.
+      </Alert>
+      <div className="flex flex-1 flex-col justify-center gap-16 px-2.5 py-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
+      <div className="flex flex-col gap-4"> {/* (the line under the greeting is hidden in Figma now, owner 2026-11-17, so it is gone) Figma Frame 2147225884 (owner, 2026-11-17): the greeting, then "You're ready to investigate and coordinate incident response" in `display-sm` / `neutral-200`, 16 px apart; the place text left the header */}
         <h2 className="font-display text-display-md text-(--neutral-100)">Welcome back,{first ? ` ${first},` : ''}</h2>
-        <p className="font-display text-display-sm text-(--neutral-200)">You&apos;re ready to investigate and coordinate incident response</p>
       </div>
-      <div className="flex flex-col gap-8"> {/* Figma Frame 2147225871 (owner, 2026-11-16, latest): "Let's catch up" and the modules, 32 px apart (it was 24); the greeting is 64 px above them, the group has 16 px above and below and 10 at the sides (700 px wide) */}
-      <Section title="Let's catch up">
+      <div className="flex flex-col gap-12"> {/* Figma Dashboard modules (owner's Figma, 2026-11-17, checked): "Here's what's happening" and "Recurrences to investigate" are 48 px apart (the code had 32); before that, Figma Frame 2147225871 (2026-11-16): the modules 32 px apart (it was 24); the greeting is 64 px above them, the group has 16 px above and below and 10 at the sides (700 px wide) */}
+      <Section title="Here's what's happening">
           <div className="flex flex-wrap items-center gap-3"> {/* Figma CatchUp_Module2 (owner, 2026-11-15, checked again later that day): a wrapping row, 12 px across and 12 px between wrapped rows, items centered; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
             <div className="@container min-w-[180px] flex-1 basis-0">
               {/* The two small cards stack in a column beside the medium card, and sit side by side once the group has the whole width, i.e. when the medium card has dropped below (owner, 2026-11-15; the panel at its minimum width) */}
@@ -118,8 +115,8 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
                   <button key={c.title} type="button" className="group flex min-w-[120px] flex-1 cursor-pointer flex-col items-start justify-end gap-4 rounded-md bg-(--neutral-700) p-3 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(c.question)}> {/* Figma Category_Card2 (owner, 2026-11-15): vertical, neutral-700, 6 px radius, 12 px padding, 16 px between the icon (24 px, top left) and the name (Fill width, Hug height, neutral-200, wraps) and the name; no inner block. Rollover (owner's try): neutral-600 and the icon turns filled */}
                     {Icon && (
                       <span className="grid size-6 place-items-center">
-                        <Icon weight="duotone" className="size-6 text-(--indigo-300) group-hover:hidden group-focus-visible:hidden" aria-hidden />
-                        <Icon weight="fill" className="hidden size-6 text-(--indigo-300) group-hover:block group-focus-visible:block" aria-hidden />
+                        <Icon weight="duotone" className="size-6 text-(--neutral-100) group-hover:hidden group-focus-visible:hidden" aria-hidden />
+                        <Icon weight="fill" className="hidden size-6 text-(--neutral-100) group-hover:block group-focus-visible:block" aria-hidden />
                       </span>
                     )}
                     <span className="w-full max-w-[88px] text-body-sm-medium text-(--neutral-200)">{c.title}</span>
