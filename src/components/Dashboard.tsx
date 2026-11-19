@@ -78,6 +78,9 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   const [filters, setFilters] = useState<Filters>(NO_FILTERS)
   const [filtersOpen, setFiltersOpen] = useState(false)
   useEffect(() => {
+    window.dispatchEvent(new CustomEvent('filters-open', { detail: filtersOpen })) // the sidebar steps aside while the filters are open on a narrow viewport (owner, 2026-11-17)
+  }, [filtersOpen])
+  useEffect(() => {
     if (!filtersOpen) return
     const esc = (e: KeyboardEvent) => e.key === 'Escape' && setFiltersOpen(false)
     document.addEventListener('keydown', esc)
@@ -346,10 +349,10 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. The banner sits under the filters row (owner, 2026-11-15; it was above the stat cards, then between them and the filters row); while an incident or recurrence is open the stat cards and filters are hidden, so it goes back to the top and the panel sits below it (`--banner-offset`, owner, 2026-11-07). */}
       {chatMode && (
-        <div data-float className={`fixed inset-x-0 top-[53px] ${!selected && !selectedProblem ? 'md:max-desk:top-[221px]' : ''} z-10 flex h-(--answer-banner-h) items-center gap-3 bg-(--indigo-600) px-2.5 text-meta text-(--indigo-100) desk:absolute ${selected || selectedProblem ? 'desk:top-(--map-pad)' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--control-default)+16px)]'} desk:right-(--col-right) desk:left-(--col-left) desk:inset-x-auto desk:rounded-md`}>
+        <div data-float className={`fixed inset-x-0 top-[53px] ${!selected && !selectedProblem ? 'md:max-desk:top-[221px]' : ''} z-10 flex h-(--answer-banner-h) items-center gap-1 bg-(--indigo-800) px-2 text-meta text-(--indigo-100) justify-center desk:absolute ${selected || selectedProblem ? 'desk:top-(--map-pad)' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--control-default)+16px)]'} desk:right-(--col-right) desk:left-(--col-left) desk:inset-x-auto desk:rounded-sm`}>
           <span className="grid size-9 shrink-0 place-items-center"><ChatCircleDots weight="fill" className="size-5 text-(--indigo-200)" aria-hidden /></span>
-          <span className="flex-1">While showing the agent's answer on the map, filters will narrow it down.</span>
-          <Button variant="secondary" className="ring-[0.5px] ring-(--neutral-100)" onClick={onClearHighlight}> {/* Figma: the default 36 px size, a 0.5 px neutral-100 line outside, 16 px at the sides */}
+          <span>While showing the agent's answer on the map, filters will narrow it down.</span>
+          <Button size="sm" variant="outline" className="ml-7 border-[0.5px] border-(--neutral-400) bg-(--neutral-900) px-3" onClick={onClearHighlight}> {/* Figma (owner, 2026-11-17): outline, small (32 px), `neutral-900` fill, a 0.5 px `neutral-400` line, 12 px at the sides */}
             Clear agent results
           </Button>
         </div>
@@ -437,7 +440,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         className={`${tab !== 'explore' ? 'flex' : 'hidden md:max-desk:flex'} desk:transition-[width] desk:duration-300 min-h-0 flex-1 flex-col desk:pointer-events-none desk:absolute desk:top-0 desk:bottom-0 desk:left-0 desk:z-30 desk:flex desk:w-(--agent-w) desk:flex-none desk:pl-(--sidebar-gap)`}
       >
         {/* Outer container: no padding outside the panel any more (owner, 2026-11-15; it had the 12 px float padding since 2026-11-06): the sidebar and the agent panel touch the window's top, bottom and left edges. */}
-        <div data-float data-agent-panel className="relative flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:backdrop-blur-[32px] desk:border-r desk:border-r-(--neutral-600) desk:bg-(--neutral-900) desk:p-0">
+        <div data-float data-agent-panel className="relative flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:backdrop-blur-[32px] desk:border-r-[0.5px] desk:border-r-(--neutral-500) desk:bg-(--neutral-900) desk:p-0">
           {agentOff ? (
             <button type="button" aria-label="Open agent" title="Open agent" onClick={() => onAgentOff(false)} className="hidden h-full w-full flex-col items-center gap-3 py-4 text-(--neutral-200) hover:text-(--neutral-100) desk:flex">
               <Sparkle className="size-4" />

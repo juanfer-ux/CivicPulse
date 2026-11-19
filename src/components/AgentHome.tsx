@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
-import { Car, CarSimple, Trash, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wrench, type Icon } from '@phosphor-icons/react'
+import { Car, CarSimple, Sparkle, Trash, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wrench, type Icon } from '@phosphor-icons/react'
 import { SUGGESTIONS, WORTH_INVESTIGATING } from '@/lib/agent'
 import { useAuth } from '@/lib/auth'
 
@@ -61,14 +61,17 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
     return () => document.removeEventListener('keydown', onKey)
   }, [ask])
   return (
-    <div className="flex flex-col"> {/* Figma Dashboard (owner, 2026-11-17): fills the body with one group inside; the composer is no longer here, it is pinned at the bottom of the panel */}
-      <div className="flex flex-col gap-16 px-2.5 py-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
-      <div className="flex flex-wrap items-center justify-between gap-x-9 gap-y-2"> {/* Figma Welcome Message (owner, 2026-11-16, latest): "Welcome back," at the left and the place at the right, space between, 36 px apart, centered on each other */}
-        <h2 className="font-display text-display-md text-(--neutral-100)">Welcome back{first ? ` ${first}` : ''},</h2>
-        <p className="flex items-center gap-2 text-body whitespace-nowrap text-(--neutral-200)"> {/* Figma (latest): `map-pin` regular 18 px `neutral-300`, 8 px, then "Bogotá, Colombia" in display-xs (16 / 20) `neutral-200`; it was display-sm `neutral-100` */}
-          <MapPin weight="regular" className="size-[18px] text-(--neutral-300)" aria-hidden />
-          Bogotá, Colombia
-        </p>
+    <div className="flex flex-col gap-16"> {/* Figma Conversation body (owner, 2026-11-17): the summary card, then the dashboard, 64 px apart */}
+      <div className="hidden items-center gap-4 rounded-sm bg-(--indigo-800) px-3 py-4 desk:flex"> {/* Figma Summary row (owner, 2026-11-17): it moved from a strip under the title row into the body: a 720 px card, `indigo-800`, 4 px radius, 12 px at the sides and 16 above and below, a `sparkle` fill icon (`indigo-300`) and the note in `body-sm` / `brand-primary`, which may wrap */}
+        <span className="flex items-center gap-4 px-2">
+          <Sparkle weight="fill" className="size-5 shrink-0 text-(--indigo-300)" aria-hidden />
+          <p className="text-body-sm text-(--brand-primary)">CivicPulse AI groups related reports into patterns. Nothing goes to the authorities until you’ve reviewed it.</p>
+        </span>
+      </div>
+      <div className="flex flex-col gap-12 px-2.5 py-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
+      <div className="flex flex-col gap-4"> {/* Figma Frame 2147225884 (owner, 2026-11-17): the greeting, then "You're ready to investigate and coordinate incident response" in `display-sm` / `neutral-200`, 16 px apart; the place text left the header */}
+        <h2 className="font-display text-display-md text-(--neutral-100)">Welcome back,{first ? ` ${first},` : ''}</h2>
+        <p className="font-display text-display-sm text-(--neutral-200)">You&apos;re ready to investigate and coordinate incident response</p>
       </div>
       <div className="flex flex-col gap-8"> {/* Figma Frame 2147225871 (owner, 2026-11-16, latest): "Let's catch up" and the modules, 32 px apart (it was 24); the greeting is 64 px above them, the group has 16 px above and below and 10 at the sides (700 px wide) */}
       <Section title="Let's catch up">

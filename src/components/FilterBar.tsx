@@ -1,6 +1,6 @@
 import { Car, Circle, DotsThree, Trash, TrafficSignal, Warning, Wheelchair } from '@phosphor-icons/react'
 import type { ComponentType } from 'react'
-import { Chip } from '@/components/ui/chip'
+import { SelectorChip } from '@/components/ui/selector-chip'
 import type { Category } from '@/lib/incidents'
 import type { Group, ProblemStatus } from '@/lib/statusColors'
 
@@ -36,7 +36,6 @@ export const PLANNED: Category[] = [
 
 /** What the map shows (owner, 2026-10-30): problems, incidents or both. Both is `[]`. */
 /** The two map toggles are pressed with a 2 px `neutral-300` line (owner's Figma, Map Legend chips, 2026-11-15); other chips keep the 1 px `neutral-100`. */
-const PRESSED = 'aria-pressed:border-2 aria-pressed:border-(--neutral-300)'
 
 export const typesOn = (filters: Filters, hasProblems: boolean) => ({
   problems: hasProblems && (!filters.types.length || filters.types.includes('problems')),
@@ -65,12 +64,12 @@ export function MapTypeChips({ filters, onChange, problemCount, incidentCount }:
   }
   return (
     <div role="group" aria-label="What the map shows" className="flex items-center gap-2">
-      <Chip className={PRESSED} pressed={on.problems} icon={<Warning weight="fill" className={`size-[18px]! ${ICON_OUTLINE}`} aria-hidden />} count={problemCount} onClick={() => toggle('problems')}>
+      <SelectorChip selected={on.problems} icon={<Warning weight="fill" className={`size-[18px]! ${ICON_OUTLINE}`} aria-hidden />} count={problemCount} onClick={() => toggle('problems')}>
         Recurrences
-      </Chip>
-      <Chip className={PRESSED} pressed={on.incidents} icon={<Circle weight="fill" className={ICON_OUTLINE} aria-hidden />} count={incidentCount} onClick={() => toggle('incidents')}>
+      </SelectorChip>
+      <SelectorChip selected={on.incidents} icon={<Circle weight="fill" className={ICON_OUTLINE} aria-hidden />} count={incidentCount} onClick={() => toggle('incidents')}>
         Incidents
-      </Chip>
+      </SelectorChip>
     </div>
   )
 }

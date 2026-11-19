@@ -2,10 +2,11 @@ import { activeRow, type Pick } from '@/lib/sidebarActive'
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
 import { useNoSelect } from '@/lib/useNoSelect'
-import { Check, CaretDown, CaretRight, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, FunnelSimple, SignOut, Sparkle, Warning, X } from '@phosphor-icons/react'
+import { Check, CaretDown, CaretRight, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
+import { NARROW_VIEWPORT } from '@/components/AgentResizer'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -162,9 +163,9 @@ function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row, children,
 }
 
 const WIDTH_KEY = 'sidebar-width'
-const SIDEBAR_MIN = 260 // min width of the expanded Sidebar (owner's Figma, 2026-11-12; it was 245 since 2026-10-30, 260, 266, 262, 240, briefly 220)
+const SIDEBAR_MIN = 320 // 320 in the big sidebar pass of 2026-11-17 (Figma 320 wide), 300 earlier that day; min width of the expanded Sidebar (owner's Figma, 2026-11-17: 300, as drawn; 260 since 2026-11-12; it was 245 since 2026-10-30, 260, 266, 262, 240, briefly 220)
 const SIDEBAR_MAX = 380 // Figma max width (was 340)
-const SIDEBAR_DEFAULT = 260 // the width it opens at (owner's Figma, 2026-11-12; it was 300, 245 and 284 before)
+const SIDEBAR_DEFAULT = 320 // 320 (Figma, 2026-11-17), 300 earlier that day; the width it opens at (owner's Figma, 2026-11-17: 300; 260 since 2026-11-12; it was 300, 245 and 284 before)
 const clampWidth = (n: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, n))
 const readWidth = () => {
   try {
@@ -224,23 +225,16 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
   )
 }
 
-const COLLAPSED_W = 60 // owner's Figma, 2026-11-16 (it was 56, and 64 before)
+const COLLAPSED_W = 0 // collapsed, the sidebar disappears (owner, 2026-11-17): the agent panel's header shows the logo and the expand button instead; it was a 60 px rail (56 and 64 before)
 /** The sidebar always starts collapsed (owner, 2026-11-16: it was collapsed under 1,800 px, or by what was saved in this browser). Dropping under 1,800 px collapses it; it never expands by itself, the toggle does. */
 const NARROW = '(max-width: 1799.98px)'
 
-/** Collapsed, the logo mark is the expand button: on hover or focus it swaps for the panel icon (owner, 2026-10-30). */
-function Brand({ collapsed, onToggle }: { collapsed: boolean; onToggle?: () => void }) {
-  if (collapsed && onToggle)
-    return (
-      <Button variant="ghost" className="group size-11 p-0" aria-label="Expand menu" title="Expand menu" onClick={onToggle}>
-        <img src={mark} alt="" width={42.94} height={42.94} className="shrink-0 group-hover:hidden group-focus-visible:hidden" /> {/* 42.94 px in the collapsed sidebar (owner's Figma, 2026-11-17, latest; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before) */}
-        <SidebarSimple weight="regular" className="hidden size-5 shrink-0 -scale-x-100 group-hover:block group-focus-visible:block" />
-      </Button>
-    )
+/** The logo. The expand button is not here any more: collapsed, it is in the agent panel's title row, left of "Explore" (owner, 2026-11-17; before, the logo mark swapped for it on hover). */
+function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={`flex items-center gap-[8.05px]`}>
-      <img src={mark} alt="" width={38.92} height={38.92} className="shrink-0" />
-      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={159} height={12.07} className="shrink-0" />}
+    <div className={`flex items-center gap-3 ${collapsed ? '' : 'pl-[1.38px]'}`}>
+      <img src={mark} alt="" width={40} height={40} className="shrink-0" /> {/* 40 px, expanded and collapsed (owner's Figma, 2026-11-17, the big sidebar pass; 42.94 collapsed and 38.92 expanded before; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before), 38.92 expanded */}
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={163.45} height={12.41} className="shrink-0" />}
     </div>
   )
 }
@@ -295,7 +289,7 @@ function MobileBrand() {
 }
 
 /** The menu itself, as in Figma Sidebar (2026-10-29): a 70 px header with the logo and the collapse button, the Investigations and Cases groups, and at the bottom the account row. Used by the desktop column and the phone slide-out. */
-function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, onNewCase, recurrences: real = [], incidents = [], chatItems = [], onOpenRecurrence, onOpenIncident, selected, onToggle, agentOff, onToggleAgent }: Chats & { collapsed: boolean; onToggle?: () => void }) {
+function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, onNewCase, recurrences: real = [], incidents = [], chatItems = [], onOpenRecurrence, onOpenIncident, selected, onToggle }: Chats & { collapsed: boolean; onToggle?: () => void }) {
   const { profile, session, signOut } = useAuth()
   const name = shortName(profile?.full_name) || 'Signed in'
   const email = session?.user?.email
@@ -316,29 +310,18 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
-        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-17 justify-between bg-(--neutral-700) px-2.5'}`}>
-          <Brand collapsed={collapsed} onToggle={onToggle} />
+        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-17 justify-between bg-(--neutral-700) px-3'}`}>
+          <Brand collapsed={collapsed} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
               <SidebarSimple weight="regular" className="size-5 shrink-0" />
             </Button>
           )}
         </div>
-        {collapsed && onToggleAgent && (
-          // owner's Figma, 2026-11-16: under the 64 px header, 16 px down, a column of 32 px ghost buttons (1 px `neutral-600` line, `neutral-900` fill, 4 px radius, `sparkle` fill 16 px); the first opens or collapses the agent panel; the second is Figma's, with no action yet.
-          <div className="flex flex-col items-center gap-6 pt-4">
-            <Button type="button" size="icon" variant="ghost" aria-label={agentOff ? 'Open agent' : 'Collapse agent'} title={agentOff ? 'Open agent' : 'Collapse agent'} onClick={onToggleAgent} className="size-8 rounded border border-(--neutral-600) bg-(--neutral-900) hover:bg-(--neutral-700)">
-              <Sparkle weight="fill" className="size-4" aria-hidden />
-            </Button>
-            <Button type="button" size="icon" variant="ghost" aria-label="Agent shortcut" title="Agent shortcut" className="size-8 rounded border border-(--neutral-600) bg-(--neutral-900) hover:bg-(--neutral-700)"> {/* Figma's second button (owner, 2026-11-16: "include it"); what it does is not decided, so it has no action yet */}
-              <Sparkle weight="fill" className="size-4" aria-hidden />
-            </Button>
-          </div>
-        )}
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
-            <div className="flex shrink-0 flex-col gap-4 border-b border-(--neutral-500) px-3 pt-4 pb-3">
+            <div className="flex shrink-0 flex-col gap-8 border-b border-(--neutral-500) px-4 py-6">
               <div>
                 <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-800) border-(--neutral-400) text-body-sm" />
               </div>
@@ -349,7 +332,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
               </Button>
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
-              <div className="flex flex-col gap-2.5 py-2">
+              <div className="flex flex-col gap-5 py-4">
                 <Section title="Recurrences" items={recurrences} addLabel="New recurrence" onAdd={onNewCase} views pb="pb-2.5" empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
                     <ViewList items={recurrences} limit={3} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
@@ -377,10 +360,10 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
           </>
         )}
       </div>
-      <div className={`flex shrink-0 flex-col border-t border-(--neutral-600) ${collapsed ? 'items-center justify-center py-5' : 'py-3'}`}>
+      <div className={`flex shrink-0 flex-col border-t border-(--neutral-600) ${collapsed ? 'items-center justify-center py-5' : 'py-2.5'}`}>
         {collapsed ? (
           <>
-            <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar size="sm" name={profile?.full_name || 'Signed in'} title={name} />} />
+            <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} title={name} />} />
           </>
         ) : (
           <div className="flex items-center gap-3 py-1 pl-4 pr-5">
@@ -418,12 +401,12 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
 
   const [width, setWidth] = useState(readWidth)
   const aside = useRef<HTMLElement>(null)
-  const shownWidth = useRef(0) // the width on the last render: where a collapse or expand starts from (a drag changes it without animating)
+  const shownWidth = useRef(-1) // the width on the last render: where a collapse or expand starts from (a drag changes it without animating)
   // Collapse and expand: a GSAP tween of the width, 0.32 s (owner, 2026-11-08: a little slower than the 0.2 s before), the same opening and closing; the content is clipped while it runs.
   useLayoutEffect(() => {
     const el = aside.current
     const to = collapsed ? COLLAPSED_W : width
-    if (el && shownWidth.current && shownWidth.current !== to && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (el && shownWidth.current >= 0 && shownWidth.current !== to && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       gsap.fromTo(el, { width: shownWidth.current, overflow: 'hidden' }, { width: to, duration: 0.32, ease: 'power2.out', clearProps: 'overflow' })
     }
   }, [collapsed]) // eslint-disable-line react-hooks/exhaustive-deps -- only the toggle animates, not a drag of the width
@@ -431,9 +414,31 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
     shownWidth.current = collapsed ? COLLAPSED_W : width
   })
   useLayoutEffect(() => {
-    document.documentElement.style.setProperty('--sidebar-now', `${collapsed ? COLLAPSED_W : width}px`) // read by App for the agent panel's maximum width
-    window.dispatchEvent(new Event('sidebar-now'))
+    document.documentElement.toggleAttribute('data-sidebar-collapsed', collapsed) // the agent panel's expand button shows only while this is set
   }, [collapsed, width])
+  // Narrow viewport (1,600 px or below, owner 2026-11-17): with the sidebar and the agent panel both open, opening the filters collapses the sidebar, and closing them (or applying) brings it back as it was.
+  const live = useRef({ collapsed, agentOff: props.agentOff })
+  live.current = { collapsed, agentOff: props.agentOff }
+  const stepped = useRef(false)
+  useEffect(() => {
+    const on = (e: Event) => {
+      const open = (e as CustomEvent<boolean>).detail
+      if (open && window.matchMedia(NARROW_VIEWPORT).matches && !live.current.collapsed && !live.current.agentOff) {
+        stepped.current = true
+        setCollapsed(true)
+      } else if (!open && stepped.current) {
+        stepped.current = false
+        setCollapsed(false) // the width is kept, so it comes back to its own size
+      }
+    }
+    window.addEventListener('filters-open', on)
+    return () => window.removeEventListener('filters-open', on)
+  }, [])
+  useEffect(() => {
+    const expand = () => (setWidth(SIDEBAR_MIN), setCollapsed(false)) // expanding always opens at the minimum width (owner, 2026-11-17)
+    window.addEventListener('sidebar-expand', expand) // sent by the expand button in the agent panel's title row
+    return () => window.removeEventListener('sidebar-expand', expand)
+  }, [])
   const changeWidth = (px: number) => {
     const w = clampWidth(px)
     setWidth(w)
@@ -445,9 +450,8 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
   }
 
   const toggle = () => {
-    setCollapsed((c) => {
-      return !c
-    })
+    if (collapsed) setWidth(SIDEBAR_MIN) // every expand opens at the minimum width, whatever it was dragged to before (owner, 2026-11-17)
+    setCollapsed(!collapsed)
   }
   // On phones the menu closes after a choice.
   const phone: Chats = { ...props, onPick: (id) => (props.onPick(id), setOpen(false)), onNew: () => (props.onNew(), setOpen(false)), onNewCase: () => (props.onNewCase(), setOpen(false)), onOpenRecurrence: (id) => (props.onOpenRecurrence?.(id), setOpen(false)), onOpenIncident: (id) => (props.onOpenIncident?.(id), setOpen(false)) }
@@ -455,13 +459,11 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
   return (
     <>
       {/* Desktop: a column on the left, expanded or icons only. */}
-      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} className={`relative z-40 hidden shrink-0 desk:block ${collapsed ? 'bg-(--neutral-900) after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-[0.5px] after:bg-(--neutral-600) after:content-[""]' : 'bg-(--neutral-700)'}`}>
+      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} inert={collapsed} className={`relative z-40 hidden shrink-0 overflow-hidden desk:block bg-(--neutral-700)`}>
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
-        <Menu_
-          {...props}
-          collapsed={collapsed}
-          onToggle={toggle}
-        />
+        <div className="h-full" style={{ width }}> {/* the menu stays mounted at its own width and the aside clips it, so collapsing and expanding are the same slide, one the reverse of the other (owner, 2026-11-17); a collapsed one is inert */}
+          <Menu_ {...props} collapsed={false} onToggle={toggle} />
+        </div>
       </aside>
 
       {/* Phones: slim top bar with a menu button, and the menu slides in from the left. */}

@@ -53,11 +53,11 @@ function BarList({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
     <ul className="flex flex-col gap-1.5 text-body-sm" aria-label={summary('Bar list', bars)}>
       {bars.map((b) => (
         <li key={b.label} className="flex items-center gap-3">
-          <button type="button" disabled={!b.code || !onPick} onMouseEnter={() => b.code && onFocus?.(b.code)} onMouseLeave={() => onFocus?.(null)} onClick={() => b.code && onPick?.(b.code)} className="relative h-8 flex-1 overflow-hidden rounded-sm bg-(--neutral-600) text-left enabled:cursor-pointer">
+          <button type="button" disabled={!b.code || !onPick} onMouseEnter={() => b.code && onFocus?.(b.code)} onMouseLeave={() => onFocus?.(null)} onClick={() => b.code && onPick?.(b.code)} className="relative h-8 flex-1 overflow-hidden rounded-sm bg-(--indigo-700) text-left enabled:cursor-pointer">
             <span className="absolute inset-y-0 left-0 rounded-sm opacity-60" style={{ width: `${(b.value / max) * 100}%`, background: COLOR }} />
-            <span className="relative flex h-full items-center px-2 text-foreground">{b.label}</span>
+            <span className="relative flex h-full items-center px-2 text-(--brand-primary)">{b.label}</span>
           </button>
-          <span className="w-8 text-right tabular-nums text-foreground">{b.value}</span>
+          <span className="w-8 text-right text-subtitle-strong tabular-nums text-foreground">{b.value}</span>
         </li>
       ))}
     </ul>
@@ -70,7 +70,7 @@ function Dots({ bars }: { bars: Answer['bars'] }) {
     <ul className="flex flex-col gap-2.5" aria-label={summary('Reports per location', bars)}>
       {bars.map((b) => (
         <li key={b.label} className="flex flex-col gap-1">
-          <span className="flex items-baseline justify-between gap-3 text-meta">
+          <span className="flex items-baseline gap-1.5 text-meta"> {/* Figma Dot Matrix: the count sits right after the name, 6 px (owner, 2026-11-17), it was pushed to the right */}
             <span className="truncate text-muted-foreground">{b.label}</span>
             <span className="shrink-0 tabular-nums text-foreground">{b.value}</span>
           </span>
@@ -101,7 +101,7 @@ function Rows({ bars }: { bars: Answer['bars'] }) {
               <span className="block h-full rounded-full" style={{ width: `${(b.value / max) * 100}%`, background: COLOR }} />
             </span>
           </span>
-          <span className="w-8 text-right tabular-nums text-foreground">{b.value}</span>
+          <span className="w-8 text-right text-subtitle-strong tabular-nums text-foreground">{b.value}</span>
         </li>
       ))}
     </ul>
@@ -123,11 +123,11 @@ function Recurrences({ bars, onPick }: { bars: Answer['bars']; onPick?: (id: str
               </span>
               {b.sub && <span className="truncate text-meta text-muted-foreground">{b.sub}</span>}
               <span className="h-1 rounded-full bg-(--neutral-600)">
-                <span className="block h-full rounded-full" style={{ width: `${(b.value / max) * 100}%`, background: COLOR }} />
+                <span className="block h-full rounded-full" style={{ width: `${(b.value / max) * 100}%`, background: 'var(--indigo-300)' }} />
               </span>
             </span>
-            <span className="flex w-14 flex-col items-end">
-              <span className="tabular-nums text-foreground">{b.value}</span>
+            <span className="flex w-[47px] flex-col items-end">
+              <span className="text-body-sm tabular-nums text-foreground">{b.value}</span>
               <span className="text-meta text-muted-foreground">returns</span>
             </span>
           </button>

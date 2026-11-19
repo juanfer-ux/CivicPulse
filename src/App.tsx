@@ -3,7 +3,7 @@ import { gsap } from 'gsap'
 import { mockChats } from '@/lib/mockChats'
 import { Dashboard, type Tab } from '@/components/Dashboard'
 import type { Area } from '@/lib/agent'
-import { agentMax, AgentResizer } from '@/components/AgentResizer'
+import { AGENT_DEFAULT, agentMaxFor, AgentResizer } from '@/components/AgentResizer'
 import { InvestigatePanel, type Turn } from '@/components/InvestigatePanel'
 import { ModulesProvider } from '@/components/modules/ModulesProvider'
 import { Sidebar, type SidebarIncident, type SidebarRecurrence, type SidebarSelection } from '@/components/Sidebar'
@@ -14,24 +14,17 @@ const useAgentWidth = () => useState<number | null>(null)
 export default function App() {
   const [agentW, setAgentW] = useAgentWidth()
   const [agentOff, setAgentOff] = useState(false) // the agent panel is collapsed to a 44 px rail (owner's try, 2026-11-08; the composer bar was tried first); the panel stays mounted, so the conversation stays
-  const [view, setView] = useState({ win: window.innerWidth, sidebar: 0 }) // the window and the sidebar's width right now; the agent panel's maximum comes from them
+  const [vw, setVw] = useState(window.innerWidth)
   useEffect(() => {
-    let first = true
-    const calc = () => {
-      const sidebar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-now')) || 0
-      if (first && sidebar) { first = false; instant.current = true } // the first real measure (the sidebar has reported) sets the width at once, no glide on load
-      setView({ win: window.innerWidth, sidebar })
-    }
-    calc()
-    window.addEventListener('resize', calc) // the window
-    window.addEventListener('sidebar-now', calc) // the sidebar opened, closed or was resized (sent by Sidebar; a size observer missed it)
-    return () => (window.removeEventListener('resize', calc), window.removeEventListener('sidebar-now', calc))
+    const on = () => setVw(window.innerWidth)
+    window.addEventListener('resize', on)
+    return () => window.removeEventListener('resize', on)
   }, [])
-  const maxW = agentMax(view.win, view.sidebar) // the panel's right edge stops at the middle of the window (owner, 2026-11-13, final)
+  const maxW = agentMaxFor(vw) // 920 at 1,600 px or below, 1,250 above 2,100, 1,100 between (owner, 2026-11-17)
   // The agent panel's width (`--agent-w` on <main>) moves with GSAP (owner, 2026-11-13): when the window or the sidebar change what it may be, it glides to the new width (0.3 s, power2.out, the sidebar's curve); while the handle is dragged it follows the pointer at once.
   const mainRef = useRef<HTMLElement>(null)
   const instant = useRef(true)
-  const target = agentOff ? 56 : Math.min(maxW, agentW ?? maxW) // no saved width: the panel opens at its maximum, the middle of the window, so it is wider with the sidebar collapsed (owner, 2026-11-16; it was 0.345 of the window)
+  const target = agentOff ? 56 : Math.min(maxW, agentW ?? AGENT_DEFAULT) // no dragged width yet: it opens at 920 every time the page loads (owner, 2026-11-17)
   useLayoutEffect(() => {
     const el = mainRef.current!
     const was = parseFloat(el.style.getPropertyValue('--agent-w'))

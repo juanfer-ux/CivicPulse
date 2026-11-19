@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { AGENT_MIN, agentMax } from '@/components/AgentResizer'
+import { AGENT_DEFAULT, AGENT_MIN, agentMaxFor } from '@/components/AgentResizer'
 
-describe('agentMax (the panel you see ends at the middle of the window)', () => {
-  it('is half the window minus the sidebar', () => {
-    expect(agentMax(1880, 260)).toBe(680)
-    expect(agentMax(1880, 64)).toBe(876)
-    expect(agentMax(2560, 260)).toBe(1020)
+describe('agent panel limits', () => {
+  it('the maximum follows the viewport: 920, 1,100, 1,250', () => {
+    expect(agentMaxFor(1440)).toBe(920)
+    expect(agentMaxFor(1600)).toBe(920)
+    expect(agentMaxFor(1601)).toBe(1100)
+    expect(agentMaxFor(1921)).toBe(1100)
+    expect(agentMaxFor(2100)).toBe(1100)
+    expect(agentMaxFor(2101)).toBe(1250)
   })
-  it('never goes under the minimum', () => {
-    expect(agentMax(1200, 260)).toBe(AGENT_MIN)
+  it('opens at 920, between the minimum and every maximum', () => {
+    expect(AGENT_DEFAULT).toBe(920)
+    expect(AGENT_DEFAULT).toBeGreaterThan(AGENT_MIN)
   })
 })

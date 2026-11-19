@@ -5,7 +5,13 @@ import { useNoSelect } from '@/lib/useNoSelect'
 export const AGENT_MIN = 600
 const EDGE = 0 // px between the handle and the panel's visible right edge, inside its padding (owner, 2026-11-13)
 /** The panel you see ends at the middle of the window: half the window minus the sidebar's width at that moment (the sidebar's 12 px margin and the panel's 12 px gap cancel out). */
-export const agentMax = (windowW: number, sidebarW: number) => Math.max(AGENT_MIN, Math.round(windowW / 2 - sidebarW))
+export const AGENT_MAX = 1100 // the most the handle can drag it to (owner, 2026-11-17; 920, 880 and the middle of the window before)
+export const AGENT_DEFAULT = 920 // the width it opens at on every load, landing and map (owner, 2026-11-17); nothing is saved between visits
+export const NARROW_VIEWPORT = '(max-width: 1600px)' // at 1,600 px or below (owner, 2026-11-17) the maximum is 920 and the sidebar steps aside while the filters are open
+export const AGENT_MAX_NARROW = 920
+export const AGENT_MAX_WIDE = 1250 // above 2,100 px (owner, 2026-11-17; it was 1,920 for a few minutes)
+/** The most the agent panel may be for a viewport this wide: 920 at 1,600 px or below, 1,250 above 2,100, 1,100 between (owner, 2026-11-17). */
+export const agentMaxFor = (viewportW: number) => (viewportW <= 1600 ? AGENT_MAX_NARROW : viewportW > 2100 ? AGENT_MAX_WIDE : AGENT_MAX)
 
 /** Drag handle INSIDE the agent panel, along its right edge (owner, 2026-11-12: never outside it; desktop only), in the same `relative` parent as the panel. Reports `--agent-w` in px, always inside the Figma limits; double-click goes back to the automatic width. */
 export function AgentResizer({ max, onChange }: { max: number; onChange: (px: number | null) => void }) {
