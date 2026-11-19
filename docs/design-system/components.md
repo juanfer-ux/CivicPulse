@@ -15,7 +15,7 @@
 | **Card** | bg `card`, border, radius lg, padding 16, gap 12; subtitle title, body description | n/a | `card.tsx` |
 | **Separator** | horizontal, vertical; a 0.5 px line (`--border-width`) in `neutral-500` (`border`) | n/a | `separator.tsx` |
 
-Textarea, Skeleton and Alert exist in Figma only (🟨 not in code).
+Textarea and Skeleton exist in Figma only (🟨 not in code). Alert is in code since 2026-11-17 (`ui/alert.tsx`: default, destructive, ai, info).
 
 ### App components
 | Figma component | What it is | Code |
