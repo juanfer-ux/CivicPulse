@@ -1,8 +1,8 @@
 import { activeRow, type Pick } from '@/lib/sidebarActive'
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
-import { useNoSelect } from '@/lib/useNoSelect'
-import { Check, CaretDown, CaretRight, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
+import { useNoSelect, useReleaseGuard } from '@/lib/useNoSelect'
+import { Check, CaretDown, CaretRight, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, Sparkle, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
@@ -68,7 +68,7 @@ function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNo
     if (active) row.current?.scrollIntoView?.({ block: 'nearest' }) // the open one is always in view, under the sticky section title (scroll-mt-10)
   }, [active])
   return (
-    <Button ref={row} variant="ghost" className={`scroll-mt-10 h-[60px] items-start justify-start gap-3 p-2 pr-5 ${active ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} title={tip} aria-current={active || undefined} onClick={onClick}>
+    <Button ref={row} variant="ghost" className={`scroll-mt-10 h-[60px] items-start justify-start gap-2.5 p-2 pr-2.5 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) ${active ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} title={tip} aria-current={active || undefined} onClick={onClick}>
       <span className={`flex h-10 w-4 shrink-0 items-start justify-center pt-0.5`}>{icon}</span>
       <span className={`flex h-11 justify-center min-w-0 flex-col text-left`}>
         <span className="flex min-w-0 flex-col gap-1">
@@ -123,7 +123,7 @@ function ViewMenu({ view, onChange, onClose }: { view: View; onChange: (v: View)
 }
 
 /** One sidebar section (Figma Recurrences / Incidents / Investigations): a title row with its own view button and plus, then the list. Each section has its own view. Recurrences and Incidents (`views`) get the view menu; Investigations just flips newest and oldest. */
-function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row, children, empty, views, limit }: { limit?: number; title: string; items: T[]; addLabel: string; onAdd?: () => void; pb?: string; row?: (t: T) => ReactNode; children?: (view: View) => ReactNode; empty?: string; views?: boolean }) {
+function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views, limit }: { limit?: number; title: string; items: T[]; addLabel: string; onAdd?: () => void; row?: (t: T) => ReactNode; children?: (view: View) => ReactNode; empty?: string; views?: boolean }) {
   const [view, setView] = useState<View>(DEFAULT_VIEW)
   const [menu, setMenu] = useState(false)
   const newest = view.newest
@@ -139,8 +139,8 @@ function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row, children,
     return () => io.disconnect()
   }, [])
   return (
-    <div className={`flex flex-col gap-4 px-2 pt-2 ${pb}`}>
-      <div ref={head} className={`group/title sticky -top-px z-10 flex h-8 items-center gap-2.5 border-b-[1px] bg-(--neutral-700) pr-1.5 pl-2.5 ${stuck ? 'border-(--neutral-600)' : 'border-transparent'}`}>
+    <div className={`flex flex-col gap-2 py-2 pr-2.5 pl-1`}> {/* 8 px above and below and between, 10 at the right and 4 at the left, in all three sections (owner's Figma, 2026-11-17, latest) */}
+      <div ref={head} className={`group/title sticky -top-px z-10 flex h-8 items-center gap-2.5 border-b-[1px] bg-(--neutral-700) px-2 ${stuck ? 'border-(--neutral-600)' : 'border-transparent'}`}>
         <p className="flex-1 text-caption-medium text-(--neutral-300)">{title}</p>
         {/* Figma "Actions": the view and plus buttons side by side with no gap (2 x 32 px). */}
         <div className="relative flex opacity-0 transition-opacity group-hover/title:opacity-100 focus-within:opacity-100 has-[[aria-expanded=true]]:opacity-100 [@media(hover:none)]:opacity-100"> {/* the buttons show only while the pointer is over the section title (owner, 2026-11-17); they stay while one has keyboard focus or its menu is open, and on touch screens */}
@@ -159,15 +159,15 @@ function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row, children,
           {menu && <ViewMenu view={view} onChange={(v) => (setView(v), setMenu(false))} onClose={() => setMenu(false)} />}
         </div>
       </div>
-      <div className="flex flex-col gap-1 px-1">{children ? children(view) : row && (newest ? items : [...items].reverse()).slice(0, limit).map(row)}{empty && !items.length && <p className="px-2 pb-1 text-caption text-(--neutral-300)">{empty}</p>}</div>
+      <div className="flex flex-col gap-1">{children ? children(view) : row && (newest ? items : [...items].reverse()).slice(0, limit).map(row)}{empty && !items.length && <p className="px-2 pb-1 text-caption text-(--neutral-300)">{empty}</p>}</div>
     </div>
   )
 }
 
 const WIDTH_KEY = 'sidebar-width'
-const SIDEBAR_MIN = 320 // 320 in the big sidebar pass of 2026-11-17 (Figma 320 wide), 300 earlier that day; min width of the expanded Sidebar (owner's Figma, 2026-11-17: 300, as drawn; 260 since 2026-11-12; it was 245 since 2026-10-30, 260, 266, 262, 240, briefly 220)
+const SIDEBAR_MIN = 300 // 300 again (owner, 2026-11-17, after 320 for a day: the Figma frame is 320 wide); 320 before; 320 in the big sidebar pass of 2026-11-17 (Figma 320 wide), 300 earlier that day; min width of the expanded Sidebar (owner's Figma, 2026-11-17: 300, as drawn; 260 since 2026-11-12; it was 245 since 2026-10-30, 260, 266, 262, 240, briefly 220)
 const SIDEBAR_MAX = 400 // 400 since 2026-11-17 (the Figma component's max width); 380 before; Figma max width (was 340)
-const SIDEBAR_DEFAULT = 320 // 320 (Figma, 2026-11-17), 300 earlier that day; the width it opens at (owner's Figma, 2026-11-17: 300; 260 since 2026-11-12; it was 300, 245 and 284 before)
+const SIDEBAR_DEFAULT = 300 // 300 again (owner, 2026-11-17); 320 before; 320 (Figma, 2026-11-17), 300 earlier that day; the width it opens at (owner's Figma, 2026-11-17: 300; 260 since 2026-11-12; it was 300, 245 and 284 before)
 const clampWidth = (n: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, n))
 const readWidth = () => {
   try {
@@ -183,6 +183,11 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
   const [dragging, setDragging] = useState(false)
   useNoSelect(dragging)
   const active = useRef(false)
+  const stop = () => {
+    active.current = false
+    setDragging(false)
+  }
+  useReleaseGuard(dragging, stop)
   const down = (e: PointerEvent<HTMLDivElement>) => {
     e.preventDefault() // no text selection from the drag
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -190,11 +195,9 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
     setDragging(true)
   }
   const move = (e: PointerEvent<HTMLDivElement>) => {
-    if (active.current) onChange(e.clientX - e.currentTarget.parentElement!.getBoundingClientRect().left)
-  }
-  const stop = () => {
-    active.current = false
-    setDragging(false)
+    if (!active.current) return
+    if (e.buttons === 0) return stop() // the button is up but no pointerup arrived: the drag is over
+    onChange(e.clientX - e.currentTarget.parentElement!.getBoundingClientRect().left)
   }
   const key = (e: ReactKeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'ArrowLeft') onChange(width - 16)
@@ -218,6 +221,7 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
       onPointerMove={move}
       onPointerUp={stop}
       onPointerCancel={stop}
+      onLostPointerCapture={stop}
       onKeyDown={key}
       onDoubleClick={() => onChange(SIDEBAR_DEFAULT)}
       className="group absolute top-0 right-0 bottom-0 z-30 w-3 translate-x-1/2 cursor-col-resize touch-none select-none outline-none"
@@ -234,9 +238,9 @@ const NARROW = '(max-width: 1799.98px)'
 /** The logo. The expand button is not here any more: collapsed, it is in the agent panel's title row, left of "Explore" (owner, 2026-11-17; before, the logo mark swapped for it on hover). */
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={`flex items-center gap-3 ${collapsed ? '' : 'pl-[1.38px]'}`}>
-      <img src={mark} alt="" width={40} height={40} className="shrink-0" /> {/* 40 px, expanded and collapsed (owner's Figma, 2026-11-17, the big sidebar pass; 42.94 collapsed and 38.92 expanded before; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before), 38.92 expanded */}
-      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={163.45} height={12.41} className="shrink-0" />}
+    <div className={`flex items-center gap-[9.6px] ${collapsed ? '' : 'pl-[1.1px]'}`}>
+      <img src={mark} alt="" width={32} height={32} className="shrink-0" /> {/* 32 px in the expanded sidebar (owner's Figma, 2026-11-17, latest; the logo is x 0.8: wordmark 130.76 x 9.93, 9.6 px apart, 1.1 px in); it was 40 px, expanded and collapsed (owner's Figma, 2026-11-17, the big sidebar pass; 42.94 collapsed and 38.92 expanded before; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before), 38.92 expanded */}
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={130.76} height={9.93} className="shrink-0" />}
     </div>
   )
 }
@@ -309,7 +313,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
-        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-17 justify-between bg-(--neutral-700) px-3'}`}>
+        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-[70px] justify-between bg-(--neutral-700) pl-2.5 pr-0.5'}`}>
           <Brand collapsed={collapsed} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
@@ -320,23 +324,29 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
-            <div className="flex shrink-0 flex-col gap-8 border-b border-(--neutral-500) px-4 py-6">
-              <div>
-                <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-800) border-(--neutral-400) text-body-sm" />
-              </div>
-              {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
-              <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--neutral-100) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
-                <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
-                Explore
+            <div className="flex shrink-0 flex-col gap-10 px-2.5 py-4"> {/* the new chat button, 40 px, then the search and Explore, 12 apart (owner's Figma, 2026-11-17, latest) */}
+              <Button variant="secondary" size="lg" className="w-full border-[0.5px] border-(--neutral-100)" onClick={onNew}> {/* Figma Button: secondary, large, a 0.5 px `neutral-100` line, `sparkle` fill 16 px and "New chat" */}
+                <Sparkle weight="fill" className="size-4" aria-hidden />
+                New chat
               </Button>
+              <div className="flex flex-col gap-3">
+                <div>
+                  <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-800) border-(--neutral-400) text-body-sm" />
+                </div>
+                {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
+                <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--neutral-100) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
+                  <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
+                  Explore
+                </Button>
+              </div>
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
-              <div className="flex flex-col gap-5 py-4">
-                <Section title="Recurrences" items={recurrences} addLabel="New recurrence" onAdd={onNewCase} views pb="pb-2.5" empty="Nothing here yet. Ask the agent, or open a marker on the map.">
+              <div className="flex flex-col gap-2"> {/* the sections are 8 px apart, with no padding around them (owner's Figma, 2026-11-17, latest; it was 20 and 16) */}
+                <Section title="Recurrences" items={recurrences} addLabel="New recurrence" onAdd={onNewCase} views empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
                     <ViewList items={recurrences} limit={3} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
                       <TwoLineItem key={c.id} active={act.kind === 'case' ? c.id === act.id : act.kind === 'recurrence' && c.id === act.id} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => (typeof c.id === 'string' ? noCase(onOpenRecurrence)(c.id) : setLocal({ kind: 'case', id: c.id, sel: selKey }))} title={c.title}
-                        icon={<Warning weight="fill" className="size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
+                        icon={<Warning weight="fill" className="mt-0.5 size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
                         sub={c.reference ? `${c.reference} · ${c.locality ?? PROBLEM_STATUS[c.status].label}` : 'Not linked to a recurrence yet'} />
                     )} />
                   )}
@@ -349,7 +359,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                   )}
                 </Section>
                 <Section title="Investigations" limit={2} items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
-                  <Button key={c.key} variant="ghost" className={`h-9 items-center justify-start gap-4 p-2 pr-5 text-body-sm ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
+                  <Button key={c.key} variant="ghost" className={`h-9 items-center justify-start gap-2.5 py-2 pr-2.5 pl-2 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) text-body-sm ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
                     <Chat weight="regular" className="size-4 shrink-0 text-(--neutral-200)" aria-hidden />
                     <span className="truncate">{c.title}</span>
                   </Button>
@@ -365,7 +375,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
             <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} title={name} />} />
           </>
         ) : (
-          <div className="flex items-center gap-4 py-1 pl-4 pr-5">
+          <div className="flex items-center gap-4 px-3 py-1">
             <Avatar size="lg" name={profile?.full_name || 'Signed in'} />
             <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
               <p className="truncate text-body-sm-strong text-(--neutral-100)">{name}</p>
