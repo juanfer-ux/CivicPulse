@@ -49,7 +49,7 @@ const BADGE_ZOOM = 13 // from here the plain squares become squares with the cat
 /** Zoom the camera flies to when an incident is opened. */
 const INCIDENT_ZOOM = 15
 /** Zoom the camera flies to when a recurrence is opened: close enough that its incidents (a few tens of metres around the marker) show as separate dots around the marker's tile. */
-const PROBLEM_ZOOM = 18
+const PROBLEM_ZOOM = 19.5 // owner, 2026-11-19 (it was 18)
 const DOTS_ZOOM = 14 // from here every problem's incidents show as dots
 /** The closest the map zooms (owner, 2026-10-30). The basemap has no more detail past zoom 15, so more zoom only stretches it. */
 const MAX_ZOOM = 23 // owner, 2026-11-15 (it was 18)

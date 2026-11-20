@@ -245,7 +245,7 @@
   /* The whole palette is these 58 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
   --white: #ECECEE; /* new in Figma (2026-10-29), brighter than neutral-100; not used on screen yet */
-  --black: #050505; /* new in Figma (2026-11-12), darker than neutral-900; not used on screen yet */
+  --black: #050505; /* new in Figma (2026-11-12), darker than neutral-900; the collapsed sidebar rail header and the composer when active */
   --neutral-900: #111113; /* Figma (2026-11-12): the neutrals 900 to 400 got a step lighter (900 was #0E0E10) */
   --neutral-800: #18181B; /* was #111113 */
   --neutral-700: #1F1F23; /* was #18181B */
