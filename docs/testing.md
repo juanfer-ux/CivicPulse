@@ -27,7 +27,7 @@ npm run build    # type-check, then bundle
 ## 🔐 Running the permission smoke test
 1. Open the Supabase **SQL Editor**, paste `supabase/tests/rls_smoke.sql`, run it.
 2. It **always ends with an error that contains a `RESULT` line**. That is by design: the error rolls back everything the test created, so no data is left behind.
-3. Expect **`RESULT PASS 47/47`**. Any failure is listed by name. A Super Admin must exist, and both seed files must have run.
+3. Expect **`RESULT PASS 50/50`**. Any failure is listed by name. A Super Admin must exist, and both seed files must have run.
 
 ## 📝 Manual checklist (after a deploy)
 - [ ] Sign-in page loads with the logo, no console errors.

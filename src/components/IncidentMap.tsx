@@ -1,3 +1,4 @@
+import { shownCount, type Place } from '@/lib/places'
 import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import { gsap } from 'gsap'
@@ -56,6 +57,8 @@ const MAX_ZOOM = 23 // owner, 2026-11-15 (it was 18)
 /** The map cannot zoom out past this (owner, 2026-10-30: zoom 11): Bogotá and its surroundings, no further. */
 const MIN_ZOOM = 11
 const NO_PROBLEMS: ProblemRow[] = []
+const NO_PLACES: Place[] = []
+const PLACE_COLOR = { shop: '--blue-200', food: '--orange-400', education: '--green-300', bus: '--yellow-300', other: '--neutral-200' } as const
 /** The recurrence marker's image by zoom; with `sel` (the open recurrence's id) every other recurrence gets the toned-down image (opaque, like the incidents'). An Active parking marker has no circle (owner's Figma, 2026-11-13) except while it is hovered (`hover`) or open (`sel`): then it gets the circled image (a test). */
 const problemImage = (sel: string | null, hover: string | null = null, badge = false) => ['step', ['zoom'], ...PROBLEM_CIRCLE_PX.flatMap((px, i) => { const id = (dim: boolean) => ['concat', 'problem-', badge ? 'badge-' : '', ['get', 'category'], dim ? '-dim-' : '-', ['get', 'status'], `-${px}`]; const base = sel ? ['case', ['==', ['get', 'id'], sel], id(false), id(true)] : id(false); const lit = ['all', ['==', ['get', 'category'], 'parking'], ['==', ['get', 'status'], 'active'], ['any', ['==', ['get', 'id'], sel ?? ''], ['==', ['get', 'id'], hover ?? '']]]; return [...(i ? [PROBLEM_SWITCH_ZOOMS[i - 1]] : []), (sel || hover) && !badge ? ['case', lit, problemCircledId(px), base] : base] })] as never
 /** The plain square's image: one per size (step 0 below zoom 12, step 1 from 12); with `focus` (an expression) every incident but the focused one gets the toned-down image. */
@@ -177,6 +180,8 @@ interface Props {
   problemOfIncident?: Map<string, string>
   /** Ids of the open problem's incidents: their dots show at every zoom. */
   problemIncidentIds?: string[]
+  /** Experiment (`?places=1`): OpenStreetMap places around the open recurrence, drawn as small marks (owner, 2026-11-20). */
+  places?: Place[]
 }
 
 /** MapLibre caps the canvas at 4096 px by default and quietly lowers the pixel ratio to fit, so a wide window (the owner's 3440 px monitor: 2576 px of map × 2 = 5152) drew at 1.59x and the crisp marker edges crackled again (2026-11-05). Allow what this GPU can do. */
@@ -208,7 +213,7 @@ function answerStems(ids: string[], incidents: Incident[], have: Stem[], spots: 
   return [...have, ...hit.filter((i) => !seen.has(i.id)).slice(0, 200).map((i) => stemOf(i))]
 }
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots = NO_SPOTS, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, openReportId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemOfIncident, problemIncidentIds = NO_IDS }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots = NO_SPOTS, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, openReportId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemOfIncident, problemIncidentIds = NO_IDS, places = NO_PLACES }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const carsRef = useRef<{ id: string; lng: number; lat: number; status: string; kind: 'parking' | 'dumping' }[]>([]) // the 3D cars' places (parking recurrences)
@@ -455,6 +460,12 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       )
       // Recurrence radius (owner, 2026-10-30): the same radius look as the agent's answer, one per problem in its status color, so a problem reads as an area and not just a marker. Real meters, under the dots and names.
       map.addSource('problem-radius', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      map.addSource('places', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      // A place is a small square lying on the ground (a polygon 3 m across), so it follows the map's tilt and turn like the recurrence ring (owner, 2026-11-20); its name is a plain label.
+      map.addSource('places-area', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      map.addLayer({ id: 'places-square', type: 'fill', source: 'places-area', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': ['case', ['get', 'near'], 1, 0.45] } })
+      map.addLayer({ id: 'places-square-line', type: 'line', source: 'places-area', paint: { 'line-color': token('--neutral-900'), 'line-width': 1 } })
+      map.addLayer({ id: 'places-name', type: 'symbol', source: 'places', minzoom: 17, filter: ['!=', ['get', 'name'], ''], layout: { 'text-field': ['get', 'name'], 'text-font': ['Montserrat Medium', 'Open Sans Regular', 'Noto Sans Regular'], 'text-size': 11, 'text-offset': [0, 0.9], 'text-anchor': 'top', 'text-max-width': 8 }, paint: { 'text-color': token('--neutral-100'), 'text-halo-color': token('--neutral-900'), 'text-halo-width': 1.5 } })
       // From the first zoom (11, owner 2026-10-30; it used to fade in from 12) at full strength: 72 px in radius up to zoom 12, shrinking to 36 px at zoom 14, then to its real size (60 m, about 50 px in radius at zoom 17). Until the real size is bigger it never draws under that minimum on screen.
       const problemPx = (f: number) => ['interpolate', ['exponential', 2], ['zoom'], ...PROBLEM_STOPS.flatMap(([z, v]) => [z, v * f])] as never
       // The look is the owner's Figma Incident Radius (2026-10-30): a flat fill at 2.4 % and a ring, in the problem's status color; the ring is drawn 1 px at 20 % (the same brightness as the Figma 0.5 px at 35 %, without the crackle); from zoom 16 up the fill is 3.5 % and the ring 1 px at 50 % (reached evenly over zoom 14 to 16).
@@ -717,6 +728,22 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     map.fitBounds(bounds, { padding: fitPadding(), maxZoom: 15, duration: 700 })
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the answer changes, not when filters change the list
   }, [ready, highlightIds])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    const props = (p: Place, i: number) => ({ name: p.name, color: token(PLACE_COLOR[p.kind]), near: i < shownCount(places) })
+    const dLat = 1.5 / 111320 // half of the 3 m square, in degrees
+    ;(map.getSource('places') as maplibregl.GeoJSONSource).setData({ type: 'FeatureCollection', features: places.map((p, i) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [p.lng, p.lat] }, properties: props(p, i) })) })
+    ;(map.getSource('places-area') as maplibregl.GeoJSONSource).setData({
+      type: 'FeatureCollection',
+      features: places.map((p, i) => {
+        const dLng = dLat / Math.cos((p.lat * Math.PI) / 180)
+        const ring = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]].map(([x, y]) => [p.lng + x * dLng, p.lat + y * dLat])
+        return { type: 'Feature', geometry: { type: 'Polygon', coordinates: [ring] }, properties: props(p, i) }
+      }),
+    })
+  }, [ready, places])
 
   // The localities of an answer: load the boundaries once, draw the listed ones (shade by count) and move the map to show them all.
   const localities = useRef<{ features: { properties: { code: number; name: string }; geometry: { type: string; coordinates: unknown } }[] } | null>(null)
