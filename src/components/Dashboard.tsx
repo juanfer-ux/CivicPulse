@@ -31,6 +31,9 @@ import {
   type Locality,
 } from '@/lib/incidents'
 import type { Area } from '@/lib/agent'
+import { PlacesCard } from '@/components/PlacesCard'
+import { fetchRecurrencePlaces } from '@/lib/placesDb'
+import type { Place } from '@/lib/places'
 import { fetchLinkedIncidentIds, fetchProblemDetail, fetchProblems, type ProblemDetailData, type ProblemRow } from '@/lib/problems'
 import { PROBLEM_STATUSES, type ProblemStatus } from '@/lib/statusColors'
 import type { SidebarIncident, SidebarRecurrence, SidebarSelection } from '@/components/Sidebar'
@@ -209,6 +212,20 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
 
   const selectedProblem = showProblems ? (problemsFiltered.find((p) => p.id === selectedProblemId) ?? null) : null
   const problemDetail = detail && detail.id === selectedProblemId ? detail.data : null
+  // Experiment (`?places=1`, owner, 2026-11-20): the stored OpenStreetMap places around the open recurrence, as marks on the map and a small card.
+  const [places, setPlaces] = useState<{ id: string; list: Place[] | 'error' } | null>(null)
+  const placesOn = new URLSearchParams(location.search).get('places') === '1'
+  const placesFor = placesOn && selectedProblem ? selectedProblem : null
+  useEffect(() => {
+    if (!placesFor) return
+    let live = true
+    fetchRecurrencePlaces(placesFor.id).then(
+      (list) => live && setPlaces({ id: placesFor.id, list }),
+      () => live && setPlaces({ id: placesFor.id, list: 'error' }),
+    )
+    return () => { live = false }
+  }, [placesFor])
+  const placeList = placesFor && places?.id === placesFor.id && places.list !== 'error' ? places.list : undefined
   // The modules' right column (decision 0049, behind /?modules=1) pushes the map content: --dock-w feeds .map-col.
   const modules = useModules()
   const recurrenceOpen = !!selectedProblem && !selectedId // an open incident hides the recurrence panel
@@ -333,6 +350,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         incidents={mapIncidents}
         problems={showProblems ? problemsFiltered : undefined}
         problemIncidentIds={problemIncidentIds}
+        places={placeList}
         problemOfIncident={linked}
         selectedProblemId={selectedProblem?.id ?? null}
         openReportId={openReportId}
@@ -347,6 +365,8 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         zoomTo={zoomTo}
         onSelect={select}
       />
+
+      {placesFor && <PlacesCard key={placesFor.id} places={places?.id === placesFor.id ? places.list : 'loading'} />}
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. The banner sits under the filters row (owner, 2026-11-15; it was above the stat cards, then between them and the filters row); while an incident or recurrence is open the stat cards and filters are hidden, so it goes back to the top and the panel sits below it (`--banner-offset`, owner, 2026-11-07). */}
       {chatMode && (

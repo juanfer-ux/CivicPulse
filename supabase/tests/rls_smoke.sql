@@ -3,8 +3,8 @@
 -- It simulates signed-in users inside ONE DO block that ALWAYS ends by raising an exception, so every row it
 -- creates (fake users, recommendations, decisions, audit events) is rolled back. Read the RESULT line.
 --
--- Expected result:  RESULT PASS 47/47 ...
--- Any failing check is listed by name, e.g.  RESULT FAIL 43/47 failed: T3 sp0_sees_nothing, T7 ...
+-- Expected result:  RESULT PASS 50/50 ...
+-- Any failing check is listed by name, e.g.  RESULT FAIL 46/50 failed: T3 sp0_sees_nothing, T7 ...
 --
 -- Fake users (all in Kennedy, locality 8):
 --   la    Locality Admin, no category rows     -> must see ALL categories in Kennedy
@@ -243,9 +243,25 @@ begin
   begin update public.incidents set title = title || '.' where id = v_ip; ok := true; exception when others then ok := false; end;
   if ok then fails := fails || 'T16 incidents_only_assignment_can_change'::text; end if;
 
+  -- ── Places around a recurrence (migration 20261120000000): read follows the recurrence, nobody writes from the browser ──
+  perform set_config('request.jwt.claims', '', true);
+  insert into public.recurrence_places (problem_id, source_ref, kind, lat, lng, dist_m, snapshot_at) values (v_pp, 'node1', 'shop', 4.6, -74.1, 10, current_date);
+  perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  select count(*) into n from public.recurrence_places where problem_id = v_pp;
+  if n <> 1 then fails := fails || 'T17a super_admin_reads_places'::text; end if;
+  begin insert into public.recurrence_places (problem_id, source_ref, kind, lat, lng, dist_m, snapshot_at) values (v_pp, 'node2', 'shop', 4.6, -74.1, 10, current_date); ok := true; exception when others then ok := false; end;
+  if ok then fails := fails || 'T17b browser_cannot_write_places'::text; end if;
+  reset role;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_env, 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  select count(*) into n from public.recurrence_places; -- sp_env sees only dumping: the one place belongs to the parking problem
+  if n <> 0 then fails := fails || 'T17c other_category_sees_no_places'::text; end if;
+  reset role;
+
   raise exception 'RESULT % % | kennedy all=% parking=% dumping=% | failed: %',
     case when cardinality(fails) = 0 then 'PASS' else 'FAIL' end,
-    (47 - cardinality(fails)) || '/47',
+    (50 - cardinality(fails)) || '/50',
     e_all, e_park, e_dump,
     coalesce(nullif(array_to_string(fails, ', '), ''), 'none');
 end $$;
