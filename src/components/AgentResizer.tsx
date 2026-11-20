@@ -1,5 +1,5 @@
 import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
-import { useNoSelect } from '@/lib/useNoSelect'
+import { useNoSelect, useReleaseGuard } from '@/lib/useNoSelect'
 
 /** The agent panel's minimum from the owner's Figma (Agent Panel: min 600, it was 650 until 2026-11-13); `--agent-w` is the panel's visible width since the 12 px page padding around it was removed (owner, 2026-11-15; it was 612 for 600 visible). The maximum puts the panel's right edge at the exact middle of the window (owner, 2026-11-13), see `agentMax`; never below the minimum. FINAL (owner, 2026-11-13): do not change this rule again. */
 export const AGENT_MIN = 900 // the whole panel, the 70 px rail included (owner, 2026-11-17; it was 600, Figma's number; 720 was tried and rolled back the same day)
@@ -13,8 +13,8 @@ export const AGENT_MAX_NARROW = 920
 export const AGENT_MAX_WIDE = 1250 // above 2,100 px (owner, 2026-11-17; it was 1,920 for a few minutes)
 /** The most the agent panel may be for a viewport this wide: 920 at 1,600 px or below, 1,250 above 2,100, 1,100 between (owner, 2026-11-17). */
 const byViewport = (viewportW: number) => (viewportW <= 1600 ? AGENT_MAX_NARROW : viewportW > 2100 ? AGENT_MAX_WIDE : AGENT_MAX)
-export const MAP_MIN_SHARE = 0.47 // the map area (everything to the right of the agent panel) is at least 47 % of the viewport at every size (owner, 2026-11-17)
-export const AGENT_FLOOR = AGENT_MIN // the panel never goes under its minimum (900); where that leaves the map under 47 % the minimum wins and the sidebar has to give way
+export const MAP_MIN_SHARE = 0.4 // the map area (everything to the right of the agent panel) is at least 40 % of the viewport at every size (owner, 2026-11-17; 47 % and 50 % were tried the same day)
+export const AGENT_FLOOR = 480 // under this the panel is not usable; the 40 % map rule wins over the 900 minimum (owner, 2026-11-17), down to this floor; if even this leaves the map under 40 %, the sidebar has to give way
 /** The most the agent panel may be: the table by viewport, but never so wide that the map area drops under 47 % of the viewport (`sidebarW` is the sidebar's width right now, 0 collapsed). */
 export const agentMaxFor = (viewportW: number, sidebarW = 0) => Math.min(byViewport(viewportW), Math.max(AGENT_FLOOR, Math.floor(viewportW * (1 - MAP_MIN_SHARE) - sidebarW)))
 
@@ -23,6 +23,8 @@ export function AgentResizer({ max, onChange }: { max: number; onChange: (px: nu
   const [dragging, setDragging] = useState(false)
   const [now, setNow] = useState(0)
   useNoSelect(dragging)
+  const stop = () => setDragging(false)
+  useReleaseGuard(dragging, stop)
   const ref = useRef<HTMLDivElement>(null)
   const clamp = (px: number) => Math.round(Math.min(max, Math.max(AGENT_MIN, px)))
   const left = () => ref.current!.parentElement!.getBoundingClientRect().left
@@ -30,7 +32,11 @@ export function AgentResizer({ max, onChange }: { max: number; onChange: (px: nu
   const current = () => ref.current!.getBoundingClientRect().right - left() + EDGE
 
   const down = (e: PointerEvent<HTMLDivElement>) => { e.currentTarget.setPointerCapture(e.pointerId); setDragging(true) }
-  const move = (e: PointerEvent<HTMLDivElement>) => { if (dragging) set(e.clientX - left() + EDGE) }
+  const move = (e: PointerEvent<HTMLDivElement>) => {
+    if (!dragging) return
+    if (e.buttons === 0) return stop() // the button is up but no pointerup arrived: the drag is over
+    set(e.clientX - left() + EDGE)
+  }
   const key = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'ArrowLeft') set(current() - 16)
     else if (e.key === 'ArrowRight') set(current() + 16)
@@ -53,8 +59,9 @@ export function AgentResizer({ max, onChange }: { max: number; onChange: (px: nu
       title="Drag to resize, double-click to reset"
       onPointerDown={down}
       onPointerMove={move}
-      onPointerUp={() => setDragging(false)}
-      onPointerCancel={() => setDragging(false)}
+      onPointerUp={stop}
+      onPointerCancel={stop}
+      onLostPointerCapture={stop}
       onKeyDown={key}
       onDoubleClick={() => { setNow(0); onChange(null) }}
       style={{ left: `calc(var(--agent-w) - ${EDGE}px)` }}
