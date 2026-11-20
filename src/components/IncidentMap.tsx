@@ -641,7 +641,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     })
     mapRef.current = map
     const clear = (e: KeyboardEvent) => e.key === 'Escape' && onSelectRef.current(null)
-    const onFloat = () => map.loaded() && setFree(map) // a floating box appeared or went without the map resizing (the modules' column)
+    const onFloat = () => setFree(map) // no `map.loaded()` gate (owner, 2026-11-20): when a case closes the map is still loading tiles, the call was skipped and the old padding left an empty strip; // a floating box appeared or went without the map resizing (the modules' column)
     window.addEventListener('keydown', clear)
     window.addEventListener('civic:float', onFloat)
     return () => {

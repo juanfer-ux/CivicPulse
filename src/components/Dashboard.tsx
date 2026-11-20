@@ -212,8 +212,9 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   // The modules' right column (decision 0049, behind /?modules=1) pushes the map content: --dock-w feeds .map-col.
   const modules = useModules()
   const recurrenceOpen = !!selectedProblem && !selectedId // an open incident hides the recurrence panel
-  const dockW = modules.on ? pushOf(modules.placed, 'right', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
-  const dockL = modules.on ? pushOf(modules.placed, 'left', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
+  const caseOpen = !!selectedProblem || !!selectedId // modules exist only while a case is open: with none open they push nothing (owner, 2026-11-20: the stat cards stayed squeezed to the right, leaving an empty strip)
+  const dockW = modules.on && caseOpen ? pushOf(modules.placed, 'right', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
+  const dockL = modules.on && caseOpen ? pushOf(modules.placed, 'left', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
   const filtersPush = FILTERS_PUSH && filtersOpen ? FILTERS_W : 0 // the panel, flush with the window's right edge (no page padding around it since 2026-11-15)
   // The map holds the loose incidents plus, while a problem is open, that problem's own incidents (drawn as tiny dots around its marker).
   const problemIncidents = useMemo(() => (selectedProblem ? (problemDetail?.incidents ?? []) : []), [selectedProblem, problemDetail])

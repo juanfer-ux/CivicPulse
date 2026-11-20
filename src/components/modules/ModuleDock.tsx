@@ -17,10 +17,10 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind, open
   const { on, placed, follow, drag, message, setOpen, remove, setRightSlot, startDrag } = useModules()
   const recurrenceOpen = openKind === 'recurrence'
   useEffect(() => setOpen({ id: openProblemId, kind: openKind }), [openProblemId, openKind, setOpen])
-  const mods = (a: Area) => inArea(placed, a, follow, openProblemId)
+  const mods = (a: Area) => (openKind ? inArea(placed, a, follow, openProblemId) : []) // modules show only while a recurrence or an incident is open, and take no room otherwise (owner, 2026-11-20); the layout is kept and saved
   const [left, right, bottom] = [mods('left'), mods('right'), mods('bottom')]
   // the map recentres in the free area when a column appears or goes (the map itself does not resize)
-  useEffect(() => void window.dispatchEvent(new Event('civic:float')), [left.length, right.length, bottom.length, recurrenceOpen])
+  useEffect(() => void window.dispatchEvent(new Event('civic:float')), [left.length, right.length, bottom.length, openKind])
   if (!on) return null
 
   const card = (m: Placed, area: Area) => {
