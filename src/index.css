@@ -37,7 +37,7 @@
   --text-display-xs--font-weight: calc(400 + var(--display-weight-offset));
   --text-display-xs--line-height: 20px;
   --text-display-xs--letter-spacing: 0.01em;
-  --text-stat: 28px; /* Figma stat (2026-11-17, latest): Zalando Sans SemiExpanded SemiBold 28 / 28, tracking -2 % (it was 24 / 24, 42 / 32 and 40 / 32 before) */
+  --text-stat: 32px; /* Figma stat (2026-11-17, latest: 32 px, line 28, it was 28; before: Zalando Sans SemiExpanded SemiBold 28 / 28, tracking -2 % (it was 24 / 24, 42 / 32 and 40 / 32 before) */
   --text-stat--font-weight: calc(600 + var(--display-weight-offset));
   --text-stat--line-height: 28px;
   --text-stat--letter-spacing: -0.02em;

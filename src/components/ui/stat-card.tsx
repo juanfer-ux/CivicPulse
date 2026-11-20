@@ -5,10 +5,10 @@ import { sparkPoints } from '@/lib/sparkline'
 
 /** The trend mark (Figma Stat Trend `above`, owner, 2026-11-17, fourth pass): just the 14 px arrow in a 24 px box at the right of the name, `red-400` for above; the circle is gone. Figma only redrew `above`; the other three keep their old outlined strip there, so their arrow tones are their old label tones. */
 const TREND = {
-  above: { Icon: ArrowUp, text: 'Above usual', icon: 'text-(--red-400)' },
-  about: { Icon: ArrowRight, text: 'About usual', icon: 'text-(--blue-300)' },
-  low: { Icon: TrendDown, text: 'Low reporting', icon: 'text-(--yellow-500)' },
-  below: { Icon: ArrowDown, text: 'Below usual', icon: 'text-(--green-500)' },
+  above: { Icon: ArrowUp, text: 'Above usual', box: 'size-6 bg-(--red-900)', icon: 'size-3.5 text-(--red-400)' },
+  about: { Icon: ArrowRight, text: 'About usual', box: 'size-5 bg-(--blue-900)', icon: 'size-3 text-(--blue-200)' },
+  low: { Icon: TrendDown, text: 'Low reporting', box: 'size-5 bg-(--yellow-900)', icon: 'size-3 text-(--yellow-300)' },
+  below: { Icon: ArrowDown, text: 'Below usual', box: 'size-5 bg-(--green-900)', icon: 'size-3 text-(--green-400)' },
 } as const
 
 /** A number with its name (Figma Stat Card, owner's seventh look 2026-11-17): a `neutral-900` fill, an 8 px radius, 16 px padding all round and 16 px between the header (the name and the 24 px trend mark) and the number row, 121 px high; the number row is 49 px high, its items centered: the number (stat style, now 28 / 28, `brand-primary`) with the "Reports" caption under it, spread top and bottom, and a 32 px graph (8 px on its right, the peak dot), 40 px apart; hover or selected is a 2 px `neutral-600` ring outside the card, so the grid that holds the cards must not clip it (`desk:overflow-visible` in `Dashboard.tsx`). */
@@ -34,8 +34,8 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
       <span className="flex h-6 items-center justify-between gap-2">
         <span className="truncate text-subtitle text-(--neutral-100)">{label}</span>
         {t && (
-          <span className="grid size-6 shrink-0 place-items-center" title={t.text}>
-            <t.Icon className={`size-3.5 ${t.icon}`} aria-hidden />
+          <span className={`grid shrink-0 place-items-center rounded-xs ${t.box}`} title={t.text}> {/* Figma Stat Trend (owner, 2026-11-17, latest): a small filled box (radius 2) with the trend icon: above 24 px, `red-900` and `red-400`; about, low and below 20 px, `blue-900` / `blue-200`, `yellow-900` / `yellow-300`, `green-900` / `green-400`; the icon is 14 px in above and 12 in the rest; the Figma glyph `trend-top` is an up arrow (turned to the right for about and down for below), and low is the zigzag `trend-down`: Phosphor `ArrowUp`, `ArrowRight`, `TrendDown`, `ArrowDown` */}
+            <t.Icon className={t.icon} aria-hidden />
             <span className="sr-only">{t.text}</span>
           </span>
         )}
