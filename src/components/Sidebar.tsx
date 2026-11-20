@@ -140,10 +140,10 @@ function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row, children,
   }, [])
   return (
     <div className={`flex flex-col gap-4 px-2 pt-2 ${pb}`}>
-      <div ref={head} className={`sticky -top-px z-10 flex h-8 items-center gap-2.5 border-b-[1px] bg-(--neutral-700) pr-1.5 pl-2.5 ${stuck ? 'border-(--neutral-600)' : 'border-transparent'}`}>
+      <div ref={head} className={`group/title sticky -top-px z-10 flex h-8 items-center gap-2.5 border-b-[1px] bg-(--neutral-700) pr-1.5 pl-2.5 ${stuck ? 'border-(--neutral-600)' : 'border-transparent'}`}>
         <p className="flex-1 text-caption-medium text-(--neutral-300)">{title}</p>
         {/* Figma "Actions": the view and plus buttons side by side with no gap (2 x 32 px). */}
-        <div className="relative flex">
+        <div className="relative flex opacity-0 transition-opacity group-hover/title:opacity-100 focus-within:opacity-100 has-[[aria-expanded=true]]:opacity-100 [@media(hover:none)]:opacity-100"> {/* the buttons show only while the pointer is over the section title (owner, 2026-11-17); they stay while one has keyboard focus or its menu is open, and on touch screens */}
           {views ? (
             <Button size="icon" variant="ghost" className="size-8" aria-label={`${title}: view options`} aria-haspopup="menu" aria-expanded={menu} title="View options" onClick={() => setMenu((m) => !m)}>
               <FunnelSimple weight="regular" className="size-4 text-(--neutral-100)" />
