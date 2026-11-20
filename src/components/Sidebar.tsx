@@ -232,7 +232,7 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
 }
 
 const COLLAPSED_W = 0 // collapsed, the sidebar disappears (owner, 2026-11-17): the agent panel's header shows the logo and the expand button instead; it was a 60 px rail (56 and 64 before)
-/** The sidebar always starts collapsed (owner, 2026-11-16: it was collapsed under 1,800 px, or by what was saved in this browser). Dropping under 1,800 px collapses it; it never expands by itself, the toggle does. */
+/** The sidebar always starts expanded (owner, 2026-11-19; it started collapsed from 2026-11-16, and before that collapsed under 1,800 px or by what was saved in this browser). Dropping under 1,800 px while open collapses it; it never expands by itself, the toggle does. */
 const NARROW = '(max-width: 1799.98px)'
 
 /** The logo. The expand button is not here any more: collapsed, it is in the agent panel's title row, left of "Explore" (owner, 2026-11-17; before, the logo mark swapped for it on hover). */
@@ -389,8 +389,8 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   )
 }
 
-export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // initialCollapsed only lets the tests start expanded
-  const [collapsed, setCollapsed] = useState(props.initialCollapsed ?? true)
+export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // initialCollapsed only lets the tests choose
+  const [collapsed, setCollapsed] = useState(props.initialCollapsed ?? false)
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -472,8 +472,8 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
   const rail =
     collapsed && railSlot
       ? createPortal(
-          <div className="flex h-full w-[70px] flex-col items-center"> {/* Figma Sidebar inside the Agent Panel (owner's Figma, 2026-11-17): the instance has no fill and no line of its own, so the panel's texture and star show through; only the brand header keeps its `neutral-900` fill with 0.5 px `neutral-600` lines at its right and under it */}
-            <Button variant="ghost" className="group h-17 w-full rounded-none border-r-[0.5px] border-b-[0.5px] border-(--neutral-600) bg-(--neutral-900) p-0 hover:bg-(--neutral-900)" aria-label="Expand menu" title="Expand menu" onClick={toggle}>
+          <div className="flex h-full w-[70px] flex-col items-center"> {/* Figma Sidebar inside the Agent Panel (owner's Figma, 2026-11-17): the instance has no fill and no line of its own, so the panel's texture and star show through; only the brand header keeps its fill (`black` #050505 since 2026-11-19, it was `neutral-900`) with 0.5 px `neutral-600` lines at its right and under it */}
+            <Button variant="ghost" className="group h-17 w-full rounded-none border-r-[0.5px] border-b-[0.5px] border-(--neutral-600) bg-(--black) p-0 hover:bg-(--black)" aria-label="Expand menu" title="Expand menu" onClick={toggle}>
               <img src={mark} alt="" width={40} height={40} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
               <SidebarSimple weight="regular" className="hidden size-5 -scale-x-100 group-hover:block group-focus-visible:block" aria-hidden />
             </Button>
