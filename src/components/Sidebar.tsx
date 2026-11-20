@@ -6,6 +6,8 @@ import { Check, CaretDown, CaretRight, Chat, Compass, DotsThreeVertical, List, P
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
+import { createPortal } from 'react-dom'
+import { useRailSlot } from '@/lib/railSlot'
 import { NARROW_VIEWPORT } from '@/components/AgentResizer'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -164,7 +166,7 @@ function Section<T>({ title, items, addLabel, onAdd, pb = 'pb-3', row, children,
 
 const WIDTH_KEY = 'sidebar-width'
 const SIDEBAR_MIN = 320 // 320 in the big sidebar pass of 2026-11-17 (Figma 320 wide), 300 earlier that day; min width of the expanded Sidebar (owner's Figma, 2026-11-17: 300, as drawn; 260 since 2026-11-12; it was 245 since 2026-10-30, 260, 266, 262, 240, briefly 220)
-const SIDEBAR_MAX = 380 // Figma max width (was 340)
+const SIDEBAR_MAX = 400 // 400 since 2026-11-17 (the Figma component's max width); 380 before; Figma max width (was 340)
 const SIDEBAR_DEFAULT = 320 // 320 (Figma, 2026-11-17), 300 earlier that day; the width it opens at (owner's Figma, 2026-11-17: 300; 260 since 2026-11-12; it was 300, 245 and 284 before)
 const clampWidth = (n: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, n))
 const readWidth = () => {
@@ -251,12 +253,9 @@ function AccountMenu({ onSignOut, side, avatar }: { onSignOut: () => void; side:
   return (
     <div className="relative" onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
       {avatar ? (
-        // Collapsed sidebar (owner, 2026-10-30): the profile itself is the button, with a small down chevron badge on its top right so it reads as a menu (the badge sticks out 8 px past the avatar's right edge, 4 px above it: owner's Figma, 2026-11-16). No extra height: the area stays as tall as the expanded one.
+        // Collapsed sidebar (owner, 2026-10-30): the profile itself is the button, (the small chevron badge on its top right is gone: owner's Figma, 2026-11-17) so it reads as a menu (the badge sticks out 8 px past the avatar's right edge, 4 px above it: owner's Figma, 2026-11-16). No extra height: the area stays as tall as the expanded one.
         <button type="button" aria-label="Account menu" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="group relative cursor-pointer rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
           {avatar}
-          <span className="absolute -top-2.5 -right-[7px] grid size-4 place-items-center rounded-full bg-(--neutral-500) text-(--neutral-100) ring-2 ring-(--neutral-900) group-hover:bg-(--white) group-hover:text-(--neutral-900) group-focus-visible:bg-(--white) group-focus-visible:text-(--neutral-900)">
-            <CaretDown weight="bold" className="size-2.5" aria-hidden />
-          </span>
         </button>
       ) : (
         <Button variant="ghost" size="icon" aria-label="Account menu" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
@@ -360,14 +359,14 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
           </>
         )}
       </div>
-      <div className={`flex shrink-0 flex-col border-t border-(--neutral-600) ${collapsed ? 'items-center justify-center py-5' : 'py-2.5'}`}>
+      <div className={`flex shrink-0 flex-col border-t border-(--neutral-600) ${collapsed ? 'items-center justify-center py-5' : 'py-4'}`}> {/* the expanded user row has 20 px above and below (owner's Figma, 2026-11-17, it was 10), the large avatar and 16 px beside it (it was the default avatar and 12) */}
         {collapsed ? (
           <>
             <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} title={name} />} />
           </>
         ) : (
-          <div className="flex items-center gap-3 py-1 pl-4 pr-5">
-            <Avatar name={profile?.full_name || 'Signed in'} />
+          <div className="flex items-center gap-4 py-1 pl-4 pr-5">
+            <Avatar size="lg" name={profile?.full_name || 'Signed in'} />
             <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
               <p className="truncate text-body-sm-strong text-(--neutral-100)">{name}</p>
               {email && <p className="truncate text-caption-medium text-(--neutral-200)">{email}</p>}
@@ -414,7 +413,9 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
     shownWidth.current = collapsed ? COLLAPSED_W : width
   })
   useLayoutEffect(() => {
-    document.documentElement.toggleAttribute('data-sidebar-collapsed', collapsed) // the agent panel's expand button shows only while this is set
+    document.documentElement.toggleAttribute('data-sidebar-collapsed', collapsed) // the agent panel's rail shows only while this is set
+    document.documentElement.style.setProperty('--sidebar-now', `${collapsed ? 0 : width}px`) // read by App: the agent panel's maximum leaves the map 47 % of the viewport
+    window.dispatchEvent(new Event('sidebar-now'))
   }, [collapsed, width])
   // Narrow viewport (1,600 px or below, owner 2026-11-17): with the sidebar and the agent panel both open, opening the filters collapses the sidebar, and closing them (or applying) brings it back as it was.
   const live = useRef({ collapsed, agentOff: props.agentOff })
@@ -456,9 +457,24 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
   // On phones the menu closes after a choice.
   const phone: Chats = { ...props, onPick: (id) => (props.onPick(id), setOpen(false)), onNew: () => (props.onNew(), setOpen(false)), onNewCase: () => (props.onNewCase(), setOpen(false)), onOpenRecurrence: (id) => (props.onOpenRecurrence?.(id), setOpen(false)), onOpenIncident: (id) => (props.onOpenIncident?.(id), setOpen(false)) }
 
+  const railSlot = useRailSlot()
+  // The collapsed sidebar is a 70 px rail inside the agent panel (owner's Figma, 2026-11-17): only the logo, which expands the sidebar (the avatar left the rail the same day).
+  const rail =
+    collapsed && railSlot
+      ? createPortal(
+          <div className="flex h-full w-[70px] flex-col items-center"> {/* Figma Sidebar inside the Agent Panel (owner's Figma, 2026-11-17): the instance has no fill and no line of its own, so the panel's texture and star show through; only the brand header keeps its `neutral-900` fill with 0.5 px `neutral-600` lines at its right and under it */}
+            <Button variant="ghost" className="group h-17 w-full rounded-none border-r-[0.5px] border-b-[0.5px] border-(--neutral-600) bg-(--neutral-900) p-0 hover:bg-(--neutral-900)" aria-label="Expand menu" title="Expand menu" onClick={toggle}>
+              <img src={mark} alt="" width={40} height={40} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
+              <SidebarSimple weight="regular" className="hidden size-5 -scale-x-100 group-hover:block group-focus-visible:block" aria-hidden />
+            </Button>
+          </div>,
+          railSlot,
+        )
+      : null
   return (
     <>
-      {/* Desktop: a column on the left, expanded or icons only. */}
+      {rail}
+      {/* Desktop: a column on the left; collapsed, it is 0 wide and its rail is inside the agent panel. */}
       <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} inert={collapsed} className={`relative z-40 hidden shrink-0 overflow-hidden desk:block bg-(--neutral-700)`}>
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         <div className="h-full" style={{ width }}> {/* the menu stays mounted at its own width and the aside clips it, so collapsing and expanding are the same slide, one the reverse of the other (owner, 2026-11-17); a collapsed one is inert */}
