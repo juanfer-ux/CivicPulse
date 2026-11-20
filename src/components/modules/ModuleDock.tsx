@@ -17,7 +17,7 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind, open
   const { on, placed, follow, drag, message, setOpen, remove, setRightSlot, startDrag } = useModules()
   const recurrenceOpen = openKind === 'recurrence'
   useEffect(() => setOpen({ id: openProblemId, kind: openKind }), [openProblemId, openKind, setOpen])
-  const mods = (a: Area) => inArea(placed, a, follow, openProblemId)
+  const mods = (a: Area) => (follow && !openKind ? [] : inArea(placed, a, follow, openProblemId)) // following the open case, nothing open means nothing to show: the docked modules wait (kept and saved) instead of sitting empty (owner's screenshot, 2026-11-19)
   const [left, right, bottom] = [mods('left'), mods('right'), mods('bottom')]
   // the map recentres in the free area when a column appears or goes (the map itself does not resize)
   useEffect(() => void window.dispatchEvent(new Event('civic:float')), [left.length, right.length, bottom.length, recurrenceOpen])
