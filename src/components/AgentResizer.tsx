@@ -2,7 +2,7 @@ import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { useNoSelect } from '@/lib/useNoSelect'
 
 /** The agent panel's minimum from the owner's Figma (Agent Panel: min 600, it was 650 until 2026-11-13); `--agent-w` is the panel's visible width since the 12 px page padding around it was removed (owner, 2026-11-15; it was 612 for 600 visible). The maximum puts the panel's right edge at the exact middle of the window (owner, 2026-11-13), see `agentMax`; never below the minimum. FINAL (owner, 2026-11-13): do not change this rule again. */
-export const AGENT_MIN = 600
+export const AGENT_MIN = 900 // the whole panel, the 70 px rail included (owner, 2026-11-17; it was 600, Figma's number; 720 was tried and rolled back the same day)
 const EDGE = 0 // px between the handle and the panel's visible right edge, inside its padding (owner, 2026-11-13)
 /** The panel you see ends at the middle of the window: half the window minus the sidebar's width at that moment (the sidebar's 12 px margin and the panel's 12 px gap cancel out). */
 export const AGENT_MAX = 1100 // the most the handle can drag it to (owner, 2026-11-17; 920, 880 and the middle of the window before)
@@ -14,7 +14,7 @@ export const AGENT_MAX_WIDE = 1250 // above 2,100 px (owner, 2026-11-17; it was 
 /** The most the agent panel may be for a viewport this wide: 920 at 1,600 px or below, 1,250 above 2,100, 1,100 between (owner, 2026-11-17). */
 const byViewport = (viewportW: number) => (viewportW <= 1600 ? AGENT_MAX_NARROW : viewportW > 2100 ? AGENT_MAX_WIDE : AGENT_MAX)
 export const MAP_MIN_SHARE = 0.47 // the map area (everything to the right of the agent panel) is at least 47 % of the viewport at every size (owner, 2026-11-17)
-export const AGENT_FLOOR = 480 // under this the panel is not usable; if even this leaves the map under 47 %, the sidebar has to give way
+export const AGENT_FLOOR = AGENT_MIN // the panel never goes under its minimum (900); where that leaves the map under 47 % the minimum wins and the sidebar has to give way
 /** The most the agent panel may be: the table by viewport, but never so wide that the map area drops under 47 % of the viewport (`sidebarW` is the sidebar's width right now, 0 collapsed). */
 export const agentMaxFor = (viewportW: number, sidebarW = 0) => Math.min(byViewport(viewportW), Math.max(AGENT_FLOOR, Math.floor(viewportW * (1 - MAP_MIN_SHARE) - sidebarW)))
 
