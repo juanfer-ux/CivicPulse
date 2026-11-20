@@ -1,8 +1,8 @@
 import { gsap } from 'gsap'
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { CaretDown, MapPin, PictureInPicture, SidebarSimple, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
-import mark from '@/assets/logo-mark.svg'
+import { CaretDown, MapPin, PictureInPicture, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
+import { setRailSlot } from '@/lib/railSlot'
 import { AgentHome } from '@/components/AgentHome'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -62,7 +62,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
   }
 
   return (
-    <Card className="isolate min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:gap-0 max-md:gradient-border md:max-desk:rounded-none md:max-desk:border-0 md:max-desk:bg-transparent desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
+    <Card className="isolate min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:flex-row desk:gap-0 max-md:gradient-border md:max-desk:rounded-none md:max-desk:border-0 md:max-desk:bg-transparent desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
       {/* Dotted texture (owner, 2026-11-15; whole panel 2026-11-16): a dot every 8 px (about 2 px wide), colored by a gradient from neutral-900 at the top to neutral-600 at the bottom, made by masking the gradient with the dots; behind everything, from the top of the panel to the bottom (title row, chat and composer), not only the chat area. */}
         {turns.length === 0 && (
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"> {/* Figma Star (owner's Figma, 2026-11-17, it replaced the ellipse): a four-pointed star, 502 x 502, centered, 305 px below the panel's bottom edge (so only its top points show), a gradient at about 50 degrees from `indigo-400` (10 %) through `red-300` (61 %) to `yellow-300`, 40 % opacity, blurred 120 in Figma (60 px in CSS); the landing only, it goes once a conversation starts; behind the dots and everything else */}
@@ -79,14 +79,10 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </div>
         )}
         <div aria-hidden className={`pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,var(--neutral-900),var(--neutral-600))] ${turns.length ? 'opacity-40' : ''}`} style={{ maskImage: 'radial-gradient(#000 1px, transparent 1.5px)', maskSize: '8px 8px', WebkitMaskImage: 'radial-gradient(#000 1px, transparent 1.5px)', WebkitMaskSize: '8px 8px' }} />
+      <div ref={setRailSlot} className="hidden shrink-0 [:root[data-sidebar-collapsed]_&]:desk:block" /> {/* the collapsed sidebar's rail is drawn here, inside the panel (owner's Figma, 2026-11-17); empty while the sidebar is open */}
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       {/* The title row (owner's Figma, 2026-11-12): 60 px (8 px above and below the 44 px collapse button), 16 px at the sides, "Explore" in `label` / neutral-200, a 0.5 px `neutral-600` line under it (owner, 2026-11-16: removed, put back, then set to `neutral-600` like the sidebar line; Figma has none right now), the collapse control at its right: Figma's Sidebar Item Investigation instance, 40 × 44 px, 4 px radius, the `picture-in-picture` icon at 20 px (`PictureInPicture`, regular; owner, 2026-11-16, a try: it was `Minus`, a minimize dash, and before that `panel-left`), `neutral-600` on hover (owner, 2026-11-13; it was a 32 px ghost button with a 16 px arrow). */}
       <div className={`flex items-center md:max-desk:hidden desk:shrink-0 desk:border-b-[0.5px] desk:border-(--neutral-600) ${turns.length === 0 ? 'desk:h-17' : 'desk:h-(--agent-header-h)'}`}> {/* Figma title row (owner, 2026-11-17, latest): 68 px high, two cells side by side: a 44 px cell with the expand button (40 x 44, 2 px at the sides; invisible while the sidebar is expanded, so nothing moves) and the rest, 16 px in, with a 0.5 px `neutral-600` line at its left and under both; the rest holds the title, the collapse button and a 40 px empty space at the right. The conversation's Figma row still has the older layout. */}
-        <div className="hidden h-full w-16 shrink-0 items-center justify-center border-r-[0.5px] border-(--neutral-700) px-3 py-2 [:root[data-sidebar-collapsed]_&]:desk:flex"> {/* Figma "Logo (collapsed) container" (owner's Figma, 2026-11-17): while the sidebar is collapsed it is gone, and the logo mark sits here, a 40 px button that expands it; while the sidebar is open the container is not drawn */}
-          <button type="button" aria-label="Expand menu" title="Expand menu" onClick={() => window.dispatchEvent(new Event('sidebar-expand'))} className="group grid size-10 shrink-0 cursor-pointer place-items-center rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
-            <img src={mark} alt="" width={40} height={40} className="group-hover:hidden group-focus-visible:hidden" /> {/* the rollover is kept (owner, 2026-11-17): on hover or focus the logo swaps for the panel icon, mirrored, as it did in the collapsed sidebar */}
-            <SidebarSimple weight="regular" className="hidden size-5 -scale-x-100 group-hover:block group-focus-visible:block" aria-hidden />
-          </button>
-        </div>
         <div className="flex h-full flex-1 items-center">
           <CardHeader className="flex w-full flex-row items-center gap-2.5 max-desk:mx-auto max-desk:max-w-[664px] desk:px-8"> {/* Figma title row (owner's Figma, 2026-11-17): 32 px at the sides, "Explore" (fills), the place (map-pin, "Bogotá, Colombia", a chevron; no menu yet) and the collapse button */}
             <CardTitle asChild className="flex-1 text-label text-(--neutral-200)">
@@ -104,11 +100,11 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           </CardHeader>
         </div>
       </div>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0">
+      <CardContent className={`flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0 [:root[data-sidebar-collapsed]_&]:desk:pr-[70px]`}> {/* the body and the chat area have 70 px at the right while the rail is on the left, so they are centered in the whole panel, not only in the agent column (owner's Figma, 2026-11-17: the landing first, then the conversation too) */}
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
         <div className="relative min-h-0 flex-1">
         <ScrollArea className="relative h-full" viewportClassName={turns.length === 0 ? '[&>div]:!flex [&>div]:min-h-full [&>div]:flex-col' : '[&>div]:!block'}> {/* the landing's group is centered vertically between the strip and the composer (owner, 2026-11-17, with a screenshot; Figma's body is centered both ways); taller content scrolls from the top; a conversation starts at the top */}
-        <div className={`flex w-full flex-col gap-3 text-body ${turns.length === 0 ? 'flex-1' : ''} max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[816px] desk:gap-8 desk:px-12 desk:py-8`}> {/* the landing's body is top-aligned (owner's Figma, 2026-11-17): the summary card sits at the top and the dashboard fills the rest and centers its own content */}
+        <div className={`flex w-full flex-col gap-3 text-body ${turns.length === 0 ? 'flex-1' : ''} max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[calc(var(--agent-content-w)+96px)] desk:gap-8 ${turns.length === 0 ? 'desk:px-10 desk:py-10' : 'desk:px-12 desk:py-8'}`}> {/* the landing's body is top-aligned (owner's Figma, 2026-11-17): the summary card sits at the top and the dashboard fills the rest and centers its own content */}
           {turns.length === 0 && <AgentHome ask={(q) => void ask(q)} />}
           {turns.map((t, i) => (
             <div key={i} className="flex flex-col gap-4 desk:gap-5"> {/* 20 px between a question and its answer on desktop (owner's Figma, 2026-11-17; it was 16) */}
@@ -122,11 +118,11 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </div>
         </ScrollArea>
         </div>
-        <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:flex-row desk:flex-col desk:items-stretch desk:gap-1.5 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-12 desk:py-2.5 desk:max-w-[816px]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
+        <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:flex-row desk:flex-col desk:items-stretch desk:gap-1.5 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-8 desk:py-5 desk:max-w-[calc(var(--agent-content-w)+64px)]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
           <Composer value={text} onChange={setText} busy={busy} />
-          <p className="hidden text-center text-[11px]/4 tracking-[0.05em] text-(--neutral-300) desk:block">Civic Pulse AI supports decisions and may contain errors. Verify before acting. The final decision rests with the responsible official.</p> {/* Figma chat area (owner's Figma, 2026-11-17): the note is under the composer in the landing and in a conversation, 11 / 16 Manrope Regular with 5 % spacing, `neutral-300` (owner's Figma, 2026-11-17; it was `neutral-200`); the text is the institutional one (owner, 2026-11-17: decision support, verify, the responsible official decides; no "legal advice", no Terms link) */}
         </form>
       </CardContent>
+      </div>
     </Card>
   )
 }

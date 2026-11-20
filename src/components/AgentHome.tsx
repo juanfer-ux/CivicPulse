@@ -62,15 +62,15 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
     return () => document.removeEventListener('keydown', onKey)
   }, [ask])
   return (
-    <div className="flex flex-1 flex-col gap-10"> {/* Figma Conversation body (owner, 2026-11-17, latest): the summary card, then the dashboard, 40 px apart (it was 64) */}
-      <Alert variant="info" icon={<Sparkle weight="fill" className="size-5 text-(--indigo-300)" aria-hidden />} className="mx-auto hidden max-w-[700px] desk:flex"> {/* Figma Alert, variant info (owner, 2026-11-17): the summary card, 700 px at most and centered; the icon is `indigo-300` (below) */}
-        CivicPulse AI groups related reports into patterns. Nothing goes to the authorities until you’ve reviewed it.
+    <div className="flex flex-1 flex-col gap-20"> {/* Figma Conversation body (owner, 2026-11-17, latest): the alert, then the dashboard, 80 px apart (64 before) */}
+      <Alert variant="info" icon={<Sparkle weight="fill" className="size-5 text-(--indigo-300)" aria-hidden />} className="mx-auto hidden max-w-(--agent-content-w) desk:flex"> {/* Figma Alert, variant info (owner, 2026-11-17): the summary card, 700 px at most and centered; the icon is `indigo-300` (below) */}
+        CivicPulse AI groups related reports into patterns and may contain errors. Verify before acting: nothing goes to the authorities until you’ve reviewed it, and the final decision rests with the responsible official.
       </Alert>
-      <div className="flex flex-1 flex-col justify-center gap-16 px-2.5 py-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
+      <div className="flex flex-1 flex-col justify-start gap-16 px-2.5 py-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
       <div className="flex flex-col gap-4"> {/* (the line under the greeting is hidden in Figma now, owner 2026-11-17, so it is gone) Figma Frame 2147225884 (owner, 2026-11-17): the greeting, then "You're ready to investigate and coordinate incident response" in `display-sm` / `neutral-200`, 16 px apart; the place text left the header */}
         <h2 className="font-display text-display-md text-(--neutral-100)">Welcome back,{first ? ` ${first},` : ''}</h2>
       </div>
-      <div className="flex flex-col gap-12"> {/* Figma Dashboard modules (owner's Figma, 2026-11-17, checked): "Here's what's happening" and "Recurrences to investigate" are 48 px apart (the code had 32); before that, Figma Frame 2147225871 (2026-11-16): the modules 32 px apart (it was 24); the greeting is 64 px above them, the group has 16 px above and below and 10 at the sides (700 px wide) */}
+      <div className="flex flex-col gap-16"> {/* Figma Dashboard modules (owner's Figma, 2026-11-17, latest): 64 px between the two modules (48 an hour before);  (owner's Figma, 2026-11-17, checked): "Here's what's happening" and "Recurrences to investigate" are 48 px apart (the code had 32); before that, Figma Frame 2147225871 (2026-11-16): the modules 32 px apart (it was 24); the greeting is 64 px above them, the group has 16 px above and below and 10 at the sides (700 px wide) */}
       <Section title="Here's what's happening">
           <div className="flex flex-wrap items-center gap-3"> {/* Figma CatchUp_Module2 (owner, 2026-11-15, checked again later that day): a wrapping row, 12 px across and 12 px between wrapped rows, items centered; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
             <div className="@container min-w-[180px] flex-1 basis-0">

@@ -138,6 +138,11 @@
 }
 
 /* Sizes from Figma's Device collection: Mobile values by default (windows under 1,440 px), Desktop values from 1,440 px. */
+/* The elements inside the agent panel (conversation column, composer, summary card, landing content) are as wide as the viewport allows (owner, 2026-11-17): 720 px at 1,600 px or below, 760 from 1,601 to 2,100, 800 above 2,100; the panel itself is 920 / 1,100 / 1,250 (`agentMaxFor` in `AgentResizer.tsx`). The column adds 48 px of padding at each side. */
+:root { --agent-content-w: 720px; }
+@media (min-width: 1601px) { :root { --agent-content-w: 760px; } }
+@media (min-width: 2101px) { :root { --agent-content-w: 800px; } }
+
 :root {
   --display-weight-offset: -300; /* Zalando Sans Expanded (owner, 2026-11-08; -100, then -200 first): added to every display weight, so Regular 400 asks for 100 and display-lg for -100; the font starts at 200, so all four display styles draw as ExtraLight, the thinnest it has. Figma: all four ExtraLight. */
   --weight-offset: -100; /* Added to every font weight (owner, 2026-11-05; -100 since 2026-11-08, it was -75, -65, first -60): 400 becomes 300, 500 becomes 400, 600 becomes 500, 700 becomes 600. 0 = the standard weights. Only the variable font Manrope follows it; Zalando Sans Expanded uses the Figma weights as they are. Figma text styles keep the named weights. */

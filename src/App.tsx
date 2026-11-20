@@ -3,7 +3,7 @@ import { gsap } from 'gsap'
 import { mockChats } from '@/lib/mockChats'
 import { Dashboard, type Tab } from '@/components/Dashboard'
 import type { Area } from '@/lib/agent'
-import { AGENT_DEFAULT, agentMaxFor, AgentResizer } from '@/components/AgentResizer'
+import { agentDefaultFor, agentMaxFor, AgentResizer } from '@/components/AgentResizer'
 import { InvestigatePanel, type Turn } from '@/components/InvestigatePanel'
 import { ModulesProvider } from '@/components/modules/ModulesProvider'
 import { Sidebar, type SidebarIncident, type SidebarRecurrence, type SidebarSelection } from '@/components/Sidebar'
@@ -15,16 +15,22 @@ export default function App() {
   const [agentW, setAgentW] = useAgentWidth()
   const [agentOff, setAgentOff] = useState(false) // the agent panel is collapsed to a 44 px rail (owner's try, 2026-11-08; the composer bar was tried first); the panel stays mounted, so the conversation stays
   const [vw, setVw] = useState(window.innerWidth)
+  const [sidebarW, setSidebarW] = useState(0) // the sidebar's width right now (0 collapsed): the agent panel leaves the map at least 47 % of the viewport
   useEffect(() => {
-    const on = () => setVw(window.innerWidth)
+    const on = () => {
+      setVw(window.innerWidth)
+      setSidebarW(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-now')) || 0)
+    }
+    on()
     window.addEventListener('resize', on)
-    return () => window.removeEventListener('resize', on)
+    window.addEventListener('sidebar-now', on) // sent by Sidebar when it opens, closes or is resized
+    return () => (window.removeEventListener('resize', on), window.removeEventListener('sidebar-now', on))
   }, [])
-  const maxW = agentMaxFor(vw) // 920 at 1,600 px or below, 1,250 above 2,100, 1,100 between (owner, 2026-11-17)
+  const maxW = agentMaxFor(vw, sidebarW) // 920 at 1,600 px or below, 1,250 above 2,100, 1,100 between, and never so wide that the map is under 47 % of the viewport (owner, 2026-11-17)
   // The agent panel's width (`--agent-w` on <main>) moves with GSAP (owner, 2026-11-13): when the window or the sidebar change what it may be, it glides to the new width (0.3 s, power2.out, the sidebar's curve); while the handle is dragged it follows the pointer at once.
   const mainRef = useRef<HTMLElement>(null)
   const instant = useRef(true)
-  const target = agentOff ? 56 : Math.min(maxW, agentW ?? AGENT_DEFAULT) // no dragged width yet: it opens at 920 every time the page loads (owner, 2026-11-17)
+  const target = agentOff ? 56 : Math.min(maxW, agentW ?? agentDefaultFor(vw)) // no dragged width yet: it opens at 920, 1,000 or 1,100 by viewport every time the page loads (owner, 2026-11-17)
   useLayoutEffect(() => {
     const el = mainRef.current!
     const was = parseFloat(el.style.getPropertyValue('--agent-w'))
