@@ -8,9 +8,10 @@ export function buckets(times: number[], end: number, bins = 5, binDays = 12): n
   return out
 }
 
-/** The graph's points in a w x h box (a peak sits at the top, a zero at the bottom) and the index of the peak (the last one wins a tie, it is the newest). */
+/** The graph's points in a w x h box (owner, 2026-11-20: the line fills the box like Figma's Vector 1, its lowest point on the bottom edge and its peak on the top, 1 px in each way for the 2 px stroke; it used to put a zero at the bottom, so a series that never reaches zero floated above it) and the index of the peak (the last one wins a tie, it is the newest). A flat series sits at the bottom. */
 export function sparkPoints(series: number[], w: number, h: number) {
-  const max = Math.max(1, ...series)
-  const pts = series.map((v, i) => [(i / Math.max(1, series.length - 1)) * w, h - (v / max) * h] as const)
+  const lo = Math.min(...series)
+  const span = Math.max(...series) - lo
+  const pts = series.map((v, i) => [(i / Math.max(1, series.length - 1)) * w, span ? h - 1 - ((v - lo) / span) * (h - 2) : h - 1] as const)
   return { pts, peak: series.lastIndexOf(Math.max(...series)) }
 }
