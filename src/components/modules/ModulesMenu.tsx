@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { Check, Stack } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
@@ -17,7 +18,7 @@ const Item = ({ label, on, pick }: { label: string; on: boolean; pick: () => voi
 export function ModulesMenu({ kind }: { kind: 'recurrence' | 'incident' }) {
   const { on, startDrag, dockAt, follow, setFollow } = useModules() // off without the provider (tests) or with /?modules=0
   const [open, setOpen] = useState(false)
-  const [at, setAt] = useState({ top: 0, right: 0 })
+  const [at, setAt] = useState({ top: 0, left: 0 })
   const btn = useRef<HTMLButtonElement>(null)
   const box = useRef<HTMLDivElement>(null)
   const down = useRef({ x: 0, y: 0 })
@@ -32,7 +33,7 @@ export function ModulesMenu({ kind }: { kind: 'recurrence' | 'incident' }) {
   if (!on) return null
   const toggle = () => {
     const r = btn.current!.getBoundingClientRect()
-    setAt({ top: r.bottom + 4, right: window.innerWidth - r.right })
+    setAt({ top: r.bottom + 4, left: Math.max(8, Math.min(r.left, window.innerWidth - 240 - 8)) }) // opens from the button's left edge, never past the viewport: a right-aligned menu slid under the agent panel (owner's screenshot, 2026-11-19)
     setOpen(!open)
   }
   const row = (t: ModuleType) => (
@@ -41,7 +42,7 @@ export function ModulesMenu({ kind }: { kind: 'recurrence' | 'incident' }) {
       role="button"
       tabIndex={0}
       aria-label={`${MODULES[t].title}: drag to an area on the map, or click to add it`}
-      onPointerDown={(e: ReactPointerEvent) => { down.current = { x: e.clientX, y: e.clientY }; startDrag(t)(e) }}
+      onPointerDown={(e: ReactPointerEvent) => { down.current = { x: e.clientX, y: e.clientY }; startDrag(t)(e); window.addEventListener('pointerup', (u) => Math.hypot(u.clientX - down.current.x, u.clientY - down.current.y) >= 4 && setOpen(false), { once: true }) }} // a drag drops the module on the map and closes the menu too (it stayed open under the docked module, owner's screenshot 2026-11-19)
       onClick={(e) => { if (Math.hypot(e.clientX - down.current.x, e.clientY - down.current.y) < 4) { dockAt(suggestedArea(t), t); setOpen(false) } }} // a click, not the end of a drag
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dockAt(suggestedArea(t), t); setOpen(false) } }}
       className="flex h-8 cursor-grab touch-none items-center gap-2 rounded-sm px-2 text-body-sm text-(--neutral-100) outline-none select-none hover:bg-(--neutral-700) focus-visible:bg-(--neutral-700) active:cursor-grabbing"
@@ -56,15 +57,16 @@ export function ModulesMenu({ kind }: { kind: 'recurrence' | 'incident' }) {
         <Stack weight="regular" className="size-4" aria-hidden />
         Modules
       </Button>
-      {open && (
-        <div ref={box} role="menu" aria-label="Modules" style={{ top: at.top, right: at.right }} className="fixed z-50 w-60 rounded-sm border border-(--neutral-500) bg-(--neutral-800) p-1 shadow-lg">
+      {open && createPortal(
+        <div ref={box} role="menu" aria-label="Modules" style={{ top: at.top, left: at.left }} className="fixed z-50 w-60 rounded-sm border border-(--neutral-500) bg-(--neutral-800) p-1 shadow-lg">
           <p className="px-2 pt-1 pb-0.5 text-caption-medium text-(--neutral-300)">Drag to the map, or click to add</p>
           {modulesFor(kind).map(row)}
           <div className="my-1 h-px bg-(--neutral-600)" aria-hidden />
           <p className="px-2 pt-1 pb-0.5 text-caption-medium text-(--neutral-300)">Apply modules across every case</p>
           <Item label="Follow the open case" on={follow} pick={() => setFollow(true)} />
           <Item label="Stay with each case" on={!follow} pick={() => setFollow(false)} />
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   )
