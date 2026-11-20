@@ -79,10 +79,10 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </div>
         )}
         <div aria-hidden className={`pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,var(--neutral-900),var(--neutral-600))] ${turns.length ? 'opacity-40' : ''}`} style={{ maskImage: 'radial-gradient(#000 1px, transparent 1.5px)', maskSize: '8px 8px', WebkitMaskImage: 'radial-gradient(#000 1px, transparent 1.5px)', WebkitMaskSize: '8px 8px' }} />
-      <div ref={setRailSlot} className="hidden shrink-0 [:root[data-sidebar-collapsed]_&]:desk:block" /> {/* the collapsed sidebar's rail is drawn here, inside the panel (owner's Figma, 2026-11-17); empty while the sidebar is open */}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       {/* The title row (owner's Figma, 2026-11-12): 60 px (8 px above and below the 44 px collapse button), 16 px at the sides, "Explore" in `label` / neutral-200, a 0.5 px `neutral-600` line under it (owner, 2026-11-16: removed, put back, then set to `neutral-600` like the sidebar line; Figma has none right now), the collapse control at its right: Figma's Sidebar Item Investigation instance, 40 × 44 px, 4 px radius, the `picture-in-picture` icon at 20 px (`PictureInPicture`, regular; owner, 2026-11-16, a try: it was `Minus`, a minimize dash, and before that `panel-left`), `neutral-600` on hover (owner, 2026-11-13; it was a 32 px ghost button with a 16 px arrow). */}
-      <div className={`flex items-center md:max-desk:hidden desk:shrink-0 desk:border-b-[0.5px] desk:border-(--neutral-600) ${turns.length === 0 ? 'desk:h-17' : 'desk:h-(--agent-header-h)'}`}> {/* Figma title row (owner, 2026-11-17, latest): 68 px high, two cells side by side: a 44 px cell with the expand button (40 x 44, 2 px at the sides; invisible while the sidebar is expanded, so nothing moves) and the rest, 16 px in, with a 0.5 px `neutral-600` line at its left and under both; the rest holds the title, the collapse button and a 40 px empty space at the right. The conversation's Figma row still has the older layout. */}
+      <div className={`flex items-center md:max-desk:hidden desk:shrink-0 desk:border-b-[0.5px] desk:border-(--neutral-700) ${turns.length === 0 ? 'desk:h-17' : 'desk:h-(--agent-header-h)'}`}>
+        <div ref={setRailSlot} className="hidden h-full shrink-0 [:root[data-sidebar-collapsed]_&]:desk:block" /> {/* the collapsed sidebar's logo box (64 x 68, `black`, a line under it) is the first cell of the header row, not a column down the panel (owner's Figma, 2026-11-20: the sidebar left the Agent Panel and the logo box became part of its Header); empty while the sidebar is open */} {/* Figma title row (owner, 2026-11-17, latest): 68 px high, two cells side by side: a 44 px cell with the expand button (40 x 44, 2 px at the sides; invisible while the sidebar is expanded, so nothing moves) and the rest, 16 px in, with a 0.5 px `neutral-600` line at its left and under both; the rest holds the title, the collapse button and a 40 px empty space at the right. The conversation's Figma row still has the older layout. */}
         <div className="flex h-full flex-1 items-center">
           <CardHeader className="flex w-full flex-row items-center gap-2.5 max-desk:mx-auto max-desk:max-w-[664px] desk:px-8"> {/* Figma title row (owner's Figma, 2026-11-17): 32 px at the sides, "Explore" (fills), the place (map-pin, "Bogotá, Colombia", a chevron; no menu yet) and the collapse button */}
             <CardTitle asChild className="flex-1 text-label text-(--neutral-200)">
@@ -100,11 +100,11 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           </CardHeader>
         </div>
       </div>
-      <CardContent className={`flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0`}> {/* the body and the chat area have 70 px at the right while the rail is on the left, so they are centered in the whole panel, not only in the agent column (owner's Figma, 2026-11-17: the landing first, then the conversation too). The padding is on the content INSIDE the scroll area, never on the scroll area: the scrollbar stays on the panel's own right edge. */}
+      <CardContent className={`flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0`}> {/* the body and the chat area are centered in the whole panel (the sidebar's rail is a header cell now, owner's Figma 2026-11-20, so nothing is reserved at a side). The padding is on the content INSIDE the scroll area, never on the scroll area: the scrollbar stays on the panel's own edge. */}
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
         <div className="relative min-h-0 flex-1">
         <ScrollArea className="relative h-full" viewportClassName={turns.length === 0 ? '[&>div]:!flex [&>div]:min-h-full [&>div]:flex-col' : '[&>div]:!block'}> {/* the landing's group is centered vertically between the strip and the composer (owner, 2026-11-17, with a screenshot; Figma's body is centered both ways); taller content scrolls from the top; a conversation starts at the top */}
-        <div className={`flex w-full flex-1 flex-col [:root[data-sidebar-collapsed]_&]:desk:pr-[70px]`}>
+        <div className={`flex w-full flex-1 flex-col`}>
         <div className={`flex w-full flex-col gap-3 text-body ${turns.length === 0 ? 'flex-1' : ''} max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[calc(var(--agent-content-w)+32px)] desk:gap-8 desk:px-4 desk:py-10`}> {/* the landing's body is top-aligned (owner's Figma, 2026-11-17): the summary card sits at the top and the dashboard fills the rest and centers its own content */}
           {turns.length === 0 && <AgentHome ask={(q) => void ask(q)} />}
           {turns.map((t, i) => (
@@ -120,7 +120,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </div>
         </ScrollArea>
         </div>
-        <div className="w-full [:root[data-sidebar-collapsed]_&]:desk:pr-[70px]">
+        <div className="w-full">
         <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:flex-row desk:flex-col desk:items-stretch desk:gap-1.5 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-4 desk:py-5 desk:max-w-[calc(var(--agent-content-w)+32px)]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
           <Composer value={text} onChange={setText} busy={busy} />
         </form>
