@@ -37,9 +37,9 @@
   --text-display-xs--font-weight: calc(400 + var(--display-weight-offset));
   --text-display-xs--line-height: 20px;
   --text-display-xs--letter-spacing: 0.01em;
-  --text-stat: 40px; /* Figma stat (2026-11-20: 40 px, line 30, SemiExpanded SemiBold, tracking -2 %; before, 2026-11-17: 32 px, line 28, it was 28; before: Zalando Sans SemiExpanded SemiBold 28 / 28, tracking -2 % (it was 24 / 24, 42 / 32 and 40 / 32 before) */
+  --text-stat: 40px; /* Figma stat (2026-11-20, later: line 32; before: 40 px, line 30, SemiExpanded SemiBold, tracking -2 %; before, 2026-11-17: 32 px, line 28, it was 28; before: Zalando Sans SemiExpanded SemiBold 28 / 28, tracking -2 % (it was 24 / 24, 42 / 32 and 40 / 32 before) */
   --text-stat--font-weight: calc(600 + var(--stat-weight-offset));
-  --text-stat--line-height: 30px;
+  --text-stat--line-height: 32px;
   --text-stat--letter-spacing: -0.02em;
   --text-heading: 20px;
   --text-heading--font-weight: calc(600 + var(--weight-offset));
@@ -178,7 +178,7 @@
     --lh-label: 24px; /* Figma 2026-11-05 (it was 22) */
     --lh-button: 20px;
     --fs-meta: 13px;
-    --lh-meta: 23px; /* Figma 2026-11-05 (it was 21) */
+    --lh-meta: 20px; /* Figma 2026-11-20: 20 (it was 23 since 2026-11-05, 21 before) */
     --fs-caption: 12px; /* Figma 2026-11-12: 12 (it was 12.5) */
     --control-sm: 32px;
     --control-default: 36px;
@@ -234,7 +234,7 @@
 :root {
   --radius: 0.5rem;
   --section-header-h: 0px; /* the map has no header (owner, 2026-10-28; it was 70px), so the map and filters start at the top */
-  --stat-row-h: 127px; /* height of the row of Stat Cards over the map (Figma Stat Card, owner 2026-11-17, latest: 16 padding + 24 header + 16 + 49 number row + 20 padding; it was 121, 117, 104, 116, 143 and 156 before) */
+  --stat-row-h: 136px; /* height of the row of Stat Cards over the map (Figma Stat Card, owner 2026-11-20, latest, ninth look: 16 padding + 24 header + 12 + 66 number row (6 above, the number column 54 = number 32 + 6 + "Reports" caption 16, 6 under; the graph is 50) + 16 padding = 134, plus the two 1 px lines as before; Figma's default variant is 136; was 134, 136, 140, 131, 137, 135 and 127 earlier the same day) */
   --panel-gap: 0px; /* no space between the sidebar, the agent panel and the map on desktop: they touch and a right-side line divides them (owner, 2026-10-30, branch flush-dividers) */
   --chart-max-w: 480px; /* the widest a chart or graph in the agent's conversation may be (owner, 2026-11-15; the text column is 720 px): one rule for every chart type, change it here once */
   --page-pad: 12px; /* THE layout rule (owner, 2026-11-06): 12 px around the page and around everything that floats on the map (stat cards, filters, chips, detail panels). Change it here once. */

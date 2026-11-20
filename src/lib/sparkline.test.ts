@@ -10,8 +10,9 @@ describe('sparkline', () => {
   it('puts the peak at the top and finds it', () => {
     const { pts, peak } = sparkPoints([1, 4, 2, 4, 0], 100, 40)
     expect(peak).toBe(3)
-    expect(pts[3][1]).toBe(0)
-    expect(pts[4][1]).toBe(40)
-    expect(sparkPoints([0, 0], 10, 10).pts[0][1]).toBe(10) // all zero: flat at the bottom, no NaN
+    expect(pts[3][1]).toBe(1)
+    expect(pts[4][1]).toBe(39)
+    expect(sparkPoints([3, 5, 9], 10, 32).pts[0][1]).toBe(31) // the lowest value touches the bottom even when it is not zero
+    expect(sparkPoints([0, 0], 10, 10).pts[0][1]).toBe(9) // flat: at the bottom, no NaN
   })
 })

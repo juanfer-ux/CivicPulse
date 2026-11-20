@@ -4,6 +4,7 @@ import { ArrowDown, ArrowRight, ArrowUp, TrendDown } from '@phosphor-icons/react
 import { sparkPoints } from '@/lib/sparkline'
 
 /** The trend mark (Figma Stat Trend `above`, owner, 2026-11-17, fourth pass): just the 14 px arrow in a 24 px box at the right of the name, `red-400` for above; the circle is gone. Figma only redrew `above`; the other three keep their old outlined strip there, so their arrow tones are their old label tones. */
+const GRAPH_H = 50 // Figma Graph / Vector 1 (owner's Figma, 2026-11-20, seventh look: 50 px high; 48 in the sixth, 32 before)
 const TREND = {
   above: { Icon: ArrowUp, text: 'Above usual', box: 'size-6 bg-(--neutral-700)', icon: 'size-3.5 text-(--red-400)' },
   about: { Icon: ArrowRight, text: 'About usual', box: 'size-6 bg-(--neutral-700)', icon: 'size-3 text-(--blue-200)' },
@@ -25,28 +26,28 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
     ro.observe(el)
     return () => ro.disconnect()
   }, [series])
-  const g = series && w > 0 ? sparkPoints(series, w, 32) : null
+  const g = series && w > 0 ? sparkPoints(series, w, GRAPH_H) : null
   return (
     <Tag
-      className={`@container flex min-w-0 flex-col gap-4 rounded-[4px] bg-(--neutral-900) px-4 pt-4 pb-5 text-left shadow-[inset_0_0_0_1px_var(--neutral-600)] enabled:hover:shadow-[0_0_0_2px_var(--neutral-500)] ${selected ? "shadow-[0_0_0_2px_var(--neutral-500)]" : ""}`}
+      className={`@container flex min-w-0 flex-col gap-3 rounded-[4px] bg-(--neutral-900) p-4 text-left shadow-[inset_0_0_0_1px_var(--neutral-600)] enabled:hover:shadow-[0_0_0_2px_var(--neutral-500)] ${selected ? "shadow-[0_0_0_2px_var(--neutral-500)]" : ""}`}
       {...(onClick ? { type: 'button' as const, onClick, 'aria-pressed': !!selected } : {})}
     >
-      <span className="flex h-6 items-center justify-between gap-2">
+      <span className="flex h-6 items-center justify-between gap-2 px-px"> {/* Figma Header (owner's Figma, 2026-11-20, fifth look): the name and the trend mark only, 24 px high ("Reports" went back down to the number row) */}
         <span className="truncate text-subtitle text-(--neutral-100)">{label}</span>
         {t && (
-          <span className={`grid shrink-0 place-items-center rounded-xs ${t.box}`} title={t.text}> {/* Figma Stat Trend (owner, 2026-11-17, latest): a small filled box (radius 2) with the trend icon: above 24 px, `red-900` and `red-400`; about, low and below 20 px, `blue-900` / `blue-200`, `yellow-900` / `yellow-300`, `green-900` / `green-400`; the icon is 14 px in above and 12 in the rest; the Figma glyph `trend-top` is an up arrow (turned to the right for about and down for below), and low is the zigzag `trend-down`: Phosphor `ArrowUp`, `ArrowRight`, `TrendDown`, `ArrowDown` */}
+          <span className={`grid shrink-0 place-items-center rounded-[6px] ${t.box}`} title={t.text}> {/* Figma Stat Trend (owner, 2026-11-17, latest): a small filled box (radius 2) with the trend icon: above 24 px, `red-900` and `red-400`; about, low and below 20 px, `blue-900` / `blue-200`, `yellow-900` / `yellow-300`, `green-900` / `green-400`; the icon is 14 px in above and 12 in the rest; the Figma glyph `trend-top` is an up arrow (turned to the right for about and down for below), and low is the zigzag `trend-down`: Phosphor `ArrowUp`, `ArrowRight`, `TrendDown`, `ArrowDown` */}
             <t.Icon className={t.icon} aria-hidden />
             <span className="sr-only">{t.text}</span>
           </span>
         )}
       </span>
-      <span className="flex h-[49px] items-center gap-10">
-          <span className="flex flex-1 basis-0 flex-col justify-between self-stretch">
+      <span className="flex items-center gap-10 py-1.5"> {/* Figma Data (owner's Figma, 2026-11-20, ninth look, "surgical": items centered, 40 px between the number column and the graph, 6 px of padding above and under it (only under it before), 12 px under the header (20 before); the column is the number (32 px line) with "Reports" (caption) under it, 6 px apart (54 px), the graph 50 px high, so the row is 66 px */}
+          <span className="flex flex-1 basis-0 flex-col gap-1.5">
             <span className="font-display-semi text-stat text-(--brand-primary)">{value}</span>
-            <span className="text-meta text-(--neutral-300)">Reports</span>
+            <span className="px-px text-caption text-(--neutral-300)">Reports</span> {/* Figma wraps the label in a frame with 1 px at each side */}
           </span>
           {series && (
-            <span className="hidden h-8 min-w-0 flex-1 basis-0 pr-2 @min-[140px]:block"> {/* Figma Graph (owner, 2026-11-15): 164 px at most, padding included */}
+            <span className="hidden h-[50px] min-w-0 flex-1 basis-0 pr-2 @min-[140px]:block"> {/* Figma Graph (owner, 2026-11-15): 164 px at most, padding included */}
               <span ref={box} className="relative block h-full"> {/* Figma Vector 1 (owner, 2026-11-15, latest): Fill in width and height, so the line is as long as the Graph's inner box (96.5 px in a 257 px card) */}
                 {g && (
                   <>
@@ -57,7 +58,7 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
                       // Option 2 (owner, 2026-11-15): the line is a solid-color stroke used as a mask over a CSS gradient (indigo-500 for the first third, blending to indigo-300 at 93 %, solid after), because the SVG gradient stroke looked crackled. 2 px, flat ends, mitered corners, drawn at the real pixel size.
                       style={{
                         background: 'linear-gradient(90deg, var(--indigo-500) 33.2%, var(--indigo-300) 93.3%)',
-                        mask: `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="56"><polyline points="${g.pts.map((p) => p.join(',')).join(' ')}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/></svg>`)}") 0 0 / ${w}px 56px no-repeat`,
+                        mask: `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${GRAPH_H}"><polyline points="${g.pts.map((p) => p.join(',')).join(' ')}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="miter"/></svg>`)}") 0 0 / ${w}px ${GRAPH_H}px no-repeat`,
                       }}
                     />
                     {/* the peak: a 6 px dot on the newest point (Figma: indigo-200 since 2026-11-15, it was indigo-300) */}

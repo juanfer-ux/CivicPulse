@@ -468,16 +468,14 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
   const phone: Chats = { ...props, onPick: (id) => (props.onPick(id), setOpen(false)), onNew: () => (props.onNew(), setOpen(false)), onNewCase: () => (props.onNewCase(), setOpen(false)), onOpenRecurrence: (id) => (props.onOpenRecurrence?.(id), setOpen(false)), onOpenIncident: (id) => (props.onOpenIncident?.(id), setOpen(false)) }
 
   const railSlot = useRailSlot()
-  // The collapsed sidebar is a 70 px rail inside the agent panel (owner's Figma, 2026-11-17): only the logo, which expands the sidebar (the avatar left the rail the same day).
+  // The collapsed sidebar is its logo box in the agent panel's header row (owner's Figma, 2026-11-20; a 70 px rail down the panel before): the logo expands the sidebar.
   const rail =
     collapsed && railSlot
       ? createPortal(
-          <div className="flex h-full w-[70px] flex-col items-center"> {/* Figma Sidebar inside the Agent Panel (owner's Figma, 2026-11-17): the instance has no fill and no line of its own, so the panel's texture and star show through; only the brand header keeps its fill (`black` #050505 since 2026-11-19, it was `neutral-900`) with 0.5 px `neutral-600` lines at its right and under it */}
-            <Button variant="ghost" className="group h-17 w-full rounded-none border-r-[0.5px] border-b-[0.5px] border-(--neutral-600) bg-(--black) p-0 hover:bg-(--black)" aria-label="Expand menu" title="Expand menu" onClick={toggle}>
-              <img src={mark} alt="" width={40} height={40} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
-              <SidebarSimple weight="regular" className="hidden size-5 -scale-x-100 group-hover:block group-focus-visible:block" aria-hidden />
-            </Button>
-          </div>,
+          <Button variant="ghost" className="group h-17 w-16 rounded-none border-b-[0.5px] border-(--neutral-700) bg-(--black) p-0 hover:bg-(--black)" aria-label="Expand menu" title="Expand menu" onClick={toggle}> {/* Figma Header's "Logo _Collapsed Container" (owner's Figma, 2026-11-20): 64 x 68, `black`, 12 px at the sides around the 40 px logo, a 0.5 px `neutral-700` line under it and none at its right */}
+            <img src={mark} alt="" width={40} height={40} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
+            <SidebarSimple weight="regular" className="hidden size-5 -scale-x-100 group-hover:block group-focus-visible:block" aria-hidden />
+          </Button>,
           railSlot,
         )
       : null

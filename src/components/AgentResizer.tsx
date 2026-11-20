@@ -2,7 +2,7 @@ import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { useNoSelect, useReleaseGuard } from '@/lib/useNoSelect'
 
 /** The agent panel's minimum from the owner's Figma (Agent Panel: min 600, it was 650 until 2026-11-13); `--agent-w` is the panel's visible width since the 12 px page padding around it was removed (owner, 2026-11-15; it was 612 for 600 visible). The maximum puts the panel's right edge at the exact middle of the window (owner, 2026-11-13), see `agentMax`; never below the minimum. FINAL (owner, 2026-11-13): do not change this rule again. */
-export const AGENT_MIN = 900 // the whole panel, the 70 px rail included (owner, 2026-11-17; it was 600, Figma's number; 720 was tried and rolled back the same day)
+export const AGENT_MIN = 900 // the whole panel (owner, 2026-11-17, when a 70 px rail was part of it; the rail became a header cell on 2026-11-20; it was 600, Figma's number; 720 was tried and rolled back the same day)
 const EDGE = 0 // px between the handle and the panel's visible right edge, inside its padding (owner, 2026-11-13)
 /** The panel you see ends at the middle of the window: half the window minus the sidebar's width at that moment (the sidebar's 12 px margin and the panel's 12 px gap cancel out). */
 export const AGENT_MAX = 1100 // the most the handle can drag it to (owner, 2026-11-17; 920, 880 and the middle of the window before)
