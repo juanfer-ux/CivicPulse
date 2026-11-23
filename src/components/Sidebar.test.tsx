@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Sidebar, shownRecurrences } from '@/components/Sidebar'
 
 // Radix ScrollArea (the lists) needs ResizeObserver, which jsdom lacks.
@@ -219,5 +219,34 @@ describe('shownRecurrences', () => {
 
   it('is the three most recently updated when nothing is pinned', () => {
     expect(shownRecurrences(items, undefined, null).map((x) => x.id)).toEqual(['other', 'red-park', 'red-dump'])
+  })
+})
+
+describe('Sidebar — resizing the window', () => {
+  // a controllable matchMedia: `fire(true)` is the window dropping under 1,800 px, `fire(false)` growing back
+  function fakeMedia() {
+    const ls: ((e: { matches: boolean }) => void)[] = []
+    vi.stubGlobal('matchMedia', () => ({ matches: false, addEventListener: (_: string, f: (e: { matches: boolean }) => void) => ls.push(f), removeEventListener: () => {} }))
+    return (matches: boolean) => act(() => ls.forEach((f) => f({ matches })))
+  }
+  afterEach(() => vi.unstubAllGlobals())
+  const open = () => !document.documentElement.hasAttribute('data-sidebar-collapsed')
+
+  it('collapses when the window gets narrow and opens again when it grows back', () => {
+    const fire = fakeMedia()
+    render(<Sidebar {...baseProps} />)
+    fire(true)
+    expect(open()).toBe(false)
+    fire(false)
+    expect(open()).toBe(true)
+  })
+
+  it('leaves a sidebar the person collapsed alone when the window grows', async () => {
+    const user = userEvent.setup()
+    const fire = fakeMedia()
+    render(<Sidebar {...baseProps} />)
+    await user.click(screen.getByRole('button', { name: 'Collapse menu' })) // the person collapses it
+    fire(false)
+    expect(open()).toBe(false)
   })
 })
