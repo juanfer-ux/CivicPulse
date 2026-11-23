@@ -50,6 +50,7 @@ export type Tab = 'explore' | 'ask'
 
 interface Props {
   highlightIds: string[]
+  placesFor?: string | null // the agent's "show places on map": the recurrence whose places are drawn
   /** Localities to outline for an answer about localities. */
   areas: Area[]
   spots: string[][]
@@ -74,7 +75,7 @@ interface Props {
 const FILTERS_PUSH = true
 const FILTERS_W = 420
 
-export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, agentOff, onAgentOff, focus, onRows, onSelection, children }: Props) {
+export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, spots, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, agentOff, onAgentOff, focus, onRows, onSelection, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -215,7 +216,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
   // Experiment (`?places=1`, owner, 2026-11-20): the stored OpenStreetMap places around the open recurrence, as marks on the map and a small card.
   const [places, setPlaces] = useState<{ id: string; list: Place[] | 'error' } | null>(null)
   const placesOn = new URLSearchParams(location.search).get('places') === '1'
-  const placesFor = placesOn && selectedProblem ? selectedProblem : null
+  const placesFor = selectedProblem && (placesOn || askedPlaces === selectedProblem.id) ? selectedProblem : null // the flag shows them on every recurrence; the agent's button, only on the one it answered about
   useEffect(() => {
     if (!placesFor) return
     let live = true
@@ -366,7 +367,7 @@ export function Dashboard({ highlightIds, areas, spots, focusCode, zoomTo, onZoo
         onSelect={select}
       />
 
-      {placesFor && <PlacesCard key={placesFor.id} places={places?.id === placesFor.id ? places.list : 'loading'} />}
+      {placesFor && placesOn && <PlacesCard key={placesFor.id} places={places?.id === placesFor.id ? places.list : 'loading'} />}
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. The banner sits under the filters row (owner, 2026-11-15; it was above the stat cards, then between them and the filters row); while an incident or recurrence is open the stat cards and filters are hidden, so it goes back to the top and the panel sits below it (`--banner-offset`, owner, 2026-11-07). */}
       {chatMode && (

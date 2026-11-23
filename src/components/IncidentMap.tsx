@@ -59,6 +59,7 @@ const MAX_ZOOM = 23 // owner, 2026-11-15 (it was 18)
 const MIN_ZOOM = 11
 const NO_PROBLEMS: ProblemRow[] = []
 const NO_PLACES: Place[] = []
+const MAP_PLACES_MAX = 10 // the nearest ten of a recurrence's places, useful kinds first: forty stems in one circle are a forest (owner's design talk, 2026-11-23)
 const PLACE_TONE = '--neutral-100' // every place's marker and stem are this one neutral, whatever the kind (owner, 2026-11-20); the icon says what it is
 /** The recurrence marker's image by zoom; with `sel` (the open recurrence's id) every other recurrence gets the toned-down image (opaque, like the incidents'). An Active parking marker has no circle (owner's Figma, 2026-11-13) except while it is hovered (`hover`) or open (`sel`): then it gets the circled image (a test). */
 const problemImage = (sel: string | null, hover: string | null = null, badge = false) => ['step', ['zoom'], ...PROBLEM_CIRCLE_PX.flatMap((px, i) => { const id = (dim: boolean) => ['concat', 'problem-', badge ? 'badge-' : '', ['get', 'category'], dim ? '-dim-' : '-', ['get', 'status'], `-${px}`]; const base = sel ? ['case', ['==', ['get', 'id'], sel], id(false), id(true)] : id(false); const lit = ['all', ['==', ['get', 'category'], 'parking'], ['==', ['get', 'status'], 'active'], ['any', ['==', ['get', 'id'], sel ?? ''], ['==', ['get', 'id'], hover ?? '']]]; return [...(i ? [PROBLEM_SWITCH_ZOOMS[i - 1]] : []), (sel || hover) && !badge ? ['case', lit, problemCircledId(px), base] : base] })] as never
@@ -733,7 +734,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     if (!ready || !map) return
     const near = shownCount(places)
     // only the places inside the recurrence's circle are drawn (owner, 2026-11-20); the card lists the ones beyond it too
-    const ordered = places.map((p, i) => ({ p, faded: i >= near })).filter((x) => x.p.dist <= RING_M)
+    const ordered = places.map((p, i) => ({ p, faded: i >= near })).filter((x) => x.p.dist <= RING_M).slice(0, MAP_PLACES_MAX)
     ;(map.getSource('places') as maplibregl.GeoJSONSource).setData({ type: 'FeatureCollection', features: ordered.map(({ p }) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [p.lng, p.lat] }, properties: { name: p.name } })) })
     // each place is a block on the ground with a stem and a square marker on top, drawn by the 3D layer (owner, 2026-11-20)
     placeDotsRef.current = ordered.map(({ p, faded }) => ({ id: `place:${p.id}`, lng: p.lng, lat: p.lat, color: token(PLACE_TONE), open: true, pin: { category: `place:${p.label}`, group: p.kind }, box: mix(token('--neutral-300'), token('--neutral-400'), 0.5), faded })) // the block is the same neutral for every kind (owner, 2026-11-20); the kind's color is on the stem and the marker

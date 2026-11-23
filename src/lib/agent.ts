@@ -3,6 +3,8 @@ import type { Locality } from '@/lib/incidents'
 import type { Draft } from '@/lib/recommendations'
 import { timeBlockLabel } from '@/lib/utils'
 import { fetchLinkedIncidentIds, fetchProblems, type ProblemRow } from '@/lib/problems'
+import { fetchRecurrencePlaces } from '@/lib/placesDb'
+import { RADIUS_M, niceLabel, shownCount } from '@/lib/places'
 import type { Shape } from '@/lib/modules'
 import type { ProblemStatus } from '@/lib/statusColors'
 
@@ -28,6 +30,8 @@ export interface Evidence {
   period: string
   incidentCount: number
   references: string[]
+  /** What `incidentCount` counts when it is not incidents (the places answer counts places). */
+  unit?: string
 }
 export interface Area {
   code: number
@@ -40,13 +44,15 @@ export interface Answer {
   limitations: string[]
   highlightIds: string[]
   /** Which chart draws `bars`: localities of one category (donut, the smaller ones grouped as "Others"), localities of all categories (bar list), the day in 4-hour blocks (area), two periods (two columns), repeated locations (dot matrix) or tomorrow's candidates (numbered rows with a thin bar). Without it, the plain bar list. */
-  chart?: 'donut' | 'barlist' | 'time' | 'period' | 'dots' | 'rows' | 'recurrences'
+  chart?: 'donut' | 'barlist' | 'time' | 'period' | 'dots' | 'rows' | 'recurrences' | 'places'
   /** Localities to outline and shade on the map (code, and a value that sets the shade). An answer about localities shows these instead of circles. */
   areas?: Area[]
   /** Repeated locations: the incident ids of each spot. The map draws one radius around each spot's reports, not the locality outlines. */
   spots?: string[][]
   /** Set when the answer is a recommendation a human can send for review. */
   proposal?: Draft
+  /** The answer is about the places around this recurrence (owner, 2026-11-23): its button draws them on the map (blocks, stems and markers) and clears them. */
+  places?: { problemId: string; reference: string }
   /** Ready-made panels the agent suggests for this answer (decision 0049): a deterministic suggestion the person accepts, never UI the agent invents. */
   offers?: Offer[]
 }
@@ -76,6 +82,7 @@ type Plan = { category: string | null } & (
   | { kind: 'candidates' }
   | { kind: 'attention' }
   | { kind: 'timeline' }
+  | { kind: 'nearby' }
 )
 
 /** Display names, mirroring incident_categories. */
@@ -127,6 +134,9 @@ export function plan(question: string, localities: Locality[]): Plan | null {
   const parking = /\b(parking|parked|obstruction\w*|obstructive|blocking)\b/.test(q)
   const category = dumping && !parking ? 'illegal_dumping' : parking && !dumping ? 'parking' : null
 
+  // What is around the open recurrence (owner, 2026-11-23): "what is around this recurrence?", "nearby places", "shops near here". It needs words that point at the spot, so "areas near schools" keeps going to the investigations.
+  if (/\b(around|near(by)?|close to|next to|surround\w*)\b/.test(q) && /\b(this|that|here|selected|the open|open recurrence|spot|recurrence)\b/.test(q)) return { kind: 'nearby', category }
+  if (/\bnearby (places|shops|stores|businesses|schools|things)\b/.test(q)) return { kind: 'nearby', category }
   if (/\battention\b/.test(q) && /\brecurr\w*/.test(q)) return { kind: 'attention', category }
   if (/\b(timeline|different way|another way|see (the )?occurrences|chart (of )?(the )?occurrences)\b/.test(q)) return { kind: 'timeline', category }
   if (/\b(tomorrow|tonight|next (shift|evening)|deserve\w*|recommend\w*|prioriti\w+)\b/.test(q)) return { kind: 'candidates', category }
@@ -257,12 +267,48 @@ async function timelineAnswer(recurrenceId: string | null): Promise<Answer> {
   }
 }
 
+const MORE = 'OpenStreetMap is mapped by volunteers: a place that is not on it may still be there, and nothing listed does not mean nothing is there.'
+/** What is around the open recurrence: the stored OpenStreetMap places within RADIUS_M, nearest first (the tool `tool_recurrence_places`). Context for the person, never a finding about cause. */
+async function nearbyAnswer(recurrenceId: string | null): Promise<Answer> {
+  if (!recurrenceId) {
+    return { text: 'Pick a recurrence first: open one on the map or from the list, then ask again what is around it.', bars: [], evidence: [], limitations: ['I do not guess: without an open recurrence there is no spot to look around.'], highlightIds: [] }
+  }
+  const r = (await fetchProblems()).find((x) => x.id === recurrenceId)
+  if (!r) return { text: 'I cannot find that recurrence in your scope.', bars: [], evidence: [], limitations: [], highlightIds: [] }
+  const list = await fetchRecurrencePlaces(recurrenceId)
+  const what = `${r.title} (${r.reference})`
+  if (!list.length) {
+    return {
+      text: `${what} has no mapped places within ${RADIUS_M} m in the stored OpenStreetMap data.`,
+      bars: [],
+      evidence: [{ tool: 'tool_recurrence_places', scope: r.reference, period: 'stored snapshot', incidentCount: 0, references: [], unit: 'Places' }],
+      limitations: [MORE, 'The places are real map data around a synthetic recurrence.'],
+      highlightIds: [],
+    }
+  }
+  const first = shownCount(list)
+  const shown = list.slice(0, Math.min(Math.max(first, 5), 8))
+  const nearest = list[0]
+  return {
+    text:
+      `${what} has ${list.length} mapped ${list.length === 1 ? 'place' : 'places'} within ${RADIUS_M} m. Nearest: ${nearest.name || niceLabel(nearest.label)}, ${nearest.dist} m away` +
+      `${nearest.dist <= 20 ? '' : '; nothing is mapped within 20 m'}.${list.length > shown.length ? ` The ${shown.length} nearest are listed.` : ''}`,
+    bars: shown.map((p) => ({ label: p.name ? `${p.name} · ${niceLabel(p.label)}` : niceLabel(p.label), value: p.dist })),
+    chart: 'places',
+    evidence: [{ tool: 'tool_recurrence_places', scope: `${r.reference} · within ${RADIUS_M} m`, period: 'OpenStreetMap, stored snapshot', incidentCount: list.length, references: [r.reference], unit: 'Places' }],
+    limitations: [MORE, 'Only the places within the recurrence’s circle are drawn on the map; sports grounds, parks and benches are listed last. The places are real map data around a synthetic recurrence.'],
+    highlightIds: [],
+    places: { problemId: r.id, reference: r.reference },
+  }
+}
+
 // ───────── Answers ─────────
 export async function answer(question: string, localities: Locality[], ctx: AskContext = {}): Promise<Answer> {
   const p = plan(question, localities)
   if (!p) return unsupported()
   if (p.kind === 'attention') return withCategory(await attention(p.category), p.category)
   if (p.kind === 'timeline') return timelineAnswer(ctx.recurrenceId ?? null)
+  if (p.kind === 'nearby') return nearbyAnswer(ctx.recurrenceId ?? null)
   if (p.kind === 'candidates') return candidates(p.category) // names its own category
   const result =
     p.kind === 'ranking'
