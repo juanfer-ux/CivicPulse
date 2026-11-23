@@ -105,7 +105,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         <div className="relative min-h-0 flex-1">
         <ScrollArea className="relative h-full" viewportClassName={turns.length === 0 ? '[&>div]:!flex [&>div]:min-h-full [&>div]:flex-col' : '[&>div]:!block'}> {/* the landing's group is centered vertically between the strip and the composer (owner, 2026-11-17, with a screenshot; Figma's body is centered both ways); taller content scrolls from the top; a conversation starts at the top */}
         <div className={`flex w-full flex-1 flex-col`}>
-        <div className={`flex w-full flex-col gap-3 text-body ${turns.length === 0 ? 'flex-1' : ''} max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[calc(var(--agent-content-w)+32px)] desk:gap-8 desk:px-4 desk:py-10`}> {/* the landing's body is top-aligned (owner's Figma, 2026-11-17): the summary card sits at the top and the dashboard fills the rest and centers its own content */}
+        <div className={`flex w-full flex-col gap-3 text-body ${turns.length === 0 ? 'flex-1' : ''} max-desk:mx-auto max-desk:max-w-[800px] desk:gap-8 desk:px-12 desk:py-10`}> {/* the landing's body is top-aligned (owner's Figma, 2026-11-17): the summary card sits at the top and the dashboard fills the rest and centers its own content */}
           {turns.length === 0 && <AgentHome ask={(q) => void ask(q)} />}
           {turns.map((t, i) => (
             <div key={i} className="flex flex-col gap-4 desk:gap-5"> {/* 20 px between a question and its answer on desktop (owner's Figma, 2026-11-17; it was 16) */}
@@ -121,7 +121,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </ScrollArea>
         </div>
         <div className="w-full">
-        <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:flex-row desk:flex-col desk:items-stretch desk:gap-3 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-4 desk:py-5 desk:max-w-[calc(var(--agent-content-w)+32px)]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
+        <form onSubmit={onSubmit} className={`flex w-full max-desk:max-w-[800px] items-center gap-2 max-desk:flex-row desk:flex-col desk:items-stretch desk:gap-3 max-desk:mx-auto desk:shrink-0 desk:px-12 desk:py-5`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
           <Composer value={text} onChange={setText} busy={busy} />
         </form>
         </div>
