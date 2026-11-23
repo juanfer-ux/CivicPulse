@@ -2,7 +2,7 @@ import { activeRow, type Pick } from '@/lib/sidebarActive'
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
 import { useNoSelect, useReleaseGuard } from '@/lib/useNoSelect'
-import { Check, CaretDown, CaretRight, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, Sparkle, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
+import { Check, CaretDown, CaretRight, CaretUp, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, Sparkle, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
@@ -25,18 +25,74 @@ export type SidebarIncident = { id: string; title: string; reference: string; lo
 export type ChatItems = { title: string; ids: string[] }[]
 /** What is open on the map (a click there or in this menu): its row is the highlighted one. */
 export type SidebarSelection = { kind: 'recurrence' | 'incident'; id: string }
-type Chats = { agentOff?: boolean; onToggleAgent?: () => void; chats: Chat[]; activeId: number; exploring?: boolean; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void; chatItems?: ChatItems; recurrences?: SidebarRecurrence[]; incidents?: SidebarIncident[]; onOpenRecurrence?: (id: string) => void; onOpenIncident?: (id: string) => void; selected?: SidebarSelection | null }
+type Chats = { agentOff?: boolean; onToggleAgent?: () => void; chats: Chat[]; activeId: number; exploring?: boolean; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void; chatItems?: ChatItems; pinnedIds?: Set<string>; recurrences?: SidebarRecurrence[]; incidents?: SidebarIncident[]; onOpenRecurrence?: (id: string) => void; onOpenIncident?: (id: string) => void; selected?: SidebarSelection | null }
+
+/** The Recurrences list keeps the demo's three recurrences (owner, 2026-11-23: opening another one on the map used to push the yellow Monitoring row out, because the list shows the three most recently updated): the three newest of `pinnedIds`, always, plus the recurrence that is open when it is not one of them. Without `pinnedIds` the list is the three most recently updated, as before. */
+export function shownRecurrences<T extends { id: string | number; updated?: number }>(items: T[], pinned: Set<string> | undefined, openId: string | null): T[] {
+  const newest = (l: T[]) => [...l].sort((a, b) => (b.updated ?? 0) - (a.updated ?? 0))
+  if (!pinned || !items.some((i) => pinned.has(String(i.id)))) return newest(items).slice(0, 3)
+  const base = newest(items.filter((i) => pinned.has(String(i.id)))).slice(0, 3)
+  const extra = items.filter((i) => (typeof i.id !== 'string' || String(i.id) === openId) && !base.some((b) => b.id === i.id)) // the open one, and the person's own "New recurrence" rows (numeric ids)
+  return [...base, ...extra]
+}
+
+/** DEMO (owner, 2026-11-23): a list (opened by the chevron in its section title) that shows its first three rows collapsed and, expanded, draws batches of BATCH (20) rows as the end of the list scrolls into view (the data is already in memory: this only limits what is drawn). `children` gets how many rows to draw. */
+const BATCH = 20
+function Growing({ open, total, children }: { open: boolean; total: number; children: (limit: number) => ReactNode }) {
+  const [n, setN] = useState(BATCH)
+  const end = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) setN(BATCH) // collapsing starts the next expansion from the first batch
+  }, [open])
+  useEffect(() => {
+    const el = end.current
+    const root = el?.closest('[data-radix-scroll-area-viewport]')
+    if (!open || n >= total || !el || !root || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setN((x) => x + BATCH), { root, rootMargin: '40px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [open, n, total])
+  return (
+    <>
+      {children(open ? Math.min(n, total) : 3)}
+      {open && <div ref={end} />}
+    </>
+  )
+}
 
 /** The items of a section in its view: one list, or grouped by status, ordered as the view says. */
-function ViewList<T extends { id: string | number; created?: number; updated?: number }>({ items, view, group, order, labels, primary, row, limit }: { items: T[]; view: View; group: (t: T) => string; order: string[]; labels: Record<string, string>; primary: string; row: (t: T) => ReactNode; limit?: number }) {
+function ViewList<T extends { id: string | number; created?: number; updated?: number }>({ items, view, group, order, labels, primary, row, limit, batched, flat }: { items: T[]; view: View; group: (t: T) => string; order: string[]; labels: Record<string, string>; primary: string; row: (t: T) => ReactNode; limit?: number; batched?: boolean; flat?: boolean }) {
   // `limit`: only that many rows show, and only those (owner, 2026-11-09: the Incidents list shows 5); the section title still counts them all.
+  // `batched` (DEMO, owner 2026-11-23): By status, every group keeps its full count and draws its own rows in batches; View all draws `limit` rows, grown by the caller's infinite scroll.
   const sorted = sortItems(items, view)
-  const shown = limit ? sorted.slice(0, limit) : sorted
-  return view.group === 'status' ? <Groups items={shown} newest group={group} order={order} labels={labels} primary={primary} row={row} /> : <>{shown.map(row)}</>
+  if (flat) return <>{sorted.map(row)}</> // collapsed: just the rows, no group titles (a closed group would hide one)
+  if (limit && !batched) return <>{sorted.slice(0, limit).map(row)}</> // collapsed: the latest few, no group titles
+  if (view.group === 'status') return <Groups items={sorted} newest group={group} order={order} labels={labels} primary={primary} row={row} batch={batched} />
+  return <>{(limit ? sorted.slice(0, limit) : sorted).map(row)}</>
 }
 
 /** A list grouped by status (owner, 2026-11-08): every group has its own title with a caret and a count; the first (Active, Pending) is open and the later ones start collapsed. Active, Monitoring, Resolved, Archived for recurrences; Pending, Reviewing, Approved, Rejected for incidents. */
-function Groups<T extends { id: string | number }>({ items, group, order, labels, primary, row, newest }: { items: T[]; group: (t: T) => string; order: string[]; labels: Record<string, string>; primary: string; row: (t: T) => ReactNode; newest: boolean }) {
+/** One open group's rows, drawn BATCH at a time as the end of the group scrolls into view (DEMO, owner 2026-11-23: "load by clusters"): each group is its own cluster with its own infinite scroll; the group's title still counts all its rows. */
+function GroupRows<T extends { id: string | number }>({ rows, row }: { rows: T[]; row: (t: T) => ReactNode }) {
+  const [n, setN] = useState(BATCH)
+  const end = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = end.current
+    const root = el?.closest('[data-radix-scroll-area-viewport]')
+    if (n >= rows.length || !el || !root || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setN((x) => x + BATCH), { root, rootMargin: '40px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [n, rows.length])
+  return (
+    <>
+      {rows.slice(0, n).map(row)}
+      {n < rows.length && <div ref={end} />}
+    </>
+  )
+}
+
+function Groups<T extends { id: string | number }>({ items, group, order, labels, primary, row, newest, batch }: { batch?: boolean; items: T[]; group: (t: T) => string; order: string[]; labels: Record<string, string>; primary: string; row: (t: T) => ReactNode; newest: boolean }) {
   const [open, setOpen] = useState<Set<string>>(new Set([primary]))
   const toggle = (g: string) => setOpen((o) => (o.has(g) ? new Set([...o].filter((x) => x !== g)) : new Set([...o, g])))
   return (
@@ -50,7 +106,7 @@ function Groups<T extends { id: string | number }>({ items, group, order, labels
               {open.has(g) ? <CaretDown weight="bold" className="size-3" aria-hidden /> : <CaretRight weight="bold" className="size-3" aria-hidden />}
               {labels[g]} · {l.length}
             </Button>
-            {open.has(g) && (newest ? l : [...l].reverse()).map(row)}
+            {open.has(g) && (batch ? <GroupRows rows={newest ? l : [...l].reverse()} row={row} /> : (newest ? l : [...l].reverse()).map(row))}
           </div>
         ))}
     </>
@@ -94,7 +150,8 @@ function sortItems<T extends { created?: number; updated?: number }>(items: T[],
 function ViewMenu({ view, onChange, onClose }: { view: View; onChange: (v: View) => void; onClose: () => void }) {
   const box = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    const down = (e: globalThis.PointerEvent) => !box.current?.contains(e.target as Node) && onClose()
+    // A press on the button that opened the menu is not "outside": that button's own click closes the menu (owner, 2026-11-23: the second click closed it on pointer down and the click opened it again).
+    const down = (e: globalThis.PointerEvent) => !box.current?.contains(e.target as Node) && !(e.target as Element).closest?.('[aria-haspopup="menu"]') && onClose()
     const key = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     document.addEventListener('pointerdown', down)
     document.addEventListener('keydown', key)
@@ -123,7 +180,7 @@ function ViewMenu({ view, onChange, onClose }: { view: View; onChange: (v: View)
 }
 
 /** One sidebar section (Figma Recurrences / Incidents / Investigations): a title row with its own view button and plus, then the list. Each section has its own view. Recurrences and Incidents (`views`) get the view menu; Investigations just flips newest and oldest. */
-function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views, limit }: { limit?: number; title: string; items: T[]; addLabel: string; onAdd?: () => void; row?: (t: T) => ReactNode; children?: (view: View) => ReactNode; empty?: string; views?: boolean }) {
+function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views, limit, expanded, onExpand }: { expanded?: boolean; onExpand?: (open: boolean) => void; limit?: number; title: string; items: T[]; addLabel: string; onAdd?: () => void; row?: (t: T) => ReactNode; children?: (view: View) => ReactNode; empty?: string; views?: boolean }) {
   const [view, setView] = useState<View>(DEFAULT_VIEW)
   const [menu, setMenu] = useState(false)
   const newest = view.newest
@@ -141,7 +198,14 @@ function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views
   return (
     <div className={`flex flex-col gap-2 py-2 pr-2.5 pl-1`}> {/* 8 px above and below and between, 10 at the right and 4 at the left, in all three sections (owner's Figma, 2026-11-17, latest) */}
       <div ref={head} className={`group/title sticky -top-px z-10 flex h-8 items-center gap-2.5 border-b-[1px] bg-(--neutral-700) px-2 ${stuck ? 'border-(--neutral-600)' : 'border-transparent'}`}>
-        <p className="flex-1 text-caption-medium text-(--neutral-300)">{title}</p>
+        {onExpand ? (
+          <button type="button" className="flex flex-1 cursor-pointer items-center gap-1 text-left text-caption-medium text-(--neutral-300) outline-none hover:text-(--neutral-100) focus-visible:text-(--neutral-100)" aria-expanded={!!expanded} aria-label={`${title}: ${expanded ? 'show less' : 'show all'}`} title={expanded ? 'Show less' : 'Show all'} onClick={() => onExpand(!expanded)}>
+            {title}
+            {expanded ? <CaretUp weight="regular" className="size-3.5" aria-hidden /> : <CaretDown weight="regular" className="size-3.5" aria-hidden />}
+          </button>
+        ) : (
+          <p className="flex-1 text-caption-medium text-(--neutral-300)">{title}</p>
+        )}
         {/* Figma "Actions": the view and plus buttons side by side with no gap (2 x 32 px). */}
         <div className="relative flex opacity-0 transition-opacity group-hover/title:opacity-100 focus-within:opacity-100 has-[[aria-expanded=true]]:opacity-100 [@media(hover:none)]:opacity-100"> {/* the buttons show only while the pointer is over the section title (owner, 2026-11-17); they stay while one has keyboard focus or its menu is open, and on touch screens */}
           {views ? (
@@ -292,7 +356,7 @@ function MobileBrand() {
 }
 
 /** The menu itself, as in Figma Sidebar (2026-10-29): a 70 px header with the logo and the collapse button, the Investigations and Cases groups, and at the bottom the account row. Used by the desktop column and the phone slide-out. */
-function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, onNewCase, recurrences: real = [], incidents = [], chatItems = [], onOpenRecurrence, onOpenIncident, selected, onToggle }: Chats & { collapsed: boolean; onToggle?: () => void }) {
+function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, onNewCase, recurrences: real = [], incidents = [], chatItems = [], pinnedIds, onOpenRecurrence, onOpenIncident, selected, onToggle }: Chats & { collapsed: boolean; onToggle?: () => void }) {
   const { profile, session, signOut } = useAuth()
   const name = shortName(profile?.full_name) || 'Signed in'
   const email = session?.user?.email
@@ -301,6 +365,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   const act = activeRow({ selected, pick: local && local.sel === selKey ? local : null, exploring: !!exploring, activeId })
   const noCase = <A extends unknown[]>(f?: (...a: A) => void) => (...a: A) => { setLocal(null); f?.(...a) }
   const pickRow = <A extends unknown[]>(p: Pick, f?: (...a: A) => void) => (...a: A) => { setLocal({ ...p, sel: selKey }); f?.(...a) }
+  const [incOpen, setIncOpen] = useState(false) // the Incidents chevron (DEMO)
   const [query, setQuery] = useState('')
   const hit = (t: string) => t.toLowerCase().includes(query.trim().toLowerCase())
   // Only what a conversation touched is listed (owner, 2026-11-08); the map still shows everything.
@@ -308,7 +373,9 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   const tags = new Map<string, string[]>()
   convs.forEach((c) => c.ids.forEach((id) => tags.set(id, [...(tags.get(id) ?? []), c.title])))
   const recurrences: RecurrenceRow[] = [...cases.map((c): RecurrenceRow => ({ id: c.id, title: c.title, status: 'active' })), ...real.filter((r) => tags.has(r.id))].filter((c) => hit(c.title) || hit(c.reference ?? ''))
-  const incidentRows = incidents.filter((i) => tags.has(i.id) && (hit(i.title) || hit(i.reference)))
+  const allRecurrences: RecurrenceRow[] = [...cases.map((c): RecurrenceRow => ({ id: c.id, title: c.title, status: 'active' })), ...real].filter((c) => hit(c.title) || hit(c.reference ?? '')) // DEMO (owner, 2026-11-23): every recurrence, like the incidents
+  const [recOpen, setRecOpen] = useState(false) // the Recurrences chevron (DEMO)
+  const incidentRows = incidents.filter((i) => hit(i.title) || hit(i.reference)) // DEMO (owner, 2026-11-23): every incident, drawn 3 at a time collapsed and in batches of 30 when expanded; it was only the ones a conversation touched
   const investigations = chats.map((c) => ({ key: c.id, title: c.title, id: c.id })).filter((c) => hit(c.title)).reverse() // chats arrive oldest first, the list shows newest first
   return (
     <div className="flex h-full flex-col justify-between">
@@ -342,20 +409,24 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
               <div className="flex flex-col gap-2"> {/* the sections are 8 px apart, with no padding around them (owner's Figma, 2026-11-17, latest; it was 20 and 16) */}
-                <Section title="Recurrences" items={recurrences} addLabel="New recurrence" onAdd={onNewCase} views empty="Nothing here yet. Ask the agent, or open a marker on the map.">
+                <Section title="Recurrences" expanded={recOpen} onExpand={setRecOpen} items={allRecurrences} addLabel="New recurrence" onAdd={onNewCase} views empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
-                    <ViewList items={recurrences} limit={3} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
+                    <Growing open={recOpen} total={allRecurrences.length}>{(limit) => (
+                    <ViewList items={recOpen ? allRecurrences : shownRecurrences(recurrences, pinnedIds, selected?.kind === 'recurrence' ? selected.id : null)} limit={recOpen ? limit : undefined} flat={!recOpen} batched={recOpen && view.group === 'status'} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
                       <TwoLineItem key={c.id} active={act.kind === 'case' ? c.id === act.id : act.kind === 'recurrence' && c.id === act.id} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => (typeof c.id === 'string' ? noCase(onOpenRecurrence)(c.id) : setLocal({ kind: 'case', id: c.id, sel: selKey }))} title={c.title}
                         icon={<Warning weight="fill" className="mt-0.5 size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
                         sub={c.reference ? `${c.reference} · ${c.locality ?? PROBLEM_STATUS[c.status].label}` : 'Not linked to a recurrence yet'} />
                     )} />
+                    )}</Growing>
                   )}
                 </Section>
-                <Section title="Incidents" items={incidentRows} addLabel="New incident" views empty="Nothing here yet. Incidents an answer points to, or that you open, appear here.">
+                <Section title="Incidents" expanded={incOpen} onExpand={setIncOpen} items={incidentRows} addLabel="New incident" views empty="Nothing here yet. Incidents an answer points to, or that you open, appear here.">
                   {(view) => (
-                    <ViewList items={incidentRows} limit={5} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
+                    <Growing open={incOpen} total={incidentRows.length}>{(limit) => (
+                    <ViewList items={incidentRows} limit={limit} batched={incOpen && view.group === 'status'} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
                       <TwoLineItem key={i.id} active={act.kind === 'incident' && act.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => noCase(onOpenIncident)(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-2 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${i.locality ?? GROUPS[i.group].label}`} />
                     )} />
+                    )}</Growing>
                   )}
                 </Section>
                 <Section title="Investigations" limit={2} items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
