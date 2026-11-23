@@ -35,6 +35,22 @@ Say "illegal dumping" or "parking" in the question to limit it to that category.
 
 Unsupported questions get an honest "I cannot answer that yet". The agent does not guess.
 
+## 🧭 Questions about the surroundings of an open recurrence (design; owner and agent, 2026-11-23; not built yet)
+"What is around this recurrence?" (row F above) is a **lookup**: it lists places. An operator analyzing a recurrence does not want an inventory, they want to know whether the surroundings change what they should do. So the agent should answer questions about **intent**, using the same stored places and the same tool (`tool_recurrence_places`), filtered and ordered by the recurrence's category and subtype.
+
+| What the operator is really asking | Question to mock | What the answer picks out |
+|---|---|---|
+| **Does it matter more than usual?** (priority) | "Is this blocking or affecting anything important?" | Schools, clinics, bus stops, police or fire stations and pharmacies within a short distance: what, and how far. |
+| **Why does it keep happening here?** (cause to check) | "What nearby could explain why it keeps coming back?" | Parking: restaurants, bars, offices, shops, parking lots. Dumping: markets, restaurants, construction, waste points. |
+| **Who can help?** (action) | "Who nearby should know or could help?" | Businesses and institutions at the spot, and the police or fire station, for outreach or enforcement. |
+
+How these answers behave:
+- 🏷️ **They read the recurrence.** An access ramp or a pedestrian crossing cares about the school and the clinic; a dumping recurrence cares about what produces waste. The same places read differently for each category and subtype.
+- 🥇 **They lead with the few places that matter,** not the nearest ones (this also fixes lists of 40 places). The kinds that matter first: education, health, transport, civic.
+- 🧑 **The person still decides.** The wording is "could explain" and "worth checking", never "this is the cause"; it is in the sentence itself, not in a disclaimer (disclaimers are not shown under answers since 2026-11-23).
+- 🔁 **Same machinery.** Same tool, same "Show places on map" button, same map layer; the planner (rule-based) maps these phrasings to the new answers, and "what is around this recurrence?" stays as the general fallback.
+- ⬜ **Build order:** 1. the priority question ("blocking or affecting anything important?"), which is about what the operator decides; 2. the cause question; 3. the help question. Not built: today only the fallback exists (`nearby` in `lib/agent.ts`).
+
 ## 📦 What every answer contains
 `text` · `bars` (a bar that is a locality carries its `code`: hovering it lights that locality's outline on the map, clicking it zooms there; small chart; `chart` says how it is drawn: a donut for localities of one category and a Tremor-style bar list for localities of all categories (both show the biggest localities and the rest together as "Others": a locality answer always has an Others slice), an area chart over the day for time of day with AM/PM blocks, two columns for a period comparison, a dot matrix (one dot per report) for repeated locations, numbered rows with a thin bar and the count for tomorrow's candidates (owner changed it from cards, 2026-11-08), plain bars otherwise. Chosen by the owner from the gallery on 2026-11-08. shadcn Chart on Recharts, loaded with the first answer; chart options are compared at `/#charts`) · `evidence` (tool, scope, period, incident count, example references) · `limitations` (always) · `highlightIds` (incidents behind the answer, shown inside incident radii on the map; each gets a stem with its marker open above it, or, for an answer about locations, one stem and marker per location, owner 2026-11-15) · `areas` (localities to outline: an answer about localities, about one named locality, about where to look tomorrow outlines and fills the localities (the same shade for each) instead of drawing circles; an answer about repeated locations sets `spots` instead: no locality outlines, one small radius (at least 120 m, one circle per location) around each spot, owner 2026-11-08) · optional `proposal` (a recommendation draft, investigation E only).
 
