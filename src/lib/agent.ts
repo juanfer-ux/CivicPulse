@@ -291,7 +291,7 @@ async function nearbyAnswer(recurrenceId: string | null): Promise<Answer> {
   const nearest = list[0]
   return {
     text:
-      `${what} has ${list.length} mapped ${list.length === 1 ? 'place' : 'places'} within ${RADIUS_M} m. The nearest is ${nearest.name || niceLabel(nearest.label).toLowerCase()}, ${nearest.dist} m away` +
+      `${what} has ${list.length} mapped ${list.length === 1 ? 'place' : 'places'} within ${RADIUS_M} m. Nearest: ${nearest.name || niceLabel(nearest.label)}, ${nearest.dist} m away` +
       `${nearest.dist <= 20 ? '' : '; nothing is mapped within 20 m'}.${list.length > shown.length ? ` The ${shown.length} nearest are listed.` : ''} This is context for the person who reviews it, not a cause.`,
     bars: shown.map((p) => ({ label: p.name ? `${p.name} · ${niceLabel(p.label)}` : niceLabel(p.label), value: p.dist })),
     chart: 'places',
