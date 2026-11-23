@@ -1,7 +1,7 @@
 import type { Answer } from '@/lib/agent'
 
 // Mocked conversations for the demo (owner, 2026-11-08): a few of the loaded recurrences and incidents, picked by status so every group shows, each with a short history of questions and answers on one theme. All numbers are made up. Delete this file when conversations are saved for real.
-type Rec = { id: string; status: string }
+type Rec = { id: string; status: string; title?: string }
 type Inc = { id: string; title: string; group: string }
 export interface MockChat {
   ids: string[] // the incidents and recurrences it touched
@@ -24,7 +24,9 @@ export function mockChats(recs: Rec[], incs: Inc[]): MockChat[] {
   const rows = (l: Inc[], values: number[]) => l.map((x, k) => ({ label: x.title, value: values[k] ?? 1 }))
 
   // 1 · Repeated locations
-  const pr = take(recs, r('active'), 2)
+  // one red Illegal Dumping and one red Obstructive Parking (owner, 2026-11-23: the list used to show two dumping rows); the yellow Monitoring row is the second conversation's
+  const parking = (x: Rec) => (x.title ?? '').startsWith('Obstructive')
+  const pr = [...take(recs, (x) => r('active')(x) && !parking(x), 1), ...take(recs, (x) => r('active')(x) && parking(x), 1)]
   const pi = take(incs, i('pending'), 3)
   // 2 · Access ramps near schools
   const sr = [...take(recs, r('monitoring'), 1), ...take(recs, r('resolved'), 1)]

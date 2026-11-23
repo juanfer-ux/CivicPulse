@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { Sidebar } from '@/components/Sidebar'
+import { Sidebar, shownRecurrences } from '@/components/Sidebar'
 
 // Radix ScrollArea (the lists) needs ResizeObserver, which jsdom lacks.
 globalThis.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} }
@@ -155,16 +155,17 @@ describe('Sidebar — accessibility regressions', () => {
   })
 })
 
-describe('Sidebar — only what a conversation touched is listed', () => {
-  it('lists the rows an (opened or answered) conversation holds and says which one', () => {
+describe('Sidebar — every incident is listed, a few at a time (owner, 2026-11-23)', () => {
+  it('lists the incidents a conversation holds and the ones it never mentioned', () => {
     render(<Sidebar {...baseProps} recurrences={[]} incidents={[{ id: 'a', title: 'In a chat', reference: 'CP-1', group: 'pending' as const }, { id: 'b', title: 'Never mentioned', reference: 'CP-2', group: 'pending' as const }]} chatItems={[{ title: 'My question', ids: ['a'] }]} />)
     expect(screen.getByText('In a chat')).toBeInTheDocument()
-    expect(screen.queryByText('Never mentioned')).toBeNull()
+    expect(screen.getByText('Never mentioned')).toBeInTheDocument()
   })
 
   it('the first status group is open and the later ones start collapsed', async () => {
     const user = userEvent.setup()
     render(<Sidebar {...baseProps} recurrences={[]} incidents={[{ id: 'a', title: 'Open one', reference: 'CP-1', group: 'pending' as const }, { id: 'b', title: 'Folded one', reference: 'CP-2', group: 'rejected' as const }]} chatItems={[{ title: 'Q', ids: ['a', 'b'] }]} />)
+    await user.click(screen.getByRole('button', { name: 'Incidents: show all' })) // groups appear when the list is expanded
     await user.click(screen.getByRole('button', { name: 'Incidents: view options' }))
     await user.click(screen.getByRole('menuitemradio', { name: 'By status' }))
     expect(screen.getByText('Open one')).toBeInTheDocument()
@@ -174,13 +175,17 @@ describe('Sidebar — only what a conversation touched is listed', () => {
   })
 })
 
-describe('Sidebar — only five incidents and two investigations show', () => {
+describe('Sidebar — three incidents collapsed, all of them expanded, and two investigations', () => {
   const twelve = Array.from({ length: 12 }, (_, k) => ({ id: `i${k}`, title: `Incident number ${k}`, reference: `CP-${k}`, group: 'pending' as const, updated: 100 - k }))
-  it('shows the first five incidents and nothing more', () => {
+  it('shows the latest three incidents collapsed and draws more only when the title chevron is pressed', async () => {
+    const user = userEvent.setup()
     render(<Sidebar {...baseProps} recurrences={[]} incidents={twelve} chatItems={[{ title: 'Q', ids: twelve.map((i) => i.id) }]} />)
-    expect(screen.getByText('Incident number 4')).toBeInTheDocument()
-    expect(screen.queryByText('Incident number 5')).toBeNull()
-    expect(screen.queryByRole('button', { name: /Show all/ })).toBeNull()
+    expect(screen.getByText('Incident number 2')).toBeInTheDocument()
+    expect(screen.queryByText('Incident number 3')).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Incidents: show all' }))
+    expect(screen.getByText('Incident number 11')).toBeInTheDocument() // twelve is under one batch of 20
+    await user.click(screen.getByRole('button', { name: 'Incidents: show less' }))
+    expect(screen.queryByText('Incident number 3')).toBeNull()
   })
 
   it('shows the first two investigations and nothing more', () => {
@@ -189,5 +194,20 @@ describe('Sidebar — only five incidents and two investigations show', () => {
     expect(screen.getByText('Third question')).toBeInTheDocument() // newest first: the last chat leads
     expect(screen.getByText('Second question')).toBeInTheDocument()
     expect(screen.queryByText('First question')).toBeNull()
+  })
+})
+
+describe('shownRecurrences', () => {
+  const r = (id: string, updated: number) => ({ id, updated })
+  const items = [r('red-dump', 5), r('red-park', 9), r('yellow', 3), r('old-resolved', 1), r('other', 20)]
+  const pinned = new Set(['red-dump', 'red-park', 'yellow', 'old-resolved'])
+
+  it('keeps the three newest pinned recurrences, and never lets another one push them out', () => {
+    expect(shownRecurrences(items, pinned, null).map((x) => x.id)).toEqual(['red-park', 'red-dump', 'yellow'])
+    expect(shownRecurrences(items, pinned, 'other').map((x) => x.id)).toEqual(['red-park', 'red-dump', 'yellow', 'other']) // the open one is added, the yellow stays
+  })
+
+  it('is the three most recently updated when nothing is pinned', () => {
+    expect(shownRecurrences(items, undefined, null).map((x) => x.id)).toEqual(['other', 'red-park', 'red-dump'])
   })
 })
