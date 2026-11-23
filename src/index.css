@@ -257,11 +257,11 @@
   --neutral-200: #A9A9B2; /* secondary text */
   --neutral-100: #C1C1C8;
   /* Colored: indigo, red, orange, blue and yellow as 100–900 scales (the 400s are the original colors; the other steps were made around them on 2026-10-31) */
-  --indigo-900: #10112A;
-  --indigo-800: #191B44;
-  --indigo-700: #272A68;
-  --indigo-600: #343193;
-  --indigo-500: #4C49C1;
+  --indigo-900: #101237;
+  --indigo-800: #151748;
+  --indigo-700: #20246F;
+  --indigo-600: #2F2C98;
+  --indigo-500: #4542C8;
   --indigo-400: #5C59FF;
   --indigo-300: #9593FF;
   --indigo-200: #C1C0FF;

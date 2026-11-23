@@ -63,16 +63,16 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
   }, [ask])
   return (
     <div className="flex flex-1 flex-col gap-20"> {/* Figma Conversation body (owner, 2026-11-17, latest): the alert, then the dashboard, 80 px apart (64 before) */}
-      <Alert variant="info" icon={<Sparkle weight="fill" className="size-5 text-(--indigo-300)" aria-hidden />} className="mx-auto hidden max-w-(--agent-content-w) desk:flex"> {/* Figma Alert, variant info (owner, 2026-11-17): the summary card, 700 px at most and centered; the icon is `indigo-300` (below) */}
+      <Alert variant="info" icon={<Sparkle weight="fill" className="size-5 text-(--indigo-200)" aria-hidden />} className="mx-auto hidden max-w-(--agent-content-w) desk:flex"> {/* Figma Alert, variant info (owner, 2026-11-17): the summary card, 700 px at most and centered; the icon is `indigo-300` (below) */}
         CivicPulse AI groups related reports into patterns and may contain errors. Verify before acting: nothing goes to the authorities until you’ve reviewed it, and the final decision rests with the responsible official.
       </Alert>
-      <div className="flex flex-1 flex-col justify-start gap-16 px-2.5 py-4"> {/* Figma (owner, 2026-11-16, latest): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
+      <div className="flex flex-1 flex-col justify-start gap-16 px-2.5 py-4"> {/* Figma Dashboard (owner, 2026-11-23, latest: content aligned to the TOP again, primary axis MIN; an hour before it was the BOTTOM, justify-end, and before that top). Before: Fill height with its content aligned to the BOTTOM (primary axis MAX), so a taller panel adds the space between the alert and the greeting; it was top-aligned (justify-start). Figma (owner, 2026-11-16): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
       <div className="flex flex-col gap-4"> {/* (the line under the greeting is hidden in Figma now, owner 2026-11-17, so it is gone) Figma Frame 2147225884 (owner, 2026-11-17): the greeting, then "You're ready to investigate and coordinate incident response" in `display-sm` / `neutral-200`, 16 px apart; the place text left the header */}
         <h2 className="font-display text-display-md text-(--neutral-100)">Welcome back,{first ? ` ${first},` : ''}</h2>
       </div>
       <div className="flex flex-col gap-16"> {/* Figma Dashboard modules (owner's Figma, 2026-11-17, latest): 64 px between the two modules (48 an hour before);  (owner's Figma, 2026-11-17, checked): "Here's what's happening" and "Recurrences to investigate" are 48 px apart (the code had 32); before that, Figma Frame 2147225871 (2026-11-16): the modules 32 px apart (it was 24); the greeting is 64 px above them, the group has 16 px above and below and 10 at the sides (700 px wide) */}
       <Section title="Here's what's happening">
-          <div className="flex flex-wrap items-center gap-3"> {/* Figma CatchUp_Module2 (owner, 2026-11-15, checked again later that day): a wrapping row, 12 px across and 12 px between wrapped rows, items centered; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
+          <div className="flex flex-wrap items-center gap-4"> {/* Figma CatchUp_Module2 (owner, 2026-11-23: 16 px between the small cards and the medium one, it was 12) (owner, 2026-11-15, checked again later that day): a wrapping row, 12 px across and 12 px between wrapped rows, items centered; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
             <div className="@container min-w-[180px] flex-1 basis-0">
               {/* The two small cards stack in a column beside the medium card, and sit side by side once the group has the whole width, i.e. when the medium card has dropped below (owner, 2026-11-15; the panel at its minimum width) */}
               <div className="flex flex-col gap-3 @min-[420px]:flex-row">
@@ -106,9 +106,9 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
             </div>
           </div>
         </Section>
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-8"> {/* Figma Modules (owner, 2026-11-23): Category overview and Suggestions 32 px apart (it was 40) */}
           <Section title="Recurrences to investigate">
-            <div className="flex gap-2.5"> {/* Figma Worth-Investigating_Module (2026-11-15): one row that no longer wraps, 10 px apart, cards Fill with a 120 px minimum */}
+            <div className="flex gap-4"> {/* Figma Worth-Investigating_Module (owner, 2026-11-23, latest: 16 px apart; 24 an hour before, 10 earlier; 2026-11-15): one row that no longer wraps, cards Fill with a 120 px minimum */}
               {WORTH_INVESTIGATING.map((c) => {
                 const Icon = CATEGORY_ICON[c.title]
                 return (

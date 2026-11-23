@@ -67,6 +67,9 @@ Rules:
 
 - **Every screen is auto layout from the root to the deepest frame** (global rule, owner 2026-11-12; see `~/.claude/CLAUDE.md`). When you touch a Figma screen, make it so in the same change, and size desktop screens 1880 × 1000. When a screen changes size, fill the new space everywhere (see the global rule): no empty strips, no overlaps, backgrounds extended. "Ignore auto layout" only for background layers like the map placeholder; foreground panels go inside auto-layout boxes.
 
+## Agent panel changes (this project)
+- **Whenever the owner mentions adjustments to the agent panel (owner, 2026-11-23), check its whole subtree in Figma, not only the panel frame:** Alert and Summary row, Dashboard, the modules (Welcome_Module, CatchUp, Worth-Investigating), **the Suggestion cards and the Suggestion modules (they are children of the agent panel)**, Chat Area and Composer. Compare alignment and sizing too (auto layout primary axis MIN / CENTER / MAX, Fill / Hug / Fixed), not only sizes and padding: the Dashboard is bottom-aligned, which was missed once. Code: `AgentHome.tsx`, `InvestigatePanel.tsx`, `Composer.tsx`, `ui/alert.tsx`; write the result in docs/handoff.md.
+
 ## Figma text styles (every project)
 - **Keep style families together, in order.** The text styles list is grouped by family, biggest to smallest, and each variant sits right next to its base: `title`, `title-regular`, `subtitle`, `subtitle-regular`, `subtitle-strong`, `label`, `label-regular`, `meta`, `meta-medium`, `caption`, `caption-medium`, `caption-strong`. When creating a style, put it next to its family right away (`figma.moveLocalTextStyleAfter(style, base)`), never leave it at the end of the list. Re-check the order after every style change, in Figma and in the docs table.
 
