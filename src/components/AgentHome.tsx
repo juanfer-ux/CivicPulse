@@ -72,14 +72,14 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
       </div>
       <div className="flex flex-col gap-16"> {/* Figma Dashboard modules (owner's Figma, 2026-11-17, latest): 64 px between the two modules (48 an hour before);  (owner's Figma, 2026-11-17, checked): "Here's what's happening" and "Recurrences to investigate" are 48 px apart (the code had 32); before that, Figma Frame 2147225871 (2026-11-16): the modules 32 px apart (it was 24); the greeting is 64 px above them, the group has 16 px above and below and 10 at the sides (700 px wide) */}
       <Section title="Here's what's happening">
-          <div className="flex flex-wrap items-center gap-4"> {/* Figma CatchUp_Module2 (owner, 2026-11-23: 16 px between the small cards and the medium one, it was 12) (owner, 2026-11-15, checked again later that day): a wrapping row, 12 px across and 12 px between wrapped rows, items centered; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
-            <div className="@container min-w-[180px] flex-1 basis-0">
+          <div className="flex flex-wrap-reverse items-center gap-3"> {/* wrap-reverse (owner, 2026-11-23): when the row is too narrow the medium card, Today's top localities, wraps ABOVE the data cards group, not under it. Figma CatchUp_Module2 (owner, 2026-11-23, latest: 12 px between the small cards and the medium one again; 16 for an hour) (owner, 2026-11-15, checked again later that day): a wrapping row, 12 px across and 12 px between wrapped rows, items centered; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
+            <div className="@container min-w-[360px] flex-1 basis-0"> {/* Figma Data cards group (owner, 2026-11-23): minimum width 360 px (it was 180); the medium card keeps 372 */}
               {/* The two small cards stack in a column beside the medium card, and sit side by side once the group has the whole width, i.e. when the medium card has dropped below (owner, 2026-11-15; the panel at its minimum width) */}
               <div className="flex flex-col gap-3 @min-[420px]:flex-row">
                 {[0, 1].map((i) => (
                   <div key={i} className={`${dataCard} p-2 @min-[420px]:flex-1`}>
                     <p className={cardName}>Data card name</p>
-                    <div className="h-[49px]" aria-hidden /> {/* Figma Data_Chart of the small card: its neutral-800 fill is hidden now (2026-11-14), the 50 px block stays */}
+                    <div className="h-[52px]" aria-hidden /> {/* Figma Data_Chart of the small card (owner, 2026-11-23: 52 px, a card is 101 px high and the two with 12 between are 214; it was 49):  its neutral-800 fill is hidden now (2026-11-14), the 50 px block stays */}
                   </div>
                 ))}
               </div>
