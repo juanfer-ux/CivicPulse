@@ -234,7 +234,7 @@ function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views
 }
 
 const WIDTH_KEY = 'sidebar-width'
-const SIDEBAR_MIN = 300 // 300 again (owner, 2026-11-17, after 320 for a day: the Figma frame is 320 wide); 320 before; 320 in the big sidebar pass of 2026-11-17 (Figma 320 wide), 300 earlier that day; min width of the expanded Sidebar (owner's Figma, 2026-11-17: 300, as drawn; 260 since 2026-11-12; it was 245 since 2026-10-30, 260, 266, 262, 240, briefly 220)
+const SIDEBAR_MIN = 260 // 260 (owner's Figma, 2026-11-23: the Sidebar component's minimum width; 300 before); 300 again (owner, 2026-11-17, after 320 for a day: the Figma frame is 320 wide); 320 before; 320 in the big sidebar pass of 2026-11-17 (Figma 320 wide), 300 earlier that day; min width of the expanded Sidebar (owner's Figma, 2026-11-17: 300, as drawn; 260 since 2026-11-12; it was 245 since 2026-10-30, 260, 266, 262, 240, briefly 220)
 const SIDEBAR_MAX = 400 // 400 since 2026-11-17 (the Figma component's max width); 380 before; Figma max width (was 340)
 const SIDEBAR_DEFAULT = 300 // 300 again (owner, 2026-11-17); 320 before; 320 (Figma, 2026-11-17), 300 earlier that day; the width it opens at (owner's Figma, 2026-11-17: 300; 260 since 2026-11-12; it was 300, 245 and 284 before)
 const clampWidth = (n: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, n))
