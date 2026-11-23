@@ -198,7 +198,7 @@ function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views
   }, [])
   return (
     <div className={`flex flex-col gap-2 py-2 pr-2.5 pl-1`}> {/* 8 px above and below and between, 10 at the right and 4 at the left, in all three sections (owner's Figma, 2026-11-17, latest) */}
-      <div ref={head} className={`group/title sticky -top-px ${menu ? 'z-30' : 'z-10'} flex h-8 items-center gap-2.5 border-b-[1px] bg-(--neutral-700) px-2 ${stuck ? 'border-(--neutral-600)' : 'border-transparent'}`}>
+      <div ref={head} className={`group/title sticky -top-px ${menu ? 'z-30' : 'z-10'} flex items-center gap-2.5 bg-(--neutral-700) px-2 ${stuck ? 'h-12 -mb-4 border-b-[1.4px] border-(--neutral-600) pb-4' : 'h-8 border-b border-transparent'}`}> {/* stuck at the top: 16 px more padding below, 48 px high (owner, 2026-11-23: 8, then 10, then 16); the negative margin keeps the rows under it where they were, so nothing jumps */}
         {onExpand ? (
           <button type="button" className="flex flex-1 cursor-pointer items-center gap-1 text-left text-caption-medium text-(--neutral-300) outline-none hover:text-(--neutral-100) focus-visible:text-(--neutral-100)" aria-expanded={!!expanded} aria-label={`${title}: ${expanded ? 'show less' : 'show all'}`} title={expanded ? 'Show less' : 'Show all'} onClick={() => onExpand(!expanded)}>
             {title}
