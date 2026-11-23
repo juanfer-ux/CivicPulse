@@ -29,7 +29,7 @@ describe('Sidebar — creating investigations and cases', () => {
     const onNew = vi.fn()
     render(<Sidebar {...baseProps} onNew={onNew} />)
 
-    const buttons = screen.getAllByRole('button', { name: 'New investigation' }) // the top button and the plus in the Investigations title
+    const buttons = screen.getAllByRole('button', { name: 'New investigation' }) // the Explore row and the plus in the Investigations title
     expect(buttons).toHaveLength(2)
     for (const b of buttons) await user.click(b)
     expect(onNew).toHaveBeenCalledTimes(2)
@@ -58,15 +58,15 @@ describe('Sidebar — creating investigations and cases', () => {
     const onNew = vi.fn()
     render(<Sidebar {...baseProps} onNew={onNew} />)
 
-    await user.click(screen.getByRole('button', { name: 'Explore' }))
+    await user.click(screen.getAllByRole('button', { name: 'New investigation' })[0])
     expect(onNew).toHaveBeenCalledTimes(1)
   })
 
   it('Explore is selected (aria-current) on the landing page and only there', () => {
     const { rerender } = render(<Sidebar {...baseProps} exploring />)
-    expect(screen.getByRole('button', { name: 'Explore' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getAllByRole('button', { name: 'New investigation' })[0]).toHaveAttribute('aria-current', 'page')
     rerender(<Sidebar {...baseProps} exploring={false} />)
-    expect(screen.getByRole('button', { name: 'Explore' })).not.toHaveAttribute('aria-current')
+    expect(screen.getAllByRole('button', { name: 'New investigation' })[0]).not.toHaveAttribute('aria-current')
   })
 
   it('shows Recurrences, Incidents and Investigations in one sidebar', () => {
@@ -99,12 +99,14 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(screen.getByRole('button', { name: /Access ramp obstruction/ })).not.toHaveAttribute('aria-current')
   })
 
-  it('Investigations flips newest and oldest; Recurrences and Incidents have a view menu that starts at View all by last update', async () => {
+  it('Investigations have the same view menu without the View group; Recurrences and Incidents start at View all by last update', async () => {
     const user = userEvent.setup()
     render(<Sidebar {...baseProps} />)
 
-    await user.click(screen.getByRole('button', { name: /^Investigations: newest first/ }))
-    expect(screen.getByRole('button', { name: /^Investigations: oldest first/ })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Investigations: view options' }))
+    expect(screen.queryByRole('menuitemradio', { name: 'View all' })).toBeNull()
+    expect(screen.getByRole('menuitemradio', { name: 'Newest first' })).toHaveAttribute('aria-checked', 'true')
+    await user.click(screen.getByRole('menuitemradio', { name: 'Oldest first' }))
     await user.click(screen.getByRole('button', { name: 'Incidents: view options' }))
     expect(screen.getByRole('menuitemradio', { name: 'View all' })).toHaveAttribute('aria-checked', 'true')
     expect(screen.getByRole('menuitemradio', { name: 'Last updated' })).toHaveAttribute('aria-checked', 'true')
@@ -190,12 +192,18 @@ describe('Sidebar — three incidents collapsed, all of them expanded, and two i
     expect(screen.queryByText('Incident number 3')).toBeNull()
   })
 
-  it('shows the first two investigations and nothing more', () => {
-    const chats = [{ id: 1, title: 'First question' }, { id: 2, title: 'Second question' }, { id: 3, title: 'Third question' }]
+  it('shows the latest three investigations; the title chevron shows them all, sorted by the view', async () => {
+    const user = userEvent.setup()
+    const chats = [1, 2, 3, 4].map((n) => ({ id: n, title: `Question ${n}`, created: n, updated: 10 - n }))
     render(<Sidebar {...baseProps} chats={chats} />)
-    expect(screen.getByText('Third question')).toBeInTheDocument() // newest first: the last chat leads
-    expect(screen.getByText('Second question')).toBeInTheDocument()
-    expect(screen.queryByText('First question')).toBeNull()
+    expect(screen.getByText('Question 1')).toBeInTheDocument() // the default is last updated, and 1 changed last
+    expect(screen.queryByText('Question 4')).toBeNull() // collapsed: three rows
+    await user.click(screen.getByRole('button', { name: 'Investigations: view options' }))
+    await user.click(screen.getByRole('menuitemradio', { name: 'Date created' }))
+    expect(screen.getByText('Question 4')).toBeInTheDocument() // by creation, 4 is the newest
+    expect(screen.queryByText('Question 1')).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Investigations: show all' }))
+    expect(screen.getByText('Question 1')).toBeInTheDocument()
   })
 })
 

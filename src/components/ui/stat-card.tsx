@@ -4,7 +4,7 @@ import { ArrowDown, ArrowRight, ArrowUp, TrendDown } from '@phosphor-icons/react
 import { sparkPoints } from '@/lib/sparkline'
 
 /** The trend mark (Figma Stat Trend `above`, owner, 2026-11-17, fourth pass): just the 14 px arrow in a 24 px box at the right of the name, `red-400` for above; the circle is gone. Figma only redrew `above`; the other three keep their old outlined strip there, so their arrow tones are their old label tones. */
-const GRAPH_H = 50 // Figma Graph / Vector 1 (owner's Figma, 2026-11-20, seventh look: 50 px high; 48 in the sixth, 32 before)
+const GRAPH_H = 40 // Figma Graph / Vector 1 (owner's Figma, 2026-11-23: 40 px high; 50 in the seventh look of 2026-11-20; 48 in the sixth, 32 before)
 const TREND = {
   above: { Icon: ArrowUp, text: 'Above usual', box: 'size-6 bg-(--neutral-700)', icon: 'size-3.5 text-(--red-400)' },
   about: { Icon: ArrowRight, text: 'About usual', box: 'size-6 bg-(--neutral-700)', icon: 'size-3 text-(--blue-200)' },
@@ -47,7 +47,7 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
             <span className="px-px text-caption text-(--neutral-300)">Reports</span> {/* Figma wraps the label in a frame with 1 px at each side */}
           </span>
           {series && (
-            <span className="hidden h-[50px] min-w-0 flex-1 basis-0 pr-2 @min-[140px]:block"> {/* Figma Graph (owner, 2026-11-15): 164 px at most, padding included */}
+            <span className="hidden h-[40px] min-w-0 flex-1 basis-0 pr-2 @min-[140px]:block"> {/* Figma Graph (owner, 2026-11-15): 164 px at most, padding included */}
               <span ref={box} className="relative block h-full"> {/* Figma Vector 1 (owner, 2026-11-15, latest): Fill in width and height, so the line is as long as the Graph's inner box (96.5 px in a 257 px card) */}
                 {g && (
                   <>

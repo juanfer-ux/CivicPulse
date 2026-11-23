@@ -92,6 +92,8 @@ export default function App() {
   }, [selection, opened, active.id])
   // The mocked conversations for the demo (src/lib/mockChats.ts): seeded once the rows are loaded, so clicking one opens a real conversation in the agent panel.
   const [mockIds, setMockIds] = useState<Record<number, string[]>>({})
+  const [mockTimes, setMockTimes] = useState<Record<number, { created: number; updated: number }>>({}) // when each mocked conversation started and last changed, for the Investigations sort
+  const [loadedAt] = useState(() => Date.now()) // real conversations are newer than every mock one: loaded time + their number
   const seededWith = useRef<number | null>(null) // how many recurrences the mock conversations were built with; null = not built yet
   useEffect(() => {
     // Built as soon as the incidents are in (owner, 2026-11-17: the Incidents list waited for the slower recurrences and took very long), and built once more when the recurrences arrive, so the Recurrences list fills too.
@@ -106,6 +108,7 @@ export default function App() {
       return [...cs.map((c) => (turnsOf.has(c.id) ? { ...c, turns: turnsOf.get(c.id)! } : c)), ...[...turnsOf].filter(([id]) => !have.has(id)).map(([id, turns]) => ({ id, turns }))]
     })
     setMockIds(Object.fromEntries(mocks.map((m, k) => [first + k, m.ids])))
+    setMockTimes(Object.fromEntries(mocks.map((m, k) => [first + k, { created: m.created, updated: m.updated }])))
   }, [rows])
   // The sidebar always lists every conversation's items (owner, 2026-11-08: switching conversations must not change the lists); what was opened from the map belongs to the conversation that was open then.
   const idsOf = (c: { id: number; turns: Turn[] }) => [...new Set([...(mockIds[c.id] ?? []), ...(opened[c.id] ?? []), ...c.turns.flatMap((t) => t.result?.highlightIds ?? [])])]
@@ -130,7 +133,7 @@ export default function App() {
         Skip to main content
       </a>
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
-      <Sidebar pinnedIds={new Set(Object.values(mockIds).flat())} agentOff={agentOff} onToggleAgent={() => setAgentOff((o) => !o)} chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().map((c) => ({ id: c.id, title: c.turns[0]?.question ?? 'New investigation' }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
+      <Sidebar pinnedIds={new Set(Object.values(mockIds).flat())} agentOff={agentOff} onToggleAgent={() => setAgentOff((o) => !o)} chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().filter((c) => c.turns.length).map((c) => ({ id: c.id, title: c.turns[0].question, ...(mockTimes[c.id] ?? { created: loadedAt + c.id, updated: loadedAt + c.id }) }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
       {/* The agent panel is always 30 % of the browser window width (30vw), no minimum or maximum (owner, 2026-11-08; it was clamp(550px, 38%, 680px), which kept the cards and the composer from breaking on narrow windows). */}
       <main ref={mainRef} id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
         {!agentOff && <AgentResizer max={maxW} onChange={drag} />}
