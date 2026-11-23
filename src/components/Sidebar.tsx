@@ -397,7 +397,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
-            <div className="flex shrink-0 flex-col gap-10 px-2.5 py-6"> {/* the search and the New investigation row, 12 apart, 24 px above and below (owner's Figma, 2026-11-23: 136 px high; it was 16 and 120) */}
+            <div className="flex shrink-0 flex-col gap-10 px-2.5 py-8"> {/* the search and the New investigation row, 12 apart, 32 px above and below (owner's Figma, 2026-11-23, later: 152 px high; 24 and 136 an hour before, 16 and 120 earlier) */}
               <div className="flex flex-col gap-3">
                 <div>
                   <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-800) border-(--neutral-400) text-body-sm" />
