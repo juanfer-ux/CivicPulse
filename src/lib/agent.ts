@@ -570,7 +570,7 @@ async function candidates(category: string | null): Promise<Answer> {
       `Based on ${period}, the location with the most evening (16:00–20:00) incidents is "${titleCase(top.label)}" in ${top.locality_name}: ` +
       `${top.evening_count} of its ${top.total_count} incidents fell in that window and ${top.recent_count} in the last 30 days. ` +
       `${top.weekday_evening_count} of the evening incidents ${top.weekday_evening_count === 1 ? 'was' : 'were'} on a ${tomorrow}. ` +
-      `It is a candidate for human review tomorrow evening, not a prediction.${others ? ` Other candidates: ${others}.` : ''} ` +
+      `It is a candidate for human review tomorrow evening.${others ? ` Other candidates: ${others}.` : ''} ` +
       `Category: ${categoryName(top.category)}.`,
     bars: rows.map((r) => ({ label: titleCase(r.label.replace('Synthetic ', '')), value: r.evening_count })),
     chart: 'rows',
