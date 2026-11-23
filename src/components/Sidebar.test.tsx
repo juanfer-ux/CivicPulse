@@ -29,8 +29,10 @@ describe('Sidebar — creating investigations and cases', () => {
     const onNew = vi.fn()
     render(<Sidebar {...baseProps} onNew={onNew} />)
 
-    await user.click(screen.getByRole('button', { name: 'New investigation' }))
-    expect(onNew).toHaveBeenCalledTimes(1)
+    const buttons = screen.getAllByRole('button', { name: 'New investigation' }) // the top button and the plus in the Investigations title
+    expect(buttons).toHaveLength(2)
+    for (const b of buttons) await user.click(b)
+    expect(onNew).toHaveBeenCalledTimes(2)
   })
 
   it('creates a new case', async () => {
