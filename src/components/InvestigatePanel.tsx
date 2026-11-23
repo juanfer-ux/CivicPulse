@@ -215,16 +215,7 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, o
           </dl>
         </details>
       ))}
-      {result.limitations.length > 0 && (
-      <ul className="flex flex-col text-meta text-muted-foreground">
-        {result.limitations.map((l, i) => (
-          <li key={l} className="flex items-start gap-3 border-b border-(--neutral-600) py-2.5 last:border-b-0">
-            <span className="grid size-5 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--neutral-100)">{i + 1}</span>
-            <span className="pt-0.5">{l}</span>
-          </li>
-        ))}
-      </ul>
-      )}
+      {/* The numbered limitations are not shown under any answer (owner, 2026-11-23: "remove all these disclaimers, on each question"). The Answer still carries them (`limitations`), and the tests read them. */}
       {result.offers?.map((o) => (
         <ModuleOffer key={`${o.type}-${o.problemId}`} offer={o} />
       ))}
