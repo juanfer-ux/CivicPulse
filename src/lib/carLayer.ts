@@ -1,5 +1,5 @@
 import { MercatorCoordinate, type CustomLayerInterface, type Map as MapLibreMap } from 'maplibre-gl'
-import { BufferAttribute, Box3, DoubleSide, CanvasTexture, Color, DirectionalLight, Group, HemisphereLight, Matrix4, Mesh, MeshBasicMaterial, MeshStandardMaterial, PerspectiveCamera, PlaneGeometry, Scene, Sprite, SpriteMaterial, SRGBColorSpace, Vector3, WebGLRenderer, type Material } from 'three'
+import { BoxGeometry, BufferAttribute, EdgesGeometry, LineBasicMaterial, LineSegments, Box3, DoubleSide, CanvasTexture, Color, DirectionalLight, Group, HemisphereLight, Matrix4, Mesh, MeshBasicMaterial, MeshStandardMaterial, PerspectiveCamera, PlaneGeometry, Scene, Sprite, SpriteMaterial, SRGBColorSpace, Vector3, WebGLRenderer, type Material } from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js' // the three extra bags are meshopt-compressed (1.7 MB instead of 14)
 import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js'
@@ -19,7 +19,7 @@ export interface CarLayerOptions {
   badge: (status: string, dim: boolean) => HTMLCanvasElement // the warning triangle's picture (a square canvas)
   badgeFill: number // the share of that canvas the triangle's width takes
   badgePx: (zoom: number) => number // the triangle's width on screen
-  dots: () => { id: string; lng: number; lat: number; color: string; open: boolean; pid?: string; pin?: { category: string; group: string } }[]
+  dots: () => { id: string; lng: number; lat: number; color: string; open: boolean; pid?: string; pin?: { category: string; group: string }; box?: string; faded?: boolean }[] // box: the color of a small block on the ground under the stem (a place from OpenStreetMap); faded: a stem, block and marker toned down
   pinCanvas: (category: string, group: string) => Promise<HTMLCanvasElement> // the marker shown above a stem
   dimDot: (d: { id: string; pid?: string }) => boolean // a stem toned down while another incident or recurrence is open // the report dots of the recurrences, each gets a stem (owner, 2026-11-15)
   selectedDot: () => string | null // the tapped report: its stem draws in front of the other stems
@@ -82,6 +82,8 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
     for (let i = 0; i < y.count; i++) rgba.set([1, 1, 1, 0.3 * y.getY(i)], i * 4)
     stripGeometry.setAttribute('color', new BufferAttribute(rgba, 4))
   }
+  const placeBox = new BoxGeometry(1, 1, 1)
+  const placeEdges = new EdgesGeometry(placeBox)
   const stripDown = new PlaneGeometry(1, 1).translate(0, 0.5, 0) // the dot stems fade the other way: 30 % opaque at the dot (owner, 2026-11-15; it was solid), clear at the top
   {
     const y = stripDown.getAttribute('position')
@@ -330,6 +332,18 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
           strip.frustumCulled = false
           st.add(strip)
           st.userData = { rnd: 0.25 + 0.75 * ((hash(d.id) % 997) / 996) }
+          if (d.box) {
+            // a place (owner, 2026-11-20): a 3 x 3 m block, 2 m high, on the ground under its stem
+            // lit by hand (the stems' scene has no lights): a lighter top and sides of different darkness, in the order +x, -x, top, bottom, +z, -z, and a faint dark edge, so it reads as a block and not as a flat hexagon (owner, 2026-11-20)
+            const base = new Color(d.box)
+            const shade = (k: number) => new MeshBasicMaterial({ color: k > 1 ? base.clone().lerp(new Color('#ffffff'), k - 1) : base.clone().multiplyScalar(k), }) // k above 1: that share toward white; solid (owner, 2026-11-20: it looked see-through), only a faded place turns transparent
+            const box = new Mesh(placeBox, [shade(0.85), shade(0.85), shade(1.2), shade(0.5), shade(0.6), shade(0.6)]) // the owner's pick, 2d of /#place-blocks: the top 20 % toward white, east and west 0.85, south and north 0.6 (in the order +x, -x, top, bottom, +z, -z), so the two sides you see always differ
+            box.add(new LineSegments(placeEdges, new LineBasicMaterial({ color: '#050505', transparent: true, opacity: 0.7 })))
+            box.name = 'box'
+            box.renderOrder = 8
+            box.frustumCulled = false
+            st.add(box)
+          }
           if (d.pin) {
             // the answer's incidents show their marker above the stem, already open (owner, 2026-11-15)
             const sprite = new Sprite(new SpriteMaterial({ transparent: true, depthTest: false, depthWrite: false }))
@@ -350,7 +364,7 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
           dotStems.set(d.id, st)
         }
         ;(st.children[0] as Mesh).renderOrder = d.id === o.selectedDot() ? 12 : 9
-        ;(st.children[0] as Mesh).material = o.dimDot(d) ? stemDim(d.color) : stemMat(d.color)
+        ;(st.children[0] as Mesh).material = d.faded || o.dimDot(d) ? stemDim(d.color) : stemMat(d.color)
         const mc = MercatorCoordinate.fromLngLat([d.lng, d.lat], 0)
         const u = (40075016.686 * Math.cos((d.lat * Math.PI) / 180)) / (512 * 2 ** map.getZoom()) * mc.meterInMercatorCoordinateUnits() // one screen px, in map units
         const warnPx = (parkingT!.lift / parkingT!.length) * pxBase * CAR_SCALE // the warning line's height in px
@@ -360,12 +374,30 @@ export function createCarLayer(o: CarLayerOptions): CustomLayerInterface & { bad
         const eye = new Vector3().applyMatrix4(st.matrix.clone().invert())
         const strip = st.children[0] as Mesh
         strip.rotation.y = Math.atan2(eye.x, eye.z)
+        const boxH = d.box ? 2 / (u / mc.meterInMercatorCoordinateUnits()) : 0 // a place's stem starts on the top face of its 2 m block, not on the ground inside it (owner, 2026-11-20)
+        strip.position.set(0, boxH, 0)
         strip.scale.set(2, h, 1)
         st.userData.h = h
         const pin = st.getObjectByName('pin')
         if (pin) {
           pin.scale.set(30, 30, 1) // 30 screen px: the group is in screen-px units
-          pin.position.set(0, h + 15, 0)
+          pin.position.set(0, boxH + h + 15, 0)
+          ;((pin as Sprite).material as SpriteMaterial).opacity = d.faded ? 0.5 : 1
+        }
+        const box = st.getObjectByName('box') as Mesh | undefined
+        if (box) {
+          const mpp = u / mc.meterInMercatorCoordinateUnits() // metres per screen px: the block keeps its real size at every zoom
+          box.scale.set(3 / mpp, 2 / mpp, 3 / mpp)
+          box.position.set(0, 1 / mpp, 0)
+          if (box.userData.faded !== !!d.faded) {
+            box.userData.faded = !!d.faded
+            for (const m of box.material as MeshBasicMaterial[]) {
+              m.transparent = !!d.faded
+              m.opacity = d.faded ? 0.45 : 1
+              m.needsUpdate = true
+            }
+          }
+          ;((box.children[0] as LineSegments).material as LineBasicMaterial).opacity = d.faded ? 0.3 : 0.7
         }
         dotPos.push(new Vector3(mc.x, mc.y, 0))
       }

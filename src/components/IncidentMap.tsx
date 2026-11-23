@@ -1,4 +1,5 @@
-import { shownCount, type Place } from '@/lib/places'
+import { RING_M, shownCount, type Place, type PlaceKind } from '@/lib/places'
+import { placeIcon } from '@/lib/placeIcons'
 import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import { gsap } from 'gsap'
@@ -6,7 +7,7 @@ import { KEEP, mix, token } from '@/lib/tokens'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { bodyCore, bodyRadius, carHeight, problemSizes } from '@/lib/markerSizes'
-import { BADGE_FILL, PROBLEM_CIRCLE_PX, PROBLEM_SWITCH_ZOOMS, addBadges, badgeCanvas, pinCanvas, addDots, addSelectedRing, addProblemMarkers, iconCategory, problemCircledId, selectedRingId } from '@/lib/markerIcons'
+import { BADGE_FILL, PROBLEM_CIRCLE_PX, PROBLEM_SWITCH_ZOOMS, addBadges, badgeCanvas, pinCanvas, placePinCanvas, addDots, addSelectedRing, addProblemMarkers, iconCategory, problemCircledId, selectedRingId } from '@/lib/markerIcons'
 import { labelPoint } from '@/lib/polygons'
 import { circleAround, circleBounds, radiusGroups } from '@/lib/radius'
 import type { Area } from '@/lib/agent'
@@ -58,7 +59,7 @@ const MAX_ZOOM = 23 // owner, 2026-11-15 (it was 18)
 const MIN_ZOOM = 11
 const NO_PROBLEMS: ProblemRow[] = []
 const NO_PLACES: Place[] = []
-const PLACE_COLOR = { shop: '--blue-200', food: '--orange-400', education: '--green-300', bus: '--yellow-300', other: '--neutral-200' } as const
+const PLACE_TONE = '--neutral-100' // every place's marker and stem are this one neutral, whatever the kind (owner, 2026-11-20); the icon says what it is
 /** The recurrence marker's image by zoom; with `sel` (the open recurrence's id) every other recurrence gets the toned-down image (opaque, like the incidents'). An Active parking marker has no circle (owner's Figma, 2026-11-13) except while it is hovered (`hover`) or open (`sel`): then it gets the circled image (a test). */
 const problemImage = (sel: string | null, hover: string | null = null, badge = false) => ['step', ['zoom'], ...PROBLEM_CIRCLE_PX.flatMap((px, i) => { const id = (dim: boolean) => ['concat', 'problem-', badge ? 'badge-' : '', ['get', 'category'], dim ? '-dim-' : '-', ['get', 'status'], `-${px}`]; const base = sel ? ['case', ['==', ['get', 'id'], sel], id(false), id(true)] : id(false); const lit = ['all', ['==', ['get', 'category'], 'parking'], ['==', ['get', 'status'], 'active'], ['any', ['==', ['get', 'id'], sel ?? ''], ['==', ['get', 'id'], hover ?? '']]]; return [...(i ? [PROBLEM_SWITCH_ZOOMS[i - 1]] : []), (sel || hover) && !badge ? ['case', lit, problemCircledId(px), base] : base] })] as never
 /** The plain square's image: one per size (step 0 below zoom 12, step 1 from 12); with `focus` (an expression) every incident but the focused one gets the toned-down image. */
@@ -218,6 +219,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
   const mapRef = useRef<maplibregl.Map | null>(null)
   const carsRef = useRef<{ id: string; lng: number; lat: number; status: string; kind: 'parking' | 'dumping' }[]>([]) // the 3D cars' places (parking recurrences)
   const carLayerRef = useRef<ReturnType<typeof import('@/lib/carLayer').createCarLayer> | null>(null)
+  const placeDotsRef = useRef<{ id: string; lng: number; lat: number; color: string; open: boolean; pin: { category: string; group: string }; box: string; faded: boolean }[]>([]) // the OSM places around the open recurrence, as stems with blocks and markers
   const dotsRef = useRef<{ id: string; lng: number; lat: number; color: string; open: boolean; pid?: string; pin?: { category: string; group: string } }[]>([]) // the report dots (they get stems in the 3D layer)
   const carSelRef = useRef<string | null>(null) // the open recurrence: the other cars draw toned down
   const onSelectRef = useRef(onSelect)
@@ -461,10 +463,6 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       // Recurrence radius (owner, 2026-10-30): the same radius look as the agent's answer, one per problem in its status color, so a problem reads as an area and not just a marker. Real meters, under the dots and names.
       map.addSource('problem-radius', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       map.addSource('places', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
-      // A place is a small square lying on the ground (a polygon 3 m across), so it follows the map's tilt and turn like the recurrence ring (owner, 2026-11-20); its name is a plain label.
-      map.addSource('places-area', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
-      map.addLayer({ id: 'places-square', type: 'fill', source: 'places-area', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': ['case', ['get', 'near'], 1, 0.45] } })
-      map.addLayer({ id: 'places-square-line', type: 'line', source: 'places-area', paint: { 'line-color': token('--neutral-900'), 'line-width': 1 } })
       map.addLayer({ id: 'places-name', type: 'symbol', source: 'places', minzoom: 17, filter: ['!=', ['get', 'name'], ''], layout: { 'text-field': ['get', 'name'], 'text-font': ['Montserrat Medium', 'Open Sans Regular', 'Noto Sans Regular'], 'text-size': 11, 'text-offset': [0, 0.9], 'text-anchor': 'top', 'text-max-width': 8 }, paint: { 'text-color': token('--neutral-100'), 'text-halo-color': token('--neutral-900'), 'text-halo-width': 1.5 } })
       // From the first zoom (11, owner 2026-10-30; it used to fade in from 12) at full strength: 72 px in radius up to zoom 12, shrinking to 36 px at zoom 14, then to its real size (60 m, about 50 px in radius at zoom 17). Until the real size is bigger it never draws under that minimum on screen.
       const problemPx = (f: number) => ['interpolate', ['exponential', 2], ['zoom'], ...PROBLEM_STOPS.flatMap(([z, v]) => [z, v * f])] as never
@@ -587,15 +585,16 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
           const id = selectedIdRef.current
           // the incidents the agent's answer is about get a stem each too (owner, 2026-11-15)
           const answer = highlightRef.current.length ? answerStems(highlightRef.current, incidentsRef.current, dotsRef.current, spotsRef.current) : dotsRef.current
-          if (!id || answer.some((d) => d.id === id)) return answer
+          const withPlaces = (list: typeof answer) => (placeDotsRef.current.length ? [...list, ...placeDotsRef.current] : list)
+          if (!id || answer.some((d) => d.id === id)) return withPlaces(answer)
           if (looseStem.current?.id !== id) {
             const i = incidentsRef.current.find((x) => x.id === id)
             looseStem.current = i ? { id, lng: i.lng, lat: i.lat, color: token(GROUPS[groupOf(i.status)].token), open: true } : null
           }
-          return looseStem.current ? [...answer, looseStem.current] : answer
+          return withPlaces(looseStem.current ? [...answer, looseStem.current] : answer)
         },
-        dimDot: (d) => !!carSelRef.current && d.id !== selectedIdRef.current && d.pid !== carSelRef.current,
-        pinCanvas: (category, group) => pinCanvas(category, group as keyof typeof GROUPS),
+        dimDot: (d) => !d.id.startsWith('place:') && !!carSelRef.current && d.id !== selectedIdRef.current && d.pid !== carSelRef.current,
+        pinCanvas: (category, group) => (category.startsWith('place:') ? placePinCanvas(placeIcon(category.slice(6), group as PlaceKind), token('--neutral-900'), token('--neutral-100')) : pinCanvas(category, group as keyof typeof GROUPS)),
         dotsZoom: DOTS_ZOOM,
         selectedDot: () => selectedIdRef.current,
         statusColor: (status) => token(PROBLEM_STATUS[status as keyof typeof PROBLEM_STATUS].token),
@@ -732,17 +731,13 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
-    const props = (p: Place, i: number) => ({ name: p.name, color: token(PLACE_COLOR[p.kind]), near: i < shownCount(places) })
-    const dLat = 1.5 / 111320 // half of the 3 m square, in degrees
-    ;(map.getSource('places') as maplibregl.GeoJSONSource).setData({ type: 'FeatureCollection', features: places.map((p, i) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [p.lng, p.lat] }, properties: props(p, i) })) })
-    ;(map.getSource('places-area') as maplibregl.GeoJSONSource).setData({
-      type: 'FeatureCollection',
-      features: places.map((p, i) => {
-        const dLng = dLat / Math.cos((p.lat * Math.PI) / 180)
-        const ring = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]].map(([x, y]) => [p.lng + x * dLng, p.lat + y * dLat])
-        return { type: 'Feature', geometry: { type: 'Polygon', coordinates: [ring] }, properties: props(p, i) }
-      }),
-    })
+    const near = shownCount(places)
+    // only the places inside the recurrence's circle are drawn (owner, 2026-11-20); the card lists the ones beyond it too
+    const ordered = places.map((p, i) => ({ p, faded: i >= near })).filter((x) => x.p.dist <= RING_M)
+    ;(map.getSource('places') as maplibregl.GeoJSONSource).setData({ type: 'FeatureCollection', features: ordered.map(({ p }) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [p.lng, p.lat] }, properties: { name: p.name } })) })
+    // each place is a block on the ground with a stem and a square marker on top, drawn by the 3D layer (owner, 2026-11-20)
+    placeDotsRef.current = ordered.map(({ p, faded }) => ({ id: `place:${p.id}`, lng: p.lng, lat: p.lat, color: token(PLACE_TONE), open: true, pin: { category: `place:${p.label}`, group: p.kind }, box: mix(token('--neutral-300'), token('--neutral-400'), 0.5), faded })) // the block is the same neutral for every kind (owner, 2026-11-20); the kind's color is on the stem and the marker
+    map.triggerRepaint()
   }, [ready, places])
 
   // The localities of an answer: load the boundaries once, draw the listed ones (shade by count) and move the map to show them all.
