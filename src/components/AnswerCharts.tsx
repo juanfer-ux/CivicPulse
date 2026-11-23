@@ -164,10 +164,25 @@ function Period({ bars }: { bars: Answer['bars'] }) {
   )
 }
 
+/** The places around a recurrence (owner, 2026-11-23): one row each, nearest first, its name and its distance in metres. */
+function Places({ bars }: { bars: Answer['bars'] }) {
+  return (
+    <ul className="flex flex-col" aria-label={summary('Distance in metres to each place', bars)}>
+      {bars.map((b, i) => (
+        <li key={b.label + i} className={`flex items-center gap-3 py-2 ${i ? 'border-t border-(--neutral-600)' : ''}`}>
+          <span className="size-2 shrink-0 rounded-[1px] bg-(--neutral-100)" aria-hidden />
+          <span className="min-w-0 flex-1 truncate text-body-sm text-foreground" title={b.label}>{b.label}</span>
+          <span className="shrink-0 text-body-sm tabular-nums text-(--neutral-300)">{b.value} m</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 export default function AnswerChart({ kind, bars, onFocus, onPick, onPickRecurrence }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars']; onPickRecurrence?: (id: string) => void } & Link) {
   return (
     <div className="rounded-[6px] border-[0.5px] border-(--neutral-500) bg-(--neutral-700) p-4">
-      {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : kind === 'dots' ? <Dots bars={bars} /> : kind === 'rows' ? <Rows bars={bars} /> : kind === 'recurrences' ? <Recurrences bars={bars} onPick={onPickRecurrence} /> : kind === 'donut' ? <Donut bars={bars} onFocus={onFocus} onPick={onPick} /> : <BarList bars={bars} onFocus={onFocus} onPick={onPick} />}
+      {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : kind === 'dots' ? <Dots bars={bars} /> : kind === 'rows' ? <Rows bars={bars} /> : kind === 'places' ? <Places bars={bars} /> : kind === 'recurrences' ? <Recurrences bars={bars} onPick={onPickRecurrence} /> : kind === 'donut' ? <Donut bars={bars} onFocus={onFocus} onPick={onPick} /> : <BarList bars={bars} onFocus={onFocus} onPick={onPick} />}
     </div>
   )
 }

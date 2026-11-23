@@ -23,7 +23,7 @@ flowchart LR
 ## 🗂️ Categories
 Say "illegal dumping" or "parking" in the question to limit it to that category. With no category named (or both), the agent uses **all categories you may see** and says so in every answer ("Category: ..."). Specialists only ever get their assigned categories.
 
-## 🔎 The five investigations
+## 🔎 The investigations (five, and the places question)
 | | Question type | Tool (SQL function) | Notes |
 |---|---|---|---|
 | ✅ A | Which localities have the most incidents? | `tool_incidents_by_locality` | Ties are reported, not hidden |
@@ -31,6 +31,7 @@ Say "illegal dumping" or "parking" in the question to limit it to that category.
 | ✅ C | Which locations have repeated reports? | `tool_recurring_locations` | **Exact** (same described place) vs **approximate** (~200 m); never claims "same event" |
 | ✅ D | Have incidents increased over the last N days? | `tool_period_comparison` | Default 30 days; no percentage if the previous period is empty; flags small samples and incomplete periods |
 | ✅ E | Which area deserves a look tomorrow evening? | `tool_candidate_areas` | Ranks by 16:00 to 20:00 incidents over 90 days; produces a **proposal for human review** |
+| ✅ F | What is around this recurrence? (owner, 2026-11-23) | `tool_recurrence_places` | Needs an **open recurrence**; the stored OpenStreetMap places within 100 m, nearest first, as a list with distances; the button **Show places on map** draws the nearest ten inside the recurrence's circle (blocks, stems, markers). Context for the person, never a cause; says the map is volunteer-made |
 
 Unsupported questions get an honest "I cannot answer that yet". The agent does not guess.
 

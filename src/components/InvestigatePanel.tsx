@@ -18,7 +18,7 @@ const AnswerChart = lazy(loadChart)
 export type Turn = { question: string; result?: Answer; error?: string }
 
 /** `turns` are this conversation's questions and answers; the app keeps one list per conversation (the sidebar's Investigations). `onTurns` edits the conversation with this id, even if the person has switched to another one meanwhile. */
-export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea, recurrenceId = null, onOpenRecurrence, onCollapse }: { onCollapse?: () => void; recurrenceId?: string | null; onOpenRecurrence?: (id: string) => void; chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
+export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea, recurrenceId = null, onOpenRecurrence, onCollapse, placesFor = null, onPlaces }: { placesFor?: string | null; onPlaces?: (problemId: string | null) => void; onCollapse?: () => void; recurrenceId?: string | null; onOpenRecurrence?: (id: string) => void; chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
   const setTurns = (edit: (t: Turn[]) => Turn[]) => onTurns(chatId, edit)
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
@@ -112,7 +112,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
               <Question text={t.question} />
               {!t.result && !t.error && <p className="text-muted-foreground">Querying…</p>}
               {t.error && <p className="text-incident">{t.error}</p>}
-              {t.result && <AnswerView result={t.result} shown={t.result.highlightIds === highlightIds} onFocusArea={onFocusArea} onZoomArea={onZoomArea} onPickRecurrence={onOpenRecurrence} onToggle={(on) => onHighlight(on ? t.result!.highlightIds : [], on ? t.result!.areas : [], on ? t.result!.spots : [])} />}
+              {t.result && <AnswerView result={t.result} placesOn={placesFor} onPlaces={onPlaces} shown={t.result.highlightIds === highlightIds} onFocusArea={onFocusArea} onZoomArea={onZoomArea} onPickRecurrence={onOpenRecurrence} onToggle={(on) => onHighlight(on ? t.result!.highlightIds : [], on ? t.result!.areas : [], on ? t.result!.spots : [])} />}
             </div>
           ))}
           <div ref={end} />
@@ -178,7 +178,7 @@ export function Bars({ bars, onFocus, onPick }: { bars: Answer['bars']; onFocus?
   )
 }
 
-export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, onPickRecurrence }: { result: Answer; shown: boolean; onToggle: (on: boolean) => void; onFocusArea?: (code: number | null) => void; onZoomArea?: (code: number) => void; onPickRecurrence?: (id: string) => void }) {
+export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, onPickRecurrence, placesOn = null, onPlaces }: { result: Answer; shown: boolean; placesOn?: string | null; onPlaces?: (problemId: string | null) => void; onToggle: (on: boolean) => void; onFocusArea?: (code: number | null) => void; onZoomArea?: (code: number) => void; onPickRecurrence?: (id: string) => void }) {
   // Only the answer that is on the map can point at it.
   const link = shown && result.areas?.length ? { onFocus: onFocusArea, onPick: onZoomArea } : {}
   return (
@@ -198,7 +198,7 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, o
       {result.bars.length > 0 && <p className="text-muted-foreground">{result.text}</p>} {/* an answer with a chart or bars: the text goes under the graphic, every time (owner, 2026-11-17) */}
       {result.evidence.map((e) => (
         <details key={e.tool + e.scope} className="text-meta text-muted-foreground">
-          <summary className="cursor-pointer">Evidence: {e.incidentCount} Incidents</summary>
+          <summary className="cursor-pointer">Evidence: {e.incidentCount} {e.unit ?? 'Incidents'}</summary>
           <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-2">
             <dt>Tool</dt>
             <dd className="text-foreground">{e.tool}</dd>
@@ -231,6 +231,11 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, o
       {result.highlightIds.length > 0 && (
         <Button size="sm" variant="outline" className="self-start border-[0.5px] border-(--neutral-400) bg-(--neutral-900) px-3" onClick={() => onToggle(!shown)}> {/* answer actions are outline small buttons (owner's Figma, 2026-11-17) */}
           {shown ? 'Clear map highlight' : 'Show on map'}
+        </Button>
+      )}
+      {result.places && onPlaces && (
+        <Button size="sm" variant="outline" className="self-start border-[0.5px] border-(--neutral-400) bg-(--neutral-900) px-3" onClick={() => onPlaces(placesOn === result.places!.problemId ? null : result.places!.problemId)}>
+          {placesOn === result.places.problemId ? 'Hide places on map' : 'Show places on map'}
         </Button>
       )}
       <Feedback />

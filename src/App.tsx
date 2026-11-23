@@ -46,6 +46,7 @@ export default function App() {
   }, [target])
   const drag = (px: number | null) => { instant.current = px !== null; setAgentW(px) }
   const [highlightIds, setHighlightIds] = useState<string[]>([])
+  const [placesFor, setPlacesFor] = useState<string | null>(null) // the recurrence whose OpenStreetMap places the person asked the agent to draw on the map (owner, 2026-11-23)
   const [areas, setAreas] = useState<Area[]>([])
   const [spots, setSpots] = useState<string[][]>([]) // the answer is about specific spots (the incident ids of each): one radius around each, no locality outlines
   const show = (ids: string[], a: Area[] = [], s: string[][] = []) => {
@@ -135,10 +136,10 @@ export default function App() {
         {!agentOff && <AgentResizer max={maxW} onChange={drag} />}
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
-          <Dashboard highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} agentOff={agentOff} onAgentOff={setAgentOff} focus={focus} onRows={setRows} onSelection={setSelection}>
+          <Dashboard placesFor={placesFor} highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} agentOff={agentOff} onAgentOff={setAgentOff} focus={focus} onRows={setRows} onSelection={setSelection}>
             {/* Phone: only shown on the Investigate tab. Tablet (owner, 2026-11-15) and desktop: always shown; on tablet it is the bottom sheet, collapsible with the sheet's chevron. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden md:max-desk:contents desk:contents'}>
-              <InvestigatePanel onCollapse={() => setAgentOff(true)} chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} recurrenceId={selection?.kind === 'recurrence' ? selection.id : null} onOpenRecurrence={open('recurrence')} />
+              <InvestigatePanel placesFor={placesFor} onPlaces={setPlacesFor} onCollapse={() => setAgentOff(true)} chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} recurrenceId={selection?.kind === 'recurrence' ? selection.id : null} onOpenRecurrence={open('recurrence')} />
             </div>
           </Dashboard>
         </div>

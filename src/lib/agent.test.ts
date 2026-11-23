@@ -210,6 +210,19 @@ describe('recurrences that need attention', () => {
     expect(rankForAttention(rows, null, 1)[0].id).toBe('dump') // no category: every category
   })
 
+  it('sends "what is around this recurrence" to the places answer, and leaves the other questions alone', () => {
+    expect(plan('What is around this recurrence?', localities)?.kind).toBe('nearby')
+    expect(plan('Which shops are near here?', localities)?.kind).toBe('nearby')
+    expect(plan('Show me nearby places', localities)?.kind).toBe('nearby')
+    for (const q of [...SUGGESTIONS, ...WORTH_INVESTIGATING.map((w) => (typeof w === 'string' ? w : (w as { question: string }).question))]) expect(plan(q, localities)?.kind).not.toBe('nearby')
+  })
+
+  it('asks for a recurrence first when the places question comes with none open', async () => {
+    const a = await answer('What is around this recurrence?', localities)
+    expect(a.places).toBeUndefined()
+    expect(a.text).toMatch(/Pick a recurrence first/)
+  })
+
   it('asks for a recurrence first when none is open', async () => {
     const a = await answer('I would like to see a timeline', localities)
     expect(a.offers).toBeUndefined()
