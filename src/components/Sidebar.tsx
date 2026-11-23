@@ -393,9 +393,9 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
             <div className="flex shrink-0 flex-col gap-10 px-2.5 py-4"> {/* the new chat button, 40 px, then the search and Explore, 12 apart (owner's Figma, 2026-11-17, latest) */}
-              <Button variant="secondary" size="lg" className="w-full border-[0.5px] border-(--neutral-100)" onClick={onNew}> {/* Figma Button: secondary, large, a 0.5 px `neutral-100` line, `sparkle` fill 16 px and "New chat" */}
+              <Button variant="secondary" size="default" className="w-full border-[0.5px] border-(--neutral-100)" onClick={onNew}> {/* Figma Button: secondary, large, a 0.5 px `neutral-100` line, `sparkle` fill 16 px and "New chat" */}
                 <Sparkle weight="fill" className="size-4" aria-hidden />
-                New chat
+                New investigation
               </Button>
               <div className="flex flex-col gap-3">
                 <div>
