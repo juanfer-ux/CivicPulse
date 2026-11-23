@@ -121,7 +121,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </ScrollArea>
         </div>
         <div className="w-full">
-        <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:flex-row desk:flex-col desk:items-stretch desk:gap-1.5 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-4 desk:py-5 desk:max-w-[calc(var(--agent-content-w)+32px)]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
+        <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:flex-row desk:flex-col desk:items-stretch desk:gap-3 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-4 desk:py-5 desk:max-w-[calc(var(--agent-content-w)+32px)]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
           <Composer value={text} onChange={setText} busy={busy} />
         </form>
         </div>

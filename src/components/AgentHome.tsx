@@ -1,8 +1,9 @@
-import { useEffect, type ReactNode } from 'react'
-import { Car, CarSimple, Sparkle, Trash, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wrench, type Icon } from '@phosphor-icons/react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { Car, CarSimple, Sparkle, Trash, X, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wrench, type Icon } from '@phosphor-icons/react'
 import { SUGGESTIONS, WORTH_INVESTIGATING } from '@/lib/agent'
-import { useAuth } from '@/lib/auth'
 import { Alert } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/lib/auth'
 
 /** The agent panel's landing (owner's Figma, 2026-11-12: Agent Panel, Welcome_Module, CatchUp_Module, Worth-Investigating_Module, Quick Questions): a greeting and three sections, each a Welcome_Module with a title row and a caret that folds it. Data overview and the category pictures are still placeholders (Figma's numbers); the questions are real and ask the agent. */
 /** The Quick suggestions section and its Shift + 1 to 5 keys (owner, 2026-11-16: switched off for now). Set to true to bring them back. */
@@ -46,6 +47,7 @@ function Donut() {
 }
 
 export function AgentHome({ ask }: { ask: (q: string) => void }) {
+  const [noteOpen, setNoteOpen] = useState(true) // the AI note at the bottom of the body; its X closes it for this session
   const first = useAuth().profile?.full_name?.trim().split(/\s+/)[0] // the greeting names the person (owner's Figma, 2026-11-17: "Welcome back Peter,")
   useEffect(() => {
     if (!QUICK_SUGGESTIONS_ON) return
@@ -62,13 +64,15 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
     return () => document.removeEventListener('keydown', onKey)
   }, [ask])
   return (
-    <div className="flex flex-1 flex-col gap-20"> {/* Figma Conversation body (owner, 2026-11-17, latest): the alert, then the dashboard, 80 px apart (64 before) */}
-      <Alert variant="info" icon={<Sparkle weight="fill" className="size-5 text-(--indigo-200)" aria-hidden />} className="mx-auto hidden max-w-(--agent-content-w) desk:flex"> {/* Figma Alert, variant info (owner, 2026-11-17): the summary card, 700 px at most and centered; the icon is `indigo-300` (below) */}
-        CivicPulse AI groups related reports into patterns and may contain errors. Verify before acting: nothing goes to the authorities until you’ve reviewed it, and the final decision rests with the responsible official.
-      </Alert>
-      <div className="flex flex-1 flex-col justify-start gap-16 px-2.5 py-4"> {/* Figma Dashboard (owner, 2026-11-23, latest: content aligned to the TOP again, primary axis MIN; an hour before it was the BOTTOM, justify-end, and before that top). Before: Fill height with its content aligned to the BOTTOM (primary axis MAX), so a taller panel adds the space between the alert and the greeting; it was top-aligned (justify-start). Figma (owner, 2026-11-16): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
+    <div className="flex flex-1 flex-col gap-20"> {/* Figma Conversation body: the Dashboard group, which holds the alert first (owner, 2026-11-23) */}
+      <div className="flex flex-1 flex-col justify-start gap-16 px-2.5 py-10"> {/* Figma Dashboard: 40 px above and below (owner, 2026-11-23, it was 16; the alert left the body for a banner under the title row). Before: (owner, 2026-11-23, latest: content aligned to the TOP again, primary axis MIN; an hour before it was the BOTTOM, justify-end, and before that top). Before: Fill height with its content aligned to the BOTTOM (primary axis MAX), so a taller panel adds the space between the alert and the greeting; it was top-aligned (justify-start). Figma (owner, 2026-11-16): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
+      {noteOpen && (
+        <Alert variant="info" className="hidden desk:flex" icon={<Sparkle weight="fill" className="size-5 text-(--indigo-200)" aria-hidden />} action={<Button size="icon" variant="ghost" className="size-8" aria-label="Close note" onClick={() => setNoteOpen(false)}><X weight="regular" className="size-4" aria-hidden /></Button>}> {/* Figma Alert, info (owner, 2026-11-23, latest): the FIRST item of the Dashboard group, above the greeting, 64 px away, the full width of the group, 8 px radius, 0.5 px `indigo-600` line all round, `indigo-900` at 69 %, with a close button at the right (owner, 2026-11-23, latest: it was the last item of the body an hour before, and a banner under the title row before) */}
+          CivicPulse AI groups related reports into patterns. Nothing goes to the authorities until you’ve reviewed it. Final decision rests with the responsible official.
+        </Alert>
+      )}
       <div className="flex flex-col gap-4"> {/* (the line under the greeting is hidden in Figma now, owner 2026-11-17, so it is gone) Figma Frame 2147225884 (owner, 2026-11-17): the greeting, then "You're ready to investigate and coordinate incident response" in `display-sm` / `neutral-200`, 16 px apart; the place text left the header */}
-        <h2 className="font-display text-display-md text-(--neutral-100)">Welcome back,{first ? ` ${first},` : ''}</h2>
+        <h2 className="font-display text-display-md text-(--brand-primary)"> {/* Figma greeting (owner, 2026-11-23): 38 / 28 in `brand-primary` (it was 32 and `neutral-100`) */}Welcome back,{first ? ` ${first},` : ''}</h2>
       </div>
       <div className="flex flex-col gap-16"> {/* Figma Dashboard modules (owner's Figma, 2026-11-17, latest): 64 px between the two modules (48 an hour before);  (owner's Figma, 2026-11-17, checked): "Here's what's happening" and "Recurrences to investigate" are 48 px apart (the code had 32); before that, Figma Frame 2147225871 (2026-11-16): the modules 32 px apart (it was 24); the greeting is 64 px above them, the group has 16 px above and below and 10 at the sides (700 px wide) */}
       <Section title="Here's what's happening">
@@ -108,7 +112,7 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
         </Section>
         <div className="flex flex-col gap-8"> {/* Figma Modules (owner, 2026-11-23): Category overview and Suggestions 32 px apart (it was 40) */}
           <Section title="Recurrences to investigate">
-            <div className="flex gap-4"> {/* Figma Worth-Investigating_Module (owner, 2026-11-23, latest: 16 px apart; 24 an hour before, 10 earlier; 2026-11-15): one row that no longer wraps, cards Fill with a 120 px minimum */}
+            <div className="flex flex-wrap gap-4"> {/* wraps (owner, 2026-11-23: Figma wrap, cards 120 px at least). Figma Worth-Investigating_Module (owner, 2026-11-23, latest: 16 px apart; 24 an hour before, 10 earlier; 2026-11-15): one row that no longer wraps, cards Fill with a 120 px minimum */}
               {WORTH_INVESTIGATING.map((c) => {
                 const Icon = CATEGORY_ICON[c.title]
                 return (

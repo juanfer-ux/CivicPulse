@@ -301,7 +301,7 @@ function SidebarResizer({ width, onChange }: { width: number; onChange: (px: num
 }
 
 const COLLAPSED_W = 0 // collapsed, the sidebar disappears (owner, 2026-11-17): the agent panel's header shows the logo and the expand button instead; it was a 60 px rail (56 and 64 before)
-/** The sidebar always starts expanded (owner, 2026-11-19; it started collapsed from 2026-11-16, and before that collapsed under 1,800 px or by what was saved in this browser). Dropping under 1,800 px while open collapses it; it never expands by itself, the toggle does. */
+/** The sidebar always starts expanded (owner, 2026-11-19; it started collapsed from 2026-11-16, and before that collapsed under 1,800 px or by what was saved in this browser). Dropping under 1,800 px while open collapses it, and growing back to 1,800 px or more opens it again (owner, 2026-11-23), but only if the resize collapsed it; the toggle stays the person's own choice. */
 const NARROW = '(max-width: 1799.98px)'
 
 /** The logo. The expand button is not here any more: collapsed, it is in the agent panel's title row, left of "Explore" (owner, 2026-11-17; before, the logo mark swapped for it on hover). */
@@ -472,10 +472,21 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
   const [collapsed, setCollapsed] = useState(props.initialCollapsed ?? false)
   const [open, setOpen] = useState(false)
 
+  // Resizing the window (owner, 2026-11-23): dropping under 1,800 px collapses an open sidebar, and growing back to 1,800 px or more opens it again at its own width, but only if the resize collapsed it; one the person collapsed (or expanded) themselves stays as they left it.
+  const live = useRef({ collapsed, agentOff: props.agentOff })
+  live.current = { collapsed, agentOff: props.agentOff }
+  const auto = useRef(false)
   useEffect(() => {
     const mq = window.matchMedia?.(NARROW) // jsdom (the tests) has no matchMedia
     if (!mq) return
-    const on = (e: MediaQueryListEvent) => e.matches && setCollapsed(true)
+    const on = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        if (!live.current.collapsed) (auto.current = true, setCollapsed(true))
+      } else if (auto.current) {
+        auto.current = false
+        setCollapsed(false)
+      }
+    }
     mq.addEventListener('change', on)
     return () => mq.removeEventListener('change', on)
   }, [])
@@ -507,8 +518,6 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
     window.dispatchEvent(new Event('sidebar-now'))
   }, [collapsed, width])
   // Narrow viewport (1,600 px or below, owner 2026-11-17): with the sidebar and the agent panel both open, opening the filters collapses the sidebar, and closing them (or applying) brings it back as it was.
-  const live = useRef({ collapsed, agentOff: props.agentOff })
-  live.current = { collapsed, agentOff: props.agentOff }
   const stepped = useRef(false)
   useEffect(() => {
     const on = (e: Event) => {
@@ -525,7 +534,7 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
     return () => window.removeEventListener('filters-open', on)
   }, [])
   useEffect(() => {
-    const expand = () => (setWidth(SIDEBAR_MIN), setCollapsed(false)) // expanding always opens at the minimum width (owner, 2026-11-17)
+    const expand = () => (setWidth(SIDEBAR_MIN), (auto.current = false), setCollapsed(false)) // expanding always opens at the minimum width (owner, 2026-11-17)
     window.addEventListener('sidebar-expand', expand) // sent by the expand button in the agent panel's title row
     return () => window.removeEventListener('sidebar-expand', expand)
   }, [])
@@ -540,6 +549,7 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
   }
 
   const toggle = () => {
+    auto.current = false // a choice of the person's, so a later resize leaves it alone
     if (collapsed) setWidth(SIDEBAR_MIN) // every expand opens at the minimum width, whatever it was dragged to before (owner, 2026-11-17)
     setCollapsed(!collapsed)
   }

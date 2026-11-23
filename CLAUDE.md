@@ -52,6 +52,9 @@ Rules:
 ## Viewports of 1,600 px or below (owner, 2026-11-17)
 - The agent panel's maximum is 920 px at 1,600 px or below, 1,100 up to 2,100 and 1,250 above 2,100 (`agentMaxFor`), the elements inside the panel are 720, 760 and 800 px wide at the same three sizes (`--agent-content-w`), and it opens at 920, 1,000 and 1,100 px on every load (`agentDefaultFor`); and, with the sidebar and the agent panel both expanded, opening the filters collapses the sidebar until the filters close or apply. Details: [docs/handoff.md](docs/handoff.md).
 
+## Resizing the window (owner, 2026-11-23)
+- **The sidebar follows the window both ways:** dropping under 1,800 px collapses an open sidebar, and growing back to 1,800 px or more opens it again at its own width (`Sidebar.tsx`, `NARROW` and `auto`). It only reopens if the resize collapsed it: one the person collapsed (or expanded) with the toggle stays as they left it. Details: [docs/handoff.md](docs/handoff.md).
+
 ## Charts in the conversation
 - **Every chart or graph the agent shows in the conversation is at most `--chart-max-w` wide (480 px, owner 2026-11-15; the text column is 720 px)**, left-aligned under the answer text. One wrapper in `InvestigatePanel.tsx` (`AnswerView`) applies it to every chart type, so a new chart gets it for free; change the number only in `src/index.css`. Details: [docs/design.md](docs/design.md).
 
