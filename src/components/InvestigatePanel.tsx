@@ -196,35 +196,8 @@ export function AnswerView({ result, shown, onToggle, onFocusArea, onZoomArea, o
         </div>
       )}
       {result.bars.length > 0 && <p className="text-muted-foreground">{result.text}</p>} {/* an answer with a chart or bars: the text goes under the graphic, every time (owner, 2026-11-17) */}
-      {result.evidence.map((e) => (
-        <details key={e.tool + e.scope} className="text-meta text-muted-foreground">
-          <summary className="cursor-pointer">Evidence: {e.incidentCount} {e.unit ?? 'Incidents'}</summary>
-          <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-2">
-            <dt>Tool</dt>
-            <dd className="text-foreground">{e.tool}</dd>
-            <dt>Scope</dt>
-            <dd className="text-foreground">{e.scope}</dd>
-            <dt>Period</dt>
-            <dd className="text-foreground">{e.period}</dd>
-            {e.references.length > 0 && (
-              <>
-                <dt>Examples</dt>
-                <dd className="text-foreground">{e.references.join(', ')}</dd>
-              </>
-            )}
-          </dl>
-        </details>
-      ))}
-      {result.limitations.length > 0 && (
-      <ul className="flex flex-col text-meta text-muted-foreground">
-        {result.limitations.map((l, i) => (
-          <li key={l} className="flex items-start gap-3 border-b border-(--neutral-600) py-2.5 last:border-b-0">
-            <span className="grid size-5 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--neutral-100)">{i + 1}</span>
-            <span className="pt-0.5">{l}</span>
-          </li>
-        ))}
-      </ul>
-      )}
+      {/* The evidence details are not shown either (owner, 2026-11-23, with the limitations): `Answer.evidence` is still filled. */}
+      {/* The numbered limitations are not shown under any answer (owner, 2026-11-23: "remove all these disclaimers, on each question"). The Answer still carries them (`limitations`), and the tests read them. */}
       {result.offers?.map((o) => (
         <ModuleOffer key={`${o.type}-${o.problemId}`} offer={o} />
       ))}

@@ -33,7 +33,7 @@ npm run build    # type-check, then bundle
 - [ ] Sign-in page loads with the logo, no console errors.
 - [ ] Sign in; the map shows points (needs hardware acceleration), or the list appears with a message.
 - [ ] Filters change the counts; clicking a point opens the incident with placeholder photos.
-- [ ] Ask the suggested questions; evidence and limitations appear; map rings appear.
+- [ ] Ask the suggested questions; map rings appear (the evidence details and the numbered limitations are not shown since 2026-11-23).
 - [ ] Look: text is Manrope; default Button and Input are 36 px tall, corners 4 px; no request to fonts.googleapis.com in the browser's Network tab (values in [design-system/foundations.md](design-system/foundations.md)).
 - [ ] Phone width: bottom sheet with Explore and Investigate tabs.
 - [ ] Create user (needs the function deployed): invite an email you control as each role. Email arrives, link opens **Set up your account** (name and email read-only), after saving you land in the app with the right access; the table shows the new person as **Pending** (tag Invited) until they accept, then **Active**, with the right specialty; the audit trail has `user_invited`. A duplicate email gives a clear message and leaves no extra user. A Locality Admin or Specialist calling the function is refused.

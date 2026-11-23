@@ -166,7 +166,7 @@ describe('answers', () => {
     expect(a.proposal).toMatchObject({ locality_code: 8, category: 'parking', evidence: { incident_ids: ['x', 'y'] } })
     expect(a.proposal?.evidence).toMatchObject({ candidate: { evening_count: 8, total_count: 10 } })
     expect(a.proposal?.proposed_intervention).toMatch(/no dispatch/i)
-    expect(a.text).toMatch(/not a prediction/)
+    expect(a.text).toMatch(/candidate for human review/)
     expect(a.limitations.join(' ')).toMatch(/No legal violation is asserted/)
   })
 

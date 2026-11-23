@@ -18,7 +18,7 @@ flowchart LR
 - 🧭 The **planner** picks one tool from the question's words. Today it is plain rules in code.
 - 🛠️ The **tools** are database functions that run **as the user**, so row-level security applies. The agent can never return rows the user cannot see.
 - 🔢 **All numbers come from SQL.** Text is a template filled with those numbers. Nothing is invented.
-- 🏷️ The panel no longer shows a "Mock mode" badge (removed 2026-10-22 at the owner's request). Each answer still lists its limitations, including that the records are synthetic.
+- 🏷️ The panel no longer shows a "Mock mode" badge (removed 2026-10-22 at the owner's request). Until 2026-11-23 each answer listed its limitations, including that the records are synthetic.
 
 ## 🗂️ Categories
 Say "illegal dumping" or "parking" in the question to limit it to that category. With no category named (or both), the agent uses **all categories you may see** and says so in every answer ("Category: ..."). Specialists only ever get their assigned categories.
@@ -40,7 +40,7 @@ Unsupported questions get an honest "I cannot answer that yet". The agent does n
 
 ## 🛡️ Rules (never break these)
 1. 🔢 Never invent a statistic. Numbers, comparisons, percentages and counts are **calculated by SQL or deterministic code**, not by a language model.
-2. 📎 Always show the evidence and the limitations. Always say the data is synthetic.
+2. 📎 **Neither the evidence details nor the numbered limitations are shown under the answers any more (owner, 2026-11-23: no disclaimers on any question); the answer still carries both as data (`evidence`, `limitations`) and the tests read them.** The synthetic-data statement is still in the evidence and in the README; if you want it back on screen, show the list again in `AnswerView`.
 3. 🚫 Never claim a legal violation. The agent identifies *potential obstruction recurrences*.
 4. 📷 Never claim to have inspected photos or video: media are placeholders today.
 5. 🧑 Never act. The agent only recommends; a person decides. (The screens for sending a proposal for review were removed on 2026-10-18; the database part is kept, see [decision 0009](decisions/0009-recommendations-screens-removed.md).)

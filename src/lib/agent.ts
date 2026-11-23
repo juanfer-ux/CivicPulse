@@ -292,7 +292,7 @@ async function nearbyAnswer(recurrenceId: string | null): Promise<Answer> {
   return {
     text:
       `${what} has ${list.length} mapped ${list.length === 1 ? 'place' : 'places'} within ${RADIUS_M} m. Nearest: ${nearest.name || niceLabel(nearest.label)}, ${nearest.dist} m away` +
-      `${nearest.dist <= 20 ? '' : '; nothing is mapped within 20 m'}.${list.length > shown.length ? ` The ${shown.length} nearest are listed.` : ''} This is context for the person who reviews it, not a cause.`,
+      `${nearest.dist <= 20 ? '' : '; nothing is mapped within 20 m'}.${list.length > shown.length ? ` The ${shown.length} nearest are listed.` : ''}`,
     bars: shown.map((p) => ({ label: p.name ? `${p.name} · ${niceLabel(p.label)}` : niceLabel(p.label), value: p.dist })),
     chart: 'places',
     evidence: [{ tool: 'tool_recurrence_places', scope: `${r.reference} · within ${RADIUS_M} m`, period: 'OpenStreetMap, stored snapshot', incidentCount: list.length, references: [r.reference], unit: 'Places' }],
@@ -616,7 +616,7 @@ async function candidates(category: string | null): Promise<Answer> {
       `Based on ${period}, the location with the most evening (16:00–20:00) incidents is "${titleCase(top.label)}" in ${top.locality_name}: ` +
       `${top.evening_count} of its ${top.total_count} incidents fell in that window and ${top.recent_count} in the last 30 days. ` +
       `${top.weekday_evening_count} of the evening incidents ${top.weekday_evening_count === 1 ? 'was' : 'were'} on a ${tomorrow}. ` +
-      `It is a candidate for human review tomorrow evening, not a prediction.${others ? ` Other candidates: ${others}.` : ''} ` +
+      `It is a candidate for human review tomorrow evening.${others ? ` Other candidates: ${others}.` : ''} ` +
       `Category: ${categoryName(top.category)}.`,
     bars: rows.map((r) => ({ label: titleCase(r.label.replace('Synthetic ', '')), value: r.evening_count })),
     chart: 'rows',
