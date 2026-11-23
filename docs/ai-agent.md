@@ -39,7 +39,7 @@ Unsupported questions get an honest "I cannot answer that yet". The agent does n
 
 ## 🛡️ Rules (never break these)
 1. 🔢 Never invent a statistic. Numbers, comparisons, percentages and counts are **calculated by SQL or deterministic code**, not by a language model.
-2. 📎 Always show the evidence. **The numbered limitations are no longer shown under the answers (owner, 2026-11-23: no disclaimers on any question); the answer still carries them as data (`limitations`) and the tests read them.** The synthetic-data statement is still in the evidence and in the README; if you want it back on screen, show the list again in `AnswerView`.
+2. 📎 **Neither the evidence details nor the numbered limitations are shown under the answers any more (owner, 2026-11-23: no disclaimers on any question); the answer still carries both as data (`evidence`, `limitations`) and the tests read them.** The synthetic-data statement is still in the evidence and in the README; if you want it back on screen, show the list again in `AnswerView`.
 3. 🚫 Never claim a legal violation. The agent identifies *potential obstruction recurrences*.
 4. 📷 Never claim to have inspected photos or video: media are placeholders today.
 5. 🧑 Never act. The agent only recommends; a person decides. (The screens for sending a proposal for review were removed on 2026-10-18; the database part is kept, see [decision 0009](decisions/0009-recommendations-screens-removed.md).)
