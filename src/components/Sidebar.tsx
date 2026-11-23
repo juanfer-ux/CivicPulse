@@ -2,7 +2,7 @@ import { activeRow, type Pick } from '@/lib/sidebarActive'
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
 import { useNoSelect, useReleaseGuard } from '@/lib/useNoSelect'
-import { Check, CaretDown, CaretRight, CaretUp, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, Sparkle, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
+import { Check, CaretDown, CaretRight, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, Sparkle, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
@@ -187,6 +187,7 @@ function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views
   // The title row sticks at the top while its section scrolls (owner, 2026-11-06) and then gets a bottom line: it sticks 1 px above the viewport (-top-px), so it is clipped (ratio < 1) only while stuck.
   const head = useRef<HTMLDivElement>(null)
   const [stuck, setStuck] = useState(false)
+  // while its view menu is open the title row sits above the next section's sticky title, which used to paint over the menu's last rows (owner's screenshot, 2026-11-23)
   useEffect(() => {
     const el = head.current
     const root = el?.closest('[data-radix-scroll-area-viewport]')
@@ -197,11 +198,11 @@ function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views
   }, [])
   return (
     <div className={`flex flex-col gap-2 py-2 pr-2.5 pl-1`}> {/* 8 px above and below and between, 10 at the right and 4 at the left, in all three sections (owner's Figma, 2026-11-17, latest) */}
-      <div ref={head} className={`group/title sticky -top-px z-10 flex h-8 items-center gap-2.5 border-b-[1px] bg-(--neutral-700) px-2 ${stuck ? 'border-(--neutral-600)' : 'border-transparent'}`}>
+      <div ref={head} className={`group/title sticky -top-px ${menu ? 'z-30' : 'z-10'} flex h-8 items-center gap-2.5 border-b-[1px] bg-(--neutral-700) px-2 ${stuck ? 'border-(--neutral-600)' : 'border-transparent'}`}>
         {onExpand ? (
           <button type="button" className="flex flex-1 cursor-pointer items-center gap-1 text-left text-caption-medium text-(--neutral-300) outline-none hover:text-(--neutral-100) focus-visible:text-(--neutral-100)" aria-expanded={!!expanded} aria-label={`${title}: ${expanded ? 'show less' : 'show all'}`} title={expanded ? 'Show less' : 'Show all'} onClick={() => onExpand(!expanded)}>
             {title}
-            {expanded ? <CaretUp weight="regular" className="size-3.5" aria-hidden /> : <CaretDown weight="regular" className="size-3.5" aria-hidden />}
+            {expanded ? <CaretDown weight="regular" className="size-3.5" aria-hidden /> : <CaretRight weight="regular" className="size-3.5" aria-hidden />} {/* closed: an arrow to the right, open: down, like the group titles (owner, 2026-11-23) */}
           </button>
         ) : (
           <p className="flex-1 text-caption-medium text-(--neutral-300)">{title}</p>
