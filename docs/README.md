@@ -12,6 +12,8 @@ Start here. Every topic has **one** document; other documents link to it instead
 | 🗃️ | [data-model.md](data-model.md) | What is stored, and how are the tables related? | 🟨 Draft |
 | 🔄 | [incident-lifecycle.md](incident-lifecycle.md) | How do incidents and recommendations move through states? | 🟨 Draft |
 | 🤖 | [ai-agent.md](ai-agent.md) | What can "Investigate and Ask" do, and what are its rules? | 🟨 Draft |
+| 🧑‍💼 | [operator-flow.md](operator-flow.md) | How does an operator get from arriving to deciding on a recurrence, and which steps exist? | 🟨 Draft |
+| 🎬 | [demo-script.md](demo-script.md) | What does Claude do, click by click, in a recorded run of the prototype? | 🟨 Draft |
 | 🏗️ | [architecture.md](architecture.md) | How do the pieces fit together? | 🟨 Draft |
 | 🚀 | [deploy.md](deploy.md) | How do I publish it and fix common problems? | 🟩 In use |
 | 🧪 | [testing.md](testing.md) | What is tested and how do I run it? | 🟨 Draft |
@@ -26,6 +28,7 @@ Start here. Every topic has **one** document; other documents link to it instead
 - 🔒 Changing who can see something → **roles-and-permissions** first.
 - 🗄️ Adding or changing a table or column → **data-model**.
 - 💬 Changing what the AI agent answers → **ai-agent**.
+- 🧑‍💼 Changing a step the operator takes, or preparing a recorded demo → **operator-flow** and **demo-script**.
 - 🌐 Something broke after publishing → **deploy** (troubleshooting).
 - 🖌️ Building or changing a screen or a component → **design-system/** (values and components) and **design** (rules); accessibility → **design-system/accessibility.md**.
 
