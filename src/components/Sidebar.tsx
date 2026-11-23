@@ -2,7 +2,7 @@ import { activeRow, type Pick } from '@/lib/sidebarActive'
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useFocusTrap, useRestoreFocus } from '@/lib/useRestoreFocus'
 import { useNoSelect, useReleaseGuard } from '@/lib/useNoSelect'
-import { Check, CaretDown, CaretRight, Chat, Compass, DotsThreeVertical, List, Plus, SidebarSimple, Sparkle, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
+import { Check, CaretDown, CaretRight, Chat, DotsThreeVertical, List, Plus, SidebarSimple, StarFour, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
@@ -17,7 +17,7 @@ import { useAuth } from '@/lib/auth'
 import { GROUPS, PROBLEM_STATUS, PROBLEM_STATUSES, type Group, type ProblemStatus } from '@/lib/statusColors'
 import { shortName } from '@/lib/utils'
 
-type Chat = { id: number; title: string }
+type Chat = { id: number; title: string; created?: number; updated?: number }
 /** The real recurrences and incidents the lists show (shaped by Dashboard, so this file stays free of Supabase); a click flies the map to the row (owner, 2026-11-06). */
 export type SidebarRecurrence = { id: string; title: string; status: ProblemStatus; reference: string; locality?: string; created?: number; updated?: number }
 export type SidebarIncident = { id: string; title: string; reference: string; locality?: string; group: Group; created?: number; updated?: number }
@@ -147,7 +147,7 @@ function sortItems<T extends { created?: number; updated?: number }>(items: T[],
 }
 
 /** The view menu behind the funnel button: View all or By status, Last updated or Date created, newest or oldest first. */
-function ViewMenu({ view, onChange, onClose }: { view: View; onChange: (v: View) => void; onClose: () => void }) {
+function ViewMenu({ view, onChange, onClose, groups = true }: { view: View; onChange: (v: View) => void; onClose: () => void; groups?: boolean }) {
   const box = useRef<HTMLDivElement>(null)
   useEffect(() => {
     // A press on the button that opened the menu is not "outside": that button's own click closes the menu (owner, 2026-11-23: the second click closed it on pointer down and the click opened it again).
@@ -166,9 +166,13 @@ function ViewMenu({ view, onChange, onClose }: { view: View; onChange: (v: View)
   const Label = ({ children }: { children: ReactNode }) => <p className="px-2 pt-1 pb-0.5 text-caption-medium text-(--neutral-300)">{children}</p>
   return (
     <div ref={box} role="menu" aria-label="View options" className="absolute top-full right-0 z-20 mt-1 w-52 rounded-sm border border-(--neutral-500) bg-(--neutral-800) p-1 shadow-lg">
-      <Label>View</Label>
-      <Item label="View all" on={view.group === 'all'} pick={() => onChange({ ...view, group: 'all' })} />
-      <Item label="By status" on={view.group === 'status'} pick={() => onChange({ ...view, group: 'status' })} />
+      {groups && (
+        <>
+          <Label>View</Label>
+          <Item label="View all" on={view.group === 'all'} pick={() => onChange({ ...view, group: 'all' })} />
+          <Item label="By status" on={view.group === 'status'} pick={() => onChange({ ...view, group: 'status' })} />
+        </>
+      )}
       <Label>Sort by</Label>
       <Item label="Last updated" on={view.sort === 'updated'} pick={() => onChange({ ...view, sort: 'updated' })} />
       <Item label="Date created" on={view.sort === 'created'} pick={() => onChange({ ...view, sort: 'created' })} />
@@ -180,7 +184,7 @@ function ViewMenu({ view, onChange, onClose }: { view: View; onChange: (v: View)
 }
 
 /** One sidebar section (Figma Recurrences / Incidents / Investigations): a title row with its own view button and plus, then the list. Each section has its own view. Recurrences and Incidents (`views`) get the view menu; Investigations just flips newest and oldest. */
-function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views, limit, expanded, onExpand }: { expanded?: boolean; onExpand?: (open: boolean) => void; limit?: number; title: string; items: T[]; addLabel: string; onAdd?: () => void; row?: (t: T) => ReactNode; children?: (view: View) => ReactNode; empty?: string; views?: boolean }) {
+function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views, noGroups, limit, expanded, onExpand }: { expanded?: boolean; onExpand?: (open: boolean) => void; limit?: number; title: string; items: T[]; addLabel: string; onAdd?: () => void; row?: (t: T) => ReactNode; children?: (view: View) => ReactNode; empty?: string; views?: boolean; noGroups?: boolean }) {
   const [view, setView] = useState<View>(DEFAULT_VIEW)
   const [menu, setMenu] = useState(false)
   const newest = view.newest
@@ -198,7 +202,7 @@ function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views
   }, [])
   return (
     <div className={`flex flex-col gap-2 py-2 pr-2.5 pl-1`}> {/* 8 px above and below and between, 10 at the right and 4 at the left, in all three sections (owner's Figma, 2026-11-17, latest) */}
-      <div ref={head} className={`group/title sticky -top-px ${menu ? 'z-30' : 'z-10'} flex items-center gap-2.5 bg-(--neutral-700) px-2 ${stuck ? 'h-12 -mb-4 border-b-[1.4px] border-(--neutral-600) pb-4' : 'h-8 border-b border-transparent'}`}> {/* stuck at the top: 16 px more padding below, 48 px high (owner, 2026-11-23: 8, then 10, then 16); the negative margin keeps the rows under it where they were, so nothing jumps */}
+      <div ref={head} className={`group/title sticky -top-px ${menu ? 'z-30' : 'z-10'} flex items-center gap-2.5 bg-(--neutral-700) pl-2 ${noGroups ? 'pr-1.5' : 'pr-2'} ${stuck ? 'h-12 -mb-4 border-b-[1.4px] border-(--neutral-600) pb-4' : 'h-8 border-b border-transparent'}`}> {/* stuck at the top: 16 px more padding below, 48 px high (owner, 2026-11-23: 8, then 10, then 16); the negative margin keeps the rows under it where they were, so nothing jumps */}
         {onExpand ? (
           <button type="button" className="flex flex-1 cursor-pointer items-center gap-1 text-left text-caption-medium text-(--neutral-300) outline-none hover:text-(--neutral-100) focus-visible:text-(--neutral-100)" aria-expanded={!!expanded} aria-label={`${title}: ${expanded ? 'show less' : 'show all'}`} title={expanded ? 'Show less' : 'Show all'} onClick={() => onExpand(!expanded)}>
             {title}
@@ -221,7 +225,7 @@ function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views
           <Button size="icon" variant="ghost" className="size-8" aria-label={addLabel} title={addLabel} onClick={onAdd}>
             <Plus weight="regular" className="size-4 text-(--neutral-100)" />
           </Button>
-          {menu && <ViewMenu view={view} onChange={(v) => (setView(v), setMenu(false))} onClose={() => setMenu(false)} />}
+          {menu && <ViewMenu view={view} groups={!noGroups} onChange={(v) => (setView(v), setMenu(false))} onClose={() => setMenu(false)} />}
         </div>
       </div>
       <div className="flex flex-col gap-1">{children ? children(view) : row && (newest ? items : [...items].reverse()).slice(0, limit).map(row)}{empty && !items.length && <p className="px-2 pb-1 text-caption text-(--neutral-300)">{empty}</p>}</div>
@@ -377,7 +381,8 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   const allRecurrences: RecurrenceRow[] = [...cases.map((c): RecurrenceRow => ({ id: c.id, title: c.title, status: 'active' })), ...real].filter((c) => hit(c.title) || hit(c.reference ?? '')) // DEMO (owner, 2026-11-23): every recurrence, like the incidents
   const [recOpen, setRecOpen] = useState(false) // the Recurrences chevron (DEMO)
   const incidentRows = incidents.filter((i) => hit(i.title) || hit(i.reference)) // DEMO (owner, 2026-11-23): every incident, drawn 3 at a time collapsed and in batches of 30 when expanded; it was only the ones a conversation touched
-  const investigations = chats.map((c) => ({ key: c.id, title: c.title, id: c.id })).filter((c) => hit(c.title)).reverse() // chats arrive oldest first, the list shows newest first
+  const investigations = chats.map((c) => ({ key: c.id, title: c.title, id: c.id, created: c.created, updated: c.updated })).filter((c) => hit(c.title)) // sorted by the section's own view (newest first by default)
+  const [invOpen, setInvOpen] = useState(false) // the Investigations chevron
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
@@ -392,19 +397,15 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
-            <div className="flex shrink-0 flex-col gap-10 px-2.5 py-4"> {/* the new chat button, 40 px, then the search and Explore, 12 apart (owner's Figma, 2026-11-17, latest) */}
-              <Button variant="secondary" size="default" className="w-full border-[0.5px] border-(--neutral-100)" onClick={onNew}> {/* Figma Button: secondary, large, a 0.5 px `neutral-100` line, `sparkle` fill 16 px and "New chat" */}
-                <Sparkle weight="fill" className="size-4" aria-hidden />
-                New investigation
-              </Button>
+            <div className="flex shrink-0 flex-col gap-10 px-2.5 py-6"> {/* the search and the New investigation row, 12 apart, 24 px above and below (owner's Figma, 2026-11-23: 136 px high; it was 16 and 120) */}
               <div className="flex flex-col gap-3">
                 <div>
                   <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-800) border-(--neutral-400) text-body-sm" />
                 </div>
                 {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
                 <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--neutral-100) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
-                  <Compass weight="regular" className="size-6 shrink-0 text-(--neutral-200)" aria-hidden />
-                  Explore
+                  <StarFour weight="regular" className="size-[18.3px] shrink-0 text-(--neutral-200)" aria-hidden />
+                  New investigation
                 </Button>
               </div>
             </div>
@@ -430,12 +431,18 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                     )}</Growing>
                   )}
                 </Section>
-                <Section title="Investigations" limit={2} items={investigations} addLabel="New investigation" onAdd={onNew} row={(c) => (
+                <Section title="Investigations" expanded={invOpen} onExpand={setInvOpen} items={investigations} addLabel="New investigation" onAdd={onNew} views noGroups>
+                  {(view) => (
+                    <Growing open={invOpen} total={investigations.length}>{(limit) => (
+                    <ViewList items={investigations} limit={invOpen ? limit : 3} view={{ ...view, group: 'all' }} group={() => ''} order={[]} labels={{}} primary="" row={(c) => (
                   <Button key={c.key} variant="ghost" className={`h-9 items-center justify-start gap-2.5 py-2 pr-2.5 pl-2 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) text-body-sm ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
                     <Chat weight="regular" className="size-4 shrink-0 text-(--neutral-200)" aria-hidden />
                     <span className="truncate">{c.title}</span>
                   </Button>
                 )} />
+                    )}</Growing>
+                  )}
+                </Section>
               </div>
             </ScrollArea>
           </>
