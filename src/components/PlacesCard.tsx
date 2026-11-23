@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { NEAR_M, RADIUS_M, shownCount, type Place, type PlaceKind } from '@/lib/places'
+import { NEAR_M, RADIUS_M, RING_M, niceLabel, shownCount, type Place } from '@/lib/places'
 
-const COLOR: Record<PlaceKind, string> = { shop: '--blue-200', food: '--orange-400', education: '--green-300', bus: '--yellow-300', other: '--neutral-200' }
+// every place is the same neutral, like its marker on the map (owner, 2026-11-20)
 
 /** Experiment (`?places=1`, owner, 2026-11-20): what OpenStreetMap lists around the open recurrence, nearest first. Everything within NEAR_M is shown at once, whatever it is; the rest (up to RADIUS_M) is behind "View more". Mount it with `key` = the recurrence so it closes again for the next one. */
 export function PlacesCard({ places }: { places: Place[] | 'loading' | 'error' }) {
@@ -12,9 +12,9 @@ export function PlacesCard({ places }: { places: Place[] | 'loading' | 'error' }
   const far = list.slice(n)
   const none = near.length > 0 && near[0].dist > NEAR_M // nothing within NEAR_M: the nearest ones show instead
   const row = (p: Place) => (
-    <div key={p.id} className="flex items-center gap-2">
-      <span className="size-2 shrink-0 rounded-full" style={{ background: `var(${COLOR[p.kind]})` }} aria-hidden />
-      <span className="min-w-0 flex-1 truncate text-(--neutral-100)">{p.name || p.label || 'Unnamed place'}{p.name && p.label ? <span className="text-(--neutral-300)"> · {p.label}</span> : null}</span>
+    <div key={p.id} className={`flex items-center gap-2 ${p.dist > RING_M ? 'opacity-50' : ''}`}>
+      <span className="size-2 shrink-0 rounded-[1px]" style={{ background: 'var(--neutral-100)' }} aria-hidden /> {/* a square, like the mark on the map (owner, 2026-11-20) */}
+      <span className="min-w-0 flex-1 truncate text-(--neutral-100)">{p.name || niceLabel(p.label)}{p.name && p.label ? <span className="text-(--neutral-300)"> · {niceLabel(p.label)}</span> : null}</span>
       <span className="shrink-0 text-(--neutral-300)">{p.dist} m</span>
     </div>
   )
@@ -31,7 +31,7 @@ export function PlacesCard({ places }: { places: Place[] | 'loading' | 'error' }
           {near.length ? near.map(row) : <p className="text-(--neutral-300)">Nothing mapped within {RADIUS_M} m.</p>}
           {far.length > 0 && (all ? (
             <>
-              <p className="pt-1 text-caption-medium text-(--neutral-200)">Farther, up to {RADIUS_M} m</p>
+              <p className="pt-1 text-caption-medium text-(--neutral-200)">Farther, up to {RADIUS_M} m · fainter rows are outside the circle, not on the map</p>
               {far.map(row)}
             </>
           ) : (

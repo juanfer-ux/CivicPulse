@@ -105,6 +105,21 @@ export async function pinCanvas(category: string, group: Group) {
   return c
 }
 
+/** A place's marker above its stem (owner, 2026-11-20): a 30 px square with 2 px rounded corners (owner, 2026-11-20) in one dark neutral with a light icon inside (owner, 2026-11-20: inverted from a light square with a dark icon); no outline ring and no glow, unlike an incident's pin. Drawn at 2x. */
+export async function placePinCanvas(Icon: typeof Car, fill: string, ink: string) {
+  const side = 30 * PR
+  const icon = await drawIcon(Icon, ink, 16 * PR)
+  const c = document.createElement('canvas')
+  c.width = c.height = side
+  const g = c.getContext('2d')!
+  g.fillStyle = fill
+  g.beginPath()
+  g.roundRect(0, 0, side, side, 2 * PR)
+  g.fill()
+  g.drawImage(icon, (side - 16 * PR) / 2, (side - 16 * PR) / 2, 16 * PR, 16 * PR)
+  return c
+}
+
 /** Adds every badge to the map. Icon ink is dark, except on Approved (a mid blue) where it is light. */
 export async function addBadges(map: { addImage: AddImage }) {
   const outline = token('--map-dot-outline')
@@ -130,7 +145,7 @@ export const problemCircledId = (px: number) => `problem-parking-active-circle-$
 export const problemBadgeId = (status: string, px: number, dim = false) => `problem-badge-parking${dim ? '-dim' : ''}-${status}-${px}`
 export const problemMarkerId = (category: string, status: string, px: number, dim = false) => `problem-${iconCategory(category)}${dim ? '-dim' : ''}-${status}-${px}`
 
-async function drawIcon(Icon: (typeof ICONS)[keyof typeof ICONS], color: string, size: number) {
+async function drawIcon(Icon: typeof Car, color: string, size: number) {
   const { renderToStaticMarkup } = await import('react-dom/server')
   const img = new Image()
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(renderToStaticMarkup(createElement(Icon, { color, width: size, height: size, weight: 'fill' })))}`

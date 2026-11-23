@@ -29,6 +29,8 @@ const DumpingModelsGallery = lazy(() => import('@/components/DumpingModelsGaller
 const dumpingModels = location.hash === '#dumping-models' // the candidate 3D models for dumping, each in context
 const filtersPanel = location.hash === '#filters-panel' // the Filters side panel
 const categoryIcons = location.hash === '#category-icons' // duotone icons for the category cards of the agent panel
+const PlaceBlocksGallery = lazy(() => import('@/components/PlaceBlocksGallery').then((m) => ({ default: m.PlaceBlocksGallery })))
+const placeBlocks = location.hash === '#place-blocks' // the block under an OSM place's stem in 16 tones and shadings
 const App = lazy(() => import('./App.tsx'))
 const Gallery = lazy(() => import('@/components/Gallery').then((m) => ({ default: m.Gallery })))
 const ChartGallery = lazy(() => import('@/components/ChartGallery').then((m) => ({ default: m.ChartGallery })))
@@ -154,6 +156,10 @@ createRoot(document.getElementById('root')!).render(
         ) : scroll ? (
           <Suspense fallback={null}>
             <ScrollGallery />
+          </Suspense>
+        ) : placeBlocks ? (
+          <Suspense fallback={null}>
+            <PlaceBlocksGallery />
           </Suspense>
         ) : timeline ? (
           <Suspense fallback={null}>
