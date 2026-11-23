@@ -238,6 +238,8 @@ const SIDEBAR_MIN = 260 // 260 (owner's Figma, 2026-11-23: the Sidebar component
 const SIDEBAR_MAX = 400 // 400 since 2026-11-17 (the Figma component's max width); 380 before; Figma max width (was 340)
 const SIDEBAR_DEFAULT = 300 // 300 again (owner, 2026-11-17); 320 before; 320 (Figma, 2026-11-17), 300 earlier that day; the width it opens at (owner's Figma, 2026-11-17: 300; 260 since 2026-11-12; it was 300, 245 and 284 before)
 const clampWidth = (n: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, n))
+/** The sidebar follows the window (owner, 2026-11-23): 15 % of its width, kept between the minimum and the maximum (270 px at 1,800, 400 px from about 2,670). A drag sets it by hand until the window changes again. */
+export const widthFor = (viewportW: number) => clampWidth(Math.round(viewportW * 0.15))
 const readWidth = () => {
   try {
     const v = Number(localStorage.getItem(WIDTH_KEY))
@@ -499,6 +501,11 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
   }, [open])
 
   const [width, setWidth] = useState(readWidth)
+  useEffect(() => {
+    const on = () => setWidth(widthFor(window.innerWidth))
+    window.addEventListener('resize', on)
+    return () => window.removeEventListener('resize', on)
+  }, [])
   const aside = useRef<HTMLElement>(null)
   const shownWidth = useRef(-1) // the width on the last render: where a collapse or expand starts from (a drag changes it without animating)
   // Collapse and expand: a GSAP tween of the width, 0.32 s (owner, 2026-11-08: a little slower than the 0.2 s before), the same opening and closing; the content is clipped while it runs.
