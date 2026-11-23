@@ -1,7 +1,7 @@
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { Sidebar, shownRecurrences } from '@/components/Sidebar'
+import { Sidebar, shownRecurrences, widthFor } from '@/components/Sidebar'
 
 // Radix ScrollArea (the lists) needs ResizeObserver, which jsdom lacks.
 globalThis.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} }
@@ -248,5 +248,14 @@ describe('Sidebar — resizing the window', () => {
     await user.click(screen.getByRole('button', { name: 'Collapse menu' })) // the person collapses it
     fire(false)
     expect(open()).toBe(false)
+  })
+})
+
+describe('widthFor', () => {
+  it('follows the window between the minimum and the maximum', () => {
+    expect(widthFor(1800)).toBe(270)
+    expect(widthFor(1500)).toBe(260) // never under the minimum
+    expect(widthFor(2200)).toBe(330)
+    expect(widthFor(3840)).toBe(400) // never over the maximum
   })
 })
