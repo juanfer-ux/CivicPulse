@@ -13,7 +13,7 @@ The one list of what is not done yet, grouped by area. [handoff.md](handoff.md) 
 
 ## 🎨 Figma
 - [ ] **Screens page:** the Map · Recurrence selected · Desktop 1440 screen has the new layout (2026-11-09); the Incident selected screen is unchanged (the Mobile versions were removed from Figma, 2026-11-12), and no screen shows docked modules yet.
-- [ ] **Not in Figma yet:** the sidebar limits (5 incidents, 2 investigations) in the Sidebar component. Done 2026-11-09: the numbered notes rows (`Answer Notes`), the agent panel width and the rail (`Agent Panel · Collapsed`), the 1,600 px max width (`Map Column`; Figma still says 1,400, update it) and the zoom control at the bottom (`Map Zoom` note).
+- [ ] **Not in Figma yet:** the sidebar limits (5 incidents, 2 investigations) in the Sidebar component. Done 2026-11-09: the numbered notes rows (`Answer Notes`), the agent panel width and the rail (`Agent Panel · Collapsed`), the 2,000 px max width (`Map Column`; Figma still says 1,400, update it) and the zoom control at the bottom (`Map Zoom` note).
 - [x] **Stat Card sizing (2026-11-12):** Fixed 154 px with the 1 px border drawn outside (156 px in all), Value column and Graph both Fill; the code matches.
 - [x] **Category photos removed (2026-11-12):** the Recurrences to investigate cards keep a flat 80 px block until the owner adds icons.
 - [x] **Agent panel resizable (2026-11-12):** handle inside the panel; minimum from Figma (650 px), maximum the exact middle of the window (right edge at half the window width). Not yet checked in a visible browser pane (the check ran in a hidden one, where the size observer does not fire): drag it once and collapse the sidebar to confirm the maximum follows.

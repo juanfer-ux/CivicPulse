@@ -67,7 +67,7 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind, open
       </div>
     )
 
-  const columnTop = recurrenceOpen ? 'calc(var(--map-pad) + var(--banner-offset, 0px) + var(--case-header-h, 96px) + 10px)' : 'calc(var(--section-header-h) + var(--map-pad) + var(--banner-offset, 0px))'
+  const columnTop = recurrenceOpen ? 'calc(var(--map-pad) + var(--banner-offset, 0px))' : 'calc(var(--section-header-h) + var(--map-pad) + var(--banner-offset, 0px))'
   const column = (area: 'left' | 'right', list: Placed[]) => {
     const hasSlot = area === 'right' && recurrenceOpen
     if (!list.length && !drag && !hasSlot) return null

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
-import { PanelMenuRow } from '@/components/modules/ModulesMenu'
-import { useLayoutEffect, useRef } from 'react'
+import { ModulesMenu, PanelMenuRow } from '@/components/modules/ModulesMenu'
+import { useModules } from '@/components/modules/ModulesProvider'
+import { useRef } from 'react'
 import { ArrowsClockwise, Calendar, FileText, Stack, Wrench, X } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -32,20 +33,7 @@ export function ProblemDetail({
 }) {
   const panel = useRef<HTMLDivElement>(null)
   useRestoreFocus(panel)
-  // The right column (the history and the modules docked there) starts under this header, 12 px below it (owner, 2026-11-16: the header grew a Modules row and the column, placed 96 px down, overlapped it), so the header's real height goes to the dock as --case-header-h.
-  useLayoutEffect(() => {
-    const el = panel.current
-    if (!el) return
-    const root = document.documentElement
-    const set = () => root.style.setProperty('--case-header-h', `${el.getBoundingClientRect().height}px`)
-    set()
-    const ro = new ResizeObserver(set)
-    ro.observe(el)
-    return () => {
-      ro.disconnect()
-      root.style.removeProperty('--case-header-h')
-    }
-  }, [])
+  const { on: modulesOn } = useModules()
   return (
     <Card
       ref={panel}
@@ -53,17 +41,15 @@ export function ProblemDetail({
       role="region"
       data-float
       aria-label="Recurrence details"
-      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] ${WIDE ? 'desk:rounded-none desk:border-0 desk:border-b desk:border-b-(--neutral-600)' : 'desk:rounded-sm desk:border desk:border-(--neutral-600)'} desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)] ${WIDE ? 'desk:right-(--col-right)' : 'desk:w-[400px]'} ${WIDE ? 'desk:bg-(--neutral-900)!' : ''}`}
+      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none ${WIDE ? 'desk:absolute desk:top-3 desk:right-[calc(var(--col-right)+360px+12px)] desk:z-20 desk:max-h-none desk:w-auto desk:flex-row desk:items-center desk:gap-2 desk:overflow-visible desk:rounded-none desk:border-0 desk:bg-transparent! desk:shadow-none' : 'desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[400px] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]'}`}
     >
       {WIDE && (
-        <>
-          <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="absolute top-5 right-5 z-10 hidden desk:inline-flex">
+        <div className="hidden items-center gap-2 desk:flex"> {/* Recurrence header removed (owner, 2026-11-24): the Modules button and the close X float at the top right of the map, left of the right column, like the map buttons of Google Maps */}
+          {modulesOn && <div className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg"><ModulesMenu kind="recurrence" /></div>}
+          <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg hover:bg-(--neutral-700)">
             <X />
           </Button>
-          <div className="hidden desk:block">
-            <WideHeader problem={problem} localityName={localityName} categoryName={categoryName} />
-          </div>
-        </>
+        </div>
       )}
       <div className={`flex flex-col gap-4 px-4 py-6 ${WIDE ? 'desk:hidden' : ''}`}>
         <header className="flex items-start justify-between gap-2">
@@ -130,42 +116,6 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
       <PanelMenuRow kind={kind} />
     </>
   )
-}
-
-/** Gallery options 1 and 3 (/#header) with the real data. */
-function WideHeader({ problem, localityName, categoryName }: { problem: ProblemRow; localityName: string | undefined; categoryName: string | undefined }) {
-  const category = (
-    <div className="flex items-center gap-3">
-      <p className="text-body-medium leading-5">{categoryName ?? label(problem.category)}</p>
-      <span className="h-3.5 w-px bg-(--neutral-500)" aria-hidden />
-      <p className="text-meta leading-5 text-(--neutral-200)">{problem.reference} · {localityName}</p>
-      {HEADER === '1' && <ProblemStatusPill status={problem.status} />}
-    </div>
-  )
-  const title = (
-    <div className="flex min-w-0 flex-col gap-2">
-      <h2 className="font-display-semi text-display-sm font-[calc(700+var(--display-weight-offset))] tracking-[0.01em] text-(--brand-primary)">{problem.location_description}</h2>
-      {category}
-    </div>
-  )
-  const s = stats(problem)
-  if (HEADER === '1')
-    return (
-      <>
-        <div className="flex items-center gap-6 py-4 pr-[60px] pl-5">
-          {title}
-          <dl className="ml-auto flex items-stretch">
-            {s.map((x) => (
-              <div key={x.label} className="flex shrink-0 flex-col gap-0 whitespace-nowrap border-l border-(--neutral-500) px-5 first:border-l-0">
-                <dt className="text-meta text-muted-foreground">{x.label}</dt>
-                <dd className="text-heading text-[24px]!">{x.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </>
-    )
-  return <CaseHeader title={problem.location_description} category={categoryName ?? label(problem.category)} reference={problem.reference} locality={localityName} pill={<ProblemStatusPill status={problem.status} />} kind="recurrence" />
 }
 
 /** The numbers at the top of the right column (Figma Recurrence Stats, owner 2026-11-12): a `neutral-900` box (6 px radius, 12 px padding and gap) with the "Last reported" strip (`indigo-800`, `indigo-200` text) and four tiles in two columns (`neutral-700`, 4 px radius, 12 / 16 padding, the label with its icon over a 24 px SemiBold number). */

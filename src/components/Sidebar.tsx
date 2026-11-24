@@ -18,7 +18,7 @@ import { shortName } from '@/lib/utils'
 
 type Chat = { id: number; title: string; created?: number; updated?: number }
 /** The real recurrences and incidents the lists show (shaped by Dashboard, so this file stays free of Supabase); a click flies the map to the row (owner, 2026-11-06). */
-export type SidebarRecurrence = { id: string; title: string; status: ProblemStatus; reference: string; locality?: string; created?: number; updated?: number }
+export type SidebarRecurrence = { id: string; title: string; category?: string; status: ProblemStatus; reference: string; locality?: string; created?: number; updated?: number }
 export type SidebarIncident = { id: string; title: string; reference: string; locality?: string; group: Group; created?: number; updated?: number }
 /** The items each conversation touched (the ids of its incidents and recurrences): the sidebar lists only these (owner, 2026-11-08). */
 export type ChatItems = { title: string; ids: string[] }[]
@@ -219,7 +219,7 @@ function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views
     return () => io.disconnect()
   }, [])
   return (
-    <div className={`flex flex-col gap-2 py-2 pr-2.5 pl-1`}> {/* 8 px above and below and between, 10 at the right and 4 at the left, in all three sections (owner's Figma, 2026-11-17, latest) */}
+    <div className={`flex flex-col gap-2 py-2 pr-1 pl-1`}> {/* 8 px above and below and between, 4 at each side (owner's Figma, 2026-11-23; the right was 10, with the sidebar frame's own 16 px next to it), in all three sections (owner's Figma, 2026-11-17, latest) */}
       <div ref={head} className={`group/title sticky -top-px ${menu ? 'z-30' : 'z-10'} flex items-center gap-2.5 bg-(--neutral-700) pl-2 ${noGroups ? 'pr-1.5' : 'pr-2'} ${stuck ? 'h-12 -mb-4 border-b-[1.4px] border-(--neutral-600) pb-4' : 'h-8 border-b border-transparent'}`}> {/* stuck at the top: 16 px more padding below, 48 px high (owner, 2026-11-23: 8, then 10, then 16); the negative margin keeps the rows under it where they were, so nothing jumps */}
         {onExpand ? (
           <button type="button" className="flex flex-1 cursor-pointer items-center gap-1 text-left text-caption-medium text-(--neutral-300) outline-none hover:text-(--neutral-100) focus-visible:text-(--neutral-100)" aria-expanded={!!expanded} aria-label={`${title}: ${expanded ? 'show less' : 'show all'}`} title={expanded ? 'Show less' : 'Show all'} onClick={() => onExpand(!expanded)}>
@@ -417,10 +417,15 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
-            <div className="flex shrink-0 flex-col gap-10 px-2.5 py-8"> {/* the search and the New investigation row, 12 apart, 32 px above and below (owner's Figma, 2026-11-23, later: 152 px high; 24 and 136 an hour before, 16 and 120 earlier) */}
+            <div className="flex shrink-0 flex-col gap-10 border-b border-(--neutral-500) px-2.5 pt-8 pb-[31px]"> {/* the 1 px line under it (Figma Header stroke, inside) keeps the block 152 px high */} {/* the search and the New investigation row, 12 apart, 32 px above and below (owner's Figma, 2026-11-23, later: 152 px high; 24 and 136 an hour before, 16 and 120 earlier) */}
               <div className="flex flex-col gap-3">
-                <div>
-                  <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 bg-(--neutral-800) border-(--neutral-400) text-body-sm" />
+                <div className="relative"> {/* the browser's own clear button is hidden: the × is the Phosphor X (owner, 2026-11-24: only Phosphor icons) */}
+                  <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 border-[0.5px] bg-(--neutral-800) border-(--neutral-400) pr-9 text-body-sm [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none" />
+                  {query && (
+                    <Button variant="ghost" size="icon" aria-label="Clear search" className="absolute top-1 right-1 size-7" onClick={() => setQuery('')}>
+                      <X weight="regular" className="size-4 text-(--neutral-200)" aria-hidden />
+                    </Button>
+                  )}
                 </div>
                 {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
                 <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--neutral-100) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
@@ -430,7 +435,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
               </div>
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
-              <div className="flex flex-col gap-2"> {/* the sections are 8 px apart, with no padding around them (owner's Figma, 2026-11-17, latest; it was 20 and 16) */}
+              <div className="flex flex-col gap-2 pr-3"> {/* 12 px at the right, the Figma Sidebar frame's padding (owner, 2026-11-23, later: it was 16 an hour before); the sections are 8 px apart, with no padding around them (owner's Figma, 2026-11-17, latest; it was 20 and 16) */}
                 <Section title="Recurrences" expanded={recOpen} onExpand={setRecOpen} items={allRecurrences} addLabel="New recurrence" onAdd={onNewCase} views empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
                     <Growing open={recOpen} total={allRecurrences.length}>{(limit) => (
@@ -475,7 +480,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
           </>
         ) : (
           <div className="flex items-center gap-4 px-3 py-1">
-            <Avatar size="lg" name={profile?.full_name || 'Signed in'} />
+            <Avatar size="lg" className="border-2 border-(--neutral-500)" name={profile?.full_name || 'Signed in'} />
             <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
               <p className="truncate text-body-sm-strong text-(--neutral-100)">{name}</p>
               {email && <p className="truncate text-caption-medium text-(--neutral-200)">{email}</p>}
