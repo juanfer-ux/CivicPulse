@@ -1,7 +1,8 @@
 import { gsap } from 'gsap'
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { CaretDown, MapPin, PictureInPicture, ThumbsDown, ThumbsUp } from '@phosphor-icons/react'
+import { CaretDown, MapPin, PictureInPicture, Sparkle, ThumbsDown, ThumbsUp, X } from '@phosphor-icons/react'
+import { Alert } from '@/components/ui/alert'
 import { setRailSlot } from '@/lib/railSlot'
 import { AgentHome } from '@/components/AgentHome'
 import { Button } from '@/components/ui/button'
@@ -18,10 +19,11 @@ const AnswerChart = lazy(loadChart)
 export type Turn = { question: string; result?: Answer; error?: string }
 
 /** `turns` are this conversation's questions and answers; the app keeps one list per conversation (the sidebar's Investigations). `onTurns` edits the conversation with this id, even if the person has switched to another one meanwhile. */
-export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea, recurrenceId = null, onOpenRecurrence, onCollapse, placesFor = null, onPlaces }: { placesFor?: string | null; onPlaces?: (problemId: string | null) => void; onCollapse?: () => void; recurrenceId?: string | null; onOpenRecurrence?: (id: string) => void; chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
+export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea, recurrenceId = null, emptyFor = null, onOpenRecurrence, onCollapse, placesFor = null, onPlaces }: { emptyFor?: 'recurrence' | 'incident' | null; placesFor?: string | null; onPlaces?: (problemId: string | null) => void; onCollapse?: () => void; recurrenceId?: string | null; onOpenRecurrence?: (id: string) => void; chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
   const setTurns = (edit: (t: Turn[]) => Turn[]) => onTurns(chatId, edit)
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
+  const [noteOpen, setNoteOpen] = useState(true) // the AI note above the Composer; its X closes it for this session
   const end = useRef<HTMLDivElement>(null)
   const star = useRef<SVGSVGElement>(null)
   const onLanding = turns.length === 0
@@ -105,8 +107,13 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         <div className="relative min-h-0 flex-1">
         <ScrollArea className="relative h-full" viewportClassName={turns.length === 0 ? '[&>div]:!flex [&>div]:min-h-full [&>div]:flex-col' : '[&>div]:!block'}> {/* the landing's group is centered vertically between the strip and the composer (owner, 2026-11-17, with a screenshot; Figma's body is centered both ways); taller content scrolls from the top; a conversation starts at the top */}
         <div className={`flex w-full flex-1 flex-col`}>
-        <div className={`flex w-full flex-col gap-3 text-body ${turns.length === 0 ? 'flex-1' : ''} max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[calc(var(--agent-content-w)+32px)] desk:gap-8 desk:px-4 desk:py-10`}> {/* the landing's body is top-aligned (owner's Figma, 2026-11-17): the summary card sits at the top and the dashboard fills the rest and centers its own content */}
-          {turns.length === 0 && <AgentHome ask={(q) => void ask(q)} />}
+        <div className={`flex w-full flex-col gap-3 text-body ${turns.length === 0 ? 'flex-1' : ''} max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[calc(var(--agent-content-w)+32px)] desk:gap-8 desk:px-4 desk:py-12`}> {/* the landing's body is top-aligned (owner's Figma, 2026-11-17): the summary card sits at the top and the dashboard fills the rest and centers its own content */}
+          {turns.length === 0 && !emptyFor && <AgentHome ask={(q) => void ask(q)} />}
+          {turns.length === 0 && emptyFor && (
+            <div className="flex flex-1 items-center justify-center px-8 text-center"> {/* Empty state (owner, 2026-11-23): a recurrence with no conversation and no history shows an empty agent panel with one hint line (Figma Agent Panel · Empty) */}
+              <p className="max-w-[320px] text-body-sm text-(--neutral-200)">No conversation about this {emptyFor} yet. Ask the agent anything about it.</p>
+            </div>
+          )}
           {turns.map((t, i) => (
             <div key={i} className="flex flex-col gap-4 desk:gap-5"> {/* 20 px between a question and its answer on desktop (owner's Figma, 2026-11-17; it was 16) */}
               <Question text={t.question} />
@@ -122,7 +129,12 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </div>
         <div className="w-full">
         <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:flex-row desk:flex-col desk:items-stretch desk:gap-3 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-4 desk:py-5 desk:max-w-[calc(var(--agent-content-w)+32px)]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
-          <Composer value={text} onChange={setText} busy={busy} />
+          {turns.length === 0 && !emptyFor && noteOpen && (
+            <Alert variant="info" className="relative z-0 mx-1.5 w-auto -mb-9 hidden px-4 pt-4 pb-10 desk:flex" icon={<Sparkle weight="fill" className="size-5 text-(--indigo-200)" aria-hidden />} action={<Button size="icon" variant="ghost" className="size-8" aria-label="Close note" onClick={() => setNoteOpen(false)}><X weight="regular" className="size-4" aria-hidden /></Button>}> {/* Figma Chat Area (owner, 2026-11-23, latest): the Alert sits ABOVE the Composer, 8 px narrower each side, and the Composer covers its bottom 24 px (Chat Area gap -24, Alert bottom padding 40); it left the Dashboard group */}
+              CivicPulse AI groups related reports into patterns. Nothing goes to the authorities until you’ve reviewed it. Final decision rests with the responsible official.
+            </Alert>
+          )}
+          <div className="relative z-10"><Composer value={text} onChange={setText} busy={busy} /></div>
         </form>
         </div>
       </CardContent>

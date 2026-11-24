@@ -1,8 +1,6 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import { Car, CarSimple, Sparkle, Trash, X, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wrench, type Icon } from '@phosphor-icons/react'
+import { useEffect, type ReactNode } from 'react'
+import { Car, CarSimple, Trash, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wrench, type Icon } from '@phosphor-icons/react'
 import { SUGGESTIONS, WORTH_INVESTIGATING } from '@/lib/agent'
-import { Alert } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth'
 
 /** The agent panel's landing (owner's Figma, 2026-11-12: Agent Panel, Welcome_Module, CatchUp_Module, Worth-Investigating_Module, Quick Questions): a greeting and three sections, each a Welcome_Module with a title row and a caret that folds it. Data overview and the category pictures are still placeholders (Figma's numbers); the questions are real and ask the agent. */
@@ -19,7 +17,7 @@ const TOPIC_ICON: Icon[] = [Warning, MapPin, Clock, ArrowsClockwise, Compass]
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-6">
-      <h3 className="font-display-semi text-display-xs text-(--neutral-200)">{title}</h3>
+      <h3 className="font-display-semi text-display-xs-strong text-(--neutral-200)">{title}</h3>
       {children}
     </section>
   )
@@ -47,7 +45,6 @@ function Donut() {
 }
 
 export function AgentHome({ ask }: { ask: (q: string) => void }) {
-  const [noteOpen, setNoteOpen] = useState(true) // the AI note at the bottom of the body; its X closes it for this session
   const first = useAuth().profile?.full_name?.trim().split(/\s+/)[0] // the greeting names the person (owner's Figma, 2026-11-17: "Welcome back Peter,")
   useEffect(() => {
     if (!QUICK_SUGGESTIONS_ON) return
@@ -65,12 +62,7 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
   }, [ask])
   return (
     <div className="flex flex-1 flex-col gap-20"> {/* Figma Conversation body: the Dashboard group, which holds the alert first (owner, 2026-11-23) */}
-      <div className="flex flex-1 flex-col justify-start gap-16 px-2.5 py-10"> {/* Figma Dashboard: 40 px above and below (owner, 2026-11-23, it was 16; the alert left the body for a banner under the title row). Before: (owner, 2026-11-23, latest: content aligned to the TOP again, primary axis MIN; an hour before it was the BOTTOM, justify-end, and before that top). Before: Fill height with its content aligned to the BOTTOM (primary axis MAX), so a taller panel adds the space between the alert and the greeting; it was top-aligned (justify-start). Figma (owner, 2026-11-16): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
-      {noteOpen && (
-        <Alert variant="info" className="hidden desk:flex" icon={<Sparkle weight="fill" className="size-5 text-(--indigo-200)" aria-hidden />} action={<Button size="icon" variant="ghost" className="size-8" aria-label="Close note" onClick={() => setNoteOpen(false)}><X weight="regular" className="size-4" aria-hidden /></Button>}> {/* Figma Alert, info (owner, 2026-11-23, latest): the FIRST item of the Dashboard group, above the greeting, 64 px away, the full width of the group, 8 px radius, 0.5 px `indigo-600` line all round, `indigo-900` at 69 %, with a close button at the right (owner, 2026-11-23, latest: it was the last item of the body an hour before, and a banner under the title row before) */}
-          CivicPulse AI groups related reports into patterns. Nothing goes to the authorities until you’ve reviewed it. Final decision rests with the responsible official.
-        </Alert>
-      )}
+      <div className="flex flex-1 flex-col justify-start gap-12 px-2.5 py-8"> {/* Figma Dashboard: 40 px above and below (owner, 2026-11-23, it was 16; the alert left the body for a banner under the title row). Before: (owner, 2026-11-23, latest: content aligned to the TOP again, primary axis MIN; an hour before it was the BOTTOM, justify-end, and before that top). Before: Fill height with its content aligned to the BOTTOM (primary axis MAX), so a taller panel adds the space between the alert and the greeting; it was top-aligned (justify-start). Figma (owner, 2026-11-16): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
       <div className="flex flex-col gap-4"> {/* (the line under the greeting is hidden in Figma now, owner 2026-11-17, so it is gone) Figma Frame 2147225884 (owner, 2026-11-17): the greeting, then "You're ready to investigate and coordinate incident response" in `display-sm` / `neutral-200`, 16 px apart; the place text left the header */}
         <h2 className="font-display text-display-md text-(--brand-primary)"> {/* Figma greeting (owner, 2026-11-23): 38 / 28 in `brand-primary` (it was 32 and `neutral-100`) */}Welcome back,{first ? ` ${first},` : ''}</h2>
       </div>

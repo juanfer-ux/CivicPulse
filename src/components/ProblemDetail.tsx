@@ -118,7 +118,7 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
     <>
       <div className="flex items-start gap-4 pt-5 pr-[68px] pb-5 pl-5">
         <div className="flex min-w-0 flex-col gap-2">
-          <h2 className="font-display-semi text-display-sm font-[calc(500+var(--display-weight-offset))] text-(--brand-primary)">{title}</h2>
+          <h2 className="font-display-semi text-display-sm font-[calc(700+var(--display-weight-offset))] tracking-[0.01em] text-(--brand-primary)">{title}</h2>
           <div className="flex items-center gap-3">
             <p className="text-body-medium leading-5">{category}</p>
             <span className="h-3.5 w-px bg-(--neutral-500)" aria-hidden />
@@ -144,7 +144,7 @@ function WideHeader({ problem, localityName, categoryName }: { problem: ProblemR
   )
   const title = (
     <div className="flex min-w-0 flex-col gap-2">
-      <h2 className="font-display-semi text-display-sm font-[calc(500+var(--display-weight-offset))] text-(--brand-primary)">{problem.location_description}</h2>
+      <h2 className="font-display-semi text-display-sm font-[calc(700+var(--display-weight-offset))] tracking-[0.01em] text-(--brand-primary)">{problem.location_description}</h2>
       {category}
     </div>
   )

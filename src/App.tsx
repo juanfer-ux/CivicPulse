@@ -114,10 +114,21 @@ export default function App() {
   const idsOf = (c: { id: number; turns: Turn[] }) => [...new Set([...(mockIds[c.id] ?? []), ...(opened[c.id] ?? []), ...c.turns.flatMap((t) => t.result?.highlightIds ?? [])])]
   // A row of the sidebar opens the item on the map and its conversation in the agent panel (owner, 2026-11-08): the open conversation if it holds the item, else the newest one that does. Items no conversation holds leave the panel as it is.
   const open = (kind: 'recurrence' | 'incident') => (id: string) => {
-    const holder = idsOf(active).includes(id) ? active : [...chats].reverse().find((c) => idsOf(c).includes(id))
-    if (holder && holder.id !== active.id) pick(holder.id)
-    setAgentOff(false) // so does a recurrence or an incident (owner, 2026-11-15): its conversation and the panel open together
-    setFocus((f) => ({ kind, id, n: (f?.n ?? 0) + 1 }))
+    setAgentOff(false); setFocus((f) => ({ kind, id, n: (f?.n ?? 0) + 1 })) // its conversation is chosen by the effect below (recurrences and incidents alike), for a click on the map and in the menu
+  }
+  // A recurrence has its own conversation (owner, 2026-11-23): the one the person typed in while it was open, else a mocked or answered one that holds it; with none, the agent panel shows an empty conversation. Typing or continuing makes it ongoing: row 1 of the Recurrences list, the others pushed down; only opened and left alone it goes back to its place.
+  const [convOf, setConvOf] = useState<Record<string, number>>({})
+  const [ongoing, setOngoing] = useState<string[]>([])
+  const histOf = (c: { id: number; turns: Turn[] }) => [...(mockIds[c.id] ?? []), ...c.turns.flatMap((t) => t.result?.highlightIds ?? [])]
+  const holderOf = (id: string) => (convOf[id] !== undefined && chats.some((c) => c.id === convOf[id]) ? convOf[id] : [...chats].reverse().find((c) => histOf(c).includes(id))?.id)
+  useEffect(() => {
+    if (!selection) return
+    const h = holderOf(selection.id)
+    if (h === undefined) { if (active.turns.length) startChat() } else if (h !== activeId) pick(h)
+  }, [selection?.kind, selection?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  const typed = (id: number, edit: (t: Turn[]) => Turn[]) => {
+    editTurns(id, edit)
+    if (selection) { const rid = selection.id; setConvOf((m) => ({ ...m, [rid]: id })); setOngoing((o) => [rid, ...o.filter((x) => x !== rid)]) }
   }
   const chatItems = [
     ...chats
@@ -133,7 +144,7 @@ export default function App() {
         Skip to main content
       </a>
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
-      <Sidebar pinnedIds={new Set(Object.values(mockIds).flat())} agentOff={agentOff} onToggleAgent={() => setAgentOff((o) => !o)} chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().filter((c) => c.turns.length).map((c) => ({ id: c.id, title: c.turns[0].question, ...(mockTimes[c.id] ?? { created: loadedAt + c.id, updated: loadedAt + c.id }) }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
+      <Sidebar pinnedIds={new Set(Object.values(mockIds).flat())} ongoingIds={ongoing} agentOff={agentOff} onToggleAgent={() => setAgentOff((o) => !o)} chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().filter((c) => c.turns.length).map((c) => ({ id: c.id, title: c.turns[0].question, ...(mockTimes[c.id] ?? { created: loadedAt + c.id, updated: loadedAt + c.id }) }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
       {/* The agent panel is always 30 % of the browser window width (30vw), no minimum or maximum (owner, 2026-11-08; it was clamp(550px, 38%, 680px), which kept the cards and the composer from breaking on narrow windows). */}
       <main ref={mainRef} id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
         {!agentOff && <AgentResizer max={maxW} onChange={drag} />}
@@ -142,7 +153,7 @@ export default function App() {
           <Dashboard placesFor={placesFor} highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} agentOff={agentOff} onAgentOff={setAgentOff} focus={focus} onRows={setRows} onSelection={setSelection}>
             {/* Phone: only shown on the Investigate tab. Tablet (owner, 2026-11-15) and desktop: always shown; on tablet it is the bottom sheet, collapsible with the sheet's chevron. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden md:max-desk:contents desk:contents'}>
-              <InvestigatePanel placesFor={placesFor} onPlaces={setPlacesFor} onCollapse={() => setAgentOff(true)} chatId={active.id} turns={active.turns} onTurns={editTurns} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} recurrenceId={selection?.kind === 'recurrence' ? selection.id : null} onOpenRecurrence={open('recurrence')} />
+              <InvestigatePanel placesFor={placesFor} onPlaces={setPlacesFor} onCollapse={() => setAgentOff(true)} chatId={active.id} turns={active.turns} onTurns={typed} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} recurrenceId={selection?.kind === 'recurrence' ? selection.id : null} emptyFor={selection?.kind ?? null} onOpenRecurrence={open('recurrence')} />
             </div>
           </Dashboard>
         </div>

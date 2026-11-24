@@ -406,7 +406,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
               Clear filters
             </Chip>
           )}
-          <Chip className="border-(--neutral-500)" icon={<SlidersHorizontal aria-hidden />} count={filterCount(filters) || undefined} pressed={filterCount(filters) > 0} aria-expanded={filtersOpen} onClick={() => setFiltersOpen(true)}>
+          <Chip className="border-(--neutral-500)" icon={<SlidersHorizontal aria-hidden />} count={filterCount(filters) || undefined} pressed={filterCount(filters) > 0} aria-expanded={filtersOpen} onClick={() => setFiltersOpen((o) => !o)}>
             Filters
           </Chip>
         </div>

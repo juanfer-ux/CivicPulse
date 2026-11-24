@@ -8,7 +8,6 @@ import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
 import { createPortal } from 'react-dom'
 import { useRailSlot } from '@/lib/railSlot'
-import { NARROW_VIEWPORT } from '@/components/AgentResizer'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,15 +24,31 @@ export type SidebarIncident = { id: string; title: string; reference: string; lo
 export type ChatItems = { title: string; ids: string[] }[]
 /** What is open on the map (a click there or in this menu): its row is the highlighted one. */
 export type SidebarSelection = { kind: 'recurrence' | 'incident'; id: string }
-type Chats = { agentOff?: boolean; onToggleAgent?: () => void; chats: Chat[]; activeId: number; exploring?: boolean; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void; chatItems?: ChatItems; pinnedIds?: Set<string>; recurrences?: SidebarRecurrence[]; incidents?: SidebarIncident[]; onOpenRecurrence?: (id: string) => void; onOpenIncident?: (id: string) => void; selected?: SidebarSelection | null }
+type Chats = { agentOff?: boolean; onToggleAgent?: () => void; chats: Chat[]; activeId: number; exploring?: boolean; onPick: (id: number) => void; onNew: () => void; cases: Chat[]; onNewCase: () => void; chatItems?: ChatItems; pinnedIds?: Set<string>; ongoingIds?: string[]; recurrences?: SidebarRecurrence[]; incidents?: SidebarIncident[]; onOpenRecurrence?: (id: string) => void; onOpenIncident?: (id: string) => void; selected?: SidebarSelection | null }
 
 /** The Recurrences list keeps the demo's three recurrences (owner, 2026-11-23: opening another one on the map used to push the yellow Monitoring row out, because the list shows the three most recently updated): the three newest of `pinnedIds`, always, plus the recurrence that is open when it is not one of them. Without `pinnedIds` the list is the three most recently updated, as before. */
-export function shownRecurrences<T extends { id: string | number; updated?: number }>(items: T[], pinned: Set<string> | undefined, openId: string | null): T[] {
+export function shownRecurrences<T extends { id: string | number; updated?: number }>(items: T[], pinned: Set<string> | undefined, openId: string | null, ongoing: string[] = []): T[] {
+  // Ongoing conversations (owner, 2026-11-23): a recurrence the person typed on or continued goes to row 1, most recent first, and pushes the three down; one only opened and left alone returns to its place.
+  const top = ongoing.map((id) => items.find((i) => String(i.id) === id)).filter((i): i is T => !!i)
+  const rest = shownRecurrencesBase(items, pinned, openId).filter((i) => !top.includes(i))
+  const three = [...top, ...rest].slice(0, 3) // the list keeps three rows (owner, 2026-11-23: with an ongoing one on top the fourth goes away); the open recurrence that is not among them is the only extra
+  const open = items.find((i) => openId !== null && String(i.id) === openId)
+  return open && !three.includes(open) ? [...three, open] : three
+}
+function shownRecurrencesBase<T extends { id: string | number; updated?: number }>(items: T[], pinned: Set<string> | undefined, openId: string | null): T[] {
   const newest = (l: T[]) => [...l].sort((a, b) => (b.updated ?? 0) - (a.updated ?? 0))
   if (!pinned || !items.some((i) => pinned.has(String(i.id)))) return newest(items).slice(0, 3)
   const base = newest(items.filter((i) => pinned.has(String(i.id)))).slice(0, 3)
   const extra = items.filter((i) => (typeof i.id !== 'string' || String(i.id) === openId) && !base.some((b) => b.id === i.id)) // the open one, and the person's own "New recurrence" rows (numeric ids)
   return [...base, ...extra]
+}
+
+/** The open incident when it is not among the three rows the collapsed Incidents list shows (ongoing ones first, then the section's sort): it is added as a fourth row (owner, 2026-11-23, the same rule as the Recurrences). */
+function lastOf<T extends { id: string | number; created?: number; updated?: number }>(items: T[], view: View, ongoing: string[] = [], openId: string): string | null {
+  const sorted = sortItems(items, view)
+  const top = ongoing.map((id) => sorted.find((i) => String(i.id) === id)).filter((i): i is T => !!i)
+  const head = [...top, ...sorted.filter((i) => !top.includes(i))].slice(0, 3)
+  return head.some((i) => String(i.id) === openId) || !items.some((i) => String(i.id) === openId) ? null : openId
 }
 
 /** DEMO (owner, 2026-11-23): a list (opened by the chevron in its section title) that shows its first three rows collapsed and, expanded, draws batches of BATCH (20) rows as the end of the list scrolls into view (the data is already in memory: this only limits what is drawn). `children` gets how many rows to draw. */
@@ -61,12 +76,15 @@ function Growing({ open, total, children }: { open: boolean; total: number; chil
 }
 
 /** The items of a section in its view: one list, or grouped by status, ordered as the view says. */
-function ViewList<T extends { id: string | number; created?: number; updated?: number }>({ items, view, group, order, labels, primary, row, limit, batched, flat }: { items: T[]; view: View; group: (t: T) => string; order: string[]; labels: Record<string, string>; primary: string; row: (t: T) => ReactNode; limit?: number; batched?: boolean; flat?: boolean }) {
+function ViewList<T extends { id: string | number; created?: number; updated?: number }>({ items, view, group, order, labels, primary, row, limit, batched, flat, first, last }: { first?: string[]; last?: string | null; items: T[]; view: View; group: (t: T) => string; order: string[]; labels: Record<string, string>; primary: string; row: (t: T) => ReactNode; limit?: number; batched?: boolean; flat?: boolean }) {
   // `limit`: only that many rows show, and only those (owner, 2026-11-09: the Incidents list shows 5); the section title still counts them all.
   // `batched` (DEMO, owner 2026-11-23): By status, every group keeps its full count and draws its own rows in batches; View all draws `limit` rows, grown by the caller's infinite scroll.
-  const sorted = sortItems(items, view)
+  const byView = sortItems(items, view)
+  const top = (first ?? []).map((id) => byView.find((i) => String(i.id) === id)).filter((i): i is T => !!i)
+  const tail = last ? byView.find((i) => String(i.id) === last && !top.includes(i)) : undefined
+  const sorted = first || last ? [...top, ...byView.filter((i) => !top.includes(i) && i !== tail), ...(tail ? [tail] : [])] : byView // owner, 2026-11-23: an ongoing recurrence is row 1, the one open from the map and not in the top 3 is always the last row, whatever the sort
   if (flat) return <>{sorted.map(row)}</> // collapsed: just the rows, no group titles (a closed group would hide one)
-  if (limit && !batched) return <>{sorted.slice(0, limit).map(row)}</> // collapsed: the latest few, no group titles
+  if (limit && !batched) return <>{[...(tail ? sorted.slice(0, -1) : sorted).slice(0, limit), ...(tail ? [tail] : [])].map(row)}</> // collapsed: the latest few, no group titles
   if (view.group === 'status') return <Groups items={sorted} newest group={group} order={order} labels={labels} primary={primary} row={row} batch={batched} />
   return <>{(limit ? sorted.slice(0, limit) : sorted).map(row)}</>
 }
@@ -363,7 +381,7 @@ function MobileBrand() {
 }
 
 /** The menu itself, as in Figma Sidebar (2026-10-29): a 70 px header with the logo and the collapse button, the Investigations and Cases groups, and at the bottom the account row. Used by the desktop column and the phone slide-out. */
-function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, onNewCase, recurrences: real = [], incidents = [], chatItems = [], pinnedIds, onOpenRecurrence, onOpenIncident, selected, onToggle }: Chats & { collapsed: boolean; onToggle?: () => void }) {
+function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, onNewCase, recurrences: real = [], incidents = [], chatItems = [], pinnedIds, ongoingIds, onOpenRecurrence, onOpenIncident, selected, onToggle }: Chats & { collapsed: boolean; onToggle?: () => void }) {
   const { profile, session, signOut } = useAuth()
   const name = shortName(profile?.full_name) || 'Signed in'
   const email = session?.user?.email
@@ -416,7 +434,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                 <Section title="Recurrences" expanded={recOpen} onExpand={setRecOpen} items={allRecurrences} addLabel="New recurrence" onAdd={onNewCase} views empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
                     <Growing open={recOpen} total={allRecurrences.length}>{(limit) => (
-                    <ViewList items={recOpen ? allRecurrences : shownRecurrences(recurrences, pinnedIds, selected?.kind === 'recurrence' ? selected.id : null)} limit={recOpen ? limit : undefined} flat={!recOpen} batched={recOpen && view.group === 'status'} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
+                    <ViewList items={recOpen ? allRecurrences : shownRecurrences(recurrences, pinnedIds, selected?.kind === 'recurrence' ? selected.id : null, ongoingIds)} first={recOpen ? undefined : ongoingIds} last={recOpen || selected?.kind !== 'recurrence' || ongoingIds?.includes(selected.id) || shownRecurrences(recurrences, pinnedIds, null, ongoingIds).some((i) => String(i.id) === selected.id) ? null : selected.id} limit={recOpen ? limit : undefined} flat={!recOpen} batched={recOpen && view.group === 'status'} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
                       <TwoLineItem key={c.id} active={act.kind === 'case' ? c.id === act.id : act.kind === 'recurrence' && c.id === act.id} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => (typeof c.id === 'string' ? noCase(onOpenRecurrence)(c.id) : setLocal({ kind: 'case', id: c.id, sel: selKey }))} title={c.title}
                         icon={<Warning weight="fill" className="mt-0.5 size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
                         sub={c.reference ? `${c.reference} · ${c.locality ?? PROBLEM_STATUS[c.status].label}` : 'Not linked to a recurrence yet'} />
@@ -427,7 +445,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                 <Section title="Incidents" expanded={incOpen} onExpand={setIncOpen} items={incidentRows} addLabel="New incident" views empty="Nothing here yet. Incidents an answer points to, or that you open, appear here.">
                   {(view) => (
                     <Growing open={incOpen} total={incidentRows.length}>{(limit) => (
-                    <ViewList items={incidentRows} limit={limit} batched={incOpen && view.group === 'status'} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
+                    <ViewList items={incidentRows} first={incOpen ? undefined : ongoingIds} last={incOpen || selected?.kind !== 'incident' ? null : lastOf(incidentRows, view, ongoingIds, selected.id)} limit={limit} batched={incOpen && view.group === 'status'} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
                       <TwoLineItem key={i.id} active={act.kind === 'incident' && act.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => noCase(onOpenIncident)(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-2 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${i.locality ?? GROUPS[i.group].label}`} />
                     )} />
                     )}</Growing>
@@ -524,12 +542,12 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
     document.documentElement.style.setProperty('--sidebar-now', `${collapsed ? 0 : width}px`) // read by App: the agent panel's maximum leaves the map 47 % of the viewport
     window.dispatchEvent(new Event('sidebar-now'))
   }, [collapsed, width])
-  // Narrow viewport (1,600 px or below, owner 2026-11-17): with the sidebar and the agent panel both open, opening the filters collapses the sidebar, and closing them (or applying) brings it back as it was.
+  // At any width (owner, 2026-11-23; before, 1,600 px or below with the agent panel open): opening the filters collapses an expanded sidebar, and closing them (or applying) brings it back as it was, only if the filters collapsed it.
   const stepped = useRef(false)
   useEffect(() => {
     const on = (e: Event) => {
       const open = (e as CustomEvent<boolean>).detail
-      if (open && window.matchMedia(NARROW_VIEWPORT).matches && !live.current.collapsed && !live.current.agentOff) {
+      if (open && !live.current.collapsed) {
         stepped.current = true
         setCollapsed(true)
       } else if (!open && stepped.current) {
