@@ -124,7 +124,8 @@ export default function App() {
   useEffect(() => {
     if (!selection) return
     const h = holderOf(selection.id)
-    if (h === undefined) { if (active.turns.length) startChat() } else if (h !== activeId) pick(h)
+    // Only the conversation changes: `pick` would also put that conversation's last answer on the map (its incidents), and the open recurrence would turn into highlighted incidents (owner, 2026-11-24)
+    if (h === undefined) { if (active.turns.length) startChat() } else if (h !== activeId) { setChats((cs) => cs.filter((c) => c.id === h || c.turns.length)); setActiveId(h); setAgentOff(false) }
   }, [selection?.kind, selection?.id]) // eslint-disable-line react-hooks/exhaustive-deps
   const typed = (id: number, edit: (t: Turn[]) => Turn[]) => {
     editTurns(id, edit)

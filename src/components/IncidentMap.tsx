@@ -959,7 +959,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
           className="absolute z-30"
           // to the right of the pointer, or to its left near the right edge, and kept above the bottom edge
           style={{
-            top: Math.max(8, Math.min(hover.y - 12, (container.current?.clientHeight ?? 0) - 130)),
+            top: Math.max(8, Math.min(hover.y - 12, (container.current?.clientHeight ?? 0) - 270)),
             ...(hover.x > (container.current?.clientWidth ?? 0) - 290 ? { right: (container.current?.clientWidth ?? 0) - hover.x + 18 } : { left: hover.x + 18 }),
           }}
         />

@@ -136,3 +136,24 @@ export async function fetchProblemDetail(problemId: string): Promise<ProblemDeta
     events: (events.data ?? []) as ProblemEvent[],
   }
 }
+
+export interface LatestPhoto { reference: string; at: string; placeholder: boolean }
+const photoCache = new Map<string, Promise<LatestPhoto | null>>()
+/** The newest photo of a recurrence (owner, 2026-11-24): the photo of the newest report of its newest occurrence. Reports are linked to the problem, so the newest linked report is in the newest occurrence. No files exist yet (every row is a placeholder), so `placeholder` is true until the Citizen Agent attaches one. Cached per recurrence: the hover card asks on every hover. */
+export function fetchLatestPhoto(problemId: string): Promise<LatestPhoto | null> {
+  let p = photoCache.get(problemId)
+  if (!p) {
+    p = (async () => {
+      const links = await supabase.from('incident_current_link').select('incident_id').eq('problem_id', problemId).in('state', ['confirmed', 'proposed'])
+      const ids = (links.data ?? []).map((l) => l.incident_id as string)
+      if (!ids.length) return null
+      const inc = await supabase.from('incidents').select('id, reference, occurred_at').in('id', ids).order('occurred_at', { ascending: false }).limit(1)
+      const latest = inc.data?.[0]
+      if (!latest) return null
+      const media = await supabase.from('incident_media').select('is_placeholder').eq('incident_id', latest.id).eq('kind', 'photo').order('created_at', { ascending: false }).limit(1)
+      return { reference: String(latest.reference), at: String(latest.occurred_at), placeholder: media.data?.[0]?.is_placeholder !== false }
+    })().catch(() => null)
+    photoCache.set(problemId, p)
+  }
+  return p
+}
