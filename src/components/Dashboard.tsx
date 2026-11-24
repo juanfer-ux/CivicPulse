@@ -453,7 +453,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
         role="region"
         data-float
         aria-label="Busiest localities"
-        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid md:max-desk:hidden desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-2 overflow-y-auto desk:overflow-visible desk:gap-4 desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 desk:grid-cols-4 desk:top-[calc(var(--section-header-h)+var(--map-pad))]`}
+        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid md:max-desk:hidden desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-2 overflow-y-auto desk:overflow-visible desk:gap-4 desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 min-[1601px]:grid-cols-4 desk:top-[calc(var(--section-header-h)+var(--map-pad))]`}
       >
         {statCards}
       </div>
