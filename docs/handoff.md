@@ -3,6 +3,7 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-05. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **Brand header again (owner, 2026-11-24, Figma):** the expanded Brand header has **12 px at the left** as well as at the right (it was 10 / 12): `px-3`; the logo and the collapse button keep their sizes. The collapsed sidebar's mark is **40 px** now, as in Figma (it was 32: the known difference is closed). `Sidebar.tsx`.
 - **Sidebar Brand header logo is bigger (owner, 2026-11-24, Figma):** in the expanded sidebar the logo mark is **38 px** (32), the wordmark **155.3 x 11.8** (130.76 x 9.93), **11.4 px** apart (9.6) and 1.3 px in (1.1); the padding (10 / 12 / 10 / 10) is unchanged. The collapsed sidebar keeps its 32 px mark in the code (Figma's collapsed variant says 40: a known difference, left as it was). `Sidebar.tsx`.
 - **Sidebar Brand header padding (owner, 2026-11-24, Figma):** 10 px above, below and at the left and **12 px at the right** (it was 2 px): the collapse button ends 12 px from the sidebar edge, in line with the `main` container below it. `Sidebar.tsx`.
 - **Sidebar container `main` padding (owner, 2026-11-24, Figma 673:4070):** `main` (Header + the three sections) has **12 px at the right** and 16 px between its children; the sections already had it, the **header block now has it too** (search and New investigation 12 px narrower at the right: `pr-[22px]` = 10 + 12). Nothing else in `main` changed. `Sidebar.tsx`.
