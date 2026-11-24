@@ -119,7 +119,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
             </div>
           )}
           {turns.map((t, i) => (
-            <div key={i} className="flex flex-col gap-4 desk:gap-5"> {/* 20 px between a question and its answer on desktop (owner's Figma, 2026-11-17; it was 16) */}
+            <div key={i} className="flex flex-col gap-4 desk:gap-6"> {/* 24 px between a question and its answer on desktop (owner's Figma, 2026-11-24; it was 20, 16 before) */}
               <Question text={t.question} />
               {!t.result && !t.error && <p className="text-muted-foreground">Querying…</p>}
               {t.error && <p className="text-incident">{t.error}</p>}
@@ -149,7 +149,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
 
 /** The person's question (Figma Message, role user). */
 export function Question({ text }: { text: string }) {
-  return <p className="self-end rounded-lg bg-(--neutral-600) px-3 py-2">{text}</p>
+  return <p className="self-end rounded-lg bg-(--neutral-800) p-3 text-(--neutral-200)">{text}</p>
 }
 
 /** Thumbs under an answer (Figma Message, role assistant). For now they only mark the choice on screen. */
