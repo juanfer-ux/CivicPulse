@@ -116,7 +116,7 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
     </Card>
     )}
     <PortalTo target={inSlot ? rightSlot : null}>
-    <Card role="region" aria-label="Occurrences history" data-float={M3 && !inSlot ? true : undefined} className={`gap-0 overflow-hidden bg-card/95 py-0 ${inSlot ? 'desk:pointer-events-auto desk:h-full desk:w-full' : M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:right-(--col-right) desk:top-[calc(var(--map-pad)+var(--banner-offset,0px)+96px+10px)] desk:z-20 desk:w-[360px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} desk:rounded-lg desk:border desk:border-(--neutral-900) desk:bg-(--neutral-800)`}>
+    <Card role="region" aria-label="Occurrences history" data-float={M3 && !inSlot ? true : undefined} className={`gap-0 overflow-hidden bg-card/95 py-0 ${inSlot ? 'desk:pointer-events-auto desk:h-full desk:w-full' : M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:right-(--col-right) desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:z-20 desk:w-[360px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} desk:rounded-lg desk:border desk:border-(--neutral-900) desk:bg-(--neutral-800)`}>
     {M3 && <StatList problem={problem} />}
     <ScrollArea viewportRef={list} className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">

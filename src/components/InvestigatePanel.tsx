@@ -5,6 +5,8 @@ import { CaretDown, MapPin, PictureInPicture, Sparkle, ThumbsDown, ThumbsUp, X }
 import { Alert } from '@/components/ui/alert'
 import { setRailSlot } from '@/lib/railSlot'
 import { AgentHome } from '@/components/AgentHome'
+import { RecurrenceDetailHeader } from '@/components/RecurrenceDetailHeader'
+import type { SidebarRecurrence } from '@/components/Sidebar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Composer } from '@/components/Composer'
@@ -19,7 +21,7 @@ const AnswerChart = lazy(loadChart)
 export type Turn = { question: string; result?: Answer; error?: string }
 
 /** `turns` are this conversation's questions and answers; the app keeps one list per conversation (the sidebar's Investigations). `onTurns` edits the conversation with this id, even if the person has switched to another one meanwhile. */
-export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea, recurrenceId = null, emptyFor = null, onOpenRecurrence, onCollapse, placesFor = null, onPlaces }: { emptyFor?: 'recurrence' | 'incident' | null; placesFor?: string | null; onPlaces?: (problemId: string | null) => void; onCollapse?: () => void; recurrenceId?: string | null; onOpenRecurrence?: (id: string) => void; chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
+export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea, recurrenceId = null, emptyFor = null, recurrence = null, onOpenRecurrence, onCollapse, placesFor = null, onPlaces }: { recurrence?: SidebarRecurrence | null; emptyFor?: 'recurrence' | 'incident' | null; placesFor?: string | null; onPlaces?: (problemId: string | null) => void; onCollapse?: () => void; recurrenceId?: string | null; onOpenRecurrence?: (id: string) => void; chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
   const setTurns = (edit: (t: Turn[]) => Turn[]) => onTurns(chatId, edit)
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
@@ -102,6 +104,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           </CardHeader>
         </div>
       </div>
+      {recurrence && <RecurrenceDetailHeader category={recurrence.category ?? recurrence.title} reference={recurrence.reference} locality={recurrence.locality} status={recurrence.status} />} {/* every recurrence, with or without a conversation (owner, 2026-11-24): Figma Recurrence Detail Header */}
       <CardContent className={`flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0`}> {/* the body and the chat area are centered in the whole panel (the sidebar's rail is a header cell now, owner's Figma 2026-11-20, so nothing is reserved at a side). The padding is on the content INSIDE the scroll area, never on the scroll area: the scrollbar stays on the panel's own edge. */}
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
         <div className="relative min-h-0 flex-1">

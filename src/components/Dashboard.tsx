@@ -179,7 +179,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
       else if (age < 60) c.before++
       counts.set(i.locality_code, c)
     }
-    return [...counts].sort((a, b) => b[1].n - a[1].n).slice(0, 4).map(([code, c]) => [code, { ...c, series: buckets(c.times, end) }] as const)
+    return [...counts].sort((a, b) => b[1].n - a[1].n).slice(0, 6).map(([code, c]) => [code, { ...c, series: buckets(c.times, end) }] as const)
   }, [data])
 
   // Recurrences view: the same filters, applied to problems. Days means "reported in that window"; a problem has no incident status, it has its own.
@@ -303,7 +303,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
   }
   useEffect(() => {
     onRows?.({
-      recurrences: [...problems].sort((a, b) => (b.last_seen ?? '').localeCompare(a.last_seen ?? '')).map((p) => ({ id: p.id, title: titleCase(p.title), status: p.status, reference: p.reference, locality: localityName.get(p.locality_code), created: Date.parse(p.first_seen ?? '') || 0, updated: Date.parse(p.last_seen ?? '') || 0 })),
+      recurrences: [...problems].sort((a, b) => (b.last_seen ?? '').localeCompare(a.last_seen ?? '')).map((p) => ({ id: p.id, title: titleCase(p.title), category: data?.categories.find((c) => c.code === p.category)?.name ?? label(p.category), status: p.status, reference: p.reference, locality: localityName.get(p.locality_code), created: Date.parse(p.first_seen ?? '') || 0, updated: Date.parse(p.last_seen ?? '') || 0 })),
       incidents: (data?.incidents ?? []).map((i) => ({ id: i.id, title: i.title, reference: i.reference, locality: localityName.get(i.locality_code), group: groupOf(i.status), created: Date.parse(i.reported_at) || 0, updated: Date.parse(i.reported_at) || 0 })) // the data has no update time for incidents yet: reported_at stands for both,
     })
   }, [problems, data, onRows, localityName])
@@ -423,7 +423,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
       )}
 
       {/* Tablet (768 to 1,439 px, owner 2026-11-15): the stat cards float over the map in one row, above the filters row and the chips, like desktop. They cannot live in the bottom sheet below (its backdrop blur makes `fixed` relative to the sheet), so this is a second copy of the cards, shown on tablet only; the sheet's own copy is hidden there. */}
-      <div role="region" data-float aria-label="Busiest localities" className={`${selected || selectedProblem ? 'hidden' : 'hidden md:max-desk:grid'} fixed inset-x-3 top-[53px] z-10 grid-cols-4 gap-2`}>
+      <div role="region" data-float aria-label="Busiest localities" className={`${selected || selectedProblem ? 'hidden' : 'hidden md:max-desk:grid'} fixed inset-x-3 top-[53px] z-10 grid-cols-4 gap-2 [&>:nth-child(n+5)]:hidden`}>
         {statCards}
       </div>
 
@@ -453,7 +453,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
         role="region"
         data-float
         aria-label="Busiest localities"
-        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid md:max-desk:hidden desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-2 overflow-y-auto desk:overflow-visible desk:gap-4 desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 min-[1601px]:grid-cols-4 desk:top-[calc(var(--section-header-h)+var(--map-pad))]`}
+        className={`${selected || selectedProblem ? 'hidden' : tab === 'explore' ? 'grid md:max-desk:hidden desk:grid' : 'hidden desk:grid'} grid-cols-2 gap-2 overflow-y-auto desk:overflow-visible desk:gap-4 desk:absolute desk:right-(--col-right) desk:left-(--col-left) desk:z-10 min-[1601px]:grid-cols-4 min-[2601px]:grid-cols-6 max-[2600px]:[&>:nth-child(n+5)]:hidden desk:top-[calc(var(--section-header-h)+var(--map-pad))]`}
       >
         {statCards}
       </div>

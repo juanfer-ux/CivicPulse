@@ -153,7 +153,7 @@ export default function App() {
           <Dashboard placesFor={placesFor} highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} agentOff={agentOff} onAgentOff={setAgentOff} focus={focus} onRows={setRows} onSelection={setSelection}>
             {/* Phone: only shown on the Investigate tab. Tablet (owner, 2026-11-15) and desktop: always shown; on tablet it is the bottom sheet, collapsible with the sheet's chevron. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden md:max-desk:contents desk:contents'}>
-              <InvestigatePanel placesFor={placesFor} onPlaces={setPlacesFor} onCollapse={() => setAgentOff(true)} chatId={active.id} turns={active.turns} onTurns={typed} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} recurrenceId={selection?.kind === 'recurrence' ? selection.id : null} emptyFor={selection?.kind ?? null} onOpenRecurrence={open('recurrence')} />
+              <InvestigatePanel placesFor={placesFor} onPlaces={setPlacesFor} onCollapse={() => setAgentOff(true)} chatId={active.id} turns={active.turns} onTurns={typed} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} recurrenceId={selection?.kind === 'recurrence' ? selection.id : null} recurrence={selection?.kind === 'recurrence' ? rows.recurrences.find((r) => r.id === selection.id) ?? null : null} emptyFor={selection?.kind ?? null} onOpenRecurrence={open('recurrence')} />
             </div>
           </Dashboard>
         </div>

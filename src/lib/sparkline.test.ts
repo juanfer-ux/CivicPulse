@@ -16,3 +16,14 @@ describe('sparkline', () => {
     expect(sparkPoints([0, 0], 10, 10).pts[0][1]).toBe(9) // flat: at the bottom, no NaN
   })
 })
+
+describe('smoothPath', () => {
+  it('goes through every point and keeps a peak as the highest point (no overshoot)', async () => {
+    const { smoothPath } = await import('@/lib/sparkline')
+    const d = smoothPath([[0, 10], [10, 0], [20, 10]] as const)
+    expect(d.startsWith('M0,10C')).toBe(true)
+    expect(d.endsWith(' 20,10')).toBe(true)
+    expect(d).toContain(' 10,0C') // the middle point is an anchor
+    expect(smoothPath([[1, 2]] as const)).toBe('M1,2')
+  })
+})
