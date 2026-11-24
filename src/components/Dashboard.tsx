@@ -59,6 +59,8 @@ interface Props {
   /** Ask the map to fly to a locality (a Stat Card was clicked). */
   onZoomLocality: (code: number) => void
   onClearHighlight: () => void
+  /** A new investigation was started (owner, 2026-11-24): the open recurrence or incident closes, so the agent panel shows the landing. Only a new number does it. */
+  closeCase?: number
   /** Active panel on mobile (on desktop everything is visible). */
   tab: Tab
   onTab: (tab: Tab) => void
@@ -75,7 +77,7 @@ interface Props {
 const FILTERS_PUSH = true
 const FILTERS_W = 420
 
-export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, spots, focusCode, zoomTo, onZoomLocality, onClearHighlight, tab, onTab, onInspect, agentOff, onAgentOff, focus, onRows, onSelection, children }: Props) {
+export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, spots, focusCode, zoomTo, onZoomLocality, onClearHighlight, closeCase, tab, onTab, onInspect, agentOff, onAgentOff, focus, onRows, onSelection, children }: Props) {
   const [data, setData] = useState<Data | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
@@ -290,6 +292,15 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
     setSelectedId(id)
     if (id) setCollapsed(false)
   }
+  const lastClose = useRef(closeCase)
+  useEffect(() => {
+    if (closeCase === lastClose.current) return
+    lastClose.current = closeCase
+    setOpenReportId(null) // eslint-disable-line react-hooks/set-state-in-effect
+    setSelectedId(null)
+    setSelectedProblemId(null)
+    setShownProblemId(null)
+  }, [closeCase])
   const selectProblem = (id: string | null) => {
     if (id && id === selectedProblemId) {
       setSelectedId(null) // a second click on the open problem does nothing, except to come back to it from one of its incidents (its panel is still there)

@@ -327,9 +327,9 @@ const NARROW = '(max-width: 1799.98px)'
 /** The logo. The expand button is not here any more: collapsed, it is in the agent panel's title row, left of "Explore" (owner, 2026-11-17; before, the logo mark swapped for it on hover). */
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={`flex items-center gap-[9.6px] ${collapsed ? '' : 'pl-[1.1px]'}`}>
-      <img src={mark} alt="" width={32} height={32} className="shrink-0" /> {/* 32 px in the expanded sidebar (owner's Figma, 2026-11-17, latest; the logo is x 0.8: wordmark 130.76 x 9.93, 9.6 px apart, 1.1 px in); it was 40 px, expanded and collapsed (owner's Figma, 2026-11-17, the big sidebar pass; 42.94 collapsed and 38.92 expanded before; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before), 38.92 expanded */}
-      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={130.76} height={9.93} className="shrink-0" />}
+    <div className={`flex items-center gap-[11.4px] ${collapsed ? '' : 'pl-[1.3px]'}`}>
+      <img src={mark} alt="" width={collapsed ? 32 : 38} height={collapsed ? 32 : 38} className="shrink-0" /> {/* 38 px in the expanded sidebar (owner's Figma, 2026-11-24: the logo is 38 px, the wordmark 155.3 x 11.8, 11.4 px apart, 1.3 px in; 32 px, 130.76 x 9.93 and 9.6 px before); 32 px (owner's Figma, 2026-11-17; the logo is x 0.8: wordmark 130.76 x 9.93, 9.6 px apart, 1.1 px in); it was 40 px, expanded and collapsed (owner's Figma, 2026-11-17, the big sidebar pass; 42.94 collapsed and 38.92 expanded before; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before), 38.92 expanded */}
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={155.3} height={11.8} className="shrink-0" />}
     </div>
   )
 }
@@ -406,7 +406,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
-        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-[70px] justify-between bg-(--neutral-700) pl-2.5 pr-0.5'}`}>
+        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-[70px] justify-between bg-(--neutral-700) pl-2.5 pr-3'}`}>
           <Brand collapsed={collapsed} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
@@ -417,12 +417,12 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
-            <div className="flex shrink-0 flex-col gap-10 border-b border-(--neutral-500) px-2.5 pt-8 pb-[31px]"> {/* the 1 px line under it (Figma Header stroke, inside) keeps the block 152 px high */} {/* the search and the New investigation row, 12 apart, 32 px above and below (owner's Figma, 2026-11-23, later: 152 px high; 24 and 136 an hour before, 16 and 120 earlier) */}
-              <div className="flex flex-col gap-3">
+            <div className="flex shrink-0 flex-col gap-10 p-2.5 pr-[22px]"> {/* 12 px more at the right: the Figma container `main` (owner, 2026-11-24) has 12 px of padding at the right around the header and the sections, so the header block is 288 px wide in a 300 px sidebar; no line under the header block any more (owner's Figma, 2026-11-24: its stroke is gone; it was a 1 px `neutral-500` line), 128 px high */} {/* the search and the New investigation row, 12 apart, 32 px above and below (owner's Figma, 2026-11-23, later: 152 px high; 24 and 136 an hour before, 16 and 120 earlier) */}
+              <div className="flex flex-col gap-6"> {/* 24 px between the search (44 px high now) and the New investigation row (owner's Figma, 2026-11-24; 32 and 36 an hour before; 12 and 36 before), the header block is 128 px high with 10 px all round */}
                 <div className="relative"> {/* the browser's own clear button is hidden: the × is the Phosphor X (owner, 2026-11-24: only Phosphor icons) */}
-                  <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 border-[0.5px] bg-(--neutral-800) border-(--neutral-400) pr-9 text-body-sm [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none" />
+                  <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] bg-(--neutral-800) border-(--neutral-400) pr-9 text-body-sm [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none" />
                   {query && (
-                    <Button variant="ghost" size="icon" aria-label="Clear search" className="absolute top-1 right-1 size-7" onClick={() => setQuery('')}>
+                    <Button variant="ghost" size="icon" aria-label="Clear search" className="absolute top-2 right-1 size-7" onClick={() => setQuery('')}>
                       <X weight="regular" className="size-4 text-(--neutral-200)" aria-hidden />
                     </Button>
                   )}
@@ -435,7 +435,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
               </div>
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
-              <div className="flex flex-col gap-2 pr-3"> {/* 12 px at the right, the Figma Sidebar frame's padding (owner, 2026-11-23, later: it was 16 an hour before); the sections are 8 px apart, with no padding around them (owner's Figma, 2026-11-17, latest; it was 20 and 16) */}
+              <div className="flex flex-col gap-4 pt-4 pr-3"> {/* 12 px at the right, the Figma Sidebar frame's padding (owner, 2026-11-23, later: it was 16 an hour before); the sections are 8 px apart, with no padding around them (owner's Figma, 2026-11-17, latest; it was 20 and 16) */}
                 <Section title="Recurrences" expanded={recOpen} onExpand={setRecOpen} items={allRecurrences} addLabel="New recurrence" onAdd={onNewCase} views empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
                     <Growing open={recOpen} total={allRecurrences.length}>{(limit) => (

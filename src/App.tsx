@@ -68,6 +68,8 @@ export default function App() {
     const last = chats.find((c) => c.id === id)?.turns.findLast((t) => t.result)?.result
     show(last?.highlightIds ?? [], last?.areas, last?.spots) // the map shows the answer of the last question of that conversation
   }
+  const [landing, setLanding] = useState(0)
+  const newInvestigation = () => { startChat(); setLanding((n) => n + 1) } // the New investigation row also closes the open recurrence or incident, so the panel shows "Welcome back"
   const startChat = () => {
     if (active.turns.length) {
       const id = Math.max(...chats.map((c) => c.id)) + 1
@@ -145,13 +147,13 @@ export default function App() {
         Skip to main content
       </a>
       {/* Flush layout (owner, 2026-10-30): no screen padding, no gaps, square panels divided by a right-side line. */}
-      <Sidebar pinnedIds={new Set(Object.values(mockIds).flat())} ongoingIds={ongoing} agentOff={agentOff} onToggleAgent={() => setAgentOff((o) => !o)} chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().filter((c) => c.turns.length).map((c) => ({ id: c.id, title: c.turns[0].question, ...(mockTimes[c.id] ?? { created: loadedAt + c.id, updated: loadedAt + c.id }) }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={startChat} cases={cases} onNewCase={newCase} />
+      <Sidebar pinnedIds={new Set(Object.values(mockIds).flat())} ongoingIds={ongoing} agentOff={agentOff} onToggleAgent={() => setAgentOff((o) => !o)} chatItems={chatItems} recurrences={rows.recurrences} incidents={rows.incidents} onOpenRecurrence={open('recurrence')} onOpenIncident={open('incident')} selected={selection} chats={[...chats].reverse().filter((c) => c.turns.length).map((c) => ({ id: c.id, title: c.turns[0].question, ...(mockTimes[c.id] ?? { created: loadedAt + c.id, updated: loadedAt + c.id }) }))} activeId={active.id} exploring={active.turns.length === 0} onPick={pick} onNew={newInvestigation} cases={cases} onNewCase={newCase} />
       {/* The agent panel is always 30 % of the browser window width (30vw), no minimum or maximum (owner, 2026-11-08; it was clamp(550px, 38%, 680px), which kept the cards and the composer from breaking on narrow windows). */}
       <main ref={mainRef} id="main-content" tabIndex={-1} className="relative min-w-0 flex-1" style={{ '--map-left': `calc(var(--agent-w) + var(--panel-gap)${inspecting ? ' + 360px + var(--panel-gap)' : ''})` } as CSSProperties}>
         {!agentOff && <AgentResizer max={maxW} onChange={drag} />}
         {/* The map is always the page; the sidebar's conversations only change what the Investigate and Ask panel shows. (The Users page has no entry in the menu for now.) */}
         <div className="contents">
-          <Dashboard placesFor={placesFor} highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} agentOff={agentOff} onAgentOff={setAgentOff} focus={focus} onRows={setRows} onSelection={setSelection}>
+          <Dashboard closeCase={landing} placesFor={placesFor} highlightIds={highlightIds} areas={areas} spots={spots} focusCode={focusCode} zoomTo={zoomTo} onZoomLocality={zoomArea} onClearHighlight={() => show([])} tab={tab} onTab={setTab} onInspect={setInspecting} agentOff={agentOff} onAgentOff={setAgentOff} focus={focus} onRows={setRows} onSelection={setSelection}>
             {/* Phone: only shown on the Investigate tab. Tablet (owner, 2026-11-15) and desktop: always shown; on tablet it is the bottom sheet, collapsible with the sheet's chevron. */}
             <div className={tab === 'ask' ? 'contents' : 'hidden md:max-desk:contents desk:contents'}>
               <InvestigatePanel placesFor={placesFor} onPlaces={setPlacesFor} onCollapse={() => setAgentOff(true)} chatId={active.id} turns={active.turns} onTurns={typed} onHighlight={show} highlightIds={highlightIds} onFocusArea={setFocusCode} onZoomArea={zoomArea} recurrenceId={selection?.kind === 'recurrence' ? selection.id : null} recurrence={selection?.kind === 'recurrence' ? rows.recurrences.find((r) => r.id === selection.id) ?? null : null} emptyFor={selection?.kind ?? null} onOpenRecurrence={open('recurrence')} />
