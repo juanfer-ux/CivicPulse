@@ -8,7 +8,7 @@ const EDGE = 0 // px between the handle and the panel's visible right edge, insi
 export const AGENT_MAX = 1100 // the most the handle can drag it to (owner, 2026-11-17; 920, 880 and the middle of the window before)
 /** The width the panel opens at on every load, landing and map, for a viewport this wide (owner, 2026-11-17): 920 at 1,600 px or below, 1,000 from 1,601 to 2,100, 1,100 above 2,100. Nothing is saved between visits; dragging the handle changes it until the next load. */
 export const agentDefaultFor = (viewportW: number) => (viewportW <= 1600 ? 920 : viewportW > 2100 ? 1100 : 1000)
-export const NARROW_VIEWPORT = '(max-width: 1600px)' // at 1,600 px or below (owner, 2026-11-17) the maximum is 920 and the sidebar steps aside while the filters are open
+export const NARROW_VIEWPORT = '(max-width: 1600px)' // at 1,600 px or below (owner, 2026-11-17) the maximum is 920
 export const AGENT_MAX_NARROW = 920
 export const AGENT_MAX_WIDE = 1250 // above 2,100 px (owner, 2026-11-17; it was 1,920 for a few minutes)
 /** The most the agent panel may be for a viewport this wide: 920 at 1,600 px or below, 1,250 above 2,100, 1,100 between (owner, 2026-11-17). */

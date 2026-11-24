@@ -220,6 +220,12 @@ describe('shownRecurrences', () => {
   it('is the three most recently updated when nothing is pinned', () => {
     expect(shownRecurrences(items, undefined, null).map((x) => x.id)).toEqual(['other', 'red-park', 'red-dump'])
   })
+
+  it('puts an ongoing conversation first and pushes the three down, most recent ongoing first', () => {
+    expect(shownRecurrences(items, pinned, 'other', ['other']).map((x) => x.id)).toEqual(['other', 'red-park', 'red-dump'])
+    expect(shownRecurrences(items, pinned, null, ['yellow', 'old-resolved']).map((x) => x.id)).toEqual(['yellow', 'old-resolved', 'red-park'])
+    expect(shownRecurrences(items, pinned, 'red-dump', ['other', 'yellow', 'red-park']).map((x) => x.id)).toEqual(['other', 'yellow', 'red-park', 'red-dump']) // the open one that was cut off stays visible as the extra row
+  })
 })
 
 describe('Sidebar — resizing the window', () => {
