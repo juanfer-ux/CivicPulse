@@ -386,6 +386,7 @@
   /* Not a new color: built from three of the palette. Same stops as the Figma style ai_gradient (top to bottom). */
   --ai-gradient: linear-gradient(180deg, var(--ai-border) 10%, var(--incident) 64%, var(--warning) 105%);
 }
+.map-col[data-rp] { --map-pad: 0px; --map-max: 100000px; --group-gap: 0px; } /* a recurrence is open (owner's Figma Map · Recurrence selected, 2026-11-23): the header and the right column touch the map area's top, left, right and bottom edges, no padding and no maximum width (owner, 2026-11-23: they fill the map area at any window size) */
 @media (max-width: 1600px) { :root { --stat-row-h: 280px; } } /* two rows of Stat Cards at 1,600 px or below (owner, 2026-11-23): 2 x 132 + 16 gap; four in one row above */
 
 /* Border drawn with --ai-gradient (Figma paint style ai_gradient). The ring is a masked pseudo-element, so the translucent fill and blur of the element still show through. */
@@ -397,6 +398,7 @@
   --col-left: calc(var(--col-l) + (100% - var(--col-l) - var(--map-pad) - var(--dock-w, 0px) - var(--col-w)) / 2);
   --col-right: calc(var(--map-pad) + var(--dock-w, 0px) + (100% - var(--col-l) - var(--map-pad) - var(--dock-w, 0px) - var(--col-w)) / 2);
 }
+.map-col[data-rp] { --map-pad: 0px; --map-max: 100000px; --group-gap: 0px; } /* a recurrence is open (owner's Figma Map · Recurrence selected, 2026-11-23): the header and the right column touch the map area's top, left, right and bottom edges, no padding and no maximum width (owner, 2026-11-23: they fill the map area at any window size) */
 
 @utility gradient-border {
   position: relative;
