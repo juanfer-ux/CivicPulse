@@ -53,7 +53,7 @@ export function ProblemDetail({
       role="region"
       data-float
       aria-label="Recurrence details"
-      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)] ${WIDE ? 'desk:right-(--col-right)' : 'desk:w-[400px]'} ${WIDE ? 'desk:bg-(--neutral-900)!' : ''}`}
+      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] ${WIDE ? 'desk:rounded-none desk:border-0 desk:border-b desk:border-b-(--neutral-600)' : 'desk:rounded-sm desk:border desk:border-(--neutral-600)'} desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)] ${WIDE ? 'desk:right-(--col-right)' : 'desk:w-[400px]'} ${WIDE ? 'desk:bg-(--neutral-900)!' : ''}`}
     >
       {WIDE && (
         <>
@@ -116,9 +116,9 @@ export const stats = (p: ProblemRow) => [
 export function CaseHeader({ title, category, reference, locality, pill, kind }: { title: string; category: string; reference: string; locality: string | undefined; pill: ReactNode; kind: 'recurrence' | 'incident' }) {
   return (
     <>
-      <div className="flex items-start gap-4 pt-5 pr-[60px] pb-5 pl-5">
+      <div className="flex items-start gap-4 pt-5 pr-[68px] pb-5 pl-5">
         <div className="flex min-w-0 flex-col gap-2">
-          <h2 className="text-subtitle text-[20px]! leading-[30px] text-(--neutral-100)">{title}</h2>
+          <h2 className="font-display-semi text-display-sm font-[calc(500+var(--display-weight-offset))] text-(--brand-primary)">{title}</h2>
           <div className="flex items-center gap-3">
             <p className="text-body-medium leading-5">{category}</p>
             <span className="h-3.5 w-px bg-(--neutral-500)" aria-hidden />
@@ -144,7 +144,7 @@ function WideHeader({ problem, localityName, categoryName }: { problem: ProblemR
   )
   const title = (
     <div className="flex min-w-0 flex-col gap-2">
-      <h2 className="text-subtitle text-[20px]! leading-[30px] text-(--neutral-100)">{problem.location_description}</h2>
+      <h2 className="font-display-semi text-display-sm font-[calc(500+var(--display-weight-offset))] text-(--brand-primary)">{problem.location_description}</h2>
       {category}
     </div>
   )
@@ -173,10 +173,10 @@ export function StatList({ problem }: { problem: ProblemRow }) {
   const [occ, ret, rep, int, last] = stats(problem)
   return (
     <div className="hidden flex-col gap-3 rounded-md border border-(--neutral-900) bg-(--neutral-900) p-3 desk:flex">
-      <div className="flex items-center gap-2 rounded-sm bg-(--indigo-800) px-3 py-2 text-body-sm text-(--indigo-200)">
+      <div className="flex items-center gap-2 rounded-sm bg-(--indigo-800) px-3 py-2 text-body-sm leading-4 text-(--indigo-200)">
         <last.Icon weight="regular" className="size-4 text-(--indigo-300)" aria-hidden />
         <span className="flex-1">{last.label}</span>
-        <span className="text-body-sm-strong">{last.value}</span>
+        <span className="text-body-sm-strong leading-4">{last.value}</span>
       </div>
       <dl className="grid grid-cols-2 gap-1">
         {[occ, ret, rep, int].map((x, i) => (
