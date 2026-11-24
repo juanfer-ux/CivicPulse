@@ -89,8 +89,9 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         <div ref={setRailSlot} className="hidden h-full shrink-0 [:root[data-sidebar-collapsed]_&]:desk:block" /> {/* the collapsed sidebar's logo box (64 x 68, `black`, a line under it) is the first cell of the header row, not a column down the panel (owner's Figma, 2026-11-20: the sidebar left the Agent Panel and the logo box became part of its Header); empty while the sidebar is open */} {/* Figma title row (owner, 2026-11-17, latest): 68 px high, two cells side by side: a 44 px cell with the expand button (40 x 44, 2 px at the sides; invisible while the sidebar is expanded, so nothing moves) and the rest, 16 px in, with a 0.5 px `neutral-600` line at its left and under both; the rest holds the title, the collapse button and a 40 px empty space at the right. The conversation's Figma row still has the older layout. */}
         <div className="flex h-full flex-1 items-center">
           <CardHeader className="flex w-full flex-row items-center gap-2.5 max-desk:mx-auto max-desk:max-w-[664px] desk:px-8"> {/* Figma title row (owner's Figma, 2026-11-17): 32 px at the sides, "Explore" (fills), the place (map-pin, "Bogotá, Colombia", a chevron; no menu yet) and the collapse button */}
+            {/* with a recurrence open the title is its street (owner's Figma, 2026-11-24, Agent Panel · Empty · Recurrence) */}
             <CardTitle asChild className="flex-1 text-label text-(--neutral-200)">
-              <h2>Explore</h2>
+              <h2 className="truncate" title={recurrence?.address}>{recurrence?.address ?? 'Explore'}</h2>
             </CardTitle>
             <span className="hidden items-center gap-2 px-4 text-body-sm text-(--neutral-200) desk:flex">
               <span className="flex items-center gap-1"><MapPin weight="regular" className="size-3.5" aria-hidden />Bogotá, Colombia</span>

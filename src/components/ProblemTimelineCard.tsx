@@ -8,7 +8,7 @@ import { MediaGallery } from '@/components/MediaGallery'
 import { ProblemTimeline } from '@/components/ProblemTimeline'
 import { label, type Incident } from '@/lib/incidents'
 import { initials } from '@/lib/sourceInitials'
-import { HEADER, StatList } from '@/components/ProblemDetail'
+import { HEADER } from '@/components/ProblemDetail'
 import type { ProblemDetailData, ProblemRow } from '@/lib/problems'
 
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
@@ -116,8 +116,7 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
     </Card>
     )}
     <PortalTo target={inSlot ? rightSlot : null}>
-    <Card role="region" aria-label="Occurrences history" data-float={M3 && !inSlot ? true : undefined} className={`gap-0 overflow-hidden bg-card/95 py-0 ${inSlot ? 'desk:pointer-events-auto desk:h-full desk:w-full' : M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:right-(--col-right) desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:z-20 desk:w-[360px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} desk:rounded-lg desk:border desk:border-(--neutral-900) desk:bg-(--neutral-800)`}>
-    {M3 && <StatList problem={problem} />}
+    <Card role="region" aria-label="Occurrences history" data-float={M3 && !inSlot ? true : undefined} className={`gap-0 overflow-hidden bg-card/95 py-0 ${inSlot ? 'desk:pointer-events-auto desk:h-full desk:w-full' : M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:right-(--col-right) desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:z-20 desk:w-[360px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} ${M3 ? 'desk:rounded-none' : 'desk:rounded-lg'} desk:border desk:border-(--neutral-900) desk:bg-(--neutral-800)`}>
     <ScrollArea viewportRef={list} className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">
         <h3 className="text-caption-medium text-(--neutral-200)">Occurrences history</h3>

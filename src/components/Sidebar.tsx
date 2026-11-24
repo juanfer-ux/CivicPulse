@@ -18,7 +18,7 @@ import { shortName } from '@/lib/utils'
 
 type Chat = { id: number; title: string; created?: number; updated?: number }
 /** The real recurrences and incidents the lists show (shaped by Dashboard, so this file stays free of Supabase); a click flies the map to the row (owner, 2026-11-06). */
-export type SidebarRecurrence = { id: string; title: string; category?: string; status: ProblemStatus; reference: string; locality?: string; created?: number; updated?: number }
+export type SidebarRecurrence = { id: string; title: string; category?: string; address?: string; status: ProblemStatus; reference: string; locality?: string; created?: number; updated?: number }
 export type SidebarIncident = { id: string; title: string; reference: string; locality?: string; group: Group; created?: number; updated?: number }
 /** The items each conversation touched (the ids of its incidents and recurrences): the sidebar lists only these (owner, 2026-11-08). */
 export type ChatItems = { title: string; ids: string[] }[]

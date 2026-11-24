@@ -35,22 +35,24 @@ export function ProblemDetail({
   useRestoreFocus(panel)
   const { on: modulesOn } = useModules()
   return (
+    <>
     <Card
       ref={panel}
       tabIndex={-1}
       role="region"
       data-float
       aria-label="Recurrence details"
-      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none ${WIDE ? 'desk:absolute desk:top-3 desk:right-[calc(var(--col-right)+360px+12px)] desk:z-20 desk:max-h-none desk:w-auto desk:flex-row desk:items-center desk:gap-2 desk:overflow-visible desk:rounded-none desk:border-0 desk:bg-transparent! desk:shadow-none' : 'desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[400px] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]'}`}
+      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none ${WIDE ? 'desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-none desk:w-[360px] desk:flex-col desk:items-stretch desk:gap-2 desk:overflow-visible desk:rounded-none desk:border-0 desk:bg-transparent! desk:shadow-none' : 'desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[400px] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]'}`}
     >
       {WIDE && (
-        <div className="hidden items-center gap-2 desk:flex"> {/* Recurrence header removed (owner, 2026-11-24): the Modules button and the close X float at the top right of the map, left of the right column, like the map buttons of Google Maps */}
+        <div className="hidden items-center justify-end gap-2 desk:flex"> {/* Recurrence header removed (owner, 2026-11-24): the Modules button and the close X float at the top left of the map, above the numbers card and aligned to its right edge (they were left of the right column, where they sat on top of the numbers card at 1,880 px), like the map buttons of Google Maps */}
           {modulesOn && <div className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg"><ModulesMenu kind="recurrence" /></div>}
           <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg hover:bg-(--neutral-700)">
             <X />
           </Button>
         </div>
       )}
+      {WIDE && <div className="hidden desk:block desk:rounded-md desk:shadow-lg"><StatList problem={problem} /></div>} {/* the numbers (last reported, occurrences, returns, reports, interventions) float at the top left on every recurrence (owner, 2026-11-24) */}
       <div className={`flex flex-col gap-4 px-4 py-6 ${WIDE ? 'desk:hidden' : ''}`}>
         <header className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-col gap-1">
@@ -87,6 +89,7 @@ export function ProblemDetail({
 
       </div>
     </Card>
+    </>
   )
 }
 
