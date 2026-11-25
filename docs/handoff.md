@@ -3,6 +3,7 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-05. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **Sidebar structure, names and user row (owner, 2026-11-24, Figma):** the frames are now `main` (Header + sections) and `User` > `Main` > `Account Details`; no code names to change. The user row: **16 px at the sides** (it was 12) and **20 px between the avatar and the name** (it was 16), 12 px before the menu button; the rest of the sidebar (header 128, sections 16 apart, items) already matched. `Sidebar.tsx`.
 - **Brand header again (owner, 2026-11-24, Figma):** the expanded Brand header has **12 px at the left** as well as at the right (it was 10 / 12): `px-3`; the logo and the collapse button keep their sizes. The collapsed sidebar's mark is **40 px** now, as in Figma (it was 32: the known difference is closed). `Sidebar.tsx`.
 - **Avatar `lg` is 38 px (owner, 2026-11-24, Figma):** the large avatar (the sidebar's) is **38 px** (40), ring **2.28 px**, initials 12.35 px: the variant was scaled to 95 %; the sm (24) and default (32) sizes are unchanged. `ui/avatar.tsx`.
 - **Avatar component (owner, 2026-11-24, Figma):** the ring is **2.4 px outside, `neutral-400`** on the three sizes (24, 32, 40 px; it was 2 px `neutral-500`); the sidebar no longer adds its own 2 px `neutral-500` border (it used the component's). Sizes, fill (`neutral-600`) and the initials were already equal. `ui/avatar.tsx`, `Sidebar.tsx`.
