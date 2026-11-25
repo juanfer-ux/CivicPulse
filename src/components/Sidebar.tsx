@@ -6,6 +6,7 @@ import { Check, CaretDown, CaretRight, Chat, DotsThreeVertical, List, Plus, Side
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
 import wordmark from '@/assets/logo-wordmark.svg'
+import profilePhoto from '@/assets/profile-avatar.png' // the owner's photo, 160 px (owner, 2026-11-24): the avatar of the signed-in person in the sidebar until profiles have their own photo
 import { createPortal } from 'react-dom'
 import { useRailSlot } from '@/lib/railSlot'
 import { Avatar } from '@/components/ui/avatar'
@@ -476,11 +477,11 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
       <div className={`flex shrink-0 flex-col border-t border-(--neutral-600) ${collapsed ? 'items-center justify-center py-5' : 'py-4'}`}> {/* the expanded user row has 20 px above and below (owner's Figma, 2026-11-17, it was 10), the large avatar and 16 px beside it (it was the default avatar and 12) */}
         {collapsed ? (
           <>
-            <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} title={name} />} />
+            <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar src={profilePhoto} name={profile?.full_name || 'Signed in'} title={name} />} />
           </>
         ) : (
           <div className="flex items-center gap-4 px-3 py-1">
-            <Avatar size="lg" className="border-2 border-(--neutral-500)" name={profile?.full_name || 'Signed in'} />
+            <Avatar src={profilePhoto} size="lg" name={profile?.full_name || 'Signed in'} />
             <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
               <p className="truncate text-body-sm-strong text-(--neutral-100)">{name}</p>
               {email && <p className="truncate text-caption-medium text-(--neutral-200)">{email}</p>}
