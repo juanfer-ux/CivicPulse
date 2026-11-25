@@ -480,11 +480,13 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
             <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar src={profilePhoto} name={profile?.full_name || 'Signed in'} title={name} />} />
           </>
         ) : (
-          <div className="flex items-center gap-4 px-3 py-1">
-            <Avatar src={profilePhoto} size="lg" name={profile?.full_name || 'Signed in'} />
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
-              <p className="truncate text-body-sm-strong text-(--neutral-100)">{name}</p>
-              {email && <p className="truncate text-caption-medium text-(--neutral-200)">{email}</p>}
+          <div className="flex items-center gap-3 px-4 py-1"> {/* Figma User > Main (owner, 2026-11-24): 16 px at the sides (it was 12), 12 px between the account details and the menu button; the avatar and the text are 20 px apart (it was 16) */}
+            <div className="flex min-w-0 flex-1 items-center gap-5">
+              <Avatar src={profilePhoto} size="lg" name={profile?.full_name || 'Signed in'} />
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
+                <p className="truncate text-body-sm-strong text-(--neutral-100)">{name}</p>
+                {email && <p className="truncate text-caption-medium text-(--neutral-200)">{email}</p>}
+              </div>
             </div>
             <AccountMenu onSignOut={signOut} side="above" />
           </div>
