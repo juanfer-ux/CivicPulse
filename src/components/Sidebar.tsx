@@ -328,7 +328,7 @@ const NARROW = '(max-width: 1799.98px)'
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
     <div className={`flex items-center gap-[11.4px] ${collapsed ? '' : 'pl-[1.3px]'}`}>
-      <img src={mark} alt="" width={collapsed ? 32 : 38} height={collapsed ? 32 : 38} className="shrink-0" /> {/* 38 px in the expanded sidebar (owner's Figma, 2026-11-24: the logo is 38 px, the wordmark 155.3 x 11.8, 11.4 px apart, 1.3 px in; 32 px, 130.76 x 9.93 and 9.6 px before); 32 px (owner's Figma, 2026-11-17; the logo is x 0.8: wordmark 130.76 x 9.93, 9.6 px apart, 1.1 px in); it was 40 px, expanded and collapsed (owner's Figma, 2026-11-17, the big sidebar pass; 42.94 collapsed and 38.92 expanded before; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before), 38.92 expanded */}
+      <img src={mark} alt="" width={collapsed ? 40 : 38} height={collapsed ? 40 : 38} className="shrink-0" /> {/* 38 px in the expanded sidebar (owner's Figma, 2026-11-24: the logo is 38 px, the wordmark 155.3 x 11.8, 11.4 px apart, 1.3 px in; 32 px, 130.76 x 9.93 and 9.6 px before); 32 px (owner's Figma, 2026-11-17; the logo is x 0.8: wordmark 130.76 x 9.93, 9.6 px apart, 1.1 px in); it was 40 px, expanded and collapsed (owner's Figma, 2026-11-17, the big sidebar pass; 42.94 collapsed and 38.92 expanded before; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before), 38.92 expanded */}
       {!collapsed && <img src={wordmark} alt="Civic Pulse" width={155.3} height={11.8} className="shrink-0" />}
     </div>
   )
@@ -406,7 +406,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
-        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-[70px] justify-between bg-(--neutral-700) pl-2.5 pr-3'}`}>
+        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-[70px] justify-between bg-(--neutral-700) px-3'}`}>
           <Brand collapsed={collapsed} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
