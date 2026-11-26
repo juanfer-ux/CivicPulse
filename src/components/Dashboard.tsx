@@ -39,7 +39,6 @@ import { fetchLinkedIncidentIds, fetchProblemDetail, fetchProblems, type Problem
 import { PROBLEM_STATUSES, type ProblemStatus } from '@/lib/statusColors'
 import type { SidebarIncident, SidebarRecurrence, SidebarSelection } from '@/components/Sidebar'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
-import { useHeld } from '@/lib/useSlide'
 
 const SIDEBAR_DELAY_MS = 1000 // how long the sidebar waits before collapsing or expanding when an incident or problem opens or closes
 
@@ -271,9 +270,8 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
   const onFlightEnd = useCallback(() => setShownProblemId(selectedProblemIdNow.current), [])
   const panelProblem = selectedProblem && selectedProblem.id === shownProblemId ? selectedProblem : null
   const open = !!selected || !!panelProblem
-  // The open side panel (incident or problem) stays on screen while it slides back under the agent panel after it closes (owner, 2026-11-01).
-  const current = useMemo(() => (selected ? { kind: 'incident' as const, incident: selected } : panelProblem ? { kind: 'problem' as const, problem: panelProblem, detail: problemDetail } : null), [selected, panelProblem, problemDetail])
-  const shown = useHeld(current, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 350)
+  // The open panel (incident or recurrence). It leaves the screen the moment it closes (owner, 2026-11-26): the 350 ms hold for the old slide-out left the numbers card stuck on the map.
+  const item = useMemo(() => (selected ? { kind: 'incident' as const, incident: selected } : panelProblem ? { kind: 'problem' as const, problem: panelProblem, detail: problemDetail } : null), [selected, panelProblem, problemDetail])
   useEffect(() => {
     const t = setTimeout(() => onInspect(open), open && !selected ? 0 : SIDEBAR_DELAY_MS)
     return () => clearTimeout(t)
@@ -344,7 +342,6 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
     setCollapsed(false)
   }
 
-  const item = shown.value
   const mapBase = 'calc(var(--agent-w) + var(--panel-gap))'
   // Both detail panels float over the map (owner, 2026-11-05), so the map and the controls over it never move for them.
   const statCards = (
@@ -366,7 +363,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
   )
 
   return (
-    <div className="contents map-col" data-history={item?.kind === 'problem' && !shown.leaving && HEADER !== '3' ? '' : undefined} data-rp={item?.kind === 'problem' && !shown.leaving && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': `${dockW + filtersPush}px`, '--filters-push': `${filtersPush}px`, '--dock-l': `${dockL}px`, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
+    <div className="contents map-col" data-history={item?.kind === 'problem' && HEADER !== '3' ? '' : undefined} data-rp={item?.kind === 'problem' && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': `${dockW + filtersPush}px`, '--filters-push': `${filtersPush}px`, '--dock-l': `${dockL}px`, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -511,9 +508,10 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
               problem={item.problem}
               localityName={localityName.get(item.problem.locality_code)}
               categoryName={data?.categories.find((c) => c.code === item.problem.category)?.name}
+              event={item.detail?.events.filter((e) => e.kind === 'resolved' || e.kind === 'reopened').sort((a, b) => a.created_at.localeCompare(b.created_at)).at(-1)}
               onClose={() => selectProblem(null)}
             />
-            {!shown.leaving && <ProblemTimelineCard key={`h-${item.problem.id}`} problem={item.problem} detail={item.detail} onSelectIncident={select} openReportId={openReportId} />}
+            <ProblemTimelineCard key={`h-${item.problem.id}`} problem={item.problem} detail={item.detail} onSelectIncident={select} openReportId={openReportId} />
           </>
         )
       )}

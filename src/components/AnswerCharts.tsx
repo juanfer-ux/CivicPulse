@@ -1,5 +1,6 @@
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, XAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
+import { BarList } from '@/components/BarList'
 import { donutTone } from '@/lib/donutTones'
 import type { Answer } from '@/lib/agent'
 
@@ -43,24 +44,6 @@ function Donut({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
         ))}
       </ul>
     </div>
-  )
-}
-
-/** Localities of all categories: Tremor's bar list (the bar sits behind the label, the number on the right). */
-function BarList({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
-  const max = Math.max(...bars.map((b) => b.value))
-  return (
-    <ul className="flex flex-col gap-1.5 text-body-sm" aria-label={summary('Bar list', bars)}>
-      {bars.map((b) => (
-        <li key={b.label} className="flex items-center gap-3">
-          <button type="button" disabled={!b.code || !onPick} onMouseEnter={() => b.code && onFocus?.(b.code)} onMouseLeave={() => onFocus?.(null)} onClick={() => b.code && onPick?.(b.code)} className="relative h-8 flex-1 overflow-hidden rounded-sm bg-(--cobalt-800) text-left enabled:cursor-pointer">
-            <span className="absolute inset-y-0 left-0 bg-(--cobalt-300) opacity-30" style={{ width: `${(b.value / max) * 100}%` }} />
-            <span className="relative flex h-full items-center px-2 text-body-sm-medium text-(--fg-emphasis)">{b.label}</span>
-          </button>
-          <span className="w-8 text-right text-subtitle-strong tabular-nums text-foreground">{b.value}</span>
-        </li>
-      ))}
-    </ul>
   )
 }
 
