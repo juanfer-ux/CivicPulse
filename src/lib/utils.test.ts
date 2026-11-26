@@ -15,6 +15,7 @@ describe('cn', () => {
   it('knows the display, medium and strong styles (2026-11-02)', () => {
     expect(cn('text-meta-medium', 'text-foreground')).toBe('text-meta-medium text-foreground')
     expect(cn('text-caption-strong', 'text-foreground')).toBe('text-caption-strong text-foreground')
+    for (const s of ['text-caption-medium', 'text-caption-sm', 'text-caption-sm-medium', 'text-caption-sm-strong']) expect(cn(s, 'text-foreground')).toBe(`${s} text-foreground`)
     expect(cn('text-display-sm', 'text-foreground')).toBe('text-display-sm text-foreground')
     expect(cn('text-meta', 'text-meta-medium')).toBe('text-meta-medium')
     expect(cn('text-title-regular', 'text-foreground')).toBe('text-title-regular text-foreground')

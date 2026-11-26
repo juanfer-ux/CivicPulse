@@ -27,6 +27,7 @@ export function IncidentHoverCard({ incident, locality, className, style }: { in
       title={incident.title}
       columns={[date(incident.occurred_at, true), locality]}
       note={`${incident.reference}${count}`}
+      infoClassName="py-1.5" // the incident's Figma card has 6 px above and below its text
     />
   )
 }

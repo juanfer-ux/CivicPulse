@@ -66,6 +66,9 @@ Each class sets size, line height and weight together, so a component never need
 | caption | 12 / 17 (line 17 since 2026-11-26, it was 16; spacing 5 %) | **12 / 17** | 400 | Small tags and fine print, regular (new 2026-11-05; the name used to mean the Medium style) | `text-caption` |
 | caption-medium | 12 / 17 (spacing 2.4 %) | **12 / 17** | 500 | Chips, counts, the sidebar email, the auth footer, photo counts (this was `caption` until 2026-11-05) | `text-caption-medium` |
 | caption-strong | 12 / 17 (spacing 2.4 %) | **12 / 17** | 600 (Figma SemiBold) | Badge labels (new 2026-11-02); line height 17 since 2026-11-26 (12 since 2026-11-07, 16 before) | `text-caption-strong` |
+| caption-sm | 11 / 16 (spacing 5 %) | **11 / 16** | 400 | The smallest text, regular (new 2026-11-26) | `text-caption-sm` |
+| caption-sm-medium | 11 / 16 (spacing 2.4 %) | **11 / 16** | 500 | The smallest text, medium | `text-caption-sm-medium` |
+| caption-sm-strong | 11 / 16 (spacing 2.4 %) | **11 / 16** | 600 (Figma SemiBold) | The smallest text, strong | `text-caption-sm-strong` |
 | section-label | 11 / 16 (spacing 18 %) | 11 / 16 | 700 (Figma Bold) | Uppercase title above a group of sidebar items (Investigations); color `neutral-200`, like the plus buttons beside it (new 2026-10-28) | `text-section-label` + `uppercase` |
 
 - **Desktop = 1,440 px and wider; Mobile = anything narrower** (the `desk` breakpoint). The sizes come from Figma's Device collection and switch through CSS variables in `src/index.css` (`--fs-body`, `--lh-body`…); class names do not change.
@@ -81,8 +84,8 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
 |---|---|---|---|---|
-| 1 | `white` | `#ECECEE` | none | New in Figma (2026-10-29): brighter than `neutral-100`; the plus buttons and the account menu icon in the sidebar use it |
-| 2 | `black` | `#0C0C0E` (`#050505` until 2026-11-25) | none | New in Figma (2026-11-12), darker than `neutral-900`; not used on screen yet |
+| 1 | `white` | `#E7E7E9` | none | New in Figma (2026-10-29): brighter than `neutral-100`; the plus buttons and the account menu icon in the sidebar use it |
+| 2 | `black` | `#09090B` (since 2026-11-26) | none | New in Figma (2026-11-12), darker than `neutral-900`; not used on screen yet |
 | 3 | `neutral-900` | `#111113` | `sidebar` (`inset`), `ai` | Outline buttons, suggestions, role badge, agent panel background (`ai`, since 2026-10-29), mobile bars, deepest surface; text on a light fill |
 | 4 | `neutral-800` | `#18181B` | none | Was the agent surface (`ai`) until 2026-10-29; free for now |
 | 5 | `neutral-700` | `#1F1F23` | `background` | Page (Figma 2026-10-26) |
