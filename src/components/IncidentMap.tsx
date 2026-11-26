@@ -168,7 +168,7 @@ interface Props {
   /** Locality whose outline lights up (a bar of the answer is under the pointer). */
   focusCode?: number | null
   /** Locality to zoom to (a bar was clicked); n changes on every click. */
-  zoomTo?: { code: number; n: number } | null
+  zoomTo?: { code: number | null; n: number } | null
   onSelect: (id: string | null) => void
   /** Recurrences to draw as one marker each (the Recurrences view); the incidents prop then holds only the open problem's incidents. */
   problems?: ProblemRow[]
@@ -801,10 +801,19 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     map.setPaintProperty('answer-areas-fill', 'fill-opacity', ['case', ['==', ['get', 'code'], focusCode ?? -1], LOCALITY_FILL_FOCUS, LOCALITY_FILL])
   }, [ready, focusCode, areas])
 
-  // A bar of the answer clicked: zoom in on that locality.
+  // A bar of the answer or a Stat Card clicked: zoom in on that locality. A null code leaves it: back to the view from before the first of these zooms.
+  const beforeArea = useRef<{ center: maplibregl.LngLat; zoom: number; pitch: number; bearing: number; padding: maplibregl.PaddingOptions } | null>(null)
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map || !zoomTo) return
+    if (zoomTo.code === null) {
+      if (beforeArea.current) {
+        map.easeTo({ ...beforeArea.current, duration: 700 }) // with the padding it had, so the same spot lands in the same place
+        beforeArea.current = null
+      }
+      return
+    }
+    beforeArea.current ??= { center: map.getCenter(), zoom: map.getZoom(), pitch: map.getPitch(), bearing: map.getBearing(), padding: map.getPadding() }
     let stale = false
     ;(async () => {
       // The boundaries are also needed when no answer is on the map (a Stat Card was clicked), so load them here too.
@@ -893,6 +902,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
 
   // Test (owner, 2026-10-30): opening an incident flies the camera to it with GSAP, easing the centre and the zoom together; any touch of the map stops it. Closing it flies back to where the map was before (a conscious decision to leave it).
   const home = useRef<{ lng: number; lat: number; zoom: number } | null>(null)
+  const beforeReport = useRef<{ view: { lng: number; lat: number; zoom: number }; problem: string | null } | null>(null) // where the camera was before a report was opened; closing the report goes back there (owner, 2026-11-26)
   useEffect(() => {
     const map = mapRef.current
     const incidentId = selectedId ?? openReportId
@@ -901,9 +911,14 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     setFree(map)
     const from = { lng: map.getCenter().lng, lat: map.getCenter().lat, zoom: map.getZoom() }
     let to: typeof from | null = null
+    const inReport = !selectedId && !!openReportId
+    const back = beforeReport.current
+    if (!inReport) beforeReport.current = null
     if (target) {
       home.current ??= { ...from }
-      to = { lng: target.lng, lat: target.lat, zoom: !selectedId && openReportId ? REPORT_ZOOM : Math.max(from.zoom, selectedId ? INCIDENT_ZOOM : PROBLEM_ZOOM) }
+      if (inReport) beforeReport.current ??= { view: { ...from }, problem: selectedProblemId } // moving from report to report keeps the first view
+      if (back && !inReport && !selectedId && back.problem === selectedProblemId) to = back.view
+      else to = { lng: target.lng, lat: target.lat, zoom: inReport ? REPORT_ZOOM : Math.max(from.zoom, selectedId ? INCIDENT_ZOOM : PROBLEM_ZOOM) }
     } else if (home.current) {
       to = home.current
       home.current = null

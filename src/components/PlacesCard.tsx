@@ -35,7 +35,7 @@ export function PlacesCard({ places }: { places: Place[] | 'loading' | 'error' }
               {far.map(row)}
             </>
           ) : (
-            <button type="button" className="self-start text-caption-medium text-(--indigo-200) hover:text-(--indigo-100)" onClick={() => setAll(true)}>View more ({far.length} up to {RADIUS_M} m)</button>
+            <button type="button" className="self-start text-caption-medium text-(--cobalt-200) hover:text-(--cobalt-100)" onClick={() => setAll(true)}>View more ({far.length} up to {RADIUS_M} m)</button>
           ))}
         </>
       )}

@@ -58,14 +58,14 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
                       role="img"
                       aria-label={`Peak: ${Math.max(...series!)} reports`}
                       className="absolute inset-0"
-                      // Option 2 (owner, 2026-11-15): the line is a solid-color stroke used as a mask over a CSS gradient (indigo-500 for the first third, blending to indigo-300 at 93 %, solid after), because the SVG gradient stroke looked crackled. 2 px, flat ends, mitered corners, drawn at the real pixel size.
+                      // Option 2 (owner, 2026-11-15): the line is a solid-color stroke used as a mask over a CSS gradient (cobalt-500 for the first third, blending to cobalt-300 at 93 %, solid after), because the SVG gradient stroke looked crackled. 2 px, flat ends, mitered corners, drawn at the real pixel size.
                       style={{
-                        background: 'linear-gradient(90deg, var(--indigo-500) 33.2%, var(--indigo-300) 93.3%)',
+                        background: 'linear-gradient(90deg, var(--cobalt-500) 33.2%, var(--cobalt-300) 93.3%)',
                         mask: `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${GRAPH_H}"><path d="${smoothPath(g.pts)}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>`)}") 0 0 / ${w}px ${GRAPH_H}px no-repeat`,
                       }}
                     />
-                    {/* the peak: a 6 px dot on the newest point (Figma: indigo-200 since 2026-11-15, it was indigo-300) */}
-                    <span className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--indigo-200)" style={{ left: g.pts[g.peak][0], top: g.pts[g.peak][1] }} aria-hidden />
+                    {/* the peak: a 6 px dot on the newest point (Figma: cobalt-200 since 2026-11-15, it was cobalt-300) */}
+                    <span className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--cobalt-200)" style={{ left: g.pts[g.peak][0], top: g.pts[g.peak][1] }} aria-hidden />
                   </>
                 )}
               </span>

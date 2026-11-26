@@ -59,10 +59,10 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind, open
   /** While dragging, a layer over the whole area: lit when the module fits it, faded when not; it is the drop target (data-area). */
   const overlay = (area: Area) =>
     drag && (
-      <div data-area={area} className={`pointer-events-auto absolute inset-0 z-10 grid place-items-center rounded-lg border-2 border-dashed text-meta transition-opacity ${fitsArea(drag.type, area) ? 'border-(--indigo-300) bg-(--indigo-300)/10 text-(--indigo-100)' : 'border-(--neutral-500) opacity-30'}`}>
+      <div data-area={area} className={`pointer-events-auto absolute inset-0 z-10 grid place-items-center rounded-lg border-2 border-dashed text-meta transition-opacity ${fitsArea(drag.type, area) ? 'border-(--cobalt-300) bg-(--cobalt-300)/10 text-(--cobalt-100)' : 'border-(--neutral-500) opacity-30'}`}>
         <span className="flex flex-col items-center gap-0.5">
           <span>{LABEL[area]}</span>
-          {fitsArea(drag.type, area) && suggestedArea(drag.type) === area && <span className="rounded-sm bg-(--indigo-600) px-1.5 py-0.5 text-caption-strong text-(--indigo-100)">Suggested</span>}
+          {fitsArea(drag.type, area) && suggestedArea(drag.type) === area && <span className="rounded-sm bg-(--cobalt-600) px-1.5 py-0.5 text-caption-strong text-(--cobalt-100)">Suggested</span>}
         </span>
       </div>
     )

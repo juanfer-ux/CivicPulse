@@ -270,6 +270,16 @@
   --indigo-300: #9593FF;
   --indigo-200: #C1C0FF;
   --indigo-100: #E7E6FF;
+  /* Cobalt (owner's Figma, 2026-11-26; first named Indigo 2): the interface and agent color (everything that was indigo except the Resolved recurrence status, which stays indigo). */
+  --cobalt-900: #0E174E;
+  --cobalt-800: #132172;
+  --cobalt-700: #17288C;
+  --cobalt-600: #1C31AB;
+  --cobalt-500: #2D43BF;
+  --cobalt-400: #5972FF;
+  --cobalt-300: #93A3FF;
+  --cobalt-200: #C0C9FF;
+  --cobalt-100: #E6EAFF;
   --red-900: #270D0E;
   --red-800: #4B2122;
   --red-700: #743537;
@@ -306,7 +316,7 @@
   --yellow-300: #FFF398;
   --yellow-200: #FEF7C3;
   --yellow-100: #FEFBE4;
-  --plate-yellow: #ACA034; /* the license plate badge in the occurrence history (owner's Figma, 2026-11-25); Figma variable `yellow/plate-yellow` */
+  --plate-yellow: #C3AB3E; /* the license plate badge in the occurrence history (owner's Figma, 2026-11-26; #ACA034 before); Figma variable `yellow/plate-yellow` */
   /* Green scale (owner's ask, 2026-11-17; Figma green-900 to green-100): the red scale's saturation and lightness at hue 140, same idea as the neutrals; not used on screen yet. */
   --green-900: #0D2615;
   --green-800: #214A2F;
@@ -335,9 +345,9 @@
   --muted-foreground: var(--fg-secondary);
   --foreground: var(--fg-primary);
   --ai: var(--neutral-900); /* the agent panel's background (owner, 2026-10-29; it was neutral-800) */
-  --ai-border: var(--indigo-400);
+  --ai-border: var(--cobalt-400);
   --answer-banner-h: 44px; /* 44 since 2026-11-17 (Figma Answer Banner: 4 px, the 36 px icon cell, 4 px; fill indigo-800, radius 4, 8 px at the sides); it was 52 */ /* 52 since 2026-11-15 (Figma Answer Banner: 8 px, the 36 px button, 8 px; radius 6, 10 px at the sides, 12 px gaps); */ /* conversation banner height (Figma Answer Banner: 56 since 2026-11-06, a floating rounded box (radius 4) that respects --page-pad; 48 from 2026-11-05, 8 px padding around the 32 px button; it was 44 from 2026-10-28 and 38 before); the filters and the stats card move down by this much while it shows */
-  --ai-banner: var(--indigo-700); /* conversation banner background and the answer rings on the map, light text on it. Figma indigo-700 (map/banner is its alias) */
+  --ai-banner: var(--cobalt-700); /* conversation banner background and the answer rings on the map, light text on it. Figma cobalt-700 (map/banner is its alias; indigo-700 until 2026-11-26) */
   --destructive: var(--red-400); /* dangerous buttons and badges; text on it is the sidebar color */
   --warning: var(--yellow-300);
   --incident: var(--red-300); /* incidents, invalid fields and ALL error text */
@@ -354,11 +364,11 @@
   --map-problem-archived: var(--neutral-300);
   --map-dot-outline: var(--neutral-700);
   --map-answer-ring: var(--ai-banner);
-  --map-answer-radius: var(--indigo-400); /* alias of indigo-400 (owner, 2026-10-28): the edge color of the agent's answer radius fill (radial gradient: clear up to half the radius, indigo-400 at the edge). Figma map/answer-radius */
-  --map-answer-radius-ring: var(--indigo-300); /* the 1 px ring of the agent's answer radius (circle). Figma map/answer-radius-ring */
+  --map-answer-radius: var(--cobalt-400); /* alias of cobalt-400 (indigo-400 until 2026-11-26; owner, 2026-10-28): the edge color of the agent's answer radius fill (radial gradient: clear up to half the radius, indigo-400 at the edge). Figma map/answer-radius */
+  --map-answer-radius-ring: var(--cobalt-300); /* the 1 px ring of the agent's answer radius (circle). Figma map/answer-radius-ring */
   --map-locality-fill: var(--map-answer-radius); /* the localities an agent answer outlines: fill, 4 % for every locality (LOCALITY_FILL in IncidentMap.tsx). Figma map/locality-fill */
-  --map-locality-line-focus: var(--indigo-200); /* the outline of the locality whose bar is under the pointer in the agent's answer, brighter than --map-locality-line */
-  --map-locality-line: var(--indigo-300); /* the 1.4 px outline of the localities an agent answer outlines. Figma map/locality-line */
+  --map-locality-line-focus: var(--cobalt-200); /* the outline of the locality whose bar is under the pointer in the agent's answer, brighter than --map-locality-line */
+  --map-locality-line: var(--cobalt-300); /* the 1.4 px outline of the localities an agent answer outlines. Figma map/locality-line */
   --map-selected-ring: var(--neutral-100);
   --map-roads: #363644; /* rolled back (owner, 2026-11-24): it was red-500 and neutral-400 for a few hours */ /* map only, outside the palette (owner, 2026-10-26): minor and secondary streets; CARTO's is #414758. Figma map/roads */
   --map-buildings: #3F4550; /* map only, outside the palette (owner, 2026-10-26): building tops, they fade in from zoom 13 to 16. CARTO's is #393939. Figma map/buildings */

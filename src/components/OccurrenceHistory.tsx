@@ -44,7 +44,7 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
     const source = detail?.sources[i.id] ?? 'Unknown source'
     const open = openReportId === i.id
     return (
-      <li key={i.id} data-report={i.id} className="rounded-sm bg-(--neutral-800)">
+      <li key={i.id} data-report={i.id}>
         <button type="button" aria-expanded={open} onClick={() => onSelectIncident(i.id)} className={`flex w-full items-start gap-3 rounded-sm py-3 pr-4 pl-2.5 text-left hover:bg-(--neutral-700) focus-visible:bg-(--neutral-700) ${open ? 'bg-(--neutral-700)' : ''}`}>
           <span className="flex h-11 w-4 shrink-0 justify-center pt-2" aria-hidden>
             <span className="size-2 rounded-full" style={{ background: `var(${PROBLEM_STATUS[status].token})` }} /> {/* the same color as the report's dot on the map: the recurrence's status (owner, 2026-11-25) */}
@@ -89,7 +89,7 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
       <div className="flex h-17 shrink-0 items-center gap-5 border-b-[0.5px] border-(--neutral-600) px-4"> {/* Figma Title row: 68 px, 16 px at the sides, a 0.5 px `neutral-600` line under it */}
         <h3 className="flex-1 text-label text-(--fg-secondary)">Occurrence history</h3>
         <Button variant="ghost" className="h-11 w-10 justify-center px-2" aria-label={oldestFirst ? 'Show newest first' : 'Show oldest first'} title={oldestFirst ? 'Show newest first' : 'Show oldest first'} onClick={() => setOldestFirst((o) => !o)}>
-          {oldestFirst ? <SortAscending className="size-5" aria-hidden /> : <SortDescending className="size-5" aria-hidden />}
+          {oldestFirst ? <SortAscending className="size-5 text-(--neutral-100)" aria-hidden /> : <SortDescending className="size-5 text-(--neutral-100)" aria-hidden />}
         </Button>
       </div>
       <div className="shrink-0 px-4">
@@ -105,14 +105,14 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
             const OccurrenceIcon = category === 'parking' ? CarSimple : Trash
             return (
               <section key={id} data-step={`o-${id}`} className={`flex flex-col gap-0.5${focus === `o-${id}` ? RING : ''}`}>
-                <h4 className="flex min-h-10 items-center gap-2.5 rounded-sm border border-(--neutral-700) bg-(--neutral-700) px-2.5 text-body-medium text-(--fg-primary)">
+                <h4 className="flex min-h-10 items-center gap-2.5 rounded-sm border border-(--neutral-700) bg-(--neutral-700) p-[7px] text-body-medium text-(--fg-primary)">
                   <OccurrenceIcon weight="duotone" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
                   <span className="flex min-w-0 flex-1 gap-2">
                     <span className="sr-only">Occurrence</span>
                     <span>{day(g.occurrence.first_report_at!)}</span>
                     {g.occurrence.boundary_uncertain && <Badge variant="outline">Boundary uncertain</Badge>}
                   </span>
-                  {g.occurrence.subject_key && <span className="rounded-sm bg-(--plate-yellow) p-1 text-[12px]/[16px] font-bold tracking-[0.06em] text-(--neutral-900)">{g.occurrence.subject_key.replace('-', ' ')}</span>}{/* the vehicle's plate (owner's Figma, 2026-11-25); dumping has none */}
+                  {g.occurrence.subject_key && <span className="rounded-sm bg-(--plate-yellow) px-1.5 py-0.5 text-section-label uppercase text-(--neutral-900)">{g.occurrence.subject_key.replace('-', ' ')}</span>}{/* the vehicle's plate (owner's Figma, 2026-11-25); dumping has none */}
                 </h4>
                 <ul className="flex flex-col gap-0.5">{rows.map(report)}</ul>
                 {g.interventions.length > 0 && (
@@ -120,7 +120,7 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
                     {g.interventions.map((v) => (
                       <div key={v.id} data-step={`v-${v.id}`} className={`flex flex-col gap-1 py-2 pr-2 pl-0.5${focus === `v-${v.id}` ? RING : ''}`}>
                         <div className="flex items-start gap-3">
-                          <span className="flex w-4 shrink-0 justify-center pt-1 text-(--fg-primary)" aria-hidden>
+                          <span className="flex w-4 shrink-0 justify-center pt-1 text-(--neutral-100)" aria-hidden>
                             {v.outcome === 'cleared' ? <Check className="size-4" /> : <Wrench className="size-4" />}
                           </span>
                           <div className="flex min-w-0 flex-1 flex-col gap-1">

@@ -56,9 +56,9 @@ interface Props {
   areas: Area[]
   spots: string[][]
   focusCode: number | null
-  zoomTo: { code: number; n: number } | null
+  zoomTo: { code: number | null; n: number } | null
   /** Ask the map to fly to a locality (a Stat Card was clicked). */
-  onZoomLocality: (code: number) => void
+  onZoomLocality: (code: number | null) => void // null: the locality was left, the camera goes back
   onClearHighlight: () => void
   /** A new investigation was started (owner, 2026-11-24): the open recurrence or incident closes, so the agent panel shows the landing. Only a new number does it. */
   closeCase?: number
@@ -278,6 +278,15 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
     const t = setTimeout(() => onInspect(open), open && !selected ? 0 : SIDEBAR_DELAY_MS)
     return () => clearTimeout(t)
   }, [open, selected, onInspect])
+  // leaving the locality (its Stat Card clicked again, or its filter cleared) takes the camera back to where it was (owner, 2026-11-26)
+  const hadLocality = useRef(false)
+  useEffect(() => {
+    if (filters.locality) hadLocality.current = true
+    else if (hadLocality.current) {
+      hadLocality.current = false
+      onZoomLocality(null)
+    }
+  }, [filters.locality]) // eslint-disable-line react-hooks/exhaustive-deps -- only a change of the locality, not a new callback
   // A recurrence is open (owner, 2026-11-09): a click on one of its incidents (a dot, a row of the history, a point of the timeline) opens that report inside the history, it does not leave for the Incident Panel; a second click or Escape closes it before the recurrence.
   const [openReportId, setOpenReportId] = useState<string | null>(null)
   const select = (id: string | null) => {
@@ -384,8 +393,8 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
 
       {/* Conversation mode banner (Figma Answer Banner): while an answer is on the map, filters narrow it; the button ends the mode. The banner sits under the filters row (owner, 2026-11-15; it was above the stat cards, then between them and the filters row); while an incident or recurrence is open the stat cards and filters are hidden, so it goes back to the top and the panel sits below it (`--banner-offset`, owner, 2026-11-07). */}
       {chatMode && (
-        <div data-float className={`fixed inset-x-0 top-[53px] ${!selected && !selectedProblem ? 'md:max-desk:top-[221px]' : ''} z-10 flex h-(--answer-banner-h) items-center gap-1 bg-(--indigo-800) px-2 text-meta text-(--indigo-100) justify-center desk:absolute ${selected || selectedProblem ? 'desk:top-(--map-pad)' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--control-default)+16px)]'} desk:right-(--col-right) desk:left-(--col-left) desk:inset-x-auto desk:rounded-sm`}>
-          <span className="grid size-9 shrink-0 place-items-center"><ChatCircleDots weight="fill" className="size-5 text-(--indigo-200)" aria-hidden /></span>
+        <div data-float className={`fixed inset-x-0 top-[53px] ${!selected && !selectedProblem ? 'md:max-desk:top-[221px]' : ''} z-10 flex h-(--answer-banner-h) items-center gap-1 bg-(--cobalt-800) px-2 text-meta text-(--cobalt-100) justify-center desk:absolute ${selected || selectedProblem ? 'desk:top-(--map-pad)' : 'desk:top-[calc(var(--section-header-h)+var(--stat-row-h)+var(--map-pad)+16px+var(--control-default)+16px)]'} desk:right-(--col-right) desk:left-(--col-left) desk:inset-x-auto desk:rounded-sm`}>
+          <span className="grid size-9 shrink-0 place-items-center"><ChatCircleDots weight="fill" className="size-5 text-(--cobalt-200)" aria-hidden /></span>
           <span>While showing the agent's answer on the map, filters will narrow it down.</span>
           <Button size="sm" variant="outline" className="ml-7 border-[0.5px] border-(--neutral-400) bg-(--neutral-900) px-3" onClick={onClearHighlight}> {/* Figma (owner, 2026-11-17): outline, small (32 px), `neutral-900` fill, a 0.5 px `neutral-400` line, 12 px at the sides */}
             Clear agent results

@@ -28,7 +28,7 @@ export function ModuleOffer({ offer }: { offer: Offer }) {
     return (
       <div className="flex flex-col gap-2 rounded-sm border border-(--neutral-500) p-3">
         <p className="flex items-start gap-2 text-body-sm-medium text-foreground">
-          <Sparkle weight="fill" className="mt-0.5 size-4 shrink-0 text-(--indigo-200)" aria-hidden />
+          <Sparkle weight="fill" className="mt-0.5 size-4 shrink-0 text-(--cobalt-200)" aria-hidden />
           {offer.label}
         </p>
         <p className="text-meta text-muted-foreground">{offer.reason}</p>
