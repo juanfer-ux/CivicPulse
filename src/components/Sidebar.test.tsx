@@ -69,6 +69,20 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(screen.getAllByRole('button', { name: 'New investigation' })[0]).not.toHaveAttribute('aria-current')
   })
 
+  it('names a recurrence by its address on the first line, with the type on the second', () => {
+    render(<Sidebar {...baseProps} recurrences={[{ ...baseProps.recurrences[0], title: 'Obstructive Parking - Cl 72', address: 'Cl 72 #24-30', category: 'Obstructive Parking' }]} />)
+    expect(screen.getByText('Cl 72 #24-30')).toBeInTheDocument()
+    expect(screen.getByText('Obstructive Parking')).toBeInTheDocument()
+    expect(screen.queryByText('Obstructive Parking - Cl 72')).toBeNull()
+  })
+
+  it('names an incident by its address on the first line, with the type on the second', () => {
+    render(<Sidebar {...baseProps} incidents={[{ ...baseProps.incidents[0], address: 'Cl 138 con Cra 55', category: 'Illegal Dumping' }]} />)
+    expect(screen.getByText('Cl 138 con Cra 55')).toBeInTheDocument()
+    expect(screen.getByText('Illegal Dumping')).toBeInTheDocument()
+    expect(screen.queryByText('Access ramp obstruction')).toBeNull()
+  })
+
   it('shows Recurrences, Incidents and Investigations in one sidebar', () => {
     render(<Sidebar {...baseProps} />)
 
@@ -76,7 +90,7 @@ describe('Sidebar — creating investigations and cases', () => {
     expect(screen.getByText('Existing investigation')).toBeInTheDocument()
     expect(screen.getByText(/PR-00088/)).toBeInTheDocument()
     expect(screen.getByText('Access ramp obstruction')).toBeInTheDocument()
-    expect(screen.getByText(/CP-00200 · Pending/)).toBeInTheDocument() // the incident's reference and status
+    expect(screen.getByText('CP-00200')).toBeInTheDocument() // the incident's reference
   })
 
   it('clicking a recurrence or an incident asks the map to open it', async () => {

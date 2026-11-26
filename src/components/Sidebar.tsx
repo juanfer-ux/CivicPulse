@@ -5,6 +5,7 @@ import { useNoSelect, useReleaseGuard } from '@/lib/useNoSelect'
 import { Check, CaretDown, CaretRight, Chat, DotsThreeVertical, List, Plus, SidebarSimple, StarFour, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
+import sidebarMark from '@/assets/logo-mark-sidebar.svg' // the mark in `brand-primary` (owner's Figma, 2026-11-25), for the expanded sidebar
 import wordmark from '@/assets/logo-wordmark.svg'
 import profilePhoto from '@/assets/profile-avatar.png' // the owner's photo, 160 px (owner, 2026-11-24): the avatar of the signed-in person in the sidebar until profiles have their own photo
 import { createPortal } from 'react-dom'
@@ -20,7 +21,7 @@ import { shortName } from '@/lib/utils'
 type Chat = { id: number; title: string; created?: number; updated?: number }
 /** The real recurrences and incidents the lists show (shaped by Dashboard, so this file stays free of Supabase); a click flies the map to the row (owner, 2026-11-06). */
 export type SidebarRecurrence = { id: string; title: string; category?: string; address?: string; status: ProblemStatus; reference: string; locality?: string; created?: number; updated?: number }
-export type SidebarIncident = { id: string; title: string; reference: string; locality?: string; group: Group; created?: number; updated?: number }
+export type SidebarIncident = { id: string; title: string; category?: string; address?: string; reference: string; locality?: string; group: Group; created?: number; updated?: number }
 /** The items each conversation touched (the ids of its incidents and recurrences): the sidebar lists only these (owner, 2026-11-08). */
 export type ChatItems = { title: string; ids: string[] }[]
 /** What is open on the map (a click there or in this menu): its row is the highlighted one. */
@@ -134,7 +135,15 @@ function Groups<T extends { id: string | number }>({ items, group, order, labels
 
 
 /** The three row types of the sidebar (Figma 2026-11-05): Recurrence (warning icon in its status color), Incident (a dot in its status color) and Investigation. */
-type RecurrenceRow = { id: string | number; title: string; status: ProblemStatus; reference?: string; locality?: string }
+type RecurrenceRow = { id: string | number; title: string; status: ProblemStatus; reference?: string; locality?: string; category?: string; address?: string }
+
+/** The second line of a row (owner's Figma, 2026-11-26): the incident type in `caption-medium`, 10 px, the reference. */
+const SubLine = ({ category, reference }: { category?: string; reference: string }) => (
+  <span className="flex min-w-0 gap-2.5">
+    {category && <span className="shrink-0 text-caption-medium">{category}</span>}
+    <span className="truncate">{reference}</span>
+  </span>
+)
 
 /** Two-line row shared by Recurrence and Incident (Figma Sidebar Item Recurrence / Incident, 2026-11-12: 51 high, 6 left, 3 top, 8 bottom, 20 right; active = neutral-900, hover = neutral-600 (owner's Figma, 2026-11-12; hover was neutral-800), a 16 x 40 icon column with the 16 px icon 4 px below its top, 10 px to the text). */
 function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNode; title: string; sub: ReactNode; active?: boolean; tip: string; onClick: () => void }) {
@@ -143,12 +152,12 @@ function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNo
     if (active) row.current?.scrollIntoView?.({ block: 'nearest' }) // the open one is always in view, under the sticky section title (scroll-mt-10)
   }, [active])
   return (
-    <Button ref={row} variant="ghost" className={`scroll-mt-10 h-[60px] items-start justify-start gap-2.5 p-2 pr-2.5 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) ${active ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} title={tip} aria-current={active || undefined} onClick={onClick}>
+    <Button ref={row} variant="ghost" className={`scroll-mt-10 h-[60px] items-start justify-start gap-2.5 p-2 pr-5 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) ${active ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} title={tip} aria-current={active || undefined} onClick={onClick}>
       <span className={`flex h-10 w-4 shrink-0 items-start justify-center pt-0.5`}>{icon}</span>
       <span className={`flex h-11 justify-center min-w-0 flex-col text-left`}>
         <span className="flex min-w-0 flex-col gap-1">
-          <span className="truncate text-body-sm text-(--neutral-100)">{title}</span>
-          <span className="flex h-5 items-center truncate text-caption text-(--neutral-200)">{sub}</span>
+          <span className={`truncate text-body-sm ${active ? 'text-(--brand-primary)' : 'text-(--neutral-200)'}`}>{title}</span>
+          <span className="flex h-5 items-center truncate text-caption text-(--neutral-200)"><span className="truncate">{sub}</span></span>
         </span>
       </span>
     </Button>
@@ -328,9 +337,9 @@ const NARROW = '(max-width: 1799.98px)'
 /** The logo. The expand button is not here any more: collapsed, it is in the agent panel's title row, left of "Explore" (owner, 2026-11-17; before, the logo mark swapped for it on hover). */
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={`flex items-center gap-[11.4px] ${collapsed ? '' : 'pl-[1.3px]'}`}>
-      <img src={mark} alt="" width={collapsed ? 40 : 38} height={collapsed ? 40 : 38} className="shrink-0" /> {/* 38 px in the expanded sidebar (owner's Figma, 2026-11-24: the logo is 38 px, the wordmark 155.3 x 11.8, 11.4 px apart, 1.3 px in; 32 px, 130.76 x 9.93 and 9.6 px before); 32 px (owner's Figma, 2026-11-17; the logo is x 0.8: wordmark 130.76 x 9.93, 9.6 px apart, 1.1 px in); it was 40 px, expanded and collapsed (owner's Figma, 2026-11-17, the big sidebar pass; 42.94 collapsed and 38.92 expanded before; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before), 38.92 expanded */}
-      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={155.3} height={11.8} className="shrink-0" />}
+    <div className={`flex items-center gap-[11.4px] ${collapsed ? '' : 'pl-[2.6px]'}`}>
+      <img src={collapsed ? mark : sidebarMark} alt="" width={collapsed ? 40 : 38} height={collapsed ? 40 : 38} className="shrink-0" /> {/* 38 px in the expanded sidebar (owner's Figma, 2026-11-24: the logo is 38 px, the wordmark 155.3 x 11.8, 11.4 px apart, 1.3 px in; 32 px, 130.76 x 9.93 and 9.6 px before); 32 px (owner's Figma, 2026-11-17; the logo is x 0.8: wordmark 130.76 x 9.93, 9.6 px apart, 1.1 px in); it was 40 px, expanded and collapsed (owner's Figma, 2026-11-17, the big sidebar pass; 42.94 collapsed and 38.92 expanded before; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before), 38.92 expanded */}
+      {!collapsed && <span role="img" aria-label="Civic Pulse" className="h-[11.8px] w-[155.3px] shrink-0 bg-(--brand-primary)" style={{ mask: `url("${wordmark}") center / contain no-repeat` }} />} {/* the wordmark is the mask, so it takes the token's color */}
     </div>
   )
 }
@@ -398,16 +407,16 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   const convs = chatItems
   const tags = new Map<string, string[]>()
   convs.forEach((c) => c.ids.forEach((id) => tags.set(id, [...(tags.get(id) ?? []), c.title])))
-  const recurrences: RecurrenceRow[] = [...cases.map((c): RecurrenceRow => ({ id: c.id, title: c.title, status: 'active' })), ...real.filter((r) => tags.has(r.id))].filter((c) => hit(c.title) || hit(c.reference ?? ''))
-  const allRecurrences: RecurrenceRow[] = [...cases.map((c): RecurrenceRow => ({ id: c.id, title: c.title, status: 'active' })), ...real].filter((c) => hit(c.title) || hit(c.reference ?? '')) // DEMO (owner, 2026-11-23): every recurrence, like the incidents
+  const recurrences: RecurrenceRow[] = [...cases.map((c): RecurrenceRow => ({ id: c.id, title: c.title, status: 'active' })), ...real.filter((r) => tags.has(r.id))].filter((c) => hit(c.title) || hit(c.address ?? '') || hit(c.reference ?? ''))
+  const allRecurrences: RecurrenceRow[] = [...cases.map((c): RecurrenceRow => ({ id: c.id, title: c.title, status: 'active' })), ...real].filter((c) => hit(c.title) || hit(c.address ?? '') || hit(c.reference ?? '')) // DEMO (owner, 2026-11-23): every recurrence, like the incidents
   const [recOpen, setRecOpen] = useState(false) // the Recurrences chevron (DEMO)
-  const incidentRows = incidents.filter((i) => hit(i.title) || hit(i.reference)) // DEMO (owner, 2026-11-23): every incident, drawn 3 at a time collapsed and in batches of 30 when expanded; it was only the ones a conversation touched
+  const incidentRows = incidents.filter((i) => hit(i.title) || hit(i.address ?? '') || hit(i.reference)) // DEMO (owner, 2026-11-23): every incident, drawn 3 at a time collapsed and in batches of 30 when expanded; it was only the ones a conversation touched
   const investigations = chats.map((c) => ({ key: c.id, title: c.title, id: c.id, created: c.created, updated: c.updated })).filter((c) => hit(c.title)) // sorted by the section's own view (newest first by default)
   const [invOpen, setInvOpen] = useState(false) // the Investigations chevron
   return (
-    <div className={`flex h-full flex-col justify-between ${collapsed ? '' : 'desk:pl-1'}`}>
+    <div className="flex h-full flex-col justify-between">
       <div className="flex min-h-0 flex-col">
-        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-[70px] justify-between bg-(--neutral-800) px-3'}`}>
+        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-[70px] justify-between bg-(--neutral-800) px-2.5'}`}>
           <Brand collapsed={collapsed} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
@@ -418,8 +427,8 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
-            <div className="flex shrink-0 flex-col gap-10 p-2.5 pr-[22px]"> {/* 12 px more at the right: the Figma container `main` (owner, 2026-11-24) has 12 px of padding at the right around the header and the sections, so the header block is 288 px wide in a 300 px sidebar; no line under the header block any more (owner's Figma, 2026-11-24: its stroke is gone; it was a 1 px `neutral-500` line), 128 px high */} {/* the search and the New investigation row, 12 apart, 32 px above and below (owner's Figma, 2026-11-23, later: 152 px high; 24 and 136 an hour before, 16 and 120 earlier) */}
-              <div className="flex flex-col gap-6"> {/* 24 px between the search (44 px high now) and the New investigation row (owner's Figma, 2026-11-24; 32 and 36 an hour before; 12 and 36 before), the header block is 128 px high with 10 px all round */}
+            <div className="flex shrink-0 flex-col gap-10 px-4 py-4"> {/* Figma `main` > Header (owner, 2026-11-25): 6 px at the sides of `main` plus 10 of the header, 16 above and below */}
+              <div className="flex flex-col gap-4"> {/* 16 px between the search (44 px high) and the New investigation row (owner's Figma, 2026-11-25; 24 before) */}
                 <div className="relative"> {/* the browser's own clear button is hidden: the × is the Phosphor X (owner, 2026-11-24: only Phosphor icons) */}
                   <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] bg-(--neutral-700) border-(--neutral-400) pr-9 text-body-sm [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none" />
                   {query && (
@@ -436,14 +445,14 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
               </div>
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
-              <div className="flex flex-col gap-4 pt-4 pr-3"> {/* 12 px at the right, the Figma Sidebar frame's padding (owner, 2026-11-23, later: it was 16 an hour before); the sections are 8 px apart, with no padding around them (owner's Figma, 2026-11-17, latest; it was 20 and 16) */}
+              <div className="flex flex-col gap-4 px-1.5 pt-4"> {/* Figma `main` (owner, 2026-11-25): 6 px at both sides, 16 px between the header and the sections and between sections */}
                 <Section title="Recurrences" expanded={recOpen} onExpand={setRecOpen} items={allRecurrences} addLabel="New recurrence" onAdd={onNewCase} views empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
                     <Growing open={recOpen} total={allRecurrences.length}>{(limit) => (
                     <ViewList items={recOpen ? allRecurrences : shownRecurrences(recurrences, pinnedIds, selected?.kind === 'recurrence' ? selected.id : null, ongoingIds)} first={recOpen ? undefined : ongoingIds} last={recOpen || selected?.kind !== 'recurrence' || ongoingIds?.includes(selected.id) || shownRecurrences(recurrences, pinnedIds, null, ongoingIds).some((i) => String(i.id) === selected.id) ? null : selected.id} limit={recOpen ? limit : undefined} flat={!recOpen} batched={recOpen && view.group === 'status'} view={view} group={(c) => c.status} order={PROBLEM_STATUSES} primary="active" labels={Object.fromEntries(PROBLEM_STATUSES.map((st) => [st, PROBLEM_STATUS[st].label]))} row={(c) => (
-                      <TwoLineItem key={c.id} active={act.kind === 'case' ? c.id === act.id : act.kind === 'recurrence' && c.id === act.id} tip={`${c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => (typeof c.id === 'string' ? noCase(onOpenRecurrence)(c.id) : setLocal({ kind: 'case', id: c.id, sel: selKey }))} title={c.title}
+                      <TwoLineItem key={c.id} active={act.kind === 'case' ? c.id === act.id : act.kind === 'recurrence' && c.id === act.id} tip={`${c.address ?? c.title} (${PROBLEM_STATUS[c.status].label})`} onClick={() => (typeof c.id === 'string' ? noCase(onOpenRecurrence)(c.id) : setLocal({ kind: 'case', id: c.id, sel: selKey }))} title={c.address ?? c.title} /* the first line is the address only; the type is on the second line (owner, 2026-11-26) */
                         icon={<Warning weight="fill" className="mt-0.5 size-4" style={{ color: `var(${PROBLEM_STATUS[c.status].token})` }} aria-hidden />}
-                        sub={c.reference ? `${c.reference} · ${c.locality ?? PROBLEM_STATUS[c.status].label}` : 'Not linked to a recurrence yet'} />
+                        sub={c.reference ? <SubLine category={c.category} reference={c.reference} /> : 'Not linked to a recurrence yet'} />
                     )} />
                     )}</Growing>
                   )}
@@ -452,7 +461,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                   {(view) => (
                     <Growing open={incOpen} total={incidentRows.length}>{(limit) => (
                     <ViewList items={incidentRows} first={incOpen ? undefined : ongoingIds} last={incOpen || selected?.kind !== 'incident' ? null : lastOf(incidentRows, view, ongoingIds, selected.id)} limit={limit} batched={incOpen && view.group === 'status'} view={view} group={(i) => i.group} order={Object.keys(GROUPS)} primary="pending" labels={Object.fromEntries(Object.entries(GROUPS).map(([g, v]) => [g, v.label]))} row={(i) => (
-                      <TwoLineItem key={i.id} active={act.kind === 'incident' && act.id === i.id} tip={`${i.title} (${GROUPS[i.group].label})`} onClick={() => noCase(onOpenIncident)(i.id)} title={i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-2 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={`${i.reference} · ${i.locality ?? GROUPS[i.group].label}`} />
+                      <TwoLineItem key={i.id} active={act.kind === 'incident' && act.id === i.id} tip={`${i.address ?? i.title} (${GROUPS[i.group].label})`} onClick={() => noCase(onOpenIncident)(i.id)} title={i.address ?? i.title} icon={<span className="grid size-4 place-items-center" aria-hidden><span className="size-2 rounded-full" style={{ background: `var(${GROUPS[i.group].swatch})` }} /></span>} sub={<SubLine category={i.category} reference={i.reference} />} />
                     )} />
                     )}</Growing>
                   )}
@@ -461,9 +470,9 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                   {(view) => (
                     <Growing open={invOpen} total={investigations.length}>{(limit) => (
                     <ViewList items={investigations} limit={invOpen ? limit : 3} view={{ ...view, group: 'all' }} group={() => ''} order={[]} labels={{}} primary="" row={(c) => (
-                  <Button key={c.key} variant="ghost" className={`h-9 items-center justify-start gap-2.5 py-2 pr-2.5 pl-2 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) text-body-sm ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
-                    <Chat weight="regular" className="size-4 shrink-0 text-(--neutral-200)" aria-hidden />
-                    <span className="truncate">{c.title}</span>
+                  <Button key={c.key} variant="ghost" className={`h-9 items-center justify-start gap-2.5 py-2 pr-4 pl-2 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) text-body-sm ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
+                    <Chat weight="regular" className={`size-4 shrink-0 ${act.kind === 'chat' && c.id === act.id ? 'text-(--neutral-200)' : 'text-(--neutral-300)'}`} aria-hidden />
+                    <span className={`truncate ${act.kind === 'chat' && c.id === act.id ? 'text-(--brand-primary)' : 'text-(--neutral-100)'}`}>{c.title}</span>
                   </Button>
                 )} />
                     )}</Growing>
@@ -481,8 +490,8 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
           </>
         ) : (
           <div className="flex items-center gap-3 px-4 py-1"> {/* Figma User > Main (owner, 2026-11-24): 16 px at the sides (it was 12), 12 px between the account details and the menu button; the avatar and the text are 20 px apart (it was 16) */}
-            <div className="flex min-w-0 flex-1 items-center gap-5">
-              <Avatar src={profilePhoto} size="lg" name={profile?.full_name || 'Signed in'} />
+            <div className="flex min-w-0 flex-1 items-center gap-5 px-1.5">
+              <Avatar src={profilePhoto} name={profile?.full_name || 'Signed in'} />
               <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
                 <p className="truncate text-body-sm-strong text-(--neutral-100)">{name}</p>
                 {email && <p className="truncate text-caption-medium text-(--neutral-200)">{email}</p>}
