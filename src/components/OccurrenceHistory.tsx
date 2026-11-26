@@ -92,60 +92,62 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
           {oldestFirst ? <SortAscending className="size-5 text-(--neutral-100)" aria-hidden /> : <SortDescending className="size-5 text-(--neutral-100)" aria-hidden />}
         </Button>
       </div>
-      <div className="shrink-0 px-4">
+      <div className="shrink-0"> {/* the search runs from edge to edge (owner's Figma, 2026-11-26) */}
         <Input type="search" aria-label="Search the occurrence history" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] border-(--neutral-400) bg-(--neutral-800) text-body-sm" />
       </div>
       <ScrollArea viewportRef={viewport} className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh] [&>div]:!block">
-        <div className="flex flex-col gap-3 px-4">
-          {detail && groups.length === 0 && <p className="text-muted-foreground">No history yet.</p>}
-          {detail && q && shown.length === 0 && unplaced.length === 0 && <p className="text-muted-foreground">Nothing matches the search.</p>}
+        <div className="flex flex-col gap-5">
+          {detail && groups.length === 0 && <p className="px-4 text-muted-foreground">No history yet.</p>}
+          {detail && q && shown.length === 0 && unplaced.length === 0 && <p className="px-4 text-muted-foreground">Nothing matches the search.</p>}
           {shown.map((g) => {
             const id = g.occurrence.occurrence_id
             const rows = rowsOf(id)
             const OccurrenceIcon = category === 'parking' ? CarSimple : Trash
             return (
-              <section key={id} data-step={`o-${id}`} className={`flex flex-col gap-0.5${focus === `o-${id}` ? RING : ''}`}>
-                <h4 className="flex min-h-10 items-center gap-2.5 rounded-sm border border-(--neutral-700) bg-(--neutral-700) p-[7px] text-body-medium text-(--fg-primary)">
+              <section key={id} data-step={`o-${id}`} className={`flex flex-col${focus === `o-${id}` ? RING : ''}`}>
+                <h4 className="flex h-18 shrink-0 items-center gap-2.5 border-t border-(--neutral-600) px-4 text-body-medium text-(--fg-primary)">
                   <OccurrenceIcon weight="duotone" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
                   <span className="flex min-w-0 flex-1 gap-2">
                     <span className="sr-only">Occurrence</span>
                     <span>{day(g.occurrence.first_report_at!)}</span>
                     {g.occurrence.boundary_uncertain && <Badge variant="outline">Boundary uncertain</Badge>}
                   </span>
-                  {g.occurrence.subject_key && <span className="rounded-sm bg-(--plate-yellow) px-1.5 py-0.5 text-section-label uppercase text-(--neutral-900)">{g.occurrence.subject_key.replace('-', ' ')}</span>}{/* the vehicle's plate (owner's Figma, 2026-11-25); dumping has none */}
+                  {g.occurrence.subject_key && <span className="rounded-xs bg-(--plate-yellow) px-1.5 py-0.5 text-caption-sm-strong text-(--neutral-900)">{g.occurrence.subject_key.replace('-', ' ')}</span>}{/* the vehicle's plate (owner's Figma, 2026-11-25); dumping has none */}
                 </h4>
-                <ul className="flex flex-col gap-0.5">{rows.map(report)}</ul>
-                {g.interventions.length > 0 && (
-                  <div className="flex flex-col rounded-sm border border-(--neutral-800) bg-(--black) p-2">
-                    {g.interventions.map((v) => (
-                      <div key={v.id} data-step={`v-${v.id}`} className={`flex flex-col gap-1 py-2 pr-2 pl-0.5${focus === `v-${v.id}` ? RING : ''}`}>
-                        <div className="flex items-start gap-3">
-                          <span className="flex w-4 shrink-0 justify-center pt-1 text-(--neutral-100)" aria-hidden>
-                            {v.outcome === 'cleared' ? <Check className="size-4" /> : <Wrench className="size-4" />}
-                          </span>
-                          <div className="flex min-w-0 flex-1 flex-col gap-1">
-                            <p className="text-body-medium text-(--fg-secondary)">{v.outcome === 'cleared' ? 'Road Cleared' : label(v.action_type)}</p>
-                            <p className="text-body-sm text-(--fg-secondary)">{v.description}</p>
-                            {v.outcome !== 'cleared' && <p className="text-meta text-(--fg-secondary)">Outcome: {v.outcome ? label(v.outcome) : 'Not recorded yet'}</p>}
+                <div className="flex flex-col gap-0.5 px-2">
+                  <ul className="flex flex-col gap-0.5">{rows.map(report)}</ul>
+                  {g.interventions.length > 0 && (
+                    <div className="flex flex-col rounded-sm border border-(--neutral-800) bg-(--black) p-2">
+                      {g.interventions.map((v) => (
+                        <div key={v.id} data-step={`v-${v.id}`} className={`flex flex-col gap-1 py-2 pr-2 pl-0.5${focus === `v-${v.id}` ? RING : ''}`}>
+                          <div className="flex items-start gap-3">
+                            <span className="flex w-4 shrink-0 justify-center pt-1 text-(--neutral-100)" aria-hidden>
+                              {v.outcome === 'cleared' ? <Check className="size-4" /> : <Wrench className="size-4" />}
+                            </span>
+                            <div className="flex min-w-0 flex-1 flex-col gap-1">
+                              <p className="text-body-medium text-(--fg-secondary)">{v.outcome === 'cleared' ? 'Road Cleared' : label(v.action_type)}</p>
+                              <p className="text-body-sm text-(--fg-secondary)">{v.description}</p>
+                              {v.outcome !== 'cleared' && <p className="text-meta text-(--fg-secondary)">Outcome: {v.outcome ? label(v.outcome) : 'Not recorded yet'}</p>}
+                            </div>
+                            {when(v.performed_at)}
                           </div>
-                          {when(v.performed_at)}
+                          <p className="pl-[29px] text-[11px]/[21px] tracking-[0.08em] text-(--fg-secondary)">By {v.agency}</p>
                         </div>
-                        <p className="pl-[29px] text-[11px]/[21px] tracking-[0.08em] text-(--fg-secondary)">By {v.agency}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {g.events.map((e) => (
-                  <p key={e.created_at} data-step={`e-${e.created_at}`} className={`px-1 pt-1 text-meta text-(--fg-secondary)${focus === `e-${e.created_at}` ? RING : ''}`}>
-                    {day(e.created_at)} · {e.kind === 'resolved' ? 'Marked resolved by an operator' : 'Reopened by a new occurrence'}
-                  </p>
-                ))}
+                      ))}
+                    </div>
+                  )}
+                  {g.events.map((e) => (
+                    <p key={e.created_at} data-step={`e-${e.created_at}`} className={`px-1 pt-1 text-meta text-(--fg-secondary)${focus === `e-${e.created_at}` ? RING : ''}`}>
+                      {day(e.created_at)} · {e.kind === 'resolved' ? 'Marked resolved by an operator' : 'Reopened by a new occurrence'}
+                    </p>
+                  ))}
+                </div>
               </section>
             )
           })}
           {unplaced.length > 0 && (
-            <div>
-              <p className="text-body-sm-medium text-foreground">Waiting for review</p>
+            <div className="px-2">
+              <p className="px-2 text-body-sm-medium text-foreground">Waiting for review</p>
               <ul className="mt-1 flex flex-col gap-0.5">{unplaced.map(report)}</ul>
             </div>
           )}

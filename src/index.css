@@ -135,6 +135,19 @@
   --text-caption-strong--font-weight: calc(600 + var(--weight-offset));
   --text-caption-strong--line-height: 17px; /* Figma 2026-11-26: 17 (12 since 2026-11-07, 16 before) */
   --text-caption-strong--letter-spacing: 0.024em;
+  /* Figma caption-sm family (owner, 2026-11-26): the smallest text, 11 / 16 on every screen size, in the caption family's three weights. */
+  --text-caption-sm: 11px;
+  --text-caption-sm--font-weight: calc(400 + var(--weight-offset));
+  --text-caption-sm--line-height: 16px;
+  --text-caption-sm--letter-spacing: 0.05em;
+  --text-caption-sm-medium: 11px;
+  --text-caption-sm-medium--font-weight: calc(500 + var(--weight-offset));
+  --text-caption-sm-medium--line-height: 16px;
+  --text-caption-sm-medium--letter-spacing: 0.024em;
+  --text-caption-sm-strong: 11px;
+  --text-caption-sm-strong--font-weight: calc(600 + var(--weight-offset));
+  --text-caption-sm-strong--line-height: 16px;
+  --text-caption-sm-strong--letter-spacing: 0.024em;
   --text-section-label: 11px; /* the small uppercase title above a group of sidebar items (Figma section-label, 2026-10-28): Bold 11 / 16, spacing 18 %; the same on every screen size */
   --text-section-label--font-weight: calc(700 + var(--weight-offset));
   --text-section-label--line-height: 16px;
@@ -249,8 +262,8 @@
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
   /* The whole palette is these 58 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
-  --white: #ECECEE; /* new in Figma (2026-10-29), brighter than neutral-100; not used on screen yet */
-  --black: #0C0C0E; /* #0C0C0E since 2026-11-25 (owner's Figma; it was #050505); new in Figma (2026-11-12), darker than neutral-900; the collapsed sidebar rail header and the composer when active */
+  --white: #E7E7E9; /* #E7E7E9 since 2026-11-26 (it was #ECECEE); new in Figma (2026-10-29), brighter than neutral-100; not used on screen yet */
+  --black: #09090B; /* #09090B since 2026-11-26 (owner's Figma; #0C0C0E before, 2026-11-25 (owner's Figma; it was #050505); new in Figma (2026-11-12), darker than neutral-900; the collapsed sidebar rail header and the composer when active */
   --neutral-900: #111113; /* Figma (2026-11-12): the neutrals 900 to 400 got a step lighter (900 was #0E0E10) */
   --neutral-800: #18181B; /* was #111113 */
   --neutral-700: #1F1F23; /* was #18181B */
@@ -465,7 +478,7 @@
 .map-zoom { bottom: 77px; transition: bottom 0.3s, right 0.3s; }
 .map-col .map-zoom { right: calc(var(--col-right) - var(--filters-push, 0px)); } /* aligned with the map column's right edge, the same line as the stat cards and the Filters button (owner, 2026-11-15; it was 14 px from the map's edge); the Filters panel (--filters-push, inside --dock-w) already narrows the map wrapper this control sits in, so it must not be counted twice: it stays at the map's right edge, next to the panel (owner's bug report, 2026-11-15) */
 @media (min-width: 90rem) { .map-col:not([data-history]) .map-zoom { bottom: var(--map-pad); } } /* the zoom control sits at the very bottom on desktop (owner, 2026-11-09): the on-map credit is gone from that corner */
-@media (min-width: 90rem) { .map-col[data-rp] .map-zoom { right: calc(var(--col-right) + 358px + 12px - var(--filters-push, 0px)); } } /* a recurrence is open (owner, 2026-11-09): the history column is flush right and the zoom control sits inside the map, left of it */ /* the modules' right column (decision 0049) sits left of the zoom control */
+@media (min-width: 90rem) { .map-col[data-rp] .map-zoom { right: calc(var(--col-right) + 326px + 12px - var(--filters-push, 0px)); } } /* a recurrence is open (owner, 2026-11-09): the history column is flush right and the zoom control sits inside the map, left of it */ /* the modules' right column (decision 0049) sits left of the zoom control */
 @media (min-width: 90rem) { [data-history] .map-zoom { bottom: calc(77px + 384px); } }
 .zoom-slider { appearance: none; -webkit-appearance: none; writing-mode: vertical-lr; direction: rtl; width: 29px; height: 100%; margin: 0; background: transparent; cursor: pointer; }
 .zoom-slider::-webkit-slider-runnable-track { width: 2px; border-radius: 1px; background: var(--neutral-300); }

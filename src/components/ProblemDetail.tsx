@@ -38,7 +38,7 @@ export function ProblemDetail({
   return (
     <>
     {WIDE && (
-      <div className="hidden items-center gap-2 desk:absolute desk:top-3 desk:right-[calc(var(--col-right)+358px+12px)] desk:z-20 desk:flex"> {/* the Modules button and the close X float at the map's top right corner, just left of the history column (owner, 2026-11-26; they were above the numbers card), like the map buttons of Google Maps */}
+      <div className="hidden items-center gap-2 desk:absolute desk:top-3 desk:right-[calc(var(--col-right)+326px+12px)] desk:z-20 desk:flex"> {/* the Modules button and the close X float at the map's top right corner, just left of the history column (owner, 2026-11-26; they were above the numbers card), like the map buttons of Google Maps */}
         {modulesOn && <div className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg"><ModulesMenu kind="recurrence" /></div>}
         <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg hover:bg-(--neutral-700)">
           <X />
