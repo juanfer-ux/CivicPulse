@@ -271,6 +271,21 @@ describe('Sidebar — resizing the window', () => {
   })
 })
 
+describe('Sidebar — collapsing and expanding', () => {
+  it('opens again at the width it had', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal('matchMedia', (q: string) => ({ matches: q.includes('reduce'), addEventListener: () => {}, removeEventListener: () => {} })) // jsdom has none; reduced motion = no width animation
+    render(<Sidebar {...baseProps} />)
+    const width = () => (document.querySelector('aside') as HTMLElement).style.width
+    const before = width()
+    await user.click(screen.getByRole('button', { name: 'Collapse menu' }))
+    act(() => void window.dispatchEvent(new Event('sidebar-expand')))
+    expect(width()).toBe(before)
+    expect(before).not.toBe('260px')
+    vi.unstubAllGlobals()
+  })
+})
+
 describe('widthFor', () => {
   it('follows the window between the minimum and the maximum', () => {
     expect(widthFor(1800)).toBe(270)

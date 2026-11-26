@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
 import { Car, CarSimple, Trash, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wrench, type Icon } from '@phosphor-icons/react'
+import { donutTone } from '@/lib/donutTones'
 import { SUGGESTIONS, WORTH_INVESTIGATING } from '@/lib/agent'
 import { useAuth } from '@/lib/auth'
 
@@ -7,7 +8,6 @@ import { useAuth } from '@/lib/auth'
 /** The Quick suggestions section and its Shift + 1 to 5 keys (owner, 2026-11-16: switched off for now). Set to true to bring them back. */
 const QUICK_SUGGESTIONS_ON = false
 const SHARE: [string, number][] = [['Chapinero', 62], ['Suba', 52], ['Kennedy', 43], ['Engativá', 36], ['Others', 61]] // placeholder: Figma's numbers until the data comes from the incidents
-const STEPS = [1, 0.85, 0.7, 0.55, 0.4] // cobalt-400, fading from the biggest slice
 const GAP = (2.3 / 360) * 2 * Math.PI * 52.28 // 2.3 degrees between slices, centered on the cut (Figma arcs: -88.9 to -3.3, then -1 to 70.4, ...)
 const total = SHARE.reduce((a, [, n]) => a + n, 0)
 
@@ -38,7 +38,7 @@ function Donut() {
       {SHARE.map(([name, n], i) => {
         const len = (n / total) * C
         const start = (SHARE.slice(0, i).reduce((a, [, k]) => a + k, 0) / total) * C
-        return <circle key={name} cx="65.5" cy="65.5" r={R} fill="none" stroke="var(--cobalt-400)" strokeOpacity={STEPS[i]} strokeWidth="26.14" strokeDasharray={`${len - GAP} ${C - len + GAP}`} strokeDashoffset={-(start + GAP / 2)} />
+        return <circle key={name} cx="65.5" cy="65.5" r={R} fill="none" stroke={donutTone(i).color} strokeOpacity={donutTone(i).opacity} strokeWidth="26.14" strokeDasharray={`${len - GAP} ${C - len + GAP}`} strokeDashoffset={-(start + GAP / 2)} />
       })}
     </svg>
   )
@@ -92,7 +92,7 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
                 <ul className="flex max-w-[240px] min-w-0 flex-1 basis-0 flex-col justify-between gap-1 self-stretch px-2 text-meta"> {/* Figma Legend (owner, 2026-11-15): Fill in width and height, 240 px at most, 8 px at its sides, its five rows spread from top to bottom (space between), each row `meta` 23 px high */}
                   {SHARE.map(([name, n], i) => (
                     <li key={name} className="flex items-center gap-2">
-                      <span className="size-2 shrink-0 rounded-full bg-(--cobalt-400)" style={{ opacity: STEPS[i] }} aria-hidden />
+                      <span className="size-2 shrink-0 rounded-full" style={{ background: donutTone(i).color, opacity: donutTone(i).opacity }} aria-hidden />
                       <span className="flex-1 truncate text-(--fg-secondary)">{name}</span>
                       <span className="text-meta-medium text-(--fg-primary)">{n} · {Math.round((n / total) * 100)} %</span> {/* meta-medium (13 Medium) since 2026-11-15; it was regular */}
                     </li>

@@ -1,5 +1,6 @@
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, XAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
+import { donutTone } from '@/lib/donutTones'
 import type { Answer } from '@/lib/agent'
 
 /** The agent's answer charts (shadcn Chart on Recharts), in the app's own colors. No grow-in animation (owner, 2026-11-05): the bars and the area appear at once, and do not replay when the panel is resized. Fetched right after the app loads (see InvestigatePanel), so no placeholder is needed. */
@@ -14,7 +15,6 @@ const summary = (title: string, bars: Answer['bars']) => `${title}: ${bars.map((
 type Link = { onFocus?: (code: number | null) => void; onPick?: (code: number) => void }
 type Bar = Answer['bars'][number]
 const COLOR = 'var(--ai-border)'
-const shade = (i: number, n: number) => 1 - (i / Math.max(n, 1)) * 0.75 // the biggest slice is the strongest; "Others" is the lightest
 
 /** Localities of one category: parts of the whole, the smaller localities together as "Others". The legend shows the count and the share. */
 function Donut({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
@@ -26,7 +26,7 @@ function Donut({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
           <ChartTooltip content={tooltip} />
           <Pie data={bars} dataKey="value" nameKey="label" innerRadius={42} outerRadius={70} paddingAngle={2} isAnimationActive={false} stroke="none" cursor={onPick ? 'pointer' : undefined} onMouseEnter={(_, i) => onFocus?.(bars[i].code ?? null)} onMouseLeave={() => onFocus?.(null)} onClick={(_, i) => bars[i].code && onPick?.(bars[i].code!)}>
             {bars.map((b, i) => (
-              <Cell key={b.label} fill={COLOR} fillOpacity={shade(i, bars.length)} />
+              <Cell key={b.label} fill={donutTone(i).color} fillOpacity={donutTone(i).opacity} />
             ))}
           </Pie>
         </PieChart>
@@ -34,7 +34,7 @@ function Donut({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
       <ul className="flex min-w-0 flex-1 flex-col gap-1 text-meta text-muted-foreground">
         {bars.map((b, i) => (
           <li key={b.label} className="flex items-center gap-2" onMouseEnter={() => b.code && onFocus?.(b.code)} onMouseLeave={() => onFocus?.(null)}>
-            <span className="size-2 shrink-0 rounded-full" style={{ background: COLOR, opacity: shade(i, bars.length) }} />
+            <span className="size-2 shrink-0 rounded-full" style={{ background: donutTone(i).color, opacity: donutTone(i).opacity }} />
             <span className="truncate">{b.label}</span>
             <span className="ml-auto tabular-nums text-foreground">
               {b.value} · {Math.round((b.value / total) * 100)} %
@@ -53,9 +53,9 @@ function BarList({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
     <ul className="flex flex-col gap-1.5 text-body-sm" aria-label={summary('Bar list', bars)}>
       {bars.map((b) => (
         <li key={b.label} className="flex items-center gap-3">
-          <button type="button" disabled={!b.code || !onPick} onMouseEnter={() => b.code && onFocus?.(b.code)} onMouseLeave={() => onFocus?.(null)} onClick={() => b.code && onPick?.(b.code)} className="relative h-8 flex-1 overflow-hidden rounded-sm bg-(--cobalt-700) text-left enabled:cursor-pointer">
-            <span className="absolute inset-y-0 left-0 rounded-sm opacity-60" style={{ width: `${(b.value / max) * 100}%`, background: COLOR }} />
-            <span className="relative flex h-full items-center px-2 text-(--fg-emphasis)">{b.label}</span>
+          <button type="button" disabled={!b.code || !onPick} onMouseEnter={() => b.code && onFocus?.(b.code)} onMouseLeave={() => onFocus?.(null)} onClick={() => b.code && onPick?.(b.code)} className="relative h-8 flex-1 overflow-hidden rounded-sm bg-(--cobalt-800) text-left enabled:cursor-pointer">
+            <span className="absolute inset-y-0 left-0 bg-(--cobalt-300) opacity-30" style={{ width: `${(b.value / max) * 100}%` }} />
+            <span className="relative flex h-full items-center px-2 text-body-sm-medium text-(--fg-emphasis)">{b.label}</span>
           </button>
           <span className="w-8 text-right text-subtitle-strong tabular-nums text-foreground">{b.value}</span>
         </li>
@@ -180,8 +180,9 @@ function Places({ bars }: { bars: Answer['bars'] }) {
 }
 
 export default function AnswerChart({ kind, bars, onFocus, onPick, onPickRecurrence }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars']; onPickRecurrence?: (id: string) => void } & Link) {
+  const dark = kind === 'donut' || kind === 'barlist' // owner's Figma, 2026-11-26: the donut and the bar list sit on a darker, rounder card
   return (
-    <div className="rounded-[6px] border-[0.5px] border-(--neutral-500) bg-(--neutral-700) p-4">
+    <div className={`p-4 ${dark ? 'rounded-xl border border-(--neutral-700) bg-(--neutral-900)' : 'rounded-[6px] border-[0.5px] border-(--neutral-500) bg-(--neutral-700)'}`}>
       {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : kind === 'dots' ? <Dots bars={bars} /> : kind === 'rows' ? <Rows bars={bars} /> : kind === 'places' ? <Places bars={bars} /> : kind === 'recurrences' ? <Recurrences bars={bars} onPick={onPickRecurrence} /> : kind === 'donut' ? <Donut bars={bars} onFocus={onFocus} onPick={onPick} /> : <BarList bars={bars} onFocus={onFocus} onPick={onPick} />}
     </div>
   )
