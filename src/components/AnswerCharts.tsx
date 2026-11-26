@@ -55,7 +55,7 @@ function BarList({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
         <li key={b.label} className="flex items-center gap-3">
           <button type="button" disabled={!b.code || !onPick} onMouseEnter={() => b.code && onFocus?.(b.code)} onMouseLeave={() => onFocus?.(null)} onClick={() => b.code && onPick?.(b.code)} className="relative h-8 flex-1 overflow-hidden rounded-sm bg-(--cobalt-700) text-left enabled:cursor-pointer">
             <span className="absolute inset-y-0 left-0 rounded-sm opacity-60" style={{ width: `${(b.value / max) * 100}%`, background: COLOR }} />
-            <span className="relative flex h-full items-center px-2 text-(--brand-primary)">{b.label}</span>
+            <span className="relative flex h-full items-center px-2 text-(--fg-emphasis)">{b.label}</span>
           </button>
           <span className="w-8 text-right text-subtitle-strong tabular-nums text-foreground">{b.value}</span>
         </li>

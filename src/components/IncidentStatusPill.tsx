@@ -4,7 +4,7 @@ import { GROUPS, type Group } from '@/lib/statusColors'
 export function IncidentStatusPill({ group }: { group: Group }) {
   const g = GROUPS[group]
   return (
-    <span className="inline-flex w-fit items-center gap-2 rounded-sm px-3 py-2 text-body-sm-strong leading-[13px]" style={{ background: `var(${g.pill.bg})`, color: `var(${g.pill.text})` }}>
+    <span className="inline-flex h-7 w-fit items-center gap-2 rounded-sm px-3 text-body-sm-strong leading-[13px]" style={{ background: `var(${g.pill.bg})`, color: `var(${g.pill.text})` }}>
       <span className="size-2 shrink-0 rounded-full" style={{ background: `var(${g.swatch})` }} aria-hidden />
       {g.label}
     </span>

@@ -156,7 +156,7 @@ function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNo
       <span className={`flex h-10 w-4 shrink-0 items-start justify-center pt-0.5`}>{icon}</span>
       <span className={`flex h-11 justify-center min-w-0 flex-col text-left`}>
         <span className="flex min-w-0 flex-col gap-1">
-          <span className={`truncate text-body-sm ${active ? 'text-(--brand-primary)' : 'text-(--fg-secondary)'}`}>{title}</span>
+          <span className={`truncate text-body-sm ${active ? 'text-(--fg-emphasis)' : 'text-(--fg-secondary)'}`}>{title}</span>
           <span className="flex h-5 items-center truncate text-caption text-(--fg-secondary)"><span className="truncate">{sub}</span></span>
         </span>
       </span>
@@ -474,7 +474,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                     <ViewList items={investigations} limit={invOpen ? limit : 3} view={{ ...view, group: 'all' }} group={() => ''} order={[]} labels={{}} primary="" row={(c) => (
                   <Button key={c.key} variant="ghost" className={`h-9 items-center justify-start gap-2.5 py-2 pr-4 pl-2 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) text-body-sm ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
                     <Chat weight="regular" className={`size-4 shrink-0 ${act.kind === 'chat' && c.id === act.id ? 'text-(--neutral-200)' : 'text-(--neutral-300)'}`} aria-hidden />
-                    <span className={`truncate ${act.kind === 'chat' && c.id === act.id ? 'text-(--brand-primary)' : 'text-(--fg-secondary)'}`}>{c.title}</span>
+                    <span className={`truncate ${act.kind === 'chat' && c.id === act.id ? 'text-(--fg-emphasis)' : 'text-(--fg-secondary)'}`}>{c.title}</span>
                   </Button>
                 )} />
                     )}</Growing>
@@ -605,7 +605,7 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
   const rail =
     collapsed && railSlot
       ? createPortal(
-          <Button variant="ghost" className="group h-17 w-16 rounded-none border-b-[0.5px] border-(--neutral-500) bg-(--black) p-0 hover:bg-(--black)" aria-label="Expand menu" title="Expand menu" onClick={toggle}> {/* Figma Header's "Logo _Collapsed Container" (owner's Figma, 2026-11-20): 64 x 68, `black`, 12 px at the sides around the 40 px logo, a 0.5 px `neutral-700` line under it and none at its right */}
+          <Button variant="ghost" className="group h-17 w-16 rounded-none border-b-[0.5px] border-(--agent-line,var(--neutral-500)) bg-(--black) p-0 hover:bg-(--black)" aria-label="Expand menu" title="Expand menu" onClick={toggle}> {/* Figma Header's "Logo _Collapsed Container" (owner's Figma, 2026-11-20): 64 x 68, `black`, 12 px at the sides around the 40 px logo, a 0.5 px `neutral-700` line under it and none at its right */}
             <img src={mark} alt="" width={40} height={40} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
             <SidebarSimple weight="regular" className="hidden size-5 -scale-x-100 group-hover:block group-focus-visible:block" aria-hidden />
           </Button>,

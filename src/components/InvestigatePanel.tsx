@@ -1,12 +1,12 @@
 import { gsap } from 'gsap'
-import { Suspense, lazy, useEffect, useRef, useState, type FormEvent } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState, type FormEvent, type CSSProperties } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { CaretDown, MapPin, PictureInPicture, Sparkle, ThumbsDown, ThumbsUp, X } from '@phosphor-icons/react'
 import { Alert } from '@/components/ui/alert'
 import { setRailSlot } from '@/lib/railSlot'
 import { AgentHome } from '@/components/AgentHome'
 import { RecurrenceDetailHeader } from '@/components/RecurrenceDetailHeader'
-import type { SidebarRecurrence } from '@/components/Sidebar'
+import type { SidebarIncident, SidebarRecurrence } from '@/components/Sidebar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Composer } from '@/components/Composer'
@@ -21,7 +21,7 @@ const AnswerChart = lazy(loadChart)
 export type Turn = { question: string; result?: Answer; error?: string }
 
 /** `turns` are this conversation's questions and answers; the app keeps one list per conversation (the sidebar's Investigations). `onTurns` edits the conversation with this id, even if the person has switched to another one meanwhile. */
-export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea, recurrenceId = null, emptyFor = null, recurrence = null, onOpenRecurrence, onCollapse, placesFor = null, onPlaces }: { recurrence?: SidebarRecurrence | null; emptyFor?: 'recurrence' | 'incident' | null; placesFor?: string | null; onPlaces?: (problemId: string | null) => void; onCollapse?: () => void; recurrenceId?: string | null; onOpenRecurrence?: (id: string) => void; chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
+export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highlightIds, onFocusArea, onZoomArea, recurrenceId = null, emptyFor = null, recurrence = null, incident = null, onOpenRecurrence, onCollapse, placesFor = null, onPlaces }: { incident?: SidebarIncident | null; recurrence?: SidebarRecurrence | null; emptyFor?: 'recurrence' | 'incident' | null; placesFor?: string | null; onPlaces?: (problemId: string | null) => void; onCollapse?: () => void; recurrenceId?: string | null; onOpenRecurrence?: (id: string) => void; chatId: number; turns: Turn[]; onTurns: (id: number, edit: (t: Turn[]) => Turn[]) => void; onHighlight: (ids: string[], areas?: Area[], spots?: string[][]) => void; highlightIds: string[]; onFocusArea: (code: number | null) => void; onZoomArea: (code: number) => void }) {
   const setTurns = (edit: (t: Turn[]) => Turn[]) => onTurns(chatId, edit)
   const [busy, setBusy] = useState(false)
   const [text, setText] = useState('')
@@ -85,20 +85,20 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         <div aria-hidden className={`pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,var(--neutral-900),var(--neutral-600))] ${turns.length ? 'opacity-40' : ''}`} style={{ maskImage: 'radial-gradient(#000 1px, transparent 1.5px)', maskSize: '8px 8px', WebkitMaskImage: 'radial-gradient(#000 1px, transparent 1.5px)', WebkitMaskSize: '8px 8px' }} />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       {/* The title row (owner's Figma, 2026-11-12): 60 px (8 px above and below the 44 px collapse button), 16 px at the sides, "Explore" in `label` / neutral-200, a 0.5 px `neutral-600` line under it (owner, 2026-11-16: removed, put back, then set to `neutral-600` like the sidebar line; Figma has none right now), the collapse control at its right: Figma's Sidebar Item Investigation instance, 40 × 44 px, 4 px radius, the `picture-in-picture` icon at 20 px (`PictureInPicture`, regular; owner, 2026-11-16, a try: it was `Minus`, a minimize dash, and before that `panel-left`), `neutral-600` on hover (owner, 2026-11-13; it was a 32 px ghost button with a 16 px arrow). */}
-      <div className={`flex items-center md:max-desk:hidden desk:shrink-0 desk:border-b-[0.5px] desk:border-(--neutral-500) ${turns.length === 0 ? 'desk:h-17' : 'desk:h-(--agent-header-h)'}`}>
+      <div style={recurrence ? ({ '--agent-line': 'var(--neutral-700)' } as CSSProperties) : undefined} className={`flex items-center md:max-desk:hidden desk:shrink-0 desk:border-b-[0.5px] desk:border-(--agent-line,var(--neutral-500)) ${turns.length === 0 ? 'desk:h-17' : 'desk:h-(--agent-header-h)'}`}> {/* the line is `neutral-700` with a recurrence open, `neutral-500` otherwise, here and under the collapsed logo box (owner's Figma, 2026-11-26) */}
         <div ref={setRailSlot} className="hidden h-full shrink-0 [:root[data-sidebar-collapsed]_&]:desk:block" /> {/* the collapsed sidebar's logo box (64 x 68, `black`, a line under it) is the first cell of the header row, not a column down the panel (owner's Figma, 2026-11-20: the sidebar left the Agent Panel and the logo box became part of its Header); empty while the sidebar is open */} {/* Figma title row (owner, 2026-11-17, latest): 68 px high, two cells side by side: a 44 px cell with the expand button (40 x 44, 2 px at the sides; invisible while the sidebar is expanded, so nothing moves) and the rest, 16 px in, with a 0.5 px `neutral-600` line at its left and under both; the rest holds the title, the collapse button and a 40 px empty space at the right. The conversation's Figma row still has the older layout. */}
         <div className="flex h-full flex-1 items-center">
           <CardHeader className="flex w-full flex-row items-center gap-2.5 max-desk:mx-auto max-desk:max-w-[664px] desk:px-8"> {/* Figma title row (owner's Figma, 2026-11-17): 32 px at the sides, "Explore" (fills), the place (map-pin, "Bogotá, Colombia", a chevron; no menu yet) and the collapse button */}
             {/* with a recurrence open the title is its street (owner's Figma, 2026-11-24, Agent Panel · Empty · Recurrence) */}
-            <CardTitle asChild className="flex-1 text-label text-(--fg-secondary)">
+            <CardTitle asChild className="flex-1 text-label text-(--fg-emphasis)">
               <h2 className="truncate" title={recurrence?.address}>{recurrence?.address ?? 'Explore'}</h2>
             </CardTitle>
             <span className="hidden items-center gap-2 px-4 text-body-sm text-(--fg-secondary) desk:flex">
-              <span className="flex items-center gap-1"><MapPin weight="regular" className="size-3.5" aria-hidden />Bogotá, Colombia</span>
-              <CaretDown weight="regular" className="size-[18px]" aria-hidden />
+              <span className="flex items-center gap-1"><MapPin weight="regular" className="size-3.5 text-(--neutral-300)" aria-hidden />Bogotá, Colombia</span>
+              <CaretDown weight="regular" className="size-[18px] text-(--neutral-200)" aria-hidden />
             </span>
             {onCollapse && (
-              <button type="button" aria-label="Collapse agent" title="Collapse agent" onClick={onCollapse} className="hidden h-11 w-10 shrink-0 cursor-pointer place-items-center rounded-sm text-(--fg-primary) outline-none hover:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50 desk:grid">
+              <button type="button" aria-label="Collapse agent" title="Collapse agent" onClick={onCollapse} className="hidden h-11 w-10 shrink-0 cursor-pointer place-items-center rounded-sm text-(--neutral-100) outline-none hover:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50 desk:grid">
                 <PictureInPicture weight="regular" className="size-5" />
               </button>
             )}
@@ -106,6 +106,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         </div>
       </div>
       {recurrence && <RecurrenceDetailHeader category={recurrence.category ?? recurrence.title} reference={recurrence.reference} locality={recurrence.locality} status={recurrence.status} />} {/* every recurrence, with or without a conversation (owner, 2026-11-24): Figma Recurrence Detail Header */}
+      {!recurrence && incident && <RecurrenceDetailHeader category={incident.category ?? incident.title} reference={incident.reference} locality={incident.locality} group={incident.group} />} {/* an open incident has the same strip (owner's Figma, 2026-11-26) */}
       <CardContent className={`flex min-h-0 flex-1 flex-col gap-3 desk:gap-0 desk:p-0`}> {/* the body and the chat area are centered in the whole panel (the sidebar's rail is a header cell now, owner's Figma 2026-11-20, so nothing is reserved at a side). The padding is on the content INSIDE the scroll area, never on the scroll area: the scrollbar stays on the panel's own edge. */}
         {/* The scrollbar sits on the panel's own edge (owner, 2026-11-05): the scroll area is full width and the centered column is inside it. */}
         <div className="relative min-h-0 flex-1">
