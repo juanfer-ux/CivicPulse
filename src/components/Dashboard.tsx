@@ -316,7 +316,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
   useEffect(() => {
     onRows?.({
       recurrences: [...problems].sort((a, b) => (b.last_seen ?? '').localeCompare(a.last_seen ?? '')).map((p) => ({ id: p.id, title: titleCase(p.title), category: data?.categories.find((c) => c.code === p.category)?.name ?? label(p.category), address: p.location_description, status: p.status, reference: p.reference, locality: localityName.get(p.locality_code), created: Date.parse(p.first_seen ?? '') || 0, updated: Date.parse(p.last_seen ?? '') || 0 })),
-      incidents: (data?.incidents ?? []).map((i) => ({ id: i.id, title: i.title, reference: i.reference, locality: localityName.get(i.locality_code), group: groupOf(i.status), created: Date.parse(i.reported_at) || 0, updated: Date.parse(i.reported_at) || 0 })) // the data has no update time for incidents yet: reported_at stands for both,
+      incidents: (data?.incidents ?? []).map((i) => ({ id: i.id, title: i.title, category: data?.categories.find((c) => c.code === i.category)?.name ?? label(i.category), address: i.location_description, reference: i.reference, locality: localityName.get(i.locality_code), group: groupOf(i.status), created: Date.parse(i.reported_at) || 0, updated: Date.parse(i.reported_at) || 0 })) // the data has no update time for incidents yet: reported_at stands for both,
     })
   }, [problems, data, onRows, localityName])
   useEffect(() => {

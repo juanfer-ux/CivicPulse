@@ -121,10 +121,10 @@
   --text-meta-medium--font-weight: calc(500 + var(--weight-offset));
   --text-meta-medium--line-height: var(--lh-meta);
   --text-meta-medium--letter-spacing: 0.03em; /* Figma 2026-11-05: 1.4 % (it was 2 %) */
-  /* Figma caption family (2026-11-05): the same 12 / 16 size in three weights, named like body and meta: caption (Regular), caption-medium (Medium; it was called caption until 2026-11-05) and caption-strong (SemiBold). */
+  /* Figma caption family (2026-11-05): the same 12 / 17 size in three weights, named like body and meta: caption (Regular), caption-medium (Medium; it was called caption until 2026-11-05) and caption-strong (SemiBold). */
   --text-caption: var(--fs-caption);
   --text-caption--font-weight: calc(400 + var(--weight-offset));
-  --text-caption--line-height: 16px;
+  --text-caption--line-height: 17px; /* Figma 2026-11-26: 17 (it was 16) */
   --text-caption--letter-spacing: 0.05em; /* Figma 2026-11-17: 4 % (it was 2.4 %) */
   --text-caption-medium: var(--fs-caption);
   --text-caption-medium--font-weight: calc(500 + var(--weight-offset));
@@ -133,7 +133,7 @@
   /* Figma caption-strong (2026-11-02): the caption size in SemiBold, for Badge and chip labels. */
   --text-caption-strong: var(--fs-caption);
   --text-caption-strong--font-weight: calc(600 + var(--weight-offset));
-  --text-caption-strong--line-height: 12px; /* Figma 2026-11-07: 12 (it was 16) */
+  --text-caption-strong--line-height: 17px; /* Figma 2026-11-26: 17 (12 since 2026-11-07, 16 before) */
   --text-caption-strong--letter-spacing: 0.024em;
   --text-section-label: 11px; /* the small uppercase title above a group of sidebar items (Figma section-label, 2026-10-28): Bold 11 / 16, spacing 18 %; the same on every screen size */
   --text-section-label--font-weight: calc(700 + var(--weight-offset));
