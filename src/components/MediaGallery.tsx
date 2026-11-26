@@ -22,7 +22,7 @@ const placeholderPhotos = (incidentId: string, have: Media[]): Media[] => {
 }
 const CAROUSEL_MAX = 6 // a report card shows at most six items (owner, 2026-11-09)
 
-/** `carousel` (owner, 2026-11-09, the report card in the Occurrences History): 4:3 tiles at the full width, at most six, one at a time. The strip's own scrollbar is hidden because the arrows and the dots do its job. */
+/** `carousel` (owner, 2026-11-09, the report card in the Occurrences History): 246 px tiles (Figma Opened Report, 2026-11-26; 4:3 before) at the full width, at most six, one at a time. The strip's own scrollbar is hidden because the arrows and the dots do its job. */
 export function MediaGallery({ incidentId, carousel = false }: { incidentId: string; carousel?: boolean }) {
   const [loaded, setLoaded] = useState<{ id: string; rows: Media[] } | null>(null)
   const strip = useRef<HTMLDivElement>(null)
@@ -54,19 +54,19 @@ export function MediaGallery({ incidentId, carousel = false }: { incidentId: str
   if (carousel) {
     const shown = tiles
     const tile = (m: Media | null, className: string, k: number) => (
-      <div key={m?.id ?? 'none'} className={`relative grid aspect-[4/3] place-items-center rounded-md border border-dashed bg-inset text-muted-foreground ${className}`} title={m?.is_placeholder === false ? 'File stored' : 'Placeholder: no file yet'}>
+      <div key={m?.id ?? 'none'} className={`relative grid h-[246px] place-items-center rounded-md border border-dashed border-(--neutral-500) bg-(--neutral-800) text-muted-foreground ${className}`} title={m?.is_placeholder === false ? 'File stored' : 'Placeholder: no file yet'}>
         {m?.kind === 'video' ? <VideoCamera className="size-6" aria-hidden /> : <Image className="size-6" aria-hidden />}
-        <span className="absolute bottom-1.5 left-2 text-caption-medium">
+        <span className="absolute bottom-2 left-2 text-caption-medium">
           {m?.kind === 'video' ? `Video${m.duration_seconds ? ` ${clock(m.duration_seconds)}` : ''}` : m ? `Photo ${k + 1}` : 'No file'}
         </span>
       </div>
     )
     const arrow = (dir: 1 | -1, onClick: () => void, disabled: boolean) => (
-      <button type="button" aria-label={dir === 1 ? 'Next' : 'Previous'} disabled={disabled} onClick={onClick} className={`absolute top-1/2 ${dir === 1 ? 'right-1' : 'left-1'} grid size-7 -translate-y-1/2 place-items-center rounded-full bg-(--neutral-900) text-(--neutral-100) disabled:opacity-0`}>
+      <button type="button" aria-label={dir === 1 ? 'Next' : 'Previous'} disabled={disabled} onClick={onClick} className={`absolute top-1/2 ${dir === 1 ? 'right-1' : 'left-1'} grid size-7 -translate-y-1/2 place-items-center rounded-full bg-(--neutral-900) text-(--neutral-200) disabled:opacity-0`}>
         {dir === 1 ? <CaretRight className="size-3.5" /> : <CaretLeft className="size-3.5" />}
       </button>
     )
-    const note = <p className="text-meta text-muted-foreground">{loaded.rows.length ? 'Placeholder media: no files attached yet.' : 'No evidence attached yet.'}</p>
+    const note = <p className="mt-3 px-1 text-meta text-muted-foreground">{loaded.rows.length ? 'Placeholder media: no files attached yet.' : 'No evidence attached yet.'}</p>
     const i = Math.min(at, shown.length - 1)
     // one full-width photo at a time in a snapping strip, dots under it (owner's pick, 2026-11-09; the thumbnails option was dropped)
     const go = (k: number) => strip.current?.scrollTo({ left: k * (strip.current.clientWidth + 8), behavior: 'smooth' })

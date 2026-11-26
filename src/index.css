@@ -284,15 +284,15 @@
   --indigo-200: #C1C0FF;
   --indigo-100: #E7E6FF;
   /* Cobalt (owner's Figma, 2026-11-26; first named Indigo 2): the interface and agent color (everything that was indigo except the Resolved recurrence status, which stays indigo). */
-  --cobalt-900: #0E174E;
-  --cobalt-800: #132172;
-  --cobalt-700: #17288C;
-  --cobalt-600: #1C31AB;
-  --cobalt-500: #2D43BF;
-  --cobalt-400: #5972FF;
-  --cobalt-300: #93A3FF;
-  --cobalt-200: #C0C9FF;
-  --cobalt-100: #E6EAFF;
+  --cobalt-900: #10134C;
+  --cobalt-800: #151965;
+  --cobalt-700: #1D238B;
+  --cobalt-600: #1F27B2;
+  --cobalt-500: #1E29EA;
+  --cobalt-400: #444DEE;
+  --cobalt-300: #7278EE;
+  --cobalt-200: #8E92F1;
+  --cobalt-100: #A1A5F2;
   --red-900: #270D0E;
   --red-800: #4B2122;
   --red-700: #743537;

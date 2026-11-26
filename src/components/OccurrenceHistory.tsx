@@ -44,7 +44,7 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
     const source = detail?.sources[i.id] ?? 'Unknown source'
     const open = openReportId === i.id
     return (
-      <li key={i.id} data-report={i.id}>
+      <li key={i.id} data-report={i.id} className={open ? 'rounded-sm bg-(--neutral-700)' : undefined}> {/* Figma Opened Report: the row and its details share one `neutral-700` block */}
         <button type="button" aria-expanded={open} onClick={() => onSelectIncident(i.id)} className={`flex w-full items-start gap-3 rounded-sm py-3 pr-4 pl-2.5 text-left hover:bg-(--neutral-700) focus-visible:bg-(--neutral-700) ${open ? 'bg-(--neutral-700)' : ''}`}>
           <span className="flex h-11 w-4 shrink-0 justify-center pt-2" aria-hidden>
             <span className="size-2 rounded-full" style={{ background: `var(${PROBLEM_STATUS[status].token})` }} /> {/* the same color as the report's dot on the map: the recurrence's status (owner, 2026-11-25) */}
@@ -59,10 +59,10 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
           {when(i.occurred_at)}
         </button>
         {open && (
-          <div className="flex flex-col gap-3 px-2 pb-3">
+          <div className="flex flex-col gap-3 px-2 pt-2 pb-4">
             <MediaGallery incidentId={i.id} carousel />
-            <p className="text-body-sm text-foreground">{i.description}</p>
-            <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-meta">
+            <p className="px-1 text-body-sm text-foreground">{i.description}</p>
+            <dl className="grid grid-cols-[66px_1fr] gap-x-3 gap-y-1 px-1 text-meta">
               <dt className="text-muted-foreground">Vehicle</dt>
               <dd className="text-foreground">{label(i.vehicle_type)}</dd>
               <dt className="text-muted-foreground">Validation</dt>

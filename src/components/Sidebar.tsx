@@ -578,7 +578,7 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
     return () => window.removeEventListener('filters-open', on)
   }, [])
   useEffect(() => {
-    const expand = () => (setWidth(SIDEBAR_MIN), (auto.current = false), setCollapsed(false)) // expanding always opens at the minimum width (owner, 2026-11-17)
+    const expand = () => ((auto.current = false), setCollapsed(false)) // it opens at the width it had (owner, 2026-11-26; before, always at the minimum)
     window.addEventListener('sidebar-expand', expand) // sent by the expand button in the agent panel's title row
     return () => window.removeEventListener('sidebar-expand', expand)
   }, [])
@@ -594,8 +594,7 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
 
   const toggle = () => {
     auto.current = false // a choice of the person's, so a later resize leaves it alone
-    if (collapsed) setWidth(SIDEBAR_MIN) // every expand opens at the minimum width, whatever it was dragged to before (owner, 2026-11-17)
-    setCollapsed(!collapsed)
+    setCollapsed(!collapsed) // the width is kept, so expanding opens it as it was (owner, 2026-11-26; before, always at the minimum)
   }
   // On phones the menu closes after a choice.
   const phone: Chats = { ...props, onPick: (id) => (props.onPick(id), setOpen(false)), onNew: () => (props.onNew(), setOpen(false)), onNewCase: () => (props.onNewCase(), setOpen(false)), onOpenRecurrence: (id) => (props.onOpenRecurrence?.(id), setOpen(false)), onOpenIncident: (id) => (props.onOpenIncident?.(id), setOpen(false)) }
@@ -605,7 +604,7 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
   const rail =
     collapsed && railSlot
       ? createPortal(
-          <Button variant="ghost" className="group h-17 w-16 rounded-none border-b-[0.5px] border-(--agent-line,var(--neutral-500)) bg-(--black) p-0 hover:bg-(--black)" aria-label="Expand menu" title="Expand menu" onClick={toggle}> {/* Figma Header's "Logo _Collapsed Container" (owner's Figma, 2026-11-20): 64 x 68, `black`, 12 px at the sides around the 40 px logo, a 0.5 px `neutral-700` line under it and none at its right */}
+          <Button variant="ghost" className="group h-17 w-16 rounded-none border-b-[0.5px] border-(--neutral-600) bg-(--black) p-0 hover:bg-(--black)" aria-label="Expand menu" title="Expand menu" onClick={toggle}> {/* Figma Header's "Logo _Collapsed Container" (owner's Figma, 2026-11-20): 64 x 68, `black`, 12 px at the sides around the 40 px logo, a 0.5 px `neutral-700` line under it and none at its right */}
             <img src={mark} alt="" width={40} height={40} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
             <SidebarSimple weight="regular" className="hidden size-5 -scale-x-100 group-hover:block group-focus-visible:block" aria-hidden />
           </Button>,
