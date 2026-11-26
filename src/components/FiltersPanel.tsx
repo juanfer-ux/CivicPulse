@@ -62,7 +62,7 @@ export function FiltersPanel({
       <div className="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto p-8">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-col gap-3">
-            <h2 className="font-display-semi text-display-sm text-(--brand-primary)">Filters</h2>
+            <h2 className="font-display-semi text-display-sm text-(--fg-emphasis)">Filters</h2>
             <p className="text-body-sm text-(--fg-secondary)">Narrow what the map and the agent show.</p>
           </div>
           <Button type="button" variant="ghost" size="sm" onClick={onClose}>

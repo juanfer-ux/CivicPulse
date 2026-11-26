@@ -9,4 +9,9 @@ describe('RecurrenceDetailHeader', () => {
     expect(screen.getByText('PR-00088 · Teusaquillo')).toBeTruthy()
     expect(screen.getByText('Active')).toBeTruthy()
   })
+  it('shows an incident with its own status pill', () => {
+    render(<RecurrenceDetailHeader category="Illegal Dumping" reference="CP-00200" group="rejected" />)
+    expect(screen.getByText('CP-00200')).toBeTruthy()
+    expect(screen.getByText('Rejected')).toBeTruthy()
+  })
 })

@@ -46,7 +46,7 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
       </span>
       <span className="flex items-center gap-10 py-1.5"> {/* Figma Data (owner's Figma, 2026-11-20, ninth look, "surgical": items centered, 40 px between the number column and the graph, 6 px of padding above and under it (only under it before), 12 px under the header (20 before); the column is the number (32 px line) with "Reports" (caption) under it, 6 px apart (54 px), the graph 50 px high, so the row is 66 px */}
           <span className="flex flex-1 basis-0 flex-col gap-1.5">
-            <span className="font-display-semi text-stat text-(--brand-primary)">{value}</span>
+            <span className="font-display-semi text-stat text-(--fg-emphasis)">{value}</span>
             <span className="px-px text-caption text-(--neutral-300)">Reports</span> {/* Figma wraps the label in a frame with 1 px at each side */}
           </span>
           {series && (

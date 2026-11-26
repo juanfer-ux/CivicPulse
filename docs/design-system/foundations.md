@@ -18,7 +18,7 @@
 | `tertiary` | `#858593` (code `--fg-tertiary`) | Quietest readable text; not applied to layers yet |
 | `secondary` | `#A3A3AE` (code `--fg-secondary`) | Supporting text |
 | `primary` | `#B6B6BE` (code `--fg-primary`) | Main text |
-| `emphasis` | `brand-primary` | Active items, emphasis |
+| `emphasis` | `#C8C8D0` (code `--fg-emphasis`) | Active items, emphasis |
 | `on-danger` | `red-400` | On `red-900` |
 | `on-attention` | `orange-500` | On `orange-900` |
 | `on-warning` | `yellow-500` | On `yellow-900` |
@@ -51,7 +51,7 @@ Each class sets size, line height and weight together, so a component never need
 | subtitle | 16 / 19 (spacing 0 %; Figma 2026-11-06, it was 16 / 24 and 2 %) | 16 / 19 | 500 | Card titles (the Worth investigating cards) | `text-subtitle` |
 | subtitle-regular | 16 / 19 (spacing 0 %, as `subtitle`) | 16 / 19 | 400 (Figma Regular) | Same as `subtitle` in the regular weight (new 2026-11-03; no screen uses it yet) | `text-subtitle-regular` |
 | subtitle-strong | 16 / 19 (spacing 0 %, as `subtitle`) | 16 / 19 | 600 (Figma SemiBold) | Same as `subtitle` in the semi-bold weight (new 2026-11-06, owner; no screen uses it yet) | `text-subtitle-strong` |
-| label | 14 / 24 (spacing 2.2 %; line was 22 until 2026-11-05) | **16 / 24** | 600 (Figma SemiBold since 2026-10-29; was 360) | Buttons, field names, menu items, tabs | `text-label` |
+| label | 14 / 24 (spacing 3.4 % since 2026-11-26, it was 2.2 %; line was 22 until 2026-11-05) | **16 / 24** | 600 (Figma SemiBold since 2026-10-29; was 360) | Buttons, field names, menu items, tabs | `text-label` |
 | label-regular | 14 / 24 | **16 / 24** | 400 (Figma Regular) | Trend text and inline labels (new 2026-11-02; no screen uses it yet) | `text-label-regular` |
 | button | 14 / 20 (spacing 2.2%) | **16 / 24** | 600 | Text in Button (default, lg, icon-lg) | `text-button` |
 | button-sm | 13 / 24 (spacing 1.4 %; was 1.8 % until 2026-11-06 and 13.5 / 2.2 % until 2026-11-05) | **16 / 24** | 600 | Text in small Button | `text-button-sm` |
