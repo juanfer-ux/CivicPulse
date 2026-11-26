@@ -15,6 +15,7 @@ import { groupOf, label, typeOf, type Incident } from '@/lib/incidents'
 import type { ProblemRow } from '@/lib/problems'
 import { GROUPS, PROBLEM_STATUS, type ProblemStatus } from '@/lib/statusColors'
 import { ProblemHoverCard } from '@/components/ProblemHoverCard'
+import { IncidentHoverCard } from '@/components/IncidentHoverCard'
 import { MapZoomControl } from '@/components/MapZoomControl'
 
 // Free dark basemap (CARTO / OpenStreetMap), no API key. Swap the URL to change provider.
@@ -52,6 +53,8 @@ const BADGE_ZOOM = 13 // from here the plain squares become squares with the cat
 const INCIDENT_ZOOM = 15
 /** Zoom the camera flies to when a recurrence is opened: close enough that its incidents (a few tens of metres around the marker) show as separate dots around the marker's tile. */
 const PROBLEM_ZOOM = 19.5 // owner, 2026-11-19 (it was 18)
+/** Zoom the camera flies to when a report is opened inside a recurrence (owner, 2026-11-25). */
+const REPORT_ZOOM = 21.3
 const DOTS_ZOOM = 14 // from here every problem's incidents show as dots
 /** The closest the map zooms (owner, 2026-10-30). The basemap has no more detail past zoom 15, so more zoom only stretches it. */
 const MAX_ZOOM = 23 // owner, 2026-11-15 (it was 18)
@@ -172,6 +175,8 @@ interface Props {
   selectedProblemId?: string | null
   /** A report of the open recurrence opened in its history (owner, 2026-11-09): its dot gets the ring, the other dots of the recurrence tone down; the camera does not move. */
   openReportId?: string | null
+  /** Locality code -> name, for the incident hover card. */
+  localityName?: Map<number, string>
   onSelectProblem?: (id: string) => void
   /** Fires when a camera flight to a selection ends (or a touch stops it): the problem panel waits for it before it slides in. */
   onFlightEnd?: () => void
@@ -215,7 +220,7 @@ function answerStems(ids: string[], incidents: Incident[], have: Stem[], spots: 
   return [...have, ...hit.filter((i) => !seen.has(i.id)).slice(0, 200).map((i) => stemOf(i))]
 }
 
-export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots = NO_SPOTS, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, openReportId = null, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemOfIncident, problemIncidentIds = NO_IDS, places = NO_PLACES }: Props) {
+export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots = NO_SPOTS, focusCode, zoomTo, onSelect, problems = NO_PROBLEMS, selectedProblemId = null, openReportId = null, localityName, onSelectProblem, onFlightEnd, dotStatusById = NO_DOTS, problemOfIncident, problemIncidentIds = NO_IDS, places = NO_PLACES }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const carsRef = useRef<{ id: string; lng: number; lat: number; status: string; kind: 'parking' | 'dumping' }[]>([]) // the 3D cars' places (parking recurrences)
@@ -237,6 +242,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
   const onFlightEndRef = useRef(onFlightEnd)
   const [ready, setReady] = useState(false)
   const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null)
+  const [overIncident, setOverIncident] = useState<{ id: string; x: number; y: number } | null>(null)
   const hoverId = hover && problems.some((p) => p.id === hover.id) ? hover.id : null // the recurrence under the pointer (the effect below only reruns when this id changes, not on every pointer move)
 
   useEffect(() => {
@@ -636,6 +642,11 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
         map.on('mousemove', layer, (e) => setHover(e.features?.[0] ? { id: String(e.features[0].properties.id), x: e.point.x, y: e.point.y } : null))
         map.on('mouseleave', layer, () => setHover(null))
       }
+      // the incident's card (owner, 2026-11-25), the same way, over a dot, a pin or a report's dot
+      for (const layer of ['incident-selected-pin', 'incidents', 'incident-badges', 'problem-incident-dots']) {
+        map.on('mousemove', layer, (e) => setOverIncident(e.features?.[0] ? { id: String(e.features[0].properties.id), x: e.point.x, y: e.point.y } : null))
+        map.on('mouseleave', layer, () => setOverIncident(null))
+      }
       // The tapped report's pin floats at the top of its dot's stem instead of on the ground (owner, 2026-11-15): the 3D layer says how far up that is on screen
       let last = ''
       map.on('render', () => {
@@ -884,14 +895,15 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
   const home = useRef<{ lng: number; lat: number; zoom: number } | null>(null)
   useEffect(() => {
     const map = mapRef.current
-    const target = selectedId ? incidents.find((i) => i.id === selectedId) : selectedProblemId ? problems.find((p) => p.id === selectedProblemId) : null
+    const incidentId = selectedId ?? openReportId
+    const target = incidentId ? incidents.find((i) => i.id === incidentId) : selectedProblemId ? problems.find((p) => p.id === selectedProblemId) : null
     if (!ready || !map) return
     setFree(map)
     const from = { lng: map.getCenter().lng, lat: map.getCenter().lat, zoom: map.getZoom() }
     let to: typeof from | null = null
     if (target) {
       home.current ??= { ...from }
-      to = { lng: target.lng, lat: target.lat, zoom: Math.max(from.zoom, selectedId ? INCIDENT_ZOOM : PROBLEM_ZOOM) }
+      to = { lng: target.lng, lat: target.lat, zoom: !selectedId && openReportId ? REPORT_ZOOM : Math.max(from.zoom, selectedId ? INCIDENT_ZOOM : PROBLEM_ZOOM) }
     } else if (home.current) {
       to = home.current
       home.current = null
@@ -927,7 +939,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
       tween.kill()
       for (const e of events) box.removeEventListener(e, stop)
     }
-  }, [ready, selectedId, selectedProblemId]) // eslint-disable-line react-hooks/exhaustive-deps -- only a new selection moves the camera, not a filter change
+  }, [ready, selectedId, selectedProblemId, openReportId]) // eslint-disable-line react-hooks/exhaustive-deps -- only a new selection moves the camera, not a filter change
 
   // While the agent's answer is shown (owner, 2026-10-26) the incidents that are not part of it are hidden, not toned down.
   // While an incident is selected every other dot or pin is toned down toward the land color (same hue, so its status stays readable), and the focused one draws on top.
@@ -946,6 +958,14 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     map.setLayoutProperty('incident-badges', 'symbol-sort-key', (focus ? ['case', focus, 1, 0] : 0) as never)
   }, [ready, selectedId, selectedProblemId, highlightIds])
 
+  // a recurrence's card wins over an incident's; the incident or report that is already open needs none
+  const hovered = !hoverId && overIncident && overIncident.id !== selectedId && overIncident.id !== openReportId ? incidents.find((i) => i.id === overIncident.id) : undefined
+  // a hover card goes to the right of the pointer, or to its left near the right edge, and stays above the bottom edge
+  const beside = ({ x, y }: { x: number; y: number }) => ({
+    top: Math.max(8, Math.min(y - 12, (container.current?.clientHeight ?? 0) - 360)),
+    ...(x > (container.current?.clientWidth ?? 0) - 375 ? { right: (container.current?.clientWidth ?? 0) - x + 18 } : { left: x + 18 }),
+  })
+
   if (!WEBGL2) return <ListFallback incidents={incidents} selectedId={selectedId} onSelect={onSelect} />
 
   // Wrapper positions the map: maplibre's unlayered CSS overrides Tailwind's `absolute` on the map element itself.
@@ -953,17 +973,8 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     <div role="region" aria-label="Incident map" className="absolute top-0 right-0 bottom-14 left-0 desk:top-(--section-header-h) desk:right-(--filters-push,0px) desk:bottom-0 desk:overflow-hidden desk:transition-[right] desk:duration-300">
       <div ref={container} className="size-full" />
       <MapZoomControl map={ready ? mapRef.current : null} min={MIN_ZOOM} max={MAX_ZOOM} home={START_VIEW} />
-      {hover && problems.some((p) => p.id === hover.id) && (
-        <ProblemHoverCard
-          problem={problems.find((p) => p.id === hover.id)!}
-          className="absolute z-30"
-          // to the right of the pointer, or to its left near the right edge, and kept above the bottom edge
-          style={{
-            top: Math.max(8, Math.min(hover.y - 12, (container.current?.clientHeight ?? 0) - 270)),
-            ...(hover.x > (container.current?.clientWidth ?? 0) - 290 ? { right: (container.current?.clientWidth ?? 0) - hover.x + 18 } : { left: hover.x + 18 }),
-          }}
-        />
-      )}
+      {hover && problems.some((p) => p.id === hover.id) && <ProblemHoverCard problem={problems.find((p) => p.id === hover.id)!} className="absolute z-30" style={beside(hover)} />}
+      {hovered && <IncidentHoverCard incident={hovered} locality={localityName?.get(hovered.locality_code) ?? ''} className="absolute z-30" style={beside(overIncident!)} />}
     </div>
   )
 }

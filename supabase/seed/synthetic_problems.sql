@@ -151,9 +151,10 @@ select r.id, r.reference, r.category,
             else initcap(replace(r.subtype, '_', ' ')) || ' left in public space' end,
        'Synthetic report received through ' || sp.name || ' about ' || r.address || '.',
        r.locality,
-       -- reports sit ON the street: up to 24 m along it and under 2 m across it (metres, then degrees)
-       r.lat + ((hashtext(r.reference) % 25) * r.uy + (hashtext(r.reference || 'x') % 4) * 0.6 * r.ux) / 111320.0,
-       r.lng + ((hashtext(r.reference) % 25) * r.ux - (hashtext(r.reference || 'x') % 4) * 0.6 * r.uy) / (111320.0 * cos(radians(r.lat))),
+       -- reports sit ON the street. One occurrence is one vehicle or pile: it has its own spot (up to 24 m along the street,
+       -- under 2 m across it) and its reports differ only by a GPS-like 2 m along the street (metres, then degrees)
+       r.lat + ((hashtext(r.pk || '-' || r.truth_n) % 25 + hashtext(r.reference) % 3) * r.uy + (hashtext(r.pk || '-' || r.truth_n || 'x') % 4) * 0.6 * r.ux) / 111320.0,
+       r.lng + ((hashtext(r.pk || '-' || r.truth_n) % 25 + hashtext(r.reference) % 3) * r.ux - (hashtext(r.pk || '-' || r.truth_n || 'x') % 4) * 0.6 * r.uy) / (111320.0 * cos(radians(r.lat))),
        r.address, r.occurred_at,
        r.occurred_at + case r.platform when 'bogota_te_escucha' then interval '27 hours' when 'uaesp' then interval '6 hours'
                                        else interval '10 minutes' end,

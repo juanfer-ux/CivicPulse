@@ -8,6 +8,7 @@ import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
 import { buckets } from '@/lib/sparkline'
 import { trendOf, type Trend } from '@/lib/trend'
+import { twoLines } from '@/lib/address'
 
 /** DEMO (owner, 2026-11-05, released): the four cards show the four trend statuses, one each (Above, About, Below usual, Low reporting), whatever the data says, so the design can be reviewed. The incident data is synthetic anyway. Delete this line and `DEMO_TRENDS[i] ??` below to show the real trends again. */
 const DEMO_TRENDS: Trend[] = ['above', 'about', 'below', 'low']
@@ -366,6 +367,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
         problemOfIncident={linked}
         selectedProblemId={selectedProblem?.id ?? null}
         openReportId={openReportId}
+        localityName={localityName}
         dotStatusById={dotStatusById}
         onSelectProblem={selectProblem}
         onFlightEnd={onFlightEnd}
@@ -541,7 +543,7 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
         <p>{incident.description}</p>
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-muted-foreground">
           <dt>Location</dt>
-          <dd className="text-foreground">{incident.location_description}</dd>
+          <dd className="whitespace-pre-line text-foreground">{twoLines(incident.location_description)}</dd>
           <dt>Occurred</dt>
           <dd className="text-foreground">{new Date(incident.occurred_at).toLocaleString('en-GB')}</dd>
           <dt>Reported</dt>

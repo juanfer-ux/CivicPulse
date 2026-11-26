@@ -250,7 +250,7 @@
   /* The whole palette is these 58 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
   --white: #ECECEE; /* new in Figma (2026-10-29), brighter than neutral-100; not used on screen yet */
-  --black: #050505; /* new in Figma (2026-11-12), darker than neutral-900; the collapsed sidebar rail header and the composer when active */
+  --black: #0C0C0E; /* #0C0C0E since 2026-11-25 (owner's Figma; it was #050505); new in Figma (2026-11-12), darker than neutral-900; the collapsed sidebar rail header and the composer when active */
   --neutral-900: #111113; /* Figma (2026-11-12): the neutrals 900 to 400 got a step lighter (900 was #0E0E10) */
   --neutral-800: #18181B; /* was #111113 */
   --neutral-700: #1F1F23; /* was #18181B */
@@ -306,6 +306,7 @@
   --yellow-300: #FFF398;
   --yellow-200: #FEF7C3;
   --yellow-100: #FEFBE4;
+  --plate-yellow: #ACA034; /* the license plate badge in the occurrence history (owner's Figma, 2026-11-25); not a Figma variable yet */
   /* Green scale (owner's ask, 2026-11-17; Figma green-900 to green-100): the red scale's saturation and lightness at hue 140, same idea as the neutrals; not used on screen yet. */
   --green-900: #0D2615;
   --green-800: #214A2F;
@@ -449,7 +450,7 @@
 .map-zoom { bottom: 77px; transition: bottom 0.3s, right 0.3s; }
 .map-col .map-zoom { right: calc(var(--col-right) - var(--filters-push, 0px)); } /* aligned with the map column's right edge, the same line as the stat cards and the Filters button (owner, 2026-11-15; it was 14 px from the map's edge); the Filters panel (--filters-push, inside --dock-w) already narrows the map wrapper this control sits in, so it must not be counted twice: it stays at the map's right edge, next to the panel (owner's bug report, 2026-11-15) */
 @media (min-width: 90rem) { .map-col:not([data-history]) .map-zoom { bottom: var(--map-pad); } } /* the zoom control sits at the very bottom on desktop (owner, 2026-11-09): the on-map credit is gone from that corner */
-@media (min-width: 90rem) { .map-col[data-rp] .map-zoom { right: calc(var(--col-right) + 360px + 12px - var(--filters-push, 0px)); } } /* a recurrence is open (owner, 2026-11-09): the history column is flush right and the zoom control sits inside the map, left of it */ /* the modules' right column (decision 0049) sits left of the zoom control */
+@media (min-width: 90rem) { .map-col[data-rp] .map-zoom { right: calc(var(--col-right) + 358px + 12px - var(--filters-push, 0px)); } } /* a recurrence is open (owner, 2026-11-09): the history column is flush right and the zoom control sits inside the map, left of it */ /* the modules' right column (decision 0049) sits left of the zoom control */
 @media (min-width: 90rem) { [data-history] .map-zoom { bottom: calc(77px + 384px); } }
 .zoom-slider { appearance: none; -webkit-appearance: none; writing-mode: vertical-lr; direction: rtl; width: 29px; height: 100%; margin: 0; background: transparent; cursor: pointer; }
 .zoom-slider::-webkit-slider-runnable-track { width: 2px; border-radius: 1px; background: var(--neutral-300); }

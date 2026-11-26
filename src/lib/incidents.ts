@@ -113,3 +113,22 @@ export async function fetchLocalities() {
   if (error) throw error
   return data as Locality[]
 }
+
+export interface IncidentPhotos { count: number; placeholder: boolean }
+const photoCounts = new Map<string, Promise<IncidentPhotos | null>>()
+/** How many photos an incident has, for its hover card (cached: the card asks on every hover). `placeholder` is true while no file is attached. */
+export function fetchIncidentPhotos(incidentId: string): Promise<IncidentPhotos | null> {
+  let p = photoCounts.get(incidentId)
+  if (!p) {
+    p = (async () => {
+      const media = await supabase.from('incident_media').select('is_placeholder').eq('incident_id', incidentId).eq('kind', 'photo')
+      if (media.error) throw media.error
+      return { count: media.data.length, placeholder: media.data.every((m) => m.is_placeholder) }
+    })().catch(() => {
+      photoCounts.delete(incidentId) // a failed load is tried again on the next hover
+      return null
+    })
+    photoCounts.set(incidentId, p)
+  }
+  return p
+}

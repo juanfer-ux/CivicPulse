@@ -121,8 +121,8 @@ function Groups<T extends { id: string | number }>({ items, group, order, labels
         .filter(([, l]) => l.length)
         .map(([g, l]) => (
           <div key={g} className="flex flex-col gap-1">
-            <Button variant="ghost" className="h-7 justify-start gap-1 px-1 text-caption-medium text-(--neutral-200) hover:bg-(--neutral-800) aria-expanded:bg-(--neutral-600)" aria-expanded={open.has(g)} onClick={() => toggle(g)}>
-              {open.has(g) ? <CaretDown weight="bold" className="size-3" aria-hidden /> : <CaretRight weight="bold" className="size-3" aria-hidden />}
+            <Button variant="ghost" className="h-7 justify-start gap-1 px-1 text-caption-medium text-(--neutral-200) hover:bg-(--neutral-700) aria-expanded:bg-(--neutral-600)" aria-expanded={open.has(g)} onClick={() => toggle(g)}>
+              {open.has(g) ? <CaretDown weight="regular" className="size-3" aria-hidden /> : <CaretRight weight="regular" className="size-3" aria-hidden />}
               {labels[g]} · {l.length}
             </Button>
             {open.has(g) && (batch ? <GroupRows rows={newest ? l : [...l].reverse()} row={row} /> : (newest ? l : [...l].reverse()).map(row))}
@@ -178,7 +178,7 @@ function ViewMenu({ view, onChange, onClose, groups = true }: { view: View; onCh
   }, [onClose])
   const Item = ({ label, on, pick }: { label: string; on: boolean; pick: () => void }) => (
     <Button role="menuitemradio" aria-checked={on} variant="ghost" className="h-8 w-full justify-start gap-2 px-2 text-body-sm hover:bg-(--neutral-800)" onClick={pick}>
-      <span className="flex size-4 items-center justify-center">{on && <Check weight="bold" className="size-3.5" aria-hidden />}</span>
+      <span className="flex size-4 items-center justify-center">{on && <Check weight="regular" className="size-3.5" aria-hidden />}</span>
       {label}
     </Button>
   )
@@ -221,7 +221,7 @@ function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views
   }, [])
   return (
     <div className={`flex flex-col gap-2 py-2 pr-1 pl-1`}> {/* 8 px above and below and between, 4 at each side (owner's Figma, 2026-11-23; the right was 10, with the sidebar frame's own 16 px next to it), in all three sections (owner's Figma, 2026-11-17, latest) */}
-      <div ref={head} className={`group/title sticky -top-px ${menu ? 'z-30' : 'z-10'} flex items-center gap-2.5 bg-(--neutral-700) pl-2 ${noGroups ? 'pr-1.5' : 'pr-2'} ${stuck ? 'h-12 -mb-4 border-b-[1.4px] border-(--neutral-600) pb-4' : 'h-8 border-b border-transparent'}`}> {/* stuck at the top: 16 px more padding below, 48 px high (owner, 2026-11-23: 8, then 10, then 16); the negative margin keeps the rows under it where they were, so nothing jumps */}
+      <div ref={head} className={`group/title sticky -top-px ${menu ? 'z-30' : 'z-10'} flex items-center gap-2.5 pl-2 ${noGroups ? 'pr-1.5' : 'pr-2'} ${stuck ? 'h-12 -mb-4 border-b-[0.5px] border-(--neutral-500) bg-(--neutral-700) pb-4' : 'h-8 border-b border-transparent bg-(--neutral-800)'}`}> {/* stuck at the top: 16 px more padding below, 48 px high (owner, 2026-11-23: 8, then 10, then 16); the negative margin keeps the rows under it where they were, so nothing jumps */}
         {onExpand ? (
           <button type="button" className="flex flex-1 cursor-pointer items-center gap-1 text-left text-caption-medium text-(--neutral-300) outline-none hover:text-(--neutral-100) focus-visible:text-(--neutral-100)" aria-expanded={!!expanded} aria-label={`${title}: ${expanded ? 'show less' : 'show all'}`} title={expanded ? 'Show less' : 'Show all'} onClick={() => onExpand(!expanded)}>
             {title}
@@ -405,9 +405,9 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
   const investigations = chats.map((c) => ({ key: c.id, title: c.title, id: c.id, created: c.created, updated: c.updated })).filter((c) => hit(c.title)) // sorted by the section's own view (newest first by default)
   const [invOpen, setInvOpen] = useState(false) // the Investigations chevron
   return (
-    <div className="flex h-full flex-col justify-between">
+    <div className={`flex h-full flex-col justify-between ${collapsed ? '' : 'desk:pl-1'}`}>
       <div className="flex min-h-0 flex-col">
-        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-[70px] justify-between bg-(--neutral-700) px-3'}`}>
+        <div className={`flex shrink-0 items-center desk:rounded-tl-lg ${collapsed ? 'h-17 justify-center bg-(--neutral-900)' : 'h-[70px] justify-between bg-(--neutral-800) px-3'}`}>
           <Brand collapsed={collapsed} />
           {!collapsed && onToggle && (
             <Button variant="ghost" className="h-11 w-10 gap-2 px-2 justify-center" aria-label="Collapse menu" title="Collapse menu" onClick={onToggle}>
@@ -421,7 +421,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
             <div className="flex shrink-0 flex-col gap-10 p-2.5 pr-[22px]"> {/* 12 px more at the right: the Figma container `main` (owner, 2026-11-24) has 12 px of padding at the right around the header and the sections, so the header block is 288 px wide in a 300 px sidebar; no line under the header block any more (owner's Figma, 2026-11-24: its stroke is gone; it was a 1 px `neutral-500` line), 128 px high */} {/* the search and the New investigation row, 12 apart, 32 px above and below (owner's Figma, 2026-11-23, later: 152 px high; 24 and 136 an hour before, 16 and 120 earlier) */}
               <div className="flex flex-col gap-6"> {/* 24 px between the search (44 px high now) and the New investigation row (owner's Figma, 2026-11-24; 32 and 36 an hour before; 12 and 36 before), the header block is 128 px high with 10 px all round */}
                 <div className="relative"> {/* the browser's own clear button is hidden: the × is the Phosphor X (owner, 2026-11-24: only Phosphor icons) */}
-                  <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] bg-(--neutral-800) border-(--neutral-400) pr-9 text-body-sm [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none" />
+                  <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] bg-(--neutral-700) border-(--neutral-400) pr-9 text-body-sm [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none" />
                   {query && (
                     <Button variant="ghost" size="icon" aria-label="Clear search" className="absolute top-2 right-1 size-7" onClick={() => setQuery('')}>
                       <X weight="regular" className="size-4 text-(--neutral-200)" aria-hidden />
@@ -430,7 +430,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                 </div>
                 {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
                 <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--neutral-100) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
-                  <StarFour weight="regular" className="size-[18.3px] shrink-0 text-(--neutral-200)" aria-hidden />
+                  <span className="grid size-6 shrink-0 place-items-center" aria-hidden><StarFour weight="regular" className="size-[18.3px] text-(--neutral-200)" /></span>
                   New investigation
                 </Button>
               </div>
@@ -474,7 +474,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
           </>
         )}
       </div>
-      <div className={`flex shrink-0 flex-col border-t border-(--neutral-600) ${collapsed ? 'items-center justify-center py-5' : 'py-4'}`}> {/* the expanded user row has 20 px above and below (owner's Figma, 2026-11-17, it was 10), the large avatar and 16 px beside it (it was the default avatar and 12) */}
+      <div className={`flex shrink-0 flex-col border-t-[0.5px] border-(--neutral-500) ${collapsed ? 'items-center justify-center py-5' : 'py-4'}`}> {/* the expanded user row has 20 px above and below (owner's Figma, 2026-11-17, it was 10), the large avatar and 16 px beside it (it was the default avatar and 12) */}
         {collapsed ? (
           <>
             <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar src={profilePhoto} name={profile?.full_name || 'Signed in'} title={name} />} />
@@ -594,7 +594,7 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
   const rail =
     collapsed && railSlot
       ? createPortal(
-          <Button variant="ghost" className="group h-17 w-16 rounded-none border-b-[0.5px] border-(--neutral-700) bg-(--black) p-0 hover:bg-(--black)" aria-label="Expand menu" title="Expand menu" onClick={toggle}> {/* Figma Header's "Logo _Collapsed Container" (owner's Figma, 2026-11-20): 64 x 68, `black`, 12 px at the sides around the 40 px logo, a 0.5 px `neutral-700` line under it and none at its right */}
+          <Button variant="ghost" className="group h-17 w-16 rounded-none border-b-[0.5px] border-(--neutral-500) bg-(--black) p-0 hover:bg-(--black)" aria-label="Expand menu" title="Expand menu" onClick={toggle}> {/* Figma Header's "Logo _Collapsed Container" (owner's Figma, 2026-11-20): 64 x 68, `black`, 12 px at the sides around the 40 px logo, a 0.5 px `neutral-700` line under it and none at its right */}
             <img src={mark} alt="" width={40} height={40} className="shrink-0 group-hover:hidden group-focus-visible:hidden" />
             <SidebarSimple weight="regular" className="hidden size-5 -scale-x-100 group-hover:block group-focus-visible:block" aria-hidden />
           </Button>,
@@ -605,7 +605,7 @@ export function Sidebar(props: Chats & { initialCollapsed?: boolean }) { // init
     <>
       {rail}
       {/* Desktop: a column on the left; collapsed, it is 0 wide and its rail is inside the agent panel. */}
-      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} inert={collapsed} className={`relative z-40 hidden shrink-0 overflow-hidden desk:block bg-(--neutral-700)`}>
+      <aside ref={aside} style={{ width: collapsed ? COLLAPSED_W : width }} inert={collapsed} className={`relative z-40 hidden shrink-0 overflow-hidden desk:block bg-(--neutral-800) ${collapsed ? '' : 'border-r-[0.5px] border-r-(--neutral-500)'}`}> {/* Figma Sidebar (owner, 2026-11-25): a 0.5 px `neutral-500` line at its right edge (`neutral-400` for a few minutes); none while collapsed (width 0) */}
         {!collapsed && <SidebarResizer width={width} onChange={changeWidth} />}
         <div className="h-full" style={{ width }}> {/* the menu stays mounted at its own width and the aside clips it, so collapsing and expanding are the same slide, one the reverse of the other (owner, 2026-11-17); a collapsed one is inert */}
           <Menu_ {...props} collapsed={false} onToggle={toggle} />

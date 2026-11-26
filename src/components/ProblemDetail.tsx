@@ -6,6 +6,7 @@ import { ArrowsClockwise, Calendar, FileText, Stack, Wrench, X } from '@phosphor
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ProblemStatusPill } from '@/components/ProblemStatusPill'
+import { twoLines } from '@/lib/address'
 import { label } from '@/lib/incidents'
 import type { ProblemRow } from '@/lib/problems'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
@@ -57,7 +58,7 @@ export function ProblemDetail({
         <header className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-col gap-1">
             <h2 className="text-subtitle">{categoryName ?? label(problem.category)}</h2>
-            <p className="text-subtitle">{problem.location_description}</p>
+            <p className="whitespace-pre-line text-subtitle">{twoLines(problem.location_description)}</p>
             <p className="text-meta text-muted-foreground">
               {problem.reference} · {localityName}
             </p>
