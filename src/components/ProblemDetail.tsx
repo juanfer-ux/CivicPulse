@@ -1,14 +1,15 @@
 import type { ReactNode } from 'react'
+import { BarList } from '@/components/BarList'
 import { ModulesMenu, PanelMenuRow } from '@/components/modules/ModulesMenu'
 import { useModules } from '@/components/modules/ModulesProvider'
 import { useRef } from 'react'
-import { ArrowsClockwise, Calendar, FileText, Stack, Wrench, X } from '@phosphor-icons/react'
+import { ArrowsClockwise, Calendar, FileText, Stack, Wrench, X, UserCheck } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ProblemStatusPill } from '@/components/ProblemStatusPill'
 import { twoLines } from '@/lib/address'
 import { label } from '@/lib/incidents'
-import type { ProblemRow } from '@/lib/problems'
+import type { ProblemRow, ProblemEvent } from '@/lib/problems'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
 
 // Header (owner, 2026-11-08): option 3 of the header gallery (/#header) is the default on desktop; /?header=1 draws the strip option and /?header=0 today's 400 px card.
@@ -25,9 +26,11 @@ export function ProblemDetail({
   problem,
   localityName,
   categoryName,
+  event,
   onClose,
 }: {
   problem: ProblemRow
+  event?: ProblemEvent // the latest status event, shown with the numbers
   localityName: string | undefined
   categoryName: string | undefined
   onClose: () => void
@@ -53,7 +56,7 @@ export function ProblemDetail({
       aria-label="Recurrence details"
       className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none ${WIDE ? 'desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-none desk:w-[360px] desk:flex-col desk:items-stretch desk:gap-2 desk:overflow-visible desk:rounded-none desk:border-0 desk:bg-transparent! desk:shadow-none' : 'desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[400px] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]'}`}
     >
-      {WIDE && <div className="hidden desk:block desk:rounded-md desk:shadow-lg"><StatList problem={problem} /></div>} {/* the numbers (last reported, occurrences, returns, reports, interventions) float at the top left on every recurrence (owner, 2026-11-24) */}
+      {WIDE && <div className="hidden desk:block desk:rounded-md desk:shadow-lg"><StatList problem={problem} event={event} /></div>} {/* the numbers (last reported, occurrences, returns, reports, interventions) float at the top left on every recurrence (owner, 2026-11-24) */}
       <div className={`flex flex-col gap-4 px-4 py-6 ${WIDE ? 'desk:hidden' : ''}`}>
         <header className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-col gap-1">
@@ -122,27 +125,38 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
   )
 }
 
-/** The numbers at the top of the right column (Figma Recurrence Stats, owner 2026-11-12): a `neutral-900` box (6 px radius, 12 px padding and gap) with the "Last reported" strip (`cobalt-800`, `cobalt-200` text) and four tiles in two columns (`neutral-700`, 4 px radius, 12 / 16 padding, the label with its icon over a 24 px SemiBold number). */
-export function StatList({ problem }: { problem: ProblemRow }) {
+// ponytail: sample numbers from the Figma component, until the owner says what this list shows
+const SAMPLE_BARS = [{ label: 'Chapinero', value: 62 }, { label: 'Suba', value: 52 }, { label: 'Kennedy', value: 43 }, { label: 'Engativá', value: 36 }, { label: 'Others', value: 61 }]
+
+/** The numbers of an open recurrence (Figma Recurrence Stats, owner 2026-11-26): a `neutral-900` box (6 px radius, 12 px padding, 20 px gap) with a row for the last report and one for the latest status event (56 px each, a `neutral-700` line under them), then four equal 88 px `neutral-700` tiles in two columns (a 20 px icon and the label, 12 px, the number) and a bar list (sample data for now). */
+export function StatList({ problem, event }: { problem: ProblemRow; event?: ProblemEvent }) {
   const [occ, ret, rep, int, last] = stats(problem)
+  const rows = [{ Icon: last.Icon, label: last.label, value: last.value }, ...(event ? [{ Icon: event.kind === 'resolved' ? UserCheck : last.Icon, label: event.kind === 'resolved' ? 'Resolved by an operator' : 'Reopened by a new occurrence', value: day(event.created_at) }] : [])] // a person icon when an operator resolved it (owner, 2026-11-26)
   return (
-    <div className="hidden flex-col gap-3 rounded-md border border-(--neutral-900) bg-(--neutral-900) p-3 desk:flex">
-      <div className="flex items-center gap-2 rounded-sm bg-(--cobalt-800) px-3 py-2 text-body-sm leading-4 text-(--cobalt-200)">
-        <last.Icon weight="regular" className="size-4 text-(--cobalt-300)" aria-hidden />
-        <span className="flex-1">{last.label}</span>
-        <span className="text-body-sm-strong leading-4">{last.value}</span>
+    <div className="hidden flex-col gap-5 rounded-md border border-(--neutral-900) bg-(--neutral-900) p-3 desk:flex">
+      <div className="flex flex-col">
+        {rows.map((r) => (
+          <p key={r.label} className="flex items-center gap-2 border-b border-(--neutral-700) px-1 py-4">
+            <r.Icon weight="regular" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
+            <span className="flex-1 text-body text-(--fg-secondary)">{r.label}</span>
+            <span className="text-body-medium text-(--fg-primary)">{r.value}</span>
+          </p>
+        ))}
       </div>
-      <dl className="grid grid-cols-2 gap-1">
-        {[occ, ret, rep, int].map((x, i) => (
-          <div key={x.label} className="flex flex-col gap-1.5 rounded-sm bg-(--neutral-700) px-4 py-3">
-            <dt className={`flex items-center gap-1 text-(--fg-secondary) ${i < 2 ? 'text-body' : 'text-body-sm leading-4'}`}>
-              <x.Icon weight="regular" className="size-4 shrink-0 text-(--fg-primary)" aria-hidden />
+      <dl className="grid grid-cols-2 gap-1 p-1">
+        {[occ, ret, rep, int].map((x) => (
+          <div key={x.label} className="flex flex-col gap-3 rounded-sm bg-(--neutral-700) px-4 py-3">
+            <dt className="flex items-center gap-2 text-body text-(--fg-secondary)">
+              <x.Icon weight="regular" className="size-5 shrink-0 text-(--neutral-100)" aria-hidden />
               {x.label}
             </dt>
-            <dd className="text-heading text-[24px]! leading-5 text-(--fg-primary)">{x.value}</dd>
+            <dd className="font-display-semi text-stat text-[24px]! leading-7! text-(--fg-primary)">{x.value}</dd>
           </div>
         ))}
       </dl>
+      <div className="rounded-xl border border-(--neutral-700) p-4">
+        <BarList bars={SAMPLE_BARS} />
+      </div>
     </div>
   )
 }

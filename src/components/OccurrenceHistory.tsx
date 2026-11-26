@@ -44,8 +44,8 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
     const source = detail?.sources[i.id] ?? 'Unknown source'
     const open = openReportId === i.id
     return (
-      <li key={i.id} data-report={i.id} className={open ? 'rounded-sm bg-(--neutral-700)' : undefined}> {/* Figma Opened Report: the row and its details share one `neutral-700` block */}
-        <button type="button" aria-expanded={open} onClick={() => onSelectIncident(i.id)} className={`flex w-full items-start gap-3 rounded-sm py-3 pr-4 pl-2.5 text-left hover:bg-(--neutral-700) focus-visible:bg-(--neutral-700) ${open ? 'bg-(--neutral-700)' : ''}`}>
+      <li key={i.id} data-report={i.id} className={open ? 'bg-(--neutral-800)' : undefined}> {/* Figma Opened Report: the row and its details share one full-width `neutral-800` block */}
+        <button type="button" aria-expanded={open} onClick={() => onSelectIncident(i.id)} className={`flex w-full items-start gap-3 py-3 pr-4 pl-2.5 text-left focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) ${open ? 'bg-(--neutral-800)' : 'hover:bg-(--neutral-700) focus-visible:bg-(--neutral-700)'}`}>
           <span className="flex h-11 w-4 shrink-0 justify-center pt-2" aria-hidden>
             <span className="size-2 rounded-full" style={{ background: `var(${PROBLEM_STATUS[status].token})` }} /> {/* the same color as the report's dot on the map: the recurrence's status (owner, 2026-11-25) */}
           </span>
@@ -92,11 +92,11 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
           {oldestFirst ? <SortAscending className="size-5 text-(--neutral-100)" aria-hidden /> : <SortDescending className="size-5 text-(--neutral-100)" aria-hidden />}
         </Button>
       </div>
-      <div className="shrink-0"> {/* the search runs from edge to edge (owner's Figma, 2026-11-26) */}
+      <div className="shrink-0 px-3"> {/* the search has 12 px at its sides (owner's Figma, 2026-11-26, later; edge to edge before) */}
         <Input type="search" aria-label="Search the occurrence history" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] border-(--neutral-400) bg-(--neutral-800) text-body-sm" />
       </div>
       <ScrollArea viewportRef={viewport} className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh] [&>div]:!block">
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-6">
           {detail && groups.length === 0 && <p className="px-4 text-muted-foreground">No history yet.</p>}
           {detail && q && shown.length === 0 && unplaced.length === 0 && <p className="px-4 text-muted-foreground">Nothing matches the search.</p>}
           {shown.map((g) => {
@@ -114,10 +114,10 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
                   </span>
                   {g.occurrence.subject_key && <span className="rounded-xs bg-(--plate-yellow) px-1.5 py-0.5 text-caption-sm-strong text-(--neutral-900)">{g.occurrence.subject_key.replace('-', ' ')}</span>}{/* the vehicle's plate (owner's Figma, 2026-11-25); dumping has none */}
                 </h4>
-                <div className="flex flex-col gap-0.5 px-2">
+                <div className="flex flex-col gap-3"> {/* the report rows run the full width; the interventions have 12 px at their sides */}
                   <ul className="flex flex-col gap-0.5">{rows.map(report)}</ul>
                   {g.interventions.length > 0 && (
-                    <div className="flex flex-col rounded-sm border border-(--neutral-800) bg-(--black) p-2">
+                    <div className="mx-3 flex flex-col rounded-sm border border-(--neutral-800) bg-(--black) p-2">
                       {g.interventions.map((v) => (
                         <div key={v.id} data-step={`v-${v.id}`} className={`flex flex-col gap-1 py-2 pr-2 pl-0.5${focus === `v-${v.id}` ? RING : ''}`}>
                           <div className="flex items-start gap-3">
@@ -137,7 +137,7 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
                     </div>
                   )}
                   {g.events.map((e) => (
-                    <p key={e.created_at} data-step={`e-${e.created_at}`} className={`px-1 pt-1 text-meta text-(--fg-secondary)${focus === `e-${e.created_at}` ? RING : ''}`}>
+                    <p key={e.created_at} data-step={`e-${e.created_at}`} className={`px-3 text-meta text-(--fg-secondary)${focus === `e-${e.created_at}` ? RING : ''}`}>
                       {day(e.created_at)} · {e.kind === 'resolved' ? 'Marked resolved by an operator' : 'Reopened by a new occurrence'}
                     </p>
                   ))}
@@ -146,8 +146,8 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
             )
           })}
           {unplaced.length > 0 && (
-            <div className="px-2">
-              <p className="px-2 text-body-sm-medium text-foreground">Waiting for review</p>
+            <div>
+              <p className="px-3 text-body-sm-medium text-foreground">Waiting for review</p>
               <ul className="mt-1 flex flex-col gap-0.5">{unplaced.map(report)}</ul>
             </div>
           )}
