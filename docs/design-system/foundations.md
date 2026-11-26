@@ -2,6 +2,28 @@
 
 > Typeface, text styles, colors, spacing and controls. Part of the [design system](README.md); components are in [components.md](components.md).
 
+## Color variables in Figma (owner, 2026-11-26)
+
+**Checked 2026-11-26:** every Figma color, Map color and text style matches `src/index.css`. **Known difference, kept by the owner (2026-11-26):** the Figma variables `text/body-sm-leading` and `text/meta-leading` (Device collection, desktop 23) stay on their layers; the text styles and the code use 20.
+
+- **Colors** collection: grouped by family: `base` (white, black), `neutral`, `indigo`, `red`, `orange`, `blue`, `yellow`, `brand`, `green` (a variable reads `neutral/neutral-900`). Order unchanged, biggest to smallest. Code names are unchanged (`--neutral-900`).
+- **Text** collection (role names since 2026-11-26, at the root with no group): text-only variables (scope: text fill), each pointing to a color. Listed here darkest neutral first, then the status colors; in Figma they are in creation order (the plugin cannot reorder them).
+
+| Text variable | Points to | Use |
+|---|---|---|
+| `inverse` | `neutral-900` | Text on light fills |
+| `disabled` | `neutral-300` | Unavailable or decorative text only (below 4.5:1) |
+| `secondary` | `neutral-200` | Supporting text |
+| `primary` | `neutral-100` | Main text |
+| `emphasis` | `brand-primary` | Active items, emphasis |
+| `on-danger` | `red-400` | On `red-900` |
+| `on-attention` | `orange-500` | On `orange-900` |
+| `on-warning` | `yellow-500` | On `yellow-900` |
+| `on-approved` | `blue-300` | On `blue-900` |
+| `on-info` | `indigo-300` | On `indigo-900` |
+
+All Figma text that used those three colors now uses the Text variables (2026-11-26); use them for new text. Fills of icons and shapes stay on the Colors variables. Code keeps using `var(--neutral-200)`, `var(--neutral-100)` and `var(--brand-primary)`.
+
 ## 🔤 Typeface
 **Manrope** (Google Fonts), served from our own site by `@fontsource-variable/manrope`, so nothing is requested from Google ([decision 0019](../decisions/0019-manrope-font.md)). Variable font, weights 200 to 800. Font smoothing is the browser default (see Smoothing below), with `text-rendering: optimizeLegibility` and a universal letter-spacing of 0.02em. Code: `--font-sans` and the base layer in `src/index.css`.
 
@@ -51,7 +73,7 @@ Each class sets size, line height and weight together, so a component never need
 - The display styles are named `display-lg` (56, was 48 until 2026-11-08), `display` (24), `display-sm` (20, line 30) and `display-md` (28 / 28, added 2026-11-12 for the agent panel's greeting), `display-xs` (16, line 20 since 2026-11-12; it was 14, added 2026-11-06) in both Figma and code (renamed in Figma 2026-11-02, owner's yes).
 - ⚙️ `cn()` in `src/lib/utils.ts` knows these names are font sizes; without that, the class merger dropped `text-label` from colored buttons (test in `utils.test.ts`).
 
-## 🎨 Colors (dark theme): 58 in total
+## 🎨 Colors (dark theme)
 Every other token name (`primary`, `muted`, `accent`, `border`…) is only an alias of one of these 16, because shadcn components expect those names ([decision 0015](../decisions/0015-thirteen-color-palette.md)). Add a color only if none of these can do the job.
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
@@ -134,7 +156,7 @@ Names say what a color is (family and lightness: neutrals are always 100–900 a
 - **Recurrence status colors** (Figma `Map` collection, 2026-10-30, decision [0030](../decisions/0030-problems-above-incidents.md)): their own set, separate from the four incident statuses above, each an alias of a base color so no color was added: `map/problem-active` → red-300, `map/problem-monitoring` → yellow-300, `map/problem-resolved` → indigo-300, `map/problem-archived` → neutral-300, all four 300 steps (owner, 2026-11-01; **only the recurrence marker's own inner outline uses the 600 steps** (red-600, yellow-600, indigo-600, neutral-600) since 2026-11-07, in code `PROBLEM_STATUS[status].outline`; Active was coral-400 and Monitoring amber-400, and those two colors no longer exist) (code: `--map-problem-*` in `src/index.css`).
 - **Gradient** `--ai-gradient` (Figma paint style `ai_gradient`): `ai-border`, `incident`, `warning`, top to bottom at 10 %, 64 %, 105 %. Built from three existing colors (`indigo-400`, `red-300`, `yellow-300`), so not a new color. Used on the border of the Agent Panel (`gradient-border` utility in `src/index.css`).
 - **Brand colors** (owner, 2026-11-02, [decision 0035](../decisions/0035-brand-primary-and-secondary.md)): `brand-primary` `#D9D9DE` (was `#E3E3E7` until 2026-11-12) is the primary button's background and `brand-secondary` `#87DBC7` is its hover, in Figma (the Button component's `default` variant, all sizes, and the two agent-composer send buttons) and in the code (`bg-(--brand-primary) hover:bg-(--brand-secondary)` in the default Button variant). Change the brand color and the button follows. `primary` itself did not change, because it also colors link text.
-- In Figma the **Colors** collection holds exactly these 58 variables (same names, values and one mode); swatches are on the Foundations page (`Colors · 58`, in sections: Surfaces, Borders and fills, Text, Status and danger, Agent, then one section each for Indigo, Red, Orange, Blue and Yellow, 900 down to 100, and a last one, Brand). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
+- In Figma the **Colors** collection holds **68 variables** in family groups (see the top of this page), with the same names and values as `src/index.css` (checked 2026-11-26, including `white`, `black`, the nine greens and `plate-yellow`, which the table below does not all list). Swatches are on the Foundations page (not rechecked for the newer colors). The alias names (`primary`, `muted`, `accent`, `border`, `popover`, `inset`…) exist only in code. The old Primitives and Theme (Dark and Light) collections were removed on 2026-10-22; their values are kept as text on the Archive page.
 
 ### Borders
 Every border and divider in one place. Width is always `--border-width` (0.5 px). A border that is the only thing marking a control must keep **3:1 contrast** against what is next to it (WCAG 1.4.11); decorative dividers need not.
@@ -155,7 +177,7 @@ Every border and divider in one place. Width is always `--border-width` (0.5 px)
 Figma follows this: Suggestion, Filter Chip, Input and the other controls all use `neutral-400`.
 
 ## 🔣 Icons
-Phosphor (`@phosphor-icons/react`, [decision 0025](../decisions/0025-phosphor-icons.md)): the **bold** weight everywhere since 2026-10-30 (set once for the whole app with `IconContext.Provider` in `src/main.tsx`; an icon that asks for another weight keeps it), 1em by default, sized with `size-*` (sidebar items 20 px, 16 px elsewhere). The **fill** weight on the map badges (car for parking, trash can for illegal dumping), on the icons inside buttons (the Figma Button's leading Sparkle and trailing CaretRight, and the Gallery's Plus examples; owner 2026-10-29), on the "Investigate and Ask" header Sparkle, on the selected sidebar row's old solid icons, and on the sidebar's warning icon (the Investigation row's chat icon is the regular weight, outline). Colour follows the text (`currentColor`). Phosphor icons are filled shapes, so no stroke tricks are needed. Mapping from the old Iconoir names: Group→UsersThree, LogOut→SignOut, Map→MapTrifold, MediaImage→Image, Menu→List, NavArrow→Caret, Sparks→Sparkle, Xmark→X, SidebarCollapse/Expand→SidebarSimple (mirrored when collapsed).
+Phosphor (`@phosphor-icons/react`, [decision 0025](../decisions/0025-phosphor-icons.md)): the **regular** weight everywhere since 2026-11-25 (bold from 2026-10-30; set once for the whole app with `IconContext.Provider` in `src/main.tsx`; an icon that asks for **fill** or **duotone** keeps it), 1em by default, sized with `size-*` (sidebar items 20 px, 16 px elsewhere). The **fill** weight on the map badges (car for parking, trash can for illegal dumping), on the icons inside buttons (the Figma Button's leading Sparkle and trailing CaretRight, and the Gallery's Plus examples; owner 2026-10-29), on the "Investigate and Ask" header Sparkle, on the selected sidebar row's old solid icons, and on the sidebar's warning icon (the Investigation row's chat icon is the regular weight, outline). Colour follows the text (`currentColor`). Phosphor icons are filled shapes, so no stroke tricks are needed. Mapping from the old Iconoir names: Group→UsersThree, LogOut→SignOut, Map→MapTrifold, MediaImage→Image, Menu→List, NavArrow→Caret, Sparks→Sparkle, Xmark→X, SidebarCollapse/Expand→SidebarSimple (mirrored when collapsed).
 
 ## 📏 Spacing, radius, controls
 | | Value |
@@ -164,7 +186,7 @@ Phosphor (`@phosphor-icons/react`, [decision 0025](../decisions/0025-phosphor-ic
 | Radius | xs 2 (badges) · **sm 4 (buttons, inputs, selects, dropdowns)** · md 6 · **lg 8 (cards)** · xl 12 · 2xl 16 · full |
 | Control height, desktop | sm 32 · default 36 · lg 44 · icon 32 (was 36, Figma 2026-10-29) · icon-lg 44 |
 | Control height, mobile | sm 40 · **default 44 (touch)** · lg 48 · icon 44 · icon-lg 48 |
-| Border | **0.5 px**, one token `--border-width` (Figma variable `border-width` in Spacing) for every border and divider; color `border`, inputs use `input`. A hairline on retina screens, drawn as 1 px on standard screens. The 3 px focus ring and map dots are not borders. |
+| Border | **0.5 px**, one token `--border-width` (Figma variable `width/default` in its own **Border** collection since 2026-11-26; the **Spacing** collection holds only the steps `0-5` to `16`, with no group) for every border and divider; color `border`, inputs use `input`. A hairline on retina screens, drawn as 1 px on standard screens. The 3 px focus ring and map dots are not borders. |
 | Breakpoint | **1,440 px** (`desk`, `--breakpoint-desk: 90rem`): at and above, sidebar and floating panels; below, top bar and bottom sheet |
 
 Control heights use `h-(--control-sm)`, `h-(--control-default)`, `h-(--control-lg)`, `size-(--control-icon)`, `size-(--control-icon-lg)`; the variables switch at 1,440 px.

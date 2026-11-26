@@ -306,7 +306,7 @@
   --yellow-300: #FFF398;
   --yellow-200: #FEF7C3;
   --yellow-100: #FEFBE4;
-  --plate-yellow: #ACA034; /* the license plate badge in the occurrence history (owner's Figma, 2026-11-25); not a Figma variable yet */
+  --plate-yellow: #ACA034; /* the license plate badge in the occurrence history (owner's Figma, 2026-11-25); Figma variable `yellow/plate-yellow` */
   /* Green scale (owner's ask, 2026-11-17; Figma green-900 to green-100): the red scale's saturation and lightness at hue 140, same idea as the neutrals; not used on screen yet. */
   --green-900: #0D2615;
   --green-800: #214A2F;

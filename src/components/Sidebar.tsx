@@ -427,21 +427,23 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
-            <div className="flex shrink-0 flex-col gap-10 px-4 py-4"> {/* Figma `main` > Header (owner, 2026-11-25): 6 px at the sides of `main` plus 10 of the header, 16 above and below */}
-              <div className="flex flex-col gap-4"> {/* 16 px between the search (44 px high) and the New investigation row (owner's Figma, 2026-11-25; 24 before) */}
-                <div className="relative"> {/* the browser's own clear button is hidden: the × is the Phosphor X (owner, 2026-11-24: only Phosphor icons) */}
+            <div className="flex shrink-0 flex-col"> {/* Figma `main` (owner, 2026-11-26): the header (search, 24 px above and below, a 1.4 px `neutral-700` line under it), then 16 px to New investigation, which has 8 px above and below */}
+              <div className="flex flex-col">
+                <div className="mx-1.5 border-b-[1.4px] border-(--neutral-700) px-3 py-6"><div className="relative"> {/* the browser's own clear button is hidden: the × is the Phosphor X (owner, 2026-11-24: only Phosphor icons) */}
                   <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] bg-(--neutral-700) border-(--neutral-400) pr-9 text-body-sm [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none" />
                   {query && (
                     <Button variant="ghost" size="icon" aria-label="Clear search" className="absolute top-2 right-1 size-7" onClick={() => setQuery('')}>
                       <X weight="regular" className="size-4 text-(--neutral-200)" aria-hidden />
                     </Button>
                   )}
-                </div>
+                </div></div>
                 {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
+                <div className="mx-1.5 mt-4 py-2">
                 <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--neutral-100) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
                   <span className="grid size-6 shrink-0 place-items-center" aria-hidden><StarFour weight="regular" className="size-[18.3px] text-(--neutral-200)" /></span>
                   New investigation
                 </Button>
+                </div>
               </div>
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
@@ -472,7 +474,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                     <ViewList items={investigations} limit={invOpen ? limit : 3} view={{ ...view, group: 'all' }} group={() => ''} order={[]} labels={{}} primary="" row={(c) => (
                   <Button key={c.key} variant="ghost" className={`h-9 items-center justify-start gap-2.5 py-2 pr-4 pl-2 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) text-body-sm ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
                     <Chat weight="regular" className={`size-4 shrink-0 ${act.kind === 'chat' && c.id === act.id ? 'text-(--neutral-200)' : 'text-(--neutral-300)'}`} aria-hidden />
-                    <span className={`truncate ${act.kind === 'chat' && c.id === act.id ? 'text-(--brand-primary)' : 'text-(--neutral-100)'}`}>{c.title}</span>
+                    <span className={`truncate ${act.kind === 'chat' && c.id === act.id ? 'text-(--brand-primary)' : 'text-(--neutral-200)'}`}>{c.title}</span>
                   </Button>
                 )} />
                     )}</Growing>
