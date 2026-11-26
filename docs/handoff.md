@@ -3,6 +3,7 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-05. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **No hover cards while something is open (owner, 2026-11-26):** with an incident or a recurrence open, pointing at the map shows neither hover card. `IncidentMap.tsx`. Not committed.
 - **Label style and agent title line (owner, 2026-11-26):** `label` letter spacing **3.4 %** (was 2.2). With a recurrence open the line under the agent title row, and under the collapsed logo box, is **`neutral-700`**; otherwise `neutral-500` (intentional, as in the two Figma frames; replaces the open point below). Not committed.
 - **Status pills and empty agent panels (owner, 2026-11-26, Figma):** pills **28 px** high; the archived pill's text is `fg-secondary`. Agent title row: title in **`fg-emphasis`**, pin `neutral-300`, chevron `neutral-200`, collapse icon `neutral-100`. An open **incident** now has the detail strip too (category, reference · locality, **incident status pill**); its title stays "Explore". Composer send arrow `neutral-200`. Not committed.
 - **Emphasis text color (owner, 2026-11-26, Figma and code):** `emphasis` is its own value **#C8C8D0** (#CECED5 for a moment) (it pointed to `brand-primary` #D9D9DE). Code: new `--fg-emphasis`, used by the emphasized text; `--brand-primary` stays for buttons, fills and the logo. Not committed.

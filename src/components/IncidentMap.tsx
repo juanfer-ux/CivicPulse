@@ -973,8 +973,9 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     map.setLayoutProperty('incident-badges', 'symbol-sort-key', (focus ? ['case', focus, 1, 0] : 0) as never)
   }, [ready, selectedId, selectedProblemId, highlightIds])
 
-  // a recurrence's card wins over an incident's; the incident or report that is already open needs none
-  const hovered = !hoverId && overIncident && overIncident.id !== selectedId && overIncident.id !== openReportId ? incidents.find((i) => i.id === overIncident.id) : undefined
+  // no hover card at all while an incident or a recurrence is open (owner, 2026-11-26); otherwise a recurrence's card wins over an incident's
+  const open = !!(selectedId || selectedProblemId)
+  const hovered = !open && !hoverId && overIncident ? incidents.find((i) => i.id === overIncident.id) : undefined
   // a hover card goes to the right of the pointer, or to its left near the right edge, and stays above the bottom edge
   const beside = ({ x, y }: { x: number; y: number }) => ({
     top: Math.max(8, Math.min(y - 12, (container.current?.clientHeight ?? 0) - 360)),
@@ -988,7 +989,7 @@ export function IncidentMap({ incidents, selectedId, highlightIds, areas, spots 
     <div role="region" aria-label="Incident map" className="absolute top-0 right-0 bottom-14 left-0 desk:top-(--section-header-h) desk:right-(--filters-push,0px) desk:bottom-0 desk:overflow-hidden desk:transition-[right] desk:duration-300">
       <div ref={container} className="size-full" />
       <MapZoomControl map={ready ? mapRef.current : null} min={MIN_ZOOM} max={MAX_ZOOM} home={START_VIEW} />
-      {hover && problems.some((p) => p.id === hover.id) && <ProblemHoverCard problem={problems.find((p) => p.id === hover.id)!} className="absolute z-30" style={beside(hover)} />}
+      {!open && hover && problems.some((p) => p.id === hover.id) && <ProblemHoverCard problem={problems.find((p) => p.id === hover.id)!} className="absolute z-30" style={beside(hover)} />}
       {hovered && <IncidentHoverCard incident={hovered} locality={localityName?.get(hovered.locality_code) ?? ''} className="absolute z-30" style={beside(overIncident!)} />}
     </div>
   )
