@@ -7,7 +7,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } f
  * Shown at the top of /#charts. Sample numbers only; nothing here changes the app.
  */
 
-const COLOR = 'var(--ai-border)' // indigo-400, the answer charts' color
+const COLOR = 'var(--ai-border)' // cobalt-400, the answer charts' color
 const config = { value: { label: 'Incidents', color: COLOR } } satisfies ChartConfig
 const tick = { fill: 'var(--muted-foreground)', fontSize: 12 }
 const grid = 'var(--secondary)'

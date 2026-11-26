@@ -53,7 +53,7 @@ function BarList({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
     <ul className="flex flex-col gap-1.5 text-body-sm" aria-label={summary('Bar list', bars)}>
       {bars.map((b) => (
         <li key={b.label} className="flex items-center gap-3">
-          <button type="button" disabled={!b.code || !onPick} onMouseEnter={() => b.code && onFocus?.(b.code)} onMouseLeave={() => onFocus?.(null)} onClick={() => b.code && onPick?.(b.code)} className="relative h-8 flex-1 overflow-hidden rounded-sm bg-(--indigo-700) text-left enabled:cursor-pointer">
+          <button type="button" disabled={!b.code || !onPick} onMouseEnter={() => b.code && onFocus?.(b.code)} onMouseLeave={() => onFocus?.(null)} onClick={() => b.code && onPick?.(b.code)} className="relative h-8 flex-1 overflow-hidden rounded-sm bg-(--cobalt-700) text-left enabled:cursor-pointer">
             <span className="absolute inset-y-0 left-0 rounded-sm opacity-60" style={{ width: `${(b.value / max) * 100}%`, background: COLOR }} />
             <span className="relative flex h-full items-center px-2 text-(--brand-primary)">{b.label}</span>
           </button>
@@ -123,7 +123,7 @@ function Recurrences({ bars, onPick }: { bars: Answer['bars']; onPick?: (id: str
               </span>
               {b.sub && <span className="truncate text-meta text-muted-foreground">{b.sub}</span>}
               <span className="h-1 rounded-full bg-(--neutral-600)">
-                <span className="block h-full rounded-full" style={{ width: `${(b.value / max) * 100}%`, background: 'var(--indigo-300)' }} />
+                <span className="block h-full rounded-full" style={{ width: `${(b.value / max) * 100}%`, background: 'var(--indigo-300)' }} />{/* recurrence returns: stays indigo, like the Resolved status colors (owner, 2026-11-26) */}
               </span>
             </span>
             <span className="flex w-[47px] flex-col items-end">

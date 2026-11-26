@@ -69,11 +69,11 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
     <Card className="isolate min-h-0 flex-1 gap-3 overflow-visible bg-ai desk:flex-row desk:gap-0 max-md:gradient-border md:max-desk:rounded-none md:max-desk:border-0 md:max-desk:bg-transparent desk:rounded-none desk:border-0 desk:bg-transparent desk:[--card-spacing:0px]">
       {/* Dotted texture (owner, 2026-11-15; whole panel 2026-11-16): a dot every 8 px (about 2 px wide), colored by a gradient from neutral-900 at the top to neutral-600 at the bottom, made by masking the gradient with the dots; behind everything, from the top of the panel to the bottom (title row, chat and composer), not only the chat area. */}
         {turns.length === 0 && (
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"> {/* Figma Star (owner's Figma, 2026-11-17, it replaced the ellipse): a four-pointed star, 502 x 502, centered, 305 px below the panel's bottom edge (so only its top points show), a gradient at about 50 degrees from `indigo-400` (10 %) through `red-300` (61 %) to `yellow-300`, 40 % opacity, blurred 120 in Figma (60 px in CSS); the landing only, it goes once a conversation starts; behind the dots and everything else */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"> {/* Figma Star (owner's Figma, 2026-11-17, it replaced the ellipse): a four-pointed star, 502 x 502, centered, 305 px below the panel's bottom edge (so only its top points show), a gradient at about 50 degrees from `cobalt-400` (10 %) through `red-300` (61 %) to `yellow-300`, 40 % opacity, blurred 120 in Figma (60 px in CSS); the landing only, it goes once a conversation starts; behind the dots and everything else */}
           <svg ref={star} viewBox="0 0 502 502" className="absolute -bottom-[305px] left-1/2 size-[502px] -translate-x-1/2 opacity-40 blur-[60px]">
             <defs>
               <linearGradient id="agent-star" x1="0" y1="0" x2="0.64" y2="0.77">
-                <stop offset="0.1" stopColor="var(--indigo-400)" />
+                <stop offset="0.1" stopColor="var(--cobalt-400)" />
                 <stop offset="0.61" stopColor="var(--red-300)" />
                 <stop offset="1" stopColor="var(--yellow-300)" />
               </linearGradient>
@@ -134,7 +134,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         <div className="w-full">
         <form onSubmit={onSubmit} className={`flex w-full max-w-[800px] items-center gap-2 max-desk:flex-row desk:flex-col desk:items-stretch desk:gap-3 max-desk:mx-auto desk:mx-auto desk:shrink-0 desk:px-4 desk:py-5 desk:max-w-[calc(var(--agent-content-w)+32px)]`}> {/* the same maximum width in every agent panel (owner, 2026-11-16): 816 with its 48 px sides, a 720 px Composer, on the landing and in a conversation */}
           {turns.length === 0 && !emptyFor && noteOpen && (
-            <Alert variant="info" className="relative z-0 mx-1.5 w-auto -mb-9 hidden px-4 pt-4 pb-10 desk:flex" icon={<Sparkle weight="fill" className="size-5 text-(--indigo-200)" aria-hidden />} action={<Button size="icon" variant="ghost" className="size-8" aria-label="Close note" onClick={() => setNoteOpen(false)}><X weight="regular" className="size-4" aria-hidden /></Button>}> {/* Figma Chat Area (owner, 2026-11-23, latest): the Alert sits ABOVE the Composer, 8 px narrower each side, and the Composer covers its bottom 24 px (Chat Area gap -24, Alert bottom padding 40); it left the Dashboard group */}
+            <Alert variant="info" className="relative z-0 mx-1.5 w-auto -mb-9 hidden px-4 pt-4 pb-10 desk:flex" icon={<Sparkle weight="fill" className="size-5 text-(--cobalt-200)" aria-hidden />} action={<Button size="icon" variant="ghost" className="size-8" aria-label="Close note" onClick={() => setNoteOpen(false)}><X weight="regular" className="size-4" aria-hidden /></Button>}> {/* Figma Chat Area (owner, 2026-11-23, latest): the Alert sits ABOVE the Composer, 8 px narrower each side, and the Composer covers its bottom 24 px (Chat Area gap -24, Alert bottom padding 40); it left the Dashboard group */}
               CivicPulse AI groups related reports into patterns. Nothing goes to the authorities until you’ve reviewed it. Final decision rests with the responsible official.
             </Alert>
           )}

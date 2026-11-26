@@ -4,6 +4,8 @@
 
 ## Color variables in Figma (owner, 2026-11-26)
 
+**Cobalt (2026-11-26; first named Indigo 2):** the interface and agent color: `cobalt` 900 to 100 (`--cobalt-*`: #0E174E, #132172, #17288C, #1C31AB, #2D43BF, #5972FF, #93A3FF, #C0C9FF, #E6EAFF). Everything that was indigo uses it, **except** the Resolved recurrence status and the recurrence returns chart, which stay `indigo`. Where older lines on this page say indigo for the agent, banner, locality or answer colors, read cobalt.
+
 **Checked 2026-11-26:** every Figma color, Map color and text style matches `src/index.css`. **Known difference, kept by the owner (2026-11-26):** the Figma variables `text/body-sm-leading` and `text/meta-leading` (Device collection, desktop 23) stay on their layers; the text styles and the code use 20.
 
 - **Colors** collection: grouped by family: `base` (white, black), `neutral`, `indigo`, `red`, `orange`, `blue`, `yellow`, `brand`, `green` (a variable reads `neutral/neutral-900`). Order unchanged, biggest to smallest. Code names are unchanged (`--neutral-900`).

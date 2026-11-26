@@ -256,7 +256,7 @@ function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views
           {menu && <ViewMenu view={view} groups={!noGroups} onChange={(v) => (setView(v), setMenu(false))} onClose={() => setMenu(false)} />}
         </div>
       </div>
-      <div className="flex flex-col gap-1">{children ? children(view) : row && (newest ? items : [...items].reverse()).slice(0, limit).map(row)}{empty && !items.length && <p className="px-2 pb-1 text-caption text-(--neutral-300)">{empty}</p>}</div>
+      <div className={`flex flex-col ${noGroups ? 'gap-0.5' : 'gap-1'}`}>{children ? children(view) : row && (newest ? items : [...items].reverse()).slice(0, limit).map(row)}{empty && !items.length && <p className="px-2 pb-1 text-caption text-(--neutral-300)">{empty}</p>}</div>
     </div>
   )
 }
@@ -427,9 +427,9 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
         {!collapsed && (
           <>
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
-            <div className="flex shrink-0 flex-col"> {/* Figma `main` (owner, 2026-11-26): the header (search, 24 px above and below, a 1.4 px `neutral-700` line under it), then 16 px to New investigation, which has 8 px above and below */}
+            <div className="flex shrink-0 flex-col"> {/* Figma `main` (owner, 2026-11-26): the header (search, 16 px from the edges, 24 above and below, a 1.4 px `neutral-700` line under it), then 16 px to New investigation (48 px high, 16 px from the edges, 8 above and below) */}
               <div className="flex flex-col">
-                <div className="mx-1.5 border-b-[1.4px] border-(--neutral-700) px-3 py-6"><div className="relative"> {/* the browser's own clear button is hidden: the × is the Phosphor X (owner, 2026-11-24: only Phosphor icons) */}
+                <div className="mx-1.5 border-b-[1.4px] border-(--neutral-700) px-2.5 py-6"><div className="relative"> {/* the browser's own clear button is hidden: the × is the Phosphor X (owner, 2026-11-24: only Phosphor icons) */}
                   <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] bg-(--neutral-700) border-(--neutral-400) pr-9 text-body-sm [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none" />
                   {query && (
                     <Button variant="ghost" size="icon" aria-label="Clear search" className="absolute top-2 right-1 size-7" onClick={() => setQuery('')}>
@@ -438,8 +438,8 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                   )}
                 </div></div>
                 {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
-                <div className="mx-1.5 mt-4 py-2">
-                <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--fg-primary) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
+                <div className="mx-1.5 mt-4 px-2.5 py-2">
+                <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-12 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--fg-primary) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
                   <span className="grid size-6 shrink-0 place-items-center" aria-hidden><StarFour weight="regular" className="size-[18.3px] text-(--neutral-200)" /></span>
                   New investigation
                 </Button>
@@ -447,7 +447,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
               </div>
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
-              <div className="flex flex-col gap-4 px-1.5 pt-4"> {/* Figma `main` (owner, 2026-11-25): 6 px at both sides, 16 px between the header and the sections and between sections */}
+              <div className="flex flex-col gap-3 px-1.5 pt-3"> {/* Figma (owner, 2026-11-26): 6 px at both sides, 12 px under New investigation and between sections */}
                 <Section title="Recurrences" expanded={recOpen} onExpand={setRecOpen} items={allRecurrences} addLabel="New recurrence" onAdd={onNewCase} views empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
                     <Growing open={recOpen} total={allRecurrences.length}>{(limit) => (

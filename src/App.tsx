@@ -55,7 +55,7 @@ export default function App() {
     setSpots(s)
   }
   const [focusCode, setFocusCode] = useState<number | null>(null) // a bar of the answer is under the pointer: its locality lights up on the map
-  const [zoomTo, setZoomTo] = useState<{ code: number; n: number } | null>(null) // a bar was clicked: the map zooms to that locality (n makes a second click on the same bar count)
+  const [zoomTo, setZoomTo] = useState<{ code: number | null; n: number } | null>(null) // a bar was clicked: the map zooms to that locality (n makes a second click on the same bar count)
   // The conversations with Investigate and Ask (the sidebar's Investigations): each keeps its own questions and answers. They live in memory, like the single conversation did before.
   const [chats, setChats] = useState<{ id: number; turns: Turn[] }[]>([{ id: 1, turns: [] }])
   const [activeId, setActiveId] = useState(1)
@@ -82,7 +82,7 @@ export default function App() {
   // Recurrences (sidebar): the plus adds one to the list; there is no page for it yet.
   const [cases, setCases] = useState<{ id: number; title: string }[]>([])
   const newCase = () => setCases((cs) => [{ id: (cs[0]?.id ?? 0) + 1, title: `New recurrence ${(cs[0]?.id ?? 0) + 1}` }, ...cs])
-  const zoomArea = (code: number) => setZoomTo((z) => ({ code, n: (z?.n ?? 0) + 1 }))
+  const zoomArea = (code: number | null) => setZoomTo((z) => ({ code, n: (z?.n ?? 0) + 1 }))
   const [tab, setTab] = useState<Tab>('explore')
   const [rows, setRows] = useState<{ recurrences: SidebarRecurrence[]; incidents: SidebarIncident[] }>({ recurrences: [], incidents: [] })
   const [selection, setSelection] = useState<SidebarSelection | null>(null)

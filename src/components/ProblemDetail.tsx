@@ -37,6 +37,14 @@ export function ProblemDetail({
   const { on: modulesOn } = useModules()
   return (
     <>
+    {WIDE && (
+      <div className="hidden items-center gap-2 desk:absolute desk:top-3 desk:right-[calc(var(--col-right)+358px+12px)] desk:z-20 desk:flex"> {/* the Modules button and the close X float at the map's top right corner, just left of the history column (owner, 2026-11-26; they were above the numbers card), like the map buttons of Google Maps */}
+        {modulesOn && <div className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg"><ModulesMenu kind="recurrence" /></div>}
+        <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg hover:bg-(--neutral-700)">
+          <X />
+        </Button>
+      </div>
+    )}
     <Card
       ref={panel}
       tabIndex={-1}
@@ -45,14 +53,6 @@ export function ProblemDetail({
       aria-label="Recurrence details"
       className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none ${WIDE ? 'desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-none desk:w-[360px] desk:flex-col desk:items-stretch desk:gap-2 desk:overflow-visible desk:rounded-none desk:border-0 desk:bg-transparent! desk:shadow-none' : 'desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[400px] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]'}`}
     >
-      {WIDE && (
-        <div className="hidden items-center justify-end gap-2 desk:flex"> {/* Recurrence header removed (owner, 2026-11-24): the Modules button and the close X float at the top left of the map, above the numbers card and aligned to its right edge (they were left of the right column, where they sat on top of the numbers card at 1,880 px), like the map buttons of Google Maps */}
-          {modulesOn && <div className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg"><ModulesMenu kind="recurrence" /></div>}
-          <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg hover:bg-(--neutral-700)">
-            <X />
-          </Button>
-        </div>
-      )}
       {WIDE && <div className="hidden desk:block desk:rounded-md desk:shadow-lg"><StatList problem={problem} /></div>} {/* the numbers (last reported, occurrences, returns, reports, interventions) float at the top left on every recurrence (owner, 2026-11-24) */}
       <div className={`flex flex-col gap-4 px-4 py-6 ${WIDE ? 'desk:hidden' : ''}`}>
         <header className="flex items-start justify-between gap-2">
@@ -122,13 +122,13 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
   )
 }
 
-/** The numbers at the top of the right column (Figma Recurrence Stats, owner 2026-11-12): a `neutral-900` box (6 px radius, 12 px padding and gap) with the "Last reported" strip (`indigo-800`, `indigo-200` text) and four tiles in two columns (`neutral-700`, 4 px radius, 12 / 16 padding, the label with its icon over a 24 px SemiBold number). */
+/** The numbers at the top of the right column (Figma Recurrence Stats, owner 2026-11-12): a `neutral-900` box (6 px radius, 12 px padding and gap) with the "Last reported" strip (`cobalt-800`, `cobalt-200` text) and four tiles in two columns (`neutral-700`, 4 px radius, 12 / 16 padding, the label with its icon over a 24 px SemiBold number). */
 export function StatList({ problem }: { problem: ProblemRow }) {
   const [occ, ret, rep, int, last] = stats(problem)
   return (
     <div className="hidden flex-col gap-3 rounded-md border border-(--neutral-900) bg-(--neutral-900) p-3 desk:flex">
-      <div className="flex items-center gap-2 rounded-sm bg-(--indigo-800) px-3 py-2 text-body-sm leading-4 text-(--indigo-200)">
-        <last.Icon weight="regular" className="size-4 text-(--indigo-300)" aria-hidden />
+      <div className="flex items-center gap-2 rounded-sm bg-(--cobalt-800) px-3 py-2 text-body-sm leading-4 text-(--cobalt-200)">
+        <last.Icon weight="regular" className="size-4 text-(--cobalt-300)" aria-hidden />
         <span className="flex-1">{last.label}</span>
         <span className="text-body-sm-strong leading-4">{last.value}</span>
       </div>
