@@ -90,15 +90,15 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         <div className="flex h-full flex-1 items-center">
           <CardHeader className="flex w-full flex-row items-center gap-2.5 max-desk:mx-auto max-desk:max-w-[664px] desk:px-8"> {/* Figma title row (owner's Figma, 2026-11-17): 32 px at the sides, "Explore" (fills), the place (map-pin, "Bogotá, Colombia", a chevron; no menu yet) and the collapse button */}
             {/* with a recurrence open the title is its street (owner's Figma, 2026-11-24, Agent Panel · Empty · Recurrence) */}
-            <CardTitle asChild className="flex-1 text-label text-(--neutral-200)">
+            <CardTitle asChild className="flex-1 text-label text-(--fg-secondary)">
               <h2 className="truncate" title={recurrence?.address}>{recurrence?.address ?? 'Explore'}</h2>
             </CardTitle>
-            <span className="hidden items-center gap-2 px-4 text-body-sm text-(--neutral-200) desk:flex">
+            <span className="hidden items-center gap-2 px-4 text-body-sm text-(--fg-secondary) desk:flex">
               <span className="flex items-center gap-1"><MapPin weight="regular" className="size-3.5" aria-hidden />Bogotá, Colombia</span>
               <CaretDown weight="regular" className="size-[18px]" aria-hidden />
             </span>
             {onCollapse && (
-              <button type="button" aria-label="Collapse agent" title="Collapse agent" onClick={onCollapse} className="hidden h-11 w-10 shrink-0 cursor-pointer place-items-center rounded-sm text-(--neutral-100) outline-none hover:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50 desk:grid">
+              <button type="button" aria-label="Collapse agent" title="Collapse agent" onClick={onCollapse} className="hidden h-11 w-10 shrink-0 cursor-pointer place-items-center rounded-sm text-(--fg-primary) outline-none hover:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50 desk:grid">
                 <PictureInPicture weight="regular" className="size-5" />
               </button>
             )}
@@ -115,7 +115,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           {turns.length === 0 && !emptyFor && <AgentHome ask={(q) => void ask(q)} />}
           {turns.length === 0 && emptyFor && (
             <div className="flex flex-1 items-center justify-center px-8 text-center"> {/* Empty state (owner, 2026-11-23): a recurrence with no conversation and no history shows an empty agent panel with one hint line (Figma Agent Panel · Empty) */}
-              <p className="max-w-[320px] text-body-sm text-(--neutral-200)">No conversation about this {emptyFor} yet. Ask the agent anything about it.</p>
+              <p className="max-w-[320px] text-body-sm text-(--fg-secondary)">No conversation about this {emptyFor} yet. Ask the agent anything about it.</p>
             </div>
           )}
           {turns.map((t, i) => (
@@ -149,7 +149,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
 
 /** The person's question (Figma Message, role user). */
 export function Question({ text }: { text: string }) {
-  return <p className="self-end rounded-lg bg-(--neutral-800) p-3 text-(--neutral-200)">{text}</p>
+  return <p className="self-end rounded-lg bg-(--neutral-800) p-3 text-(--fg-secondary)">{text}</p>
 }
 
 /** Thumbs under an answer (Figma Message, role assistant). For now they only mark the choice on screen. */

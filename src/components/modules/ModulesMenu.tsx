@@ -45,7 +45,7 @@ export function ModulesMenu({ kind }: { kind: 'recurrence' | 'incident' }) {
       onPointerDown={(e: ReactPointerEvent) => { down.current = { x: e.clientX, y: e.clientY }; startDrag(t)(e); window.addEventListener('pointerup', (u) => Math.hypot(u.clientX - down.current.x, u.clientY - down.current.y) >= 4 && setOpen(false), { once: true }) }} // a drag drops the module on the map and closes the menu too (it stayed open under the docked module, owner's screenshot 2026-11-19)
       onClick={(e) => { if (Math.hypot(e.clientX - down.current.x, e.clientY - down.current.y) < 4) { dockAt(suggestedArea(t), t); setOpen(false) } }} // a click, not the end of a drag
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dockAt(suggestedArea(t), t); setOpen(false) } }}
-      className="flex h-8 cursor-grab touch-none items-center gap-2 rounded-sm px-2 text-body-sm text-(--neutral-100) outline-none select-none hover:bg-(--neutral-700) focus-visible:bg-(--neutral-700) active:cursor-grabbing"
+      className="flex h-8 cursor-grab touch-none items-center gap-2 rounded-sm px-2 text-body-sm text-(--fg-primary) outline-none select-none hover:bg-(--neutral-700) focus-visible:bg-(--neutral-700) active:cursor-grabbing"
     >
       <Stack weight="regular" className="size-4 text-(--neutral-200)" aria-hidden />
       <span className="flex-1 truncate">{MODULES[t].title}</span>

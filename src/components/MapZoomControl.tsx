@@ -19,7 +19,7 @@ export interface ZoomableMap {
 /** How far the map tilts when the tilt button is pressed (MapLibre's own limit is 60). */
 const TILT = 55
 
-const BTN = 'grid h-[29px] w-full place-items-center text-(--neutral-200) hover:bg-(--neutral-400) active:bg-(--neutral-600) focus-visible:shadow-[inset_0_0_0_1.5px_var(--foreground)] disabled:opacity-50 disabled:hover:bg-transparent outline-none'
+const BTN = 'grid h-[29px] w-full place-items-center text-(--fg-secondary) hover:bg-(--neutral-400) active:bg-(--neutral-600) focus-visible:shadow-[inset_0_0_0_1.5px_var(--foreground)] disabled:opacity-50 disabled:hover:bg-transparent outline-none'
 
 /**
  * The map's zoom control, like Google's (owner, 2026-11-07): a button that goes back to the default view, then plus, a vertical slider and minus.

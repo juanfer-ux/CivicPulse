@@ -6,9 +6,9 @@ export function RecurrenceDetailHeader({ category, reference, locality, status }
   return (
     <div data-slot="recurrence-detail-header" className="flex shrink-0 items-center justify-between gap-4 border-b border-(--neutral-600) bg-(--neutral-800) px-8 py-2.5 max-desk:hidden">
       <div className="flex min-w-0 items-center gap-4">
-        <p className="truncate text-body-medium leading-5 text-(--neutral-100)">{category}</p>
+        <p className="truncate text-body-medium leading-5 text-(--fg-primary)">{category}</p>
         <span className="h-3.5 w-px shrink-0 bg-(--neutral-500)" aria-hidden />
-        <p className="truncate text-meta leading-5 text-(--neutral-200)">{reference}{locality ? ` · ${locality}` : ''}</p>
+        <p className="truncate text-meta leading-5 text-(--fg-secondary)">{reference}{locality ? ` · ${locality}` : ''}</p>
       </div>
       <ProblemStatusPill status={status} />
     </div>

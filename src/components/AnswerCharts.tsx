@@ -92,7 +92,7 @@ function Rows({ bars }: { bars: Answer['bars'] }) {
     <ul className="flex flex-col" aria-label={summary('Evening incidents per candidate', bars)}>
       {bars.map((b, i) => (
         <li key={b.label} className={`flex items-center gap-3 py-2.5 ${i ? 'border-t border-(--neutral-600)' : ''}`}>
-          <span className="grid size-7 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--neutral-100)">{i + 1}</span>
+          <span className="grid size-7 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--fg-primary)">{i + 1}</span>
           <span className="flex min-w-0 flex-1 flex-col gap-1">
             <span className="truncate text-body-sm text-foreground" title={b.label}>
               {b.label}
@@ -116,7 +116,7 @@ function Recurrences({ bars, onPick }: { bars: Answer['bars']; onPick?: (id: str
       {bars.map((b, i) => (
         <li key={b.problemId ?? b.label} className={i ? 'border-t border-(--neutral-600)' : ''}>
           <button type="button" onClick={() => b.problemId && onPick?.(b.problemId)} className="-mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-sm px-2 py-2.5 text-left hover:bg-(--neutral-800) focus-visible:bg-(--neutral-800)">
-            <span className="grid size-7 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--neutral-100)">{i + 1}</span>
+            <span className="grid size-7 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--fg-primary)">{i + 1}</span>
             <span className="flex min-w-0 flex-1 flex-col gap-1">
               <span className="truncate text-body-sm text-foreground" title={b.label}>
                 {b.label}

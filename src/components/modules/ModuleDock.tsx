@@ -35,7 +35,7 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind, open
           {/* The title is the drag handle: a docked module can be moved to another area, or above or below its neighbours, without going back to the sidebar. */}
           <div role="button" tabIndex={0} aria-label={`${title}: drag to move it`} onPointerDown={startDrag(m.type)} className="flex min-w-0 flex-1 cursor-grab touch-none select-none items-center gap-1 active:cursor-grabbing">
             <DotsSixVertical className="size-3.5 shrink-0 text-(--neutral-300)" aria-hidden />
-            <h3 className="flex-1 truncate text-caption-medium text-(--neutral-200)">
+            <h3 className="flex-1 truncate text-caption-medium text-(--fg-secondary)">
               {title}
               {problem ? ` · ${problem.reference}` : incident ? ` · ${incident.reference}` : ''}
             </h3>

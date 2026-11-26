@@ -293,7 +293,7 @@ function SpotRows({ data }: { data: (typeof SPOTS)[number][] }) {
     <ul className="flex flex-col">
       {data.map((d, i) => (
         <li key={d.label} className={`flex items-center gap-3 py-2.5 ${i ? 'border-t border-(--neutral-600)' : ''}`}>
-          <span className="grid size-7 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--neutral-100)">{i + 1}</span>
+          <span className="grid size-7 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--fg-primary)">{i + 1}</span>
           <span className="flex min-w-0 flex-1 flex-col gap-1">
             <span className="truncate text-body-sm text-foreground">{d.label}</span>
             <span className="h-1 rounded-full bg-(--neutral-600)">

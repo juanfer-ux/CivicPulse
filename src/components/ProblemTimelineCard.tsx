@@ -35,7 +35,7 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
     <Card role="region" aria-label="Timeline" data-float={M3 ? true : undefined} className={`min-w-0 gap-0 overflow-hidden bg-card/95 py-0 ${M3 ? 'desk:absolute desk:right-(--col-right) desk:bottom-(--map-pad) desk:left-[calc(var(--col-left)+360px+12px)] desk:z-20 desk:h-[360px]' : 'desk:h-full desk:flex-1'} desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]`}>
     <ScrollArea className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh]">
       <section className="flex flex-col gap-3 p-4">
-        <h3 className="text-caption-medium text-(--neutral-200)">Timeline · {problem.reference}</h3>
+        <h3 className="text-caption-medium text-(--fg-secondary)">Timeline · {problem.reference}</h3>
         {!detail && <p className="text-muted-foreground">Loading…</p>}
         {detail && <ProblemTimeline detail={detail} status={problem.status} onSelectIncident={onSelectIncident} onPick={setFocus} />}
       </section>

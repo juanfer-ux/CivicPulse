@@ -328,8 +328,12 @@
   --secondary: var(--neutral-500);
   --input: var(--neutral-400); /* owner's choice (2026-10-26): one border for every control. Reaches only ~1.6:1 on the input fill, below WCAG 1.4.11's 3:1 for text inputs; accepted by the owner */
   --closed: var(--neutral-300);
-  --muted-foreground: var(--neutral-200);
-  --foreground: var(--neutral-100);
+  /* Text colors (owner's Figma Text collection, 2026-11-26): text only; icons, lines and fills stay on the neutrals. Brightest text: --brand-primary. */
+  --fg-primary: #B6B6BE;
+  --fg-secondary: #A3A3AE;
+  --fg-tertiary: #858593;
+  --muted-foreground: var(--fg-secondary);
+  --foreground: var(--fg-primary);
   --ai: var(--neutral-900); /* the agent panel's background (owner, 2026-10-29; it was neutral-800) */
   --ai-border: var(--indigo-400);
   --answer-banner-h: 44px; /* 44 since 2026-11-17 (Figma Answer Banner: 4 px, the 36 px icon cell, 4 px; fill indigo-800, radius 4, 8 px at the sides); it was 52 */ /* 52 since 2026-11-15 (Figma Answer Banner: 8 px, the 36 px button, 8 px; radius 6, 10 px at the sides, 12 px gaps); */ /* conversation banner height (Figma Answer Banner: 56 since 2026-11-06, a floating rounded box (radius 4) that respects --page-pad; 48 from 2026-11-05, 8 px padding around the 32 px button; it was 44 from 2026-10-28 and 38 before); the filters and the stats card move down by this much while it shows */

@@ -17,7 +17,7 @@ const TOPIC_ICON: Icon[] = [Warning, MapPin, Clock, ArrowsClockwise, Compass]
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-6">
-      <h3 className="font-display-semi text-display-xs-strong text-(--neutral-200)">{title}</h3>
+      <h3 className="font-display-semi text-display-xs-strong text-(--fg-secondary)">{title}</h3>
       {children}
     </section>
   )
@@ -28,7 +28,7 @@ const CATEGORY_ICON: Record<string, Icon> = { 'Obstructive Parking': CarSimple, 
 
 /** Figma Data_Card_Small / Data_Card_Medium: 6 px radius, `neutral-900` fill, 0.5 px `neutral-600` line, 8 px padding and a name in `body-sm`. */
 const dataCard = 'flex flex-col gap-1 rounded-md border-[0.5px] border-(--neutral-700) bg-(--neutral-900)' // Figma data cards (owner, 2026-11-16): a `neutral-900` fill again (it was none since 2026-11-15) and a 0.5 px `neutral-600` line inside (it was `neutral-500`)
-const cardName = 'p-1 text-meta text-(--neutral-200)'
+const cardName = 'p-1 text-meta text-(--fg-secondary)'
 
 function Donut() {
   const R = 52.28 // the ring's middle radius: outer diameter 130.7, inner radius 60 % of it (the owner's Figma donut, 2026-11-12), in a 131 box (it was 140, owner's Figma 2026-11-14)
@@ -93,8 +93,8 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
                   {SHARE.map(([name, n], i) => (
                     <li key={name} className="flex items-center gap-2">
                       <span className="size-2 shrink-0 rounded-full bg-(--indigo-400)" style={{ opacity: STEPS[i] }} aria-hidden />
-                      <span className="flex-1 truncate text-(--neutral-200)">{name}</span>
-                      <span className="text-meta-medium text-(--neutral-100)">{n} · {Math.round((n / total) * 100)} %</span> {/* meta-medium (13 Medium) since 2026-11-15; it was regular */}
+                      <span className="flex-1 truncate text-(--fg-secondary)">{name}</span>
+                      <span className="text-meta-medium text-(--fg-primary)">{n} · {Math.round((n / total) * 100)} %</span> {/* meta-medium (13 Medium) since 2026-11-15; it was regular */}
                     </li>
                   ))}
                 </ul>
@@ -115,7 +115,7 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
                         <Icon weight="fill" className="hidden size-6 text-(--neutral-100) group-hover:block group-focus-visible:block" aria-hidden />
                       </span>
                     )}
-                    <span className="w-full max-w-[88px] text-body-sm-medium text-(--neutral-200)">{c.title}</span>
+                    <span className="w-full max-w-[88px] text-body-sm-medium text-(--fg-secondary)">{c.title}</span>
                   </button>
                 )
               })}
@@ -129,7 +129,7 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
                   return (
                     <button key={s} type="button" className="group flex cursor-pointer items-center gap-3 rounded-sm bg-(--neutral-700) p-2 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(s)}>
                       <TopicIcon className="size-5 shrink-0 text-(--neutral-300)" aria-hidden />
-                      <span className="flex-1 text-body-sm-medium text-(--neutral-200)">{s}</span>
+                      <span className="flex-1 text-body-sm-medium text-(--fg-secondary)">{s}</span>
                       <kbd className="grid h-6 min-w-6 shrink-0 place-items-center rounded-xs bg-(--neutral-800) px-1.5 text-meta font-sans whitespace-nowrap text-(--neutral-300)">Shift+{k + 1}</kbd>
                     </button>
                   )

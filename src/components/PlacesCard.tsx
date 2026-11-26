@@ -14,7 +14,7 @@ export function PlacesCard({ places }: { places: Place[] | 'loading' | 'error' }
   const row = (p: Place) => (
     <div key={p.id} className={`flex items-center gap-2 ${p.dist > RING_M ? 'opacity-50' : ''}`}>
       <span className="size-2 shrink-0 rounded-[1px]" style={{ background: 'var(--neutral-100)' }} aria-hidden /> {/* a square, like the mark on the map (owner, 2026-11-20) */}
-      <span className="min-w-0 flex-1 truncate text-(--neutral-100)">{p.name || niceLabel(p.label)}{p.name && p.label ? <span className="text-(--neutral-300)"> · {niceLabel(p.label)}</span> : null}</span>
+      <span className="min-w-0 flex-1 truncate text-(--fg-primary)">{p.name || niceLabel(p.label)}{p.name && p.label ? <span className="text-(--neutral-300)"> · {niceLabel(p.label)}</span> : null}</span>
       <span className="shrink-0 text-(--neutral-300)">{p.dist} m</span>
     </div>
   )
@@ -22,16 +22,16 @@ export function PlacesCard({ places }: { places: Place[] | 'loading' | 'error' }
     <div className="pointer-events-auto absolute bottom-(--map-pad) left-(--col-left) z-20 hidden max-h-[360px] w-[320px] flex-col gap-2 overflow-y-auto rounded-sm border border-(--neutral-400) bg-(--neutral-800) p-3 text-body-sm desk:flex">
       <p className="text-meta text-(--neutral-300)">Around this location · nearest first · OpenStreetMap</p>
       {places === 'loading' ? (
-        <p className="text-(--neutral-200)">Looking up places…</p>
+        <p className="text-(--fg-secondary)">Looking up places…</p>
       ) : places === 'error' ? (
-        <p className="text-(--neutral-200)">Could not load the stored places. Open the recurrence again to retry.</p>
+        <p className="text-(--fg-secondary)">Could not load the stored places. Open the recurrence again to retry.</p>
       ) : (
         <>
-          <p className="text-caption-medium text-(--neutral-200)">{none ? `Nothing mapped within ${NEAR_M} m. The nearest:` : `Within ${NEAR_M} m`}</p>
+          <p className="text-caption-medium text-(--fg-secondary)">{none ? `Nothing mapped within ${NEAR_M} m. The nearest:` : `Within ${NEAR_M} m`}</p>
           {near.length ? near.map(row) : <p className="text-(--neutral-300)">Nothing mapped within {RADIUS_M} m.</p>}
           {far.length > 0 && (all ? (
             <>
-              <p className="pt-1 text-caption-medium text-(--neutral-200)">Farther, up to {RADIUS_M} m · fainter rows are outside the circle, not on the map</p>
+              <p className="pt-1 text-caption-medium text-(--fg-secondary)">Farther, up to {RADIUS_M} m · fainter rows are outside the circle, not on the map</p>
               {far.map(row)}
             </>
           ) : (
