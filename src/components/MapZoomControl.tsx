@@ -56,7 +56,7 @@ export function MapZoomControl({ map, min, max, home }: { map: ZoomableMap | nul
       </div>
       <div className="flex flex-col overflow-hidden rounded-sm border border-(--neutral-500) bg-(--neutral-900)">
         <button type="button" className={BTN} aria-label="Zoom in" title="Zoom in" disabled={zoom >= max - 0.01} onClick={() => map?.zoomIn()}>
-          <Plus className="size-2.5" weight="bold" aria-hidden />
+          <Plus className="size-2.5" weight="regular" aria-hidden />
         </button>
         <div className="relative hidden h-[112px] justify-center desk:flex">
           <input
@@ -72,7 +72,7 @@ export function MapZoomControl({ map, min, max, home }: { map: ZoomableMap | nul
           <span className="pointer-events-none absolute left-1 h-px w-[5px] bg-(--neutral-100)" style={{ bottom: `calc(8px + (100% - 16px) * ${tick / 100})` }} aria-hidden title="Default zoom" />
         </div>
         <button type="button" className={BTN} aria-label="Zoom out" title="Zoom out" disabled={zoom <= min + 0.01} onClick={() => map?.zoomOut()}>
-          <Minus className="size-2.5" weight="bold" aria-hidden />
+          <Minus className="size-2.5" weight="regular" aria-hidden />
         </button>
       </div>
       {import.meta.env.DEV && <span className="-mx-4 text-center text-caption text-(--neutral-300)" title="Map zoom (dev server only)">z {zoom.toFixed(2)}</span>} {/* the zoom number, only on the dev server (owner, 2026-11-15) */}

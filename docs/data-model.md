@@ -111,6 +111,7 @@ erDiagram
 **Matching** (`match_unlinked()`, owner-only, never a trigger, never updates `incidents`): see [ai-agent.md](ai-agent.md#-matching-is-rules-not-ai) and [incident-lifecycle.md](incident-lifecycle.md#-problem-status-4-values).
 
 **Seed:** `supabase/seed/synthetic_problems.sql` adds **200 new reports** (tag `evidence_metadata->>'dataset' = 'problems_v1'`) with 16 problems' worth of planted truth (48 occurrences, 32 interventions, about three months, both categories). The 650 existing incidents are never changed. Each problem sits on a **real street** (positions snapped to the basemap's roads, 2026-10-30) and its reports spread up to 24 m along that street and under 2 m across it, and the problem's position is the middle of its reports. The seed does not fill problems or links: the matcher builds them and `supabase/tests/matching_smoke.sql` compares the result with the planted truth.
+- **Report positions (owner, 2026-11-25):** each synthetic occurrence has one spot on the street and its reports differ by a few metres. A database seeded earlier is updated by the owner with `supabase/seed/tighten_report_positions.sql` (once).
 
 ## 🎯 Still to build
 | | Item |
