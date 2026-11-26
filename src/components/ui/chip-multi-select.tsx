@@ -50,7 +50,7 @@ export function ChipMultiSelect({
             {groups.map(([group, rows], gi) => (
               <BaseSelect.Group key={group ?? ''}>
                 {gi > 0 && <BaseSelect.Separator className="mx-1 my-1 h-px bg-border" />}
-                {group && <BaseSelect.GroupLabel className="px-2 pt-1.5 pb-1 text-section-label uppercase text-(--neutral-200)">{group}</BaseSelect.GroupLabel>}
+                {group && <BaseSelect.GroupLabel className="px-2 pt-1.5 pb-1 text-section-label uppercase text-(--fg-secondary)">{group}</BaseSelect.GroupLabel>}
                 {rows.map((o) => (
                   <BaseSelect.Item
                     key={o.value}

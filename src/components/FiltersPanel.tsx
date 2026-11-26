@@ -15,7 +15,7 @@ const toggle = <T,>(list: T[], v: T, on: boolean) => (on ? [...list, v] : list.f
 
 function Check({ checked, disabled, onChange, children, hint }: { checked: boolean; disabled?: boolean; onChange: (v: boolean) => void; children: ReactNode; hint?: string }) {
   return (
-    <label className={`flex items-center gap-2 text-body-sm ${disabled ? 'cursor-not-allowed text-(--neutral-300)' : 'cursor-pointer text-(--neutral-100)'}`}>
+    <label className={`flex items-center gap-2 text-body-sm ${disabled ? 'cursor-not-allowed text-(--neutral-300)' : 'cursor-pointer text-(--fg-primary)'}`}>
       <Checkbox checked={checked} disabled={disabled} onCheckedChange={(v) => onChange(v === true)} />
       {children}
       {hint && (/^\d+$/.test(hint) ? <CountBadge className="ml-auto">{hint}</CountBadge> : <span className="ml-auto text-(--neutral-300)">{hint}</span>)} {/* a number is a count (the badge); "Soon" stays text */}
@@ -24,7 +24,7 @@ function Check({ checked, disabled, onChange, children, hint }: { checked: boole
 }
 const Fieldset = ({ title, children }: { title: string; children: ReactNode }) => (
   <fieldset className="flex flex-col gap-3">
-    <legend className="mb-3 text-label text-(--neutral-100)">{title}</legend>
+    <legend className="mb-3 text-label text-(--fg-primary)">{title}</legend>
     {children}
   </fieldset>
 )
@@ -63,7 +63,7 @@ export function FiltersPanel({
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-col gap-3">
             <h2 className="font-display-semi text-display-sm text-(--brand-primary)">Filters</h2>
-            <p className="text-body-sm text-(--neutral-200)">Narrow what the map and the agent show.</p>
+            <p className="text-body-sm text-(--fg-secondary)">Narrow what the map and the agent show.</p>
           </div>
           <Button type="button" variant="ghost" size="sm" onClick={onClose}>
             Close
@@ -87,7 +87,7 @@ export function FiltersPanel({
             const on = filters.categories.includes(c.code)
             return (
               <Check key={c.code} checked={on} disabled={planned || (!n && !on)} hint={planned ? 'Soon' : String(n)} onChange={(on) => set({ categories: toggle(filters.categories, c.code, on) })}>
-                <span className="grid shrink-0 text-(--neutral-200) [&>svg]:size-4" aria-hidden>
+                <span className="grid shrink-0 text-(--fg-secondary) [&>svg]:size-4" aria-hidden>
                   <Icon />
                 </span>
                 {c.name}

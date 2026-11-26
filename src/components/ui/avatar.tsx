@@ -7,7 +7,7 @@ const SIZE = { sm: 'size-6 text-[10px]/[13px] tracking-normal', default: 'size-8
 /** Round photo with initials while there is no photo (Figma: Avatar; Base UI Avatar from shadcn). */
 export function Avatar({ src, name, size = 'default', className, title }: { src?: string | null; name: string; size?: keyof typeof SIZE; className?: string; title?: string }) {
   return (
-    <BaseAvatar.Root data-slot="avatar" title={title} className={cn('inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-(--neutral-600) font-semibold text-(--neutral-100) ring-[2.4px] ring-(--neutral-400) select-none', SIZE[size], className)}>
+    <BaseAvatar.Root data-slot="avatar" title={title} className={cn('inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-(--neutral-600) font-semibold text-(--fg-primary) ring-[2.4px] ring-(--neutral-400) select-none', SIZE[size], className)}>
       {src && <BaseAvatar.Image src={src} alt={name} className="size-full object-cover" />}
       <BaseAvatar.Fallback aria-label={name}>{initials(name)}</BaseAvatar.Fallback>
     </BaseAvatar.Root>

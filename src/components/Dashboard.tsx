@@ -397,7 +397,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
       {data && (
         <div data-float className="absolute bottom-[4.5rem] left-3 z-10 flex items-center gap-2 desk:bottom-(--map-pad) desk:left-(--col-left) desk:transition-[left] desk:duration-300 desk:right-(--col-right) desk:pointer-events-none desk:[&>*]:pointer-events-auto">
           {!hasProblems && (
-            <p className="pointer-events-none rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--neutral-200)">
+            <p className="pointer-events-none rounded-sm border bg-card/95 px-3 py-1 text-meta text-(--fg-secondary)">
               Showing {filtered.length} {filtered.length === 1 ? 'incident' : 'incidents'}
             </p>
           )}
@@ -445,7 +445,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
         className={`fixed inset-x-0 bottom-0 z-10 flex flex-col gap-2 rounded-t-2xl border-t bg-sidebar/95 p-2 backdrop-blur desk:contents ${collapsed ? 'max-desk:[&>:not(:first-child)]:hidden' : 'h-[62svh] md:max-desk:h-[50svh]'}`}
       >
         <div className="flex shrink-0 items-center gap-1 md:max-desk:justify-between desk:hidden">
-          <span className="hidden px-2 text-label text-(--neutral-200) md:max-desk:block">Explore</span> {/* tablet: the panel's own title row is hidden, so its title sits here, on the row of the collapse button (owner, 2026-11-15) */} {/* tablet (owner, 2026-11-15): no tabs, only the collapse button; the sheet always shows the agent (Explore) panel, 50 % of the screen high */}
+          <span className="hidden px-2 text-label text-(--fg-secondary) md:max-desk:block">Explore</span> {/* tablet: the panel's own title row is hidden, so its title sits here, on the row of the collapse button (owner, 2026-11-15) */} {/* tablet (owner, 2026-11-15): no tabs, only the collapse button; the sheet always shows the agent (Explore) panel, 50 % of the screen high */}
           {(
             [
               ['explore', 'Explore'],
@@ -477,7 +477,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
         {/* Outer container: no padding outside the panel any more (owner, 2026-11-15; it had the 12 px float padding since 2026-11-06): the sidebar and the agent panel touch the window's top, bottom and left edges. */}
         <div data-float data-agent-panel className="relative flex min-h-0 flex-1 flex-col gap-3 desk:pointer-events-auto desk:backdrop-blur-[32px] desk:border-r-[0.5px] desk:border-r-(--neutral-500) desk:bg-(--neutral-900) desk:p-0">
           {agentOff ? (
-            <button type="button" aria-label="Open agent" title="Open agent" onClick={() => onAgentOff(false)} className="hidden h-full w-full flex-col items-center gap-3 py-4 text-(--neutral-200) hover:text-(--neutral-100) desk:flex">
+            <button type="button" aria-label="Open agent" title="Open agent" onClick={() => onAgentOff(false)} className="hidden h-full w-full flex-col items-center gap-3 py-4 text-(--fg-secondary) hover:text-(--fg-primary) desk:flex">
               <Sparkle className="size-4" />
               <span className="text-caption [writing-mode:vertical-rl]">Ask the agent</span>
             </button>

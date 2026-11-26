@@ -7,7 +7,7 @@ import type { ProblemDetailData } from '@/lib/problems'
 import { PROBLEM_STATUS, type ProblemStatus } from '@/lib/statusColors'
 import { buildTimeline, tickLabel, type Lane, type TimelinePoint } from '@/lib/timeline'
 
-const tick = { fill: 'var(--neutral-200)', fontSize: 12 }
+const tick = { fill: 'var(--fg-secondary)', fontSize: 12 }
 const LANE_PX = 44
 type ShapeProps = { cx?: number; cy?: number; size?: number; payload?: TimelinePoint }
 

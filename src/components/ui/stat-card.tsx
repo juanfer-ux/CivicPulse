@@ -34,14 +34,14 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
       {...(onClick ? { type: 'button' as const, onClick, 'aria-pressed': !!selected } : {})}
     >
       <span className="flex h-6 items-center justify-between gap-2 px-px"> {/* Figma Header (owner's Figma, 2026-11-20, fifth look): the name and the trend mark only, 24 px high ("Reports" went back down to the number row) */}
-        <span className="truncate text-subtitle text-(--neutral-100)">{label}</span>
+        <span className="truncate text-subtitle text-(--fg-primary)">{label}</span>
         {t && (
           <TooltipProvider><Tooltip><TooltipTrigger asChild>
           <span className={`grid shrink-0 place-items-center rounded-[6px] ${t.box}`}> {/* Figma Stat Trend (owner, 2026-11-17, latest): a small filled box (radius 2) with the trend icon: above 24 px, `red-900` and `red-400`; about, low and below 20 px, `blue-900` / `blue-200`, `yellow-900` / `yellow-300`, `green-900` / `green-400`; the icon is 14 px in above and 12 in the rest; the Figma glyph `trend-top` is an up arrow (turned to the right for about and down for below), and low is the zigzag `trend-down`: Phosphor `ArrowUp`, `ArrowRight`, `TrendDown`, `ArrowDown` */}
             <t.Icon className={t.icon} aria-hidden />
             <span className="sr-only">{t.text}</span>
           </span>
-          </TooltipTrigger><TooltipContent side="top" align="end"><p className="text-body-sm-strong text-(--neutral-100)">{t.text}</p><p>{t.why}</p>{'caution' in t && <p className="mt-1 text-body-sm-strong text-(--red-300)">{t.caution}</p>}</TooltipContent></Tooltip></TooltipProvider>
+          </TooltipTrigger><TooltipContent side="top" align="end"><p className="text-body-sm-strong text-(--fg-primary)">{t.text}</p><p>{t.why}</p>{'caution' in t && <p className="mt-1 text-body-sm-strong text-(--red-300)">{t.caution}</p>}</TooltipContent></Tooltip></TooltipProvider>
         )}
       </span>
       <span className="flex items-center gap-10 py-1.5"> {/* Figma Data (owner's Figma, 2026-11-20, ninth look, "surgical": items centered, 40 px between the number column and the graph, 6 px of padding above and under it (only under it before), 12 px under the header (20 before); the column is the number (32 px line) with "Reports" (caption) under it, 6 px apart (54 px), the graph 50 px high, so the row is 66 px */}

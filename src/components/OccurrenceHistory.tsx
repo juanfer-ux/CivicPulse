@@ -34,8 +34,8 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
 
   const when = (iso: string) => (
     <span className="flex w-[52px] shrink-0 flex-col items-end">
-      <span className="text-body text-(--neutral-100)">{day(iso)}</span>
-      <span className="text-meta tabular-nums text-(--neutral-200)">{clock(iso)}</span>
+      <span className="text-body text-(--fg-primary)">{day(iso)}</span>
+      <span className="text-meta tabular-nums text-(--fg-secondary)">{clock(iso)}</span>
     </span>
   )
 
@@ -50,11 +50,11 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
             <span className="size-2 rounded-full" style={{ background: `var(${PROBLEM_STATUS[status].token})` }} /> {/* the same color as the report's dot on the map: the recurrence's status (owner, 2026-11-25) */}
           </span>
           <span className="flex min-w-0 flex-1 flex-col">
-            <span className="flex items-center gap-2 text-body-medium text-(--neutral-200)">
+            <span className="flex items-center gap-2 text-body-medium text-(--fg-secondary)">
               {i.reference}
               {l.state === 'proposed' && <Badge variant="outline">Needs review</Badge>}
             </span>
-            <span className="text-body-sm text-(--neutral-200)">{source}</span>
+            <span className="text-body-sm text-(--fg-secondary)">{source}</span>
           </span>
           {when(i.occurred_at)}
         </button>
@@ -87,7 +87,7 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
   return (
     <>
       <div className="flex h-17 shrink-0 items-center gap-5 border-b-[0.5px] border-(--neutral-600) px-4"> {/* Figma Title row: 68 px, 16 px at the sides, a 0.5 px `neutral-600` line under it */}
-        <h3 className="flex-1 text-label text-(--neutral-200)">Occurrence history</h3>
+        <h3 className="flex-1 text-label text-(--fg-secondary)">Occurrence history</h3>
         <Button variant="ghost" className="h-11 w-10 justify-center px-2" aria-label={oldestFirst ? 'Show newest first' : 'Show oldest first'} title={oldestFirst ? 'Show newest first' : 'Show oldest first'} onClick={() => setOldestFirst((o) => !o)}>
           {oldestFirst ? <SortAscending className="size-5" aria-hidden /> : <SortDescending className="size-5" aria-hidden />}
         </Button>
@@ -105,7 +105,7 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
             const OccurrenceIcon = category === 'parking' ? CarSimple : Trash
             return (
               <section key={id} data-step={`o-${id}`} className={`flex flex-col gap-0.5${focus === `o-${id}` ? RING : ''}`}>
-                <h4 className="flex min-h-10 items-center gap-2.5 rounded-sm border border-(--neutral-700) bg-(--neutral-700) px-2.5 text-body-medium text-(--neutral-100)">
+                <h4 className="flex min-h-10 items-center gap-2.5 rounded-sm border border-(--neutral-700) bg-(--neutral-700) px-2.5 text-body-medium text-(--fg-primary)">
                   <OccurrenceIcon weight="duotone" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
                   <span className="flex min-w-0 flex-1 gap-2">
                     <span className="sr-only">Occurrence</span>
@@ -120,23 +120,23 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
                     {g.interventions.map((v) => (
                       <div key={v.id} data-step={`v-${v.id}`} className={`flex flex-col gap-1 py-2 pr-2 pl-0.5${focus === `v-${v.id}` ? RING : ''}`}>
                         <div className="flex items-start gap-3">
-                          <span className="flex w-4 shrink-0 justify-center pt-1 text-(--neutral-100)" aria-hidden>
+                          <span className="flex w-4 shrink-0 justify-center pt-1 text-(--fg-primary)" aria-hidden>
                             {v.outcome === 'cleared' ? <Check className="size-4" /> : <Wrench className="size-4" />}
                           </span>
                           <div className="flex min-w-0 flex-1 flex-col gap-1">
-                            <p className="text-body-medium text-(--neutral-200)">{v.outcome === 'cleared' ? 'Road Cleared' : label(v.action_type)}</p>
-                            <p className="text-body-sm text-(--neutral-200)">{v.description}</p>
-                            {v.outcome !== 'cleared' && <p className="text-meta text-(--neutral-200)">Outcome: {v.outcome ? label(v.outcome) : 'Not recorded yet'}</p>}
+                            <p className="text-body-medium text-(--fg-secondary)">{v.outcome === 'cleared' ? 'Road Cleared' : label(v.action_type)}</p>
+                            <p className="text-body-sm text-(--fg-secondary)">{v.description}</p>
+                            {v.outcome !== 'cleared' && <p className="text-meta text-(--fg-secondary)">Outcome: {v.outcome ? label(v.outcome) : 'Not recorded yet'}</p>}
                           </div>
                           {when(v.performed_at)}
                         </div>
-                        <p className="pl-[29px] text-[11px]/[21px] tracking-[0.08em] text-(--neutral-200)">By {v.agency}</p>
+                        <p className="pl-[29px] text-[11px]/[21px] tracking-[0.08em] text-(--fg-secondary)">By {v.agency}</p>
                       </div>
                     ))}
                   </div>
                 )}
                 {g.events.map((e) => (
-                  <p key={e.created_at} data-step={`e-${e.created_at}`} className={`px-1 pt-1 text-meta text-(--neutral-200)${focus === `e-${e.created_at}` ? RING : ''}`}>
+                  <p key={e.created_at} data-step={`e-${e.created_at}`} className={`px-1 pt-1 text-meta text-(--fg-secondary)${focus === `e-${e.created_at}` ? RING : ''}`}>
                     {day(e.created_at)} · {e.kind === 'resolved' ? 'Marked resolved by an operator' : 'Reopened by a new occurrence'}
                   </p>
                 ))}

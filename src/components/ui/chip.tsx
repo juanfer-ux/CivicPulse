@@ -7,7 +7,7 @@ export const chipClass =
 
 /** The number on a chip or beside a filter (owner's Figma, 2026-11-15): a small `neutral-700` badge (it was `neutral-900` until 2026-11-15), 20 px high with a 4 px radius (it was 2), 4 px at its sides, in `body-sm-strong` / `neutral-200`. Used by every count in the filters: the chips, the Filters button and the counts in the Filters panel. */
 export function CountBadge({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn('inline-flex h-5 shrink-0 items-center rounded-sm bg-(--neutral-700) px-1 text-body-sm-strong text-(--neutral-200)', className)}>{children}</span>
+  return <span className={cn('inline-flex h-5 shrink-0 items-center rounded-sm bg-(--neutral-700) px-1 text-body-sm-strong text-(--fg-secondary)', className)}>{children}</span>
 }
 
 /** A toggle: on or off. `icon` sits on the left, `count` after the label. */

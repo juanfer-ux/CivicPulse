@@ -22,7 +22,7 @@ export default function NumbersModule({ problem, incident, shape }: { problem?: 
       {(problem ? stats(problem) : incident ? incidentStats(incident) : []).map((x) => (
         <div key={x.label} className="flex min-w-0 flex-col gap-1">
           <dt className="flex items-center gap-1 truncate text-meta text-muted-foreground">
-            <x.Icon weight="regular" className="size-3.5 shrink-0 text-(--neutral-200)" aria-hidden />
+            <x.Icon weight="regular" className="size-3.5 shrink-0 text-(--fg-secondary)" aria-hidden />
             <span className="truncate">{x.label}</span>
           </dt>
           <dd className={`truncate ${big ? 'text-heading' : 'text-subtitle'}`}>{x.value}</dd>

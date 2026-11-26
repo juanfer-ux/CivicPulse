@@ -13,8 +13,9 @@
 |---|---|---|
 | `inverse` | `neutral-900` | Text on light fills |
 | `disabled` | `neutral-300` | Unavailable or decorative text only (below 4.5:1) |
-| `secondary` | `neutral-200` | Supporting text |
-| `primary` | `neutral-100` | Main text |
+| `tertiary` | `#858593` (code `--fg-tertiary`) | Quietest readable text; not applied to layers yet |
+| `secondary` | `#A3A3AE` (code `--fg-secondary`) | Supporting text |
+| `primary` | `#B6B6BE` (code `--fg-primary`) | Main text |
 | `emphasis` | `brand-primary` | Active items, emphasis |
 | `on-danger` | `red-400` | On `red-900` |
 | `on-attention` | `orange-500` | On `orange-900` |
@@ -22,7 +23,7 @@
 | `on-approved` | `blue-300` | On `blue-900` |
 | `on-info` | `indigo-300` | On `indigo-900` |
 
-All Figma text that used those three colors now uses the Text variables (2026-11-26); use them for new text. Fills of icons and shapes stay on the Colors variables. Code keeps using `var(--neutral-200)`, `var(--neutral-100)` and `var(--brand-primary)`.
+All Figma text that used those three colors now uses the Text variables (2026-11-26); use them for new text. Fills of icons and shapes stay on the Colors variables. Since 2026-11-26 `primary`, `secondary` and `tertiary` have their own values; the code uses `--fg-primary` and `--fg-secondary` for text (`--foreground` and `--muted-foreground` point to them) and keeps `--neutral-*` for icons, lines and fills.
 
 ## 🔤 Typeface
 **Manrope** (Google Fonts), served from our own site by `@fontsource-variable/manrope`, so nothing is requested from Google ([decision 0019](../decisions/0019-manrope-font.md)). Variable font, weights 200 to 800. Font smoothing is the browser default (see Smoothing below), with `text-rendering: optimizeLegibility` and a universal letter-spacing of 0.02em. Code: `--font-sans` and the base layer in `src/index.css`.

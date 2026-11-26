@@ -112,7 +112,7 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
           <div className="flex items-center gap-3">
             <p className="text-body-medium leading-5">{category}</p>
             <span className="h-3.5 w-px bg-(--neutral-500)" aria-hidden />
-            <p className="text-meta leading-5 text-(--neutral-200)">{reference} · {locality}</p>
+            <p className="text-meta leading-5 text-(--fg-secondary)">{reference} · {locality}</p>
           </div>
         </div>
         <div className="ml-auto flex items-start">{pill}</div>
@@ -135,11 +135,11 @@ export function StatList({ problem }: { problem: ProblemRow }) {
       <dl className="grid grid-cols-2 gap-1">
         {[occ, ret, rep, int].map((x, i) => (
           <div key={x.label} className="flex flex-col gap-1.5 rounded-sm bg-(--neutral-700) px-4 py-3">
-            <dt className={`flex items-center gap-1 text-(--neutral-200) ${i < 2 ? 'text-body' : 'text-body-sm leading-4'}`}>
-              <x.Icon weight="regular" className="size-4 shrink-0 text-(--neutral-100)" aria-hidden />
+            <dt className={`flex items-center gap-1 text-(--fg-secondary) ${i < 2 ? 'text-body' : 'text-body-sm leading-4'}`}>
+              <x.Icon weight="regular" className="size-4 shrink-0 text-(--fg-primary)" aria-hidden />
               {x.label}
             </dt>
-            <dd className="text-heading text-[24px]! leading-5 text-(--neutral-100)">{x.value}</dd>
+            <dd className="text-heading text-[24px]! leading-5 text-(--fg-primary)">{x.value}</dd>
           </div>
         ))}
       </dl>

@@ -122,7 +122,7 @@ function Groups<T extends { id: string | number }>({ items, group, order, labels
         .filter(([, l]) => l.length)
         .map(([g, l]) => (
           <div key={g} className="flex flex-col gap-1">
-            <Button variant="ghost" className="h-7 justify-start gap-1 px-1 text-caption-medium text-(--neutral-200) hover:bg-(--neutral-700) aria-expanded:bg-(--neutral-600)" aria-expanded={open.has(g)} onClick={() => toggle(g)}>
+            <Button variant="ghost" className="h-7 justify-start gap-1 px-1 text-caption-medium text-(--fg-secondary) hover:bg-(--neutral-700) aria-expanded:bg-(--neutral-600)" aria-expanded={open.has(g)} onClick={() => toggle(g)}>
               {open.has(g) ? <CaretDown weight="regular" className="size-3" aria-hidden /> : <CaretRight weight="regular" className="size-3" aria-hidden />}
               {labels[g]} · {l.length}
             </Button>
@@ -156,8 +156,8 @@ function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNo
       <span className={`flex h-10 w-4 shrink-0 items-start justify-center pt-0.5`}>{icon}</span>
       <span className={`flex h-11 justify-center min-w-0 flex-col text-left`}>
         <span className="flex min-w-0 flex-col gap-1">
-          <span className={`truncate text-body-sm ${active ? 'text-(--brand-primary)' : 'text-(--neutral-200)'}`}>{title}</span>
-          <span className="flex h-5 items-center truncate text-caption text-(--neutral-200)"><span className="truncate">{sub}</span></span>
+          <span className={`truncate text-body-sm ${active ? 'text-(--brand-primary)' : 'text-(--fg-secondary)'}`}>{title}</span>
+          <span className="flex h-5 items-center truncate text-caption text-(--fg-secondary)"><span className="truncate">{sub}</span></span>
         </span>
       </span>
     </Button>
@@ -232,7 +232,7 @@ function Section<T>({ title, items, addLabel, onAdd, row, children, empty, views
     <div className={`flex flex-col gap-2 py-2 pr-1 pl-1`}> {/* 8 px above and below and between, 4 at each side (owner's Figma, 2026-11-23; the right was 10, with the sidebar frame's own 16 px next to it), in all three sections (owner's Figma, 2026-11-17, latest) */}
       <div ref={head} className={`group/title sticky -top-px ${menu ? 'z-30' : 'z-10'} flex items-center gap-2.5 pl-2 ${noGroups ? 'pr-1.5' : 'pr-2'} ${stuck ? 'h-12 -mb-4 border-b-[0.5px] border-(--neutral-500) bg-(--neutral-700) pb-4' : 'h-8 border-b border-transparent bg-(--neutral-800)'}`}> {/* stuck at the top: 16 px more padding below, 48 px high (owner, 2026-11-23: 8, then 10, then 16); the negative margin keeps the rows under it where they were, so nothing jumps */}
         {onExpand ? (
-          <button type="button" className="flex flex-1 cursor-pointer items-center gap-1 text-left text-caption-medium text-(--neutral-300) outline-none hover:text-(--neutral-100) focus-visible:text-(--neutral-100)" aria-expanded={!!expanded} aria-label={`${title}: ${expanded ? 'show less' : 'show all'}`} title={expanded ? 'Show less' : 'Show all'} onClick={() => onExpand(!expanded)}>
+          <button type="button" className="flex flex-1 cursor-pointer items-center gap-1 text-left text-caption-medium text-(--neutral-300) outline-none hover:text-(--fg-primary) focus-visible:text-(--fg-primary)" aria-expanded={!!expanded} aria-label={`${title}: ${expanded ? 'show less' : 'show all'}`} title={expanded ? 'Show less' : 'Show all'} onClick={() => onExpand(!expanded)}>
             {title}
             {expanded ? <CaretDown weight="regular" className="size-3.5" aria-hidden /> : <CaretRight weight="regular" className="size-3.5" aria-hidden />} {/* closed: an arrow to the right, open: down, like the group titles (owner, 2026-11-23) */}
           </button>
@@ -439,7 +439,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                 </div></div>
                 {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
                 <div className="mx-1.5 mt-4 py-2">
-                <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--neutral-100) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
+                <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-10 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--fg-primary) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
                   <span className="grid size-6 shrink-0 place-items-center" aria-hidden><StarFour weight="regular" className="size-[18.3px] text-(--neutral-200)" /></span>
                   New investigation
                 </Button>
@@ -474,7 +474,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                     <ViewList items={investigations} limit={invOpen ? limit : 3} view={{ ...view, group: 'all' }} group={() => ''} order={[]} labels={{}} primary="" row={(c) => (
                   <Button key={c.key} variant="ghost" className={`h-9 items-center justify-start gap-2.5 py-2 pr-4 pl-2 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) text-body-sm ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
                     <Chat weight="regular" className={`size-4 shrink-0 ${act.kind === 'chat' && c.id === act.id ? 'text-(--neutral-200)' : 'text-(--neutral-300)'}`} aria-hidden />
-                    <span className={`truncate ${act.kind === 'chat' && c.id === act.id ? 'text-(--brand-primary)' : 'text-(--neutral-200)'}`}>{c.title}</span>
+                    <span className={`truncate ${act.kind === 'chat' && c.id === act.id ? 'text-(--brand-primary)' : 'text-(--fg-secondary)'}`}>{c.title}</span>
                   </Button>
                 )} />
                     )}</Growing>
@@ -495,8 +495,8 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
             <div className="flex min-w-0 flex-1 items-center gap-5 px-1.5">
               <Avatar src={profilePhoto} name={profile?.full_name || 'Signed in'} />
               <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
-                <p className="truncate text-body-sm-strong text-(--neutral-100)">{name}</p>
-                {email && <p className="truncate text-caption-medium text-(--neutral-200)">{email}</p>}
+                <p className="truncate text-body-sm-strong text-(--fg-primary)">{name}</p>
+                {email && <p className="truncate text-caption-medium text-(--fg-secondary)">{email}</p>}
               </div>
             </div>
             <AccountMenu onSignOut={signOut} side="above" />

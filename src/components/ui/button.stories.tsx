@@ -24,7 +24,7 @@ export const AllVariants: Story = {
     <div className="flex flex-col gap-6">
       {VARIANTS.map((v) => (
         <div key={v} className="flex flex-col gap-2">
-          <p className="text-caption-medium text-(--neutral-200)">{v}</p>
+          <p className="text-caption-medium text-(--fg-secondary)">{v}</p>
           <div className="flex items-center gap-4">
             {SIZES.map((s) => (
               <Button key={s} variant={v} size={s}>

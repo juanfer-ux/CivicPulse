@@ -6,10 +6,10 @@ import { cn } from '@/lib/utils'
 const alert = cva('flex w-full items-start text-body-sm', {
   variants: {
     variant: {
-      default: 'gap-3 rounded-lg border-[0.5px] border-(--neutral-500) bg-(--neutral-600) px-4 py-3 text-(--neutral-200)',
+      default: 'gap-3 rounded-lg border-[0.5px] border-(--neutral-500) bg-(--neutral-600) px-4 py-3 text-(--fg-secondary)',
       destructive: 'gap-3 rounded-lg bg-(--red-400) px-4 py-3 text-(--neutral-900)',
-      ai: 'gap-3 rounded-lg border-[0.5px] border-(--indigo-400) bg-(--neutral-800) px-4 py-3 text-(--neutral-100)',
-      info: 'items-start gap-4 rounded-lg border-[0.5px] border-(--indigo-600) bg-(--indigo-900)/69 p-4 text-(--neutral-200)',
+      ai: 'gap-3 rounded-lg border-[0.5px] border-(--indigo-400) bg-(--neutral-800) px-4 py-3 text-(--fg-primary)',
+      info: 'items-start gap-4 rounded-lg border-[0.5px] border-(--indigo-600) bg-(--indigo-900)/69 p-4 text-(--fg-secondary)',
     },
   },
   defaultVariants: { variant: 'default' },
@@ -20,7 +20,7 @@ export function Alert({ variant, icon, title, action, className, children, ...pr
     <div role="status" className={cn(alert({ variant }), className)} {...props}>
       {icon && <span className={variant === 'info' ? 'flex w-4 shrink-0 justify-center' : 'mt-0.5 flex shrink-0'}>{icon}</span>}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        {title && <p className={cn('text-body-sm-strong', variant === 'default' || variant === 'ai' ? 'text-(--neutral-100)' : '')}>{title}</p>}
+        {title && <p className={cn('text-body-sm-strong', variant === 'default' || variant === 'ai' ? 'text-(--fg-primary)' : '')}>{title}</p>}
         <p>{children}</p>
       </div>
       {action && <div className="shrink-0">{action}</div>} {/* Figma Action (owner, 2026-11-23): a small secondary button at the right end of every variant, hidden in Figma and not rendered unless a caller passes one */}
