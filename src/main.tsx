@@ -78,8 +78,8 @@ const timeline = location.hash === '#timeline' // ways to show a problem's histo
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {/* Every Phosphor icon is the bold weight (owner, 2026-10-30) unless it asks for another (fill on the map badges, the buttons' sparkle and the bullet). */}
-    <IconContext.Provider value={{ weight: 'bold' }}>
+    {/* Every Phosphor icon is the regular weight (owner, 2026-11-25; bold from 2026-10-30) unless it asks for another (fill, duotone). */}
+    <IconContext.Provider value={{ weight: 'regular' }}>
       <ErrorBoundary>
         {dumpingModels ? <Suspense fallback={null}><DumpingModelsGallery /></Suspense> : warningGallery ? <Suspense fallback={null}><WarningHeightGallery /></Suspense> : filtersPanel ? (
           <Suspense fallback={null}>
