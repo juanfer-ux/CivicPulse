@@ -3,6 +3,7 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-27. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **Agent panel note stroke (owner, 2026-11-27, Figma):** the panel's Alert has its inside stroke **excluded** from layout, so it is 88 px high: the code uses 19 / 15 px padding plus the 1 px line (`InvestigatePanel.tsx`). The Alert component variants keep it included.
 - **Section title padding (owner, 2026-11-27):** the agent panel section titles have **4 px** at both sides (Figma had 2, the code none). Figma and code (`AgentHome.tsx`).
 - **Agent panel title (owner, 2026-11-27, Figma):** "Explore" is now **"New Investigation"** (`InvestigatePanel.tsx`); a recurrence still shows its address. Figma changed the default variant only.
 - **Current state (2026-11-27):** the code noted below is merged and live with this release; older notes about uncommitted work are history. Figma component descriptions and `design-system/` were brought up to date the same day.
