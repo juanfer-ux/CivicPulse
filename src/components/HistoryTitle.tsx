@@ -11,7 +11,7 @@ export function HistoryTitle({ title, oldestFirst, onSort }: HistorySort & { tit
     <div className="flex h-17 shrink-0 items-center gap-5 border-b-[0.5px] border-(--neutral-600) px-4">
       <h3 className="flex-1 text-label text-(--fg-secondary)">{title}</h3>
       <Button variant="ghost" className="h-11 w-10 justify-center px-2" aria-label={hint} title={hint} onClick={onSort}>
-        <Icon className="size-5 text-(--neutral-100)" aria-hidden />
+        <Icon className="size-5 text-(--neutral-200)" aria-hidden />
       </Button>
     </div>
   )

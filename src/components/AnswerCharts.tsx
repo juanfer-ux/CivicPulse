@@ -169,7 +169,7 @@ function Places({ bars }: { bars: Answer['bars'] }) {
 export default function AnswerChart({ kind, bars, onFocus, onPick, onPickRecurrence }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars']; onPickRecurrence?: (id: string) => void } & Link) {
   const dark = kind === 'donut' || kind === 'barlist' || kind === 'rows' || kind === 'recurrences' // owner's Figma, 2026-11-26: these sit on the darker card
   return (
-    <div className={dark ? 'rounded-lg border border-(--neutral-700) bg-(--neutral-900) p-4' : 'rounded-lg border-[0.5px] border-(--neutral-700) bg-(--neutral-700) p-4'}>
+    <div className={dark ? `rounded-lg border border-(--neutral-700) bg-(--neutral-900) ${kind === 'barlist' ? 'p-[15px]' : 'p-4'}` : 'rounded-lg border-[0.5px] border-(--neutral-700) bg-(--neutral-700) p-4'}>
       {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : kind === 'dots' ? <Dots bars={bars} /> : kind === 'rows' ? <Rows bars={bars} /> : kind === 'places' ? <Places bars={bars} /> : kind === 'recurrences' ? <Recurrences bars={bars} onPick={onPickRecurrence} /> : kind === 'donut' ? <Donut bars={bars} onFocus={onFocus} onPick={onPick} /> : <BarList bars={bars} onFocus={onFocus} onPick={onPick} />}
     </div>
   )
