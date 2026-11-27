@@ -30,7 +30,7 @@ const Fieldset = ({ title, children }: { title: string; children: ReactNode }) =
 )
 
 /**
- * The Filters side panel (owner, 2026-11-14): every map filter in one panel that slides in from the right like Create user (Figma Side Panel: 420 px, `neutral-900`, 32 px padding, a title in display-sm over a subtitle, a ghost Close button). Filters apply as they are ticked; the footer clears them or closes the panel with the number of results.
+ * The Filters side panel (owner, 2026-11-14): every map filter in one panel that slides in from the right like Create user (360 px since 2026-11-27, owner; Figma Side Panel: 420 px, `neutral-900`, 32 px padding, a title in display-sm over a subtitle, a ghost Close button). Filters apply as they are ticked; the footer clears them or closes the panel with the number of results.
  * Every option carries its count (computed with every other filter applied) and is switched off when that count is 0 (owner, 2026-11-15: nothing to select), unless it is already chosen, so it can still be undone. The status lists follow what the map shows: recurrence statuses when recurrences are on, incident statuses when incidents are.
  */
 export function FiltersPanel({
@@ -58,7 +58,7 @@ export function FiltersPanel({
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch })
   const { problems: showProblems, incidents: showIncidents } = typesOn(filters, !!problemCounts)
   return (
-    <aside aria-label="Filters" className="flex h-full w-[420px] max-w-full flex-col border-l border-(--neutral-500) bg-(--neutral-900)">
+    <aside aria-label="Filters" className="flex h-full w-[360px] max-w-full flex-col border-l border-(--neutral-500) bg-(--neutral-900)">
       <div className="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto p-8">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-col gap-3">
