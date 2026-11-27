@@ -4,16 +4,20 @@ import { ArrowDown, ArrowRight, ArrowUp, TrendDown } from '@phosphor-icons/react
 import { smoothPath, sparkPoints } from '@/lib/sparkline'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
-/** The trend mark (Figma Stat Trend `above`, owner, 2026-11-17, fourth pass): just the 14 px arrow in a 24 px box at the right of the name, `red-400` for above; the circle is gone. Figma only redrew `above`; the other three keep their old outlined strip there, so their arrow tones are their old label tones. */
+/** The trend mark (Figma Stat Trend, owner 2026-11-27): the arrow alone in a 24 px box at the right of the name, no fill: above `red-400` (14 px), about `blue-400`, low `yellow-400`, below `green-500` (12 px). */
+// whole class strings, so Tailwind sees them
+const SPARK = '[--spark:linear-gradient(90deg,var(--cobalt-700),var(--cobalt-300)_50.5%)]'
+const SPARK_HOVER = 'enabled:hover:shadow-[0_0_0_2px_var(--neutral-400)] enabled:hover:[--spark:linear-gradient(90deg,var(--cobalt-500),var(--cobalt-300)_90.1%)]'
+const SPARK_ON = 'shadow-[0_0_0_2px_var(--neutral-400)] [--spark:linear-gradient(90deg,var(--cobalt-500),var(--cobalt-300)_90.1%)]'
 const GRAPH_H = 40 // Figma Graph / Vector 1 (owner's Figma, 2026-11-23: 40 px high; 50 in the seventh look of 2026-11-20; 48 in the sixth, 32 before)
 const TREND = {
-  above: { Icon: ArrowUp, text: 'Above usual', why: 'Reports in the last 30 days are 20 % or more higher than in the 30 days before.', box: 'size-6 bg-(--neutral-700)', icon: 'size-3.5 text-(--red-400)' },
-  about: { Icon: ArrowRight, text: 'About usual', why: 'Reports in the last 30 days are within 20 % of the 30 days before.', box: 'size-6 bg-(--neutral-700)', icon: 'size-3 text-(--blue-200)' },
-  low: { Icon: TrendDown, text: 'Low reporting', why: 'Fewer than 5 reports in the last 60 days: too few to tell a trend.', caution: 'Read the number with caution.', box: 'size-6 bg-(--neutral-700)', icon: 'size-3 text-(--yellow-200)' },
-  below: { Icon: ArrowDown, text: 'Below usual', why: 'Reports in the last 30 days are 20 % or more lower than in the 30 days before.', box: 'size-6 bg-(--neutral-700)', icon: 'size-3 text-(--green-300)' },
+  above: { Icon: ArrowUp, text: 'Above usual', why: 'Reports in the last 30 days are 20 % or more higher than in the 30 days before.', icon: 'size-3.5 text-(--red-400)' },
+  about: { Icon: ArrowRight, text: 'About usual', why: 'Reports in the last 30 days are within 20 % of the 30 days before.', icon: 'size-3 text-(--blue-400)' },
+  low: { Icon: TrendDown, text: 'Low reporting', why: 'Fewer than 5 reports in the last 60 days: too few to tell a trend.', caution: 'Read the number with caution.', icon: 'size-3 text-(--yellow-400)' },
+  below: { Icon: ArrowDown, text: 'Below usual', why: 'Reports in the last 30 days are 20 % or more lower than in the 30 days before.', icon: 'size-3 text-(--green-500)' },
 } as const
 
-/** A number with its name (Figma Stat Card, owner's seventh look 2026-11-17): a `neutral-900` fill, an 8 px radius, 16 px padding all round and 16 px between the header (the name and the 24 px trend mark) and the number row, 121 px high; the number row is 49 px high, its items centered: the number (stat style, now 28 / 28, `brand-primary`) with the "Reports" caption under it, spread top and bottom, and a 32 px graph (8 px on its right, the peak dot), 40 px apart; hover or selected is a 2 px `neutral-600` ring outside the card, so the grid that holds the cards must not clip it (`desk:overflow-visible` in `Dashboard.tsx`). */
+/** A number with its name (Figma Stat Card, owner 2026-11-27): `neutral-900`, 4 px radius, 16 px padding, 12 px between the header (name and trend mark) and the number row (the number with "Reports" under it, and a 40 px graph). Default: a 1 px `neutral-500` line inside, the graph line `cobalt-700` to `cobalt-300` at the middle. Hover or selected: a 2 px `neutral-400` ring outside (so the grid must not clip it, `desk:overflow-visible` in `Dashboard.tsx`), the line `cobalt-500` to `cobalt-300`. The peak is a 4 px `cobalt-100` dot with a 2 px `neutral-900` ring. */
 export function StatCard({ label, value, trend, selected, onClick, series }: { label: ReactNode; value: ReactNode; trend?: Trend; selected?: boolean; onClick?: () => void; series?: number[] }) {
   const Tag = onClick ? 'button' : 'div'
   const t = trend && TREND[trend]
@@ -30,14 +34,14 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
   const g = series && w > 0 ? sparkPoints(series, w, GRAPH_H) : null
   return (
     <Tag
-      className={`@container flex min-w-0 flex-col gap-3 rounded-[4px] bg-(--neutral-900) p-4 text-left shadow-[inset_0_0_0_1px_var(--neutral-600)] enabled:hover:shadow-[0_0_0_2px_var(--neutral-500)] ${selected ? "shadow-[0_0_0_2px_var(--neutral-500)]" : ""}`}
+      className={`@container flex min-w-0 flex-col gap-3 rounded-[4px] bg-(--neutral-900) p-4 text-left ${selected ? SPARK_ON : `shadow-[inset_0_0_0_1px_var(--neutral-500)] ${SPARK} ${SPARK_HOVER}`}`}
       {...(onClick ? { type: 'button' as const, onClick, 'aria-pressed': !!selected } : {})}
     >
       <span className="flex h-6 items-center justify-between gap-2 px-px"> {/* Figma Header (owner's Figma, 2026-11-20, fifth look): the name and the trend mark only, 24 px high ("Reports" went back down to the number row) */}
         <span className="truncate text-subtitle text-(--fg-primary)">{label}</span>
         {t && (
           <TooltipProvider><Tooltip><TooltipTrigger asChild>
-          <span className={`grid shrink-0 place-items-center rounded-[6px] ${t.box}`}> {/* Figma Stat Trend (owner, 2026-11-17, latest): a small filled box (radius 2) with the trend icon: above 24 px, `red-900` and `red-400`; about, low and below 20 px, `blue-900` / `blue-200`, `yellow-900` / `yellow-300`, `green-900` / `green-400`; the icon is 14 px in above and 12 in the rest; the Figma glyph `trend-top` is an up arrow (turned to the right for about and down for below), and low is the zigzag `trend-down`: Phosphor `ArrowUp`, `ArrowRight`, `TrendDown`, `ArrowDown` */}
+          <span className="grid size-6 shrink-0 place-items-center"> {/* Figma Stat Trend (owner, 2026-11-17, latest): a small filled box (radius 2) with the trend icon: above 24 px, `red-900` and `red-400`; about, low and below 20 px, `blue-900` / `blue-200`, `yellow-900` / `yellow-300`, `green-900` / `green-400`; the icon is 14 px in above and 12 in the rest; the Figma glyph `trend-top` is an up arrow (turned to the right for about and down for below), and low is the zigzag `trend-down`: Phosphor `ArrowUp`, `ArrowRight`, `TrendDown`, `ArrowDown` */}
             <t.Icon className={t.icon} aria-hidden />
             <span className="sr-only">{t.text}</span>
           </span>
@@ -58,14 +62,14 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
                       role="img"
                       aria-label={`Peak: ${Math.max(...series!)} reports`}
                       className="absolute inset-0"
-                      // Option 2 (owner, 2026-11-15): the line is a solid-color stroke used as a mask over a CSS gradient (cobalt-500 for the first third, blending to cobalt-300 at 93 %, solid after), because the SVG gradient stroke looked crackled. 2 px, flat ends, mitered corners, drawn at the real pixel size.
+                      // Option 2 (owner, 2026-11-15): the line is a solid-color stroke used as a mask over a CSS gradient (`--spark`, set by the card's state), because the SVG gradient stroke looked crackled. 2 px, flat ends, mitered corners, drawn at the real pixel size.
                       style={{
-                        background: 'linear-gradient(90deg, var(--cobalt-500) 33.2%, var(--cobalt-300) 93.3%)',
+                        background: 'var(--spark)',
                         mask: `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${GRAPH_H}"><path d="${smoothPath(g.pts)}" fill="none" stroke="black" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>`)}") 0 0 / ${w}px ${GRAPH_H}px no-repeat`,
                       }}
                     />
-                    {/* the peak: a 6 px dot on the newest point (Figma: cobalt-200 since 2026-11-15, it was cobalt-300) */}
-                    <span className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--cobalt-200)" style={{ left: g.pts[g.peak][0], top: g.pts[g.peak][1] }} aria-hidden />
+                    {/* the peak: the dot on the newest point */}
+                    <span className="absolute size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--cobalt-100) shadow-[0_0_0_2px_var(--neutral-900)]" style={{ left: g.pts[g.peak][0], top: g.pts[g.peak][1] }} aria-hidden />
                   </>
                 )}
               </span>

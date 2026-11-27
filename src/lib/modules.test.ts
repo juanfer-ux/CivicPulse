@@ -1,5 +1,6 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { COLUMN_PUSH, MAX_PER_AREA, canDock, fitsArea, inArea, insertPos, isVisible, parseLayout, place, pushOf, shapeFor, suggestedArea, type Placed } from '@/lib/modules'
+import { COLUMN_PUSH, MAX_PER_AREA, canDock, fitsArea, inArea, insertPos, isVisible, parseLayout, place, pushOf, shapeFor, suggestedArea, type Placed, HISTORY_W } from '@/lib/modules'
 
 describe('modules', () => {
   it('lights only the areas a module supports and suggests its first choice', () => {
@@ -68,5 +69,11 @@ describe('modules', () => {
     expect(parseLayout(saved)).toEqual({ placed: [good], follow: false })
     expect(parseLayout('not json')).toEqual({ placed: [], follow: true })
     expect(parseLayout(null)).toEqual({ placed: [], follow: true })
+  })
+})
+
+describe('History column width', () => {
+  it('matches the room the map controls and the Modules buttons leave for it', () => {
+    for (const f of ['src/index.css', 'src/components/ProblemDetail.tsx']) expect(readFileSync(f, 'utf8')).toContain(`${HISTORY_W}px`)
   })
 })

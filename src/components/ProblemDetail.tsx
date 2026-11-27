@@ -58,7 +58,7 @@ export function ProblemDetail({
       aria-label="Recurrence details"
       className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none ${WIDE ? 'desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-none desk:w-[360px] desk:flex-col desk:items-stretch desk:gap-2 desk:overflow-visible desk:rounded-none desk:border-0 desk:bg-transparent! desk:shadow-none' : 'desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[400px] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]'}`}
     >
-      {WIDE && <div className="hidden desk:block desk:rounded-lg desk:shadow-lg"><StatList problem={problem} event={event} {...sort} /></div>} {/* the numbers (last reported, occurrences, returns, reports, interventions) float at the top left on every recurrence (owner, 2026-11-24) */}
+      {WIDE && <div className="hidden desk:block desk:rounded-lg desk:shadow-lg"><Overview problem={problem} event={event} {...sort} /></div>} {/* the numbers (last reported, occurrences, returns, reports, interventions) float at the top left on every recurrence (owner, 2026-11-24) */}
       <div className={`flex flex-col gap-4 px-4 py-6 ${WIDE ? 'desk:hidden' : ''}`}>
         <header className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-col gap-1">
@@ -130,13 +130,13 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
 // ponytail: sample numbers from the Figma component, until the owner says what this list shows
 const SAMPLE_BARS = [{ label: 'Chapinero', value: 62 }, { label: 'Suba', value: 52 }, { label: 'Kennedy', value: 43 }, { label: 'Engativá', value: 36 }, { label: 'Others', value: 61 }]
 
-/** The numbers of an open recurrence (Figma Recurrence Stats, owner 2026-11-26): a `neutral-900` box (8 px radius): the history title row, then, 8 px in and 12 px apart, last report and the latest status event (a `neutral-600` line between them), then four equal 88 px tiles in two columns (a 20 px icon and the label, 12 px, the number) and a bar list (sample data for now). */
-export function StatList({ problem, event, ...sort }: HistorySort & { problem: ProblemRow; event?: ProblemEvent }) {
+/** The numbers of an open recurrence (Figma Overview, owner 2026-11-26): a `neutral-900` box (8 px radius): the history title row, then, 8 px in and 12 px apart, last report and the latest status event (a `neutral-600` line between them), then four equal 88 px tiles in two columns (a 20 px icon and the label, 12 px, the number) and a bar list (sample data for now). */
+export function Overview({ problem, event, ...sort }: HistorySort & { problem: ProblemRow; event?: ProblemEvent }) {
   const [occ, ret, rep, int, last] = stats(problem)
   const rows = [{ Icon: last.Icon, label: last.label, value: last.value }, ...(event ? [{ Icon: event.kind === 'resolved' ? UserCheck : last.Icon, label: event.kind === 'resolved' ? 'Resolved by an operator' : 'Reopened by a new occurrence', value: day(event.created_at) }] : [])] // a person icon when an operator resolved it (owner, 2026-11-26)
   return (
     <div className="hidden flex-col gap-2 rounded-lg bg-(--neutral-900) desk:flex">
-      <HistoryTitle {...sort} />
+      <HistoryTitle title="Overview" {...sort} />
       <div className="flex flex-col gap-3 p-2">
         <div className="flex flex-col gap-2 py-1">
           {rows.map((r, i) => (

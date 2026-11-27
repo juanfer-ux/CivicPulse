@@ -38,7 +38,7 @@ AA needs **4.5 : 1** for normal text and **3 : 1** for large text and interface 
 | `sidebar` on `destructive` `#EE8688` | 7.5 | Dangerous buttons and badges now use dark `sidebar` text (light text on it was 1.7 and failed 4.5) |
 | `yellow-400` `#FFEE6C` on page / on card | 13.8 / 12.2 | Pending dots |
 | `orange-400` `#FF9F50` on page / on card | 8.1 / 7.1 | Reviewing dots |
-| `blue-400` `#495C8B` on page / on card | 2.5 / 2.2 | Approved dots (graphics only). 🟨 Below the 3:1 that WCAG 1.4.11 asks of graphics on the dark page; the owner chose this color on 2026-10-26 |
+| `blue-400` `#3F76E4` on page / on card | 4.4 / 3.9 | Approved dots (graphics only). Passes the 3:1 that WCAG 1.4.11 asks of graphics (owner, 2026-11-27; it was 2.5 / 2.2 with the old blue) |
 | `red-400` `#EE8688` on page / on card | 6.6 / 5.8 | Rejected dots |
 | `closed` / `ring` `#737381` on page / on card | 3.5 / 3.1 | Focus ring: **graphics only, never text** |
 | `destructive` `#EE8688` as text on card | 5.8 | OK as text, but error text stays `incident` |

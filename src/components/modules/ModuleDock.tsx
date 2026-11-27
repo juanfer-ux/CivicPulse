@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, type CSSProperties, type ReactNode } from 'react'
 import { DotsSixVertical, X } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
-import { BOTTOM_H, COLUMN_MIN_H, COLUMN_NATURAL_H, COLUMN_PUSH, COLUMN_W, DOCK_GAP, MODULES, fitsArea, inArea, shapeFor, suggestedArea, type Area, type Placed } from '@/lib/modules'
+import { BOTTOM_H, COLUMN_MIN_H, COLUMN_NATURAL_H, COLUMN_W, DOCK_GAP, MODULES, fitsArea, inArea, shapeFor, suggestedArea, type Area, type Placed, HISTORY_W } from '@/lib/modules'
 import type { Incident } from '@/lib/incidents'
 import type { ProblemDetailData, ProblemRow } from '@/lib/problems'
 import { useModules } from '@/components/modules/ModulesProvider'
@@ -79,7 +79,7 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind, open
     if (hasSlot) items.push({ pos: 0, node: <div key="history" data-pos="0" data-type="history" ref={setRightSlot} className="min-h-[200px] flex-1 basis-0 [&>*]:h-full [&>*]:pointer-events-auto" /> })
     items.sort((a, b) => a.pos - b.pos)
     return (
-      <div data-col={area} data-float={list.length || hasSlot ? '' : undefined} className="pointer-events-none absolute z-20 hidden flex-col gap-3 desk:flex" style={{ ...edge, top: columnTop, bottom: `calc(var(--map-pad) + ${lift}px)`, width: COLUMN_W }}>
+      <div data-col={area} data-float={list.length || hasSlot ? '' : undefined} className="pointer-events-none absolute z-20 hidden flex-col gap-3 desk:flex" style={{ ...edge, top: columnTop, bottom: `calc(var(--map-pad) + ${lift}px)`, width: hasSlot ? HISTORY_W : COLUMN_W }}>
         {items.map((i) => i.node)}
         {overlay(area)}
       </div>
@@ -96,7 +96,7 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind, open
           data-col="bottom"
           data-float={bottom.length ? '' : undefined}
           className="pointer-events-none absolute z-20 hidden gap-3 desk:flex"
-          style={{ left: 'var(--col-left)', right: recurrenceOpen ? `calc(var(--col-right) + ${COLUMN_PUSH}px)` : 'calc(var(--col-right) + 44px)', bottom: 'var(--map-pad)', height: BOTTOM_H }}
+          style={{ left: 'var(--col-left)', right: recurrenceOpen ? `calc(var(--col-right) + ${HISTORY_W + DOCK_GAP}px)` : 'calc(var(--col-right) + 44px)', bottom: 'var(--map-pad)', height: BOTTOM_H }}
         >
           {bottom.map((m) => card(m, 'bottom'))}
           {overlay('bottom')}
