@@ -4,6 +4,7 @@ import { useModules } from '@/components/modules/ModulesProvider'
 import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { OccurrenceHistory } from '@/components/OccurrenceHistory'
+import type { HistorySort } from '@/components/HistoryTitle'
 import { ProblemTimeline } from '@/components/ProblemTimeline'
 import { HEADER } from '@/components/ProblemDetail'
 import type { ProblemDetailData, ProblemRow } from '@/lib/problems'
@@ -11,7 +12,7 @@ import type { ProblemDetailData, ProblemRow } from '@/lib/problems'
 /**
  * The history of a recurrence: with the default layout (HEADER 3) the right column `OccurrenceHistory` (owner's Figma, 2026-11-25); the other layouts also draw the lanes timeline card beside it.
  */
-export function ProblemTimelineCard({ problem, detail, onSelectIncident, openReportId = null }: { problem: ProblemRow; detail: ProblemDetailData | null; onSelectIncident: (id: string) => void; openReportId?: string | null }) {
+export function ProblemTimelineCard({ problem, detail, onSelectIncident, openReportId = null, ...sort }: HistorySort & { problem: ProblemRow; detail: ProblemDetailData | null; onSelectIncident: (id: string) => void; openReportId?: string | null }) {
   const [focus, setFocus] = useState<string | null>(null)
   const list = useRef<HTMLDivElement>(null) // the ScrollArea viewport of the occurrences history
   useEffect(() => {
@@ -44,7 +45,7 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
     )}
     <PortalTo target={inSlot ? rightSlot : null}>
     <Card role="region" aria-label="Occurrences history" data-float={M3 && !inSlot ? true : undefined} className={`gap-4 overflow-hidden bg-card/95 py-0 ${inSlot ? 'desk:pointer-events-auto desk:h-full desk:w-full' : M3 ? 'desk:absolute desk:bottom-(--map-pad) desk:right-(--col-right) desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:z-20 desk:w-[326px]' : 'desk:h-full desk:w-[calc((100%-0.75rem)*0.4)] desk:shrink-0'} ${M3 ? 'desk:rounded-none desk:border-0 desk:border-l desk:border-l-(--neutral-500) desk:bg-(--neutral-900) pt-0 pb-8' : 'desk:rounded-lg desk:border desk:border-(--neutral-900) desk:bg-(--neutral-800) p-4'}`}> {/* Figma Recurrence Right Column (owner 2026-11-25): node 1418:7408 now: 326 px (358 until 2026-11-26), `neutral-900`, a 1 px `neutral-500` line at the left, 32 px at the bottom, 16 px between the title row, the search and the list; each part sets its own side space, so the scrollbar sits on the edge */}
-    <OccurrenceHistory key={problem.id} category={problem.category} status={problem.status} detail={detail} openReportId={openReportId} onSelectIncident={onSelectIncident} focus={focus} viewport={list} />
+    <OccurrenceHistory key={problem.id} category={problem.category} status={problem.status} detail={detail} openReportId={openReportId} onSelectIncident={onSelectIncident} focus={focus} viewport={list} {...sort} />
     </Card>
     </PortalTo>
     </div>

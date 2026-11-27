@@ -240,7 +240,7 @@ async function attention(category: string | null): Promise<Answer> {
     text:
       `${rows.length === 1 ? 'One recurrence needs' : `${rows.length} recurrences need`} the most attention. ` +
       `${top.title} comes first: ${top.recurrences_n} returns, ${top.occurrences_n} occurrences, ${top.reports_n} reports, last reported ${top.last_seen ? date(top.last_seen) : 'never'}. Pick one to open it on the map.`,
-    bars: rows.map((r) => ({ label: r.title, value: r.recurrences_n, sub: `${r.reference} · ${titleCase(r.status)}`, problemId: r.id })),
+    bars: rows.map((r) => ({ label: r.location_description || r.title, value: r.recurrences_n, sub: `${r.reference} · ${titleCase(r.status)}`, problemId: r.id })),
     chart: 'recurrences',
     evidence: [{ tool: 'recurrence ranking (status, returns, latest report)', scope: `${rows.length} recurrences`, period: 'all available data', incidentCount: rows.reduce((n, r) => n + r.reports_n, 0), references: rows.map((r) => r.reference) }],
     limitations: ['Ranked by status (Active before Monitoring), then by returns (occurrences minus one), then by the latest report: a rule you can read, not a risk score.', 'A return counts occurrences, never reports: many reports of one event are one occurrence.', SYNTHETIC],

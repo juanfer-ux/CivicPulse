@@ -472,7 +472,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                   {(view) => (
                     <Growing open={invOpen} total={investigations.length}>{(limit) => (
                     <ViewList items={investigations} limit={invOpen ? limit : 3} view={{ ...view, group: 'all' }} group={() => ''} order={[]} labels={{}} primary="" row={(c) => (
-                  <Button key={c.key} variant="ghost" className={`h-9 items-center justify-start gap-2.5 py-2 pr-4 pl-2 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) text-body-sm ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
+                  <Button key={c.key} variant="ghost" className={`h-9 items-center justify-start gap-2.5 py-2 pr-5 pl-2 focus-visible:border-(--neutral-300) text-body-sm ${act.kind === 'chat' && c.id === act.id ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} aria-current={act.kind === 'chat' && c.id === act.id ? 'true' : undefined} onClick={() => pickRow({ kind: 'chat', id: c.id }, onPick)(c.id)}>
                     <Chat weight="regular" className={`size-4 shrink-0 ${act.kind === 'chat' && c.id === act.id ? 'text-(--neutral-200)' : 'text-(--neutral-300)'}`} aria-hidden />
                     <span className={`truncate ${act.kind === 'chat' && c.id === act.id ? 'text-(--fg-emphasis)' : 'text-(--fg-secondary)'}`}>{c.title}</span>
                   </Button>

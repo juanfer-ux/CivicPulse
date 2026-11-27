@@ -287,6 +287,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
   }, [filters.locality]) // eslint-disable-line react-hooks/exhaustive-deps -- only a change of the locality, not a new callback
   // A recurrence is open (owner, 2026-11-09): a click on one of its incidents (a dot, a row of the history, a point of the timeline) opens that report inside the history, it does not leave for the Incident Panel; a second click or Escape closes it before the recurrence.
   const [openReportId, setOpenReportId] = useState<string | null>(null)
+  const [oldestFirstFor, setOldestFirstFor] = useState<string | null>(null) // the recurrence whose history reads oldest first; another one starts newest first
   const select = (id: string | null) => {
     if (selectedProblemId && !selectedId && (!id ? openReportId : problemIncidentIds.includes(id))) {
       setOpenReportId((cur) => (!id || cur === id ? null : id))
@@ -361,6 +362,8 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
       )}
     </>
   )
+
+  const historySort = (id: string) => ({ oldestFirst: oldestFirstFor === id, onSort: () => setOldestFirstFor((v) => (v === id ? null : id)) })
 
   return (
     <div className="contents map-col" data-history={item?.kind === 'problem' && HEADER !== '3' ? '' : undefined} data-rp={item?.kind === 'problem' && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': `${dockW + filtersPush}px`, '--filters-push': `${filtersPush}px`, '--dock-l': `${dockL}px`, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
@@ -510,8 +513,9 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
               categoryName={data?.categories.find((c) => c.code === item.problem.category)?.name}
               event={item.detail?.events.filter((e) => e.kind === 'resolved' || e.kind === 'reopened').sort((a, b) => a.created_at.localeCompare(b.created_at)).at(-1)}
               onClose={() => selectProblem(null)}
+              {...historySort(item.problem.id)}
             />
-            <ProblemTimelineCard key={`h-${item.problem.id}`} problem={item.problem} detail={item.detail} onSelectIncident={select} openReportId={openReportId} />
+            <ProblemTimelineCard key={`h-${item.problem.id}`} problem={item.problem} detail={item.detail} onSelectIncident={select} openReportId={openReportId} {...historySort(item.problem.id)} />
           </>
         )
       )}

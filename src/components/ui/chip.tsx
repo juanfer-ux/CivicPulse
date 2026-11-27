@@ -5,9 +5,9 @@ import { cn } from '@/lib/utils'
 export const chipClass =
   'inline-flex h-(--control-default) shrink-0 cursor-pointer items-center gap-2 rounded-sm border border-input bg-(--neutral-900) px-3 text-button-sm text-foreground outline-none select-none hover:bg-secondary focus-visible:border-foreground focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50 aria-pressed:border-(--neutral-100) aria-pressed:bg-(--neutral-900) data-active:border-(--neutral-100) data-active:bg-secondary data-popup-open:border-muted-foreground [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-muted-foreground aria-pressed:[&_svg]:text-foreground data-active:[&_svg]:text-foreground'
 
-/** The number on a chip or beside a filter (owner's Figma, 2026-11-15): a small `neutral-700` badge (it was `neutral-900` until 2026-11-15), 20 px high with a 4 px radius (it was 2), 4 px at its sides, in `body-sm-strong` / `neutral-200`. Used by every count in the filters: the chips, the Filters button and the counts in the Filters panel. */
+/** The number on a chip or beside a filter (owner's Figma, 2026-11-15): a small `neutral-900` badge (owner, 2026-11-26; it was `neutral-700` from 2026-11-15), 20 px high with a 4 px radius (it was 2), 4 px at its sides, in `body-sm-strong` / `neutral-200`. Used by every count in the filters: the chips, the Filters button and the counts in the Filters panel. */
 export function CountBadge({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn('inline-flex h-5 shrink-0 items-center rounded-sm bg-(--neutral-700) px-1 text-body-sm-strong text-(--fg-secondary)', className)}>{children}</span>
+  return <span className={cn('inline-flex h-5 shrink-0 items-center rounded-sm bg-(--neutral-900) px-1 text-body-sm-strong text-(--fg-secondary)', className)}>{children}</span>
 }
 
 /** A toggle: on or off. `icon` sits on the left, `count` after the label. */

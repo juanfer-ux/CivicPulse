@@ -1,8 +1,8 @@
 import { useState, type RefObject } from 'react'
-import { CarSimple, Check, SortAscending, SortDescending, Trash, Wrench } from '@phosphor-icons/react'
+import { CarSimple, Check, Trash, Wrench } from '@phosphor-icons/react'
+import { HistoryTitle, type HistorySort } from '@/components/HistoryTitle'
 import { MediaGallery } from '@/components/MediaGallery'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { groupHistory } from '@/lib/history'
@@ -17,8 +17,7 @@ const RING = ' rounded-sm outline outline-1 outline-offset-4 outline-(--neutral-
 /**
  * The right column of an open recurrence (owner's Figma Recurrence Right Column, node 1418:7408, 2026-11-25): the title with the sort button, a search field, then one group per occurrence, newest first, all open (no collapsing, owner 2026-11-25). Each group has a header (date and plate), its reports (a dot in the recurrence's status color, as on the map, the reference over the source, the date over the time) and, attached under them, the interventions that followed it. Replaces the flat list of all occurrences.
  */
-export function OccurrenceHistory({ category, status, detail, openReportId, onSelectIncident, focus, viewport }: { category: string; status: ProblemStatus; detail: ProblemDetailData | null; openReportId: string | null; onSelectIncident: (id: string) => void; focus: string | null; viewport: RefObject<HTMLDivElement | null> }) {
-  const [oldestFirst, setOldestFirst] = useState(false)
+export function OccurrenceHistory({ category, status, detail, openReportId, onSelectIncident, focus, viewport, oldestFirst, onSort }: HistorySort & { category: string; status: ProblemStatus; detail: ProblemDetailData | null; openReportId: string | null; onSelectIncident: (id: string) => void; focus: string | null; viewport: RefObject<HTMLDivElement | null> }) {
   const [query, setQuery] = useState('')
   const groups = detail ? groupHistory(detail.occurrences, detail.interventions, detail.events) : []
   const links = detail?.links ?? []
@@ -63,17 +62,17 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
             <MediaGallery incidentId={i.id} carousel />
             <p className="px-1 text-body-sm text-foreground">{i.description}</p>
             <dl className="grid grid-cols-[66px_1fr] gap-x-3 gap-y-1 px-1 text-meta">
-              <dt className="text-muted-foreground">Vehicle</dt>
+              <dt className="text-(--fg-tertiary)">Vehicle</dt>
               <dd className="text-foreground">{label(i.vehicle_type)}</dd>
-              <dt className="text-muted-foreground">Validation</dt>
+              <dt className="text-(--fg-tertiary)">Validation</dt>
               <dd className="text-foreground">{label(i.validation_status)}</dd>
-              <dt className="text-muted-foreground">AI</dt>
+              <dt className="text-(--fg-tertiary)">AI</dt>
               <dd className="text-foreground">
                 {i.ai_classification} ({Math.round((i.ai_confidence ?? 0) * 100)}% confidence)
               </dd>
               {i.outcome && (
                 <>
-                  <dt className="text-muted-foreground">Outcome</dt>
+                  <dt className="text-(--fg-tertiary)">Outcome</dt>
                   <dd className="text-foreground">{i.outcome}</dd>
                 </>
               )}
@@ -86,12 +85,7 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
 
   return (
     <>
-      <div className="flex h-17 shrink-0 items-center gap-5 border-b-[0.5px] border-(--neutral-600) px-4"> {/* Figma Title row: 68 px, 16 px at the sides, a 0.5 px `neutral-600` line under it */}
-        <h3 className="flex-1 text-label text-(--fg-secondary)">Occurrence history</h3>
-        <Button variant="ghost" className="h-11 w-10 justify-center px-2" aria-label={oldestFirst ? 'Show newest first' : 'Show oldest first'} title={oldestFirst ? 'Show newest first' : 'Show oldest first'} onClick={() => setOldestFirst((o) => !o)}>
-          {oldestFirst ? <SortAscending className="size-5 text-(--neutral-100)" aria-hidden /> : <SortDescending className="size-5 text-(--neutral-100)" aria-hidden />}
-        </Button>
-      </div>
+      <HistoryTitle oldestFirst={oldestFirst} onSort={onSort} />
       <div className="shrink-0 px-3"> {/* the search has 12 px at its sides (owner's Figma, 2026-11-26, later; edge to edge before) */}
         <Input type="search" aria-label="Search the occurrence history" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] border-(--neutral-400) bg-(--neutral-800) text-body-sm" />
       </div>
