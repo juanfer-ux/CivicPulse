@@ -427,7 +427,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
             {/* Figma: 16 px above, 12 below, 16 between; the search is 36 px high and the Explore row 40 px, both 14 px from the edge (owner's Figma, 2026-11-05). */}
             <div className="flex shrink-0 flex-col"> {/* Figma `main` (owner, 2026-11-26): the header (search, 16 px from the edges, 24 above and below, a 1.4 px `neutral-700` line under it), then 16 px to New investigation (48 px high, 16 px from the edges, 8 above and below) */}
               <div className="flex flex-col">
-                <div className="mx-1.5 border-b-[1.4px] border-(--neutral-700) px-2.5 py-6"><div className="relative"> {/* the browser's own clear button is hidden: the × is the Phosphor X (owner, 2026-11-24: only Phosphor icons) */}
+                <div className="mx-2 border-b-[1.4px] border-(--neutral-700) px-2.5 py-6"><div className="relative"> {/* the browser's own clear button is hidden: the × is the Phosphor X (owner, 2026-11-24: only Phosphor icons) */}
                   <Input type="search" aria-label="Search the menu" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] bg-(--neutral-700) border-(--neutral-400) pr-9 text-body-sm [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:appearance-none" />
                   {query && (
                     <Button variant="ghost" size="icon" aria-label="Clear search" className="absolute top-2 right-1 size-7" onClick={() => setQuery('')}>
@@ -436,7 +436,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                   )}
                 </div></div>
                 {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
-                <div className="mx-1.5 mt-4 px-2.5 py-2">
+                <div className="mx-2 mt-4 px-2.5 py-2">
                 <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-12 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--fg-primary) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
                   <span className="grid size-6 shrink-0 place-items-center" aria-hidden><StarFour weight="regular" className="size-[18.3px] text-(--neutral-200)" /></span>
                   New investigation
@@ -445,7 +445,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
               </div>
             </div>
             <ScrollArea className="min-h-0 flex-1" viewportClassName="[&>div]:!block">
-              <div className="flex flex-col gap-3 px-1.5 pt-3"> {/* Figma (owner, 2026-11-26): 6 px at both sides, 12 px under New investigation and between sections */}
+              <div className="flex flex-col gap-3 px-2 pt-3"> {/* Figma (owner, 2026-11-27): 8 px at both sides (6), 12 px under New investigation and between sections */}
                 <Section title="Recurrences" expanded={recOpen} onExpand={setRecOpen} items={allRecurrences} addLabel="New recurrence" onAdd={onNewCase} views empty="Nothing here yet. Ask the agent, or open a marker on the map.">
                   {(view) => (
                     <Growing open={recOpen} total={allRecurrences.length}>{(limit) => (
@@ -492,7 +492,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
           <div className="flex items-center gap-3 px-4 py-1"> {/* Figma User > Main (owner, 2026-11-24): 16 px at the sides (it was 12), 12 px between the account details and the menu button; the avatar and the text are 20 px apart (it was 16) */}
             <div className="flex min-w-0 flex-1 items-center gap-5 px-1.5">
               <Avatar size="lg" name={profile?.full_name || 'Signed in'} /> {/* the large one, 38 px (owner's Figma, 2026-11-27) */}
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
+              <div className="flex min-w-0 flex-1 flex-col pb-1">
                 <p className="truncate text-body-sm-strong text-(--fg-primary)">{name}</p>
                 {email && <p className="truncate text-caption-medium text-(--fg-secondary)">{email}</p>}
               </div>
