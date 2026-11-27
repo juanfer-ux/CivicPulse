@@ -3,6 +3,8 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-27. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **Section title padding (owner, 2026-11-27):** the agent panel section titles have **4 px** at both sides (Figma had 2, the code none). Figma and code (`AgentHome.tsx`).
+- **Agent panel title (owner, 2026-11-27, Figma):** "Explore" is now **"New Investigation"** (`InvestigatePanel.tsx`); a recurrence still shows its address. Figma changed the default variant only.
 - **Current state (2026-11-27):** the code noted below is merged and live with this release; older notes about uncommitted work are history. Figma component descriptions and `design-system/` were brought up to date the same day.
 - **Open:** the stats bar list shows sample data in production; the browser tab icon is still Vite's; the selected map chip has low contrast; the debris question ignores waste type; Resolved blue looks like Approved; one Figma gradient ends `#070708`, the code `#000`.
 - **Filters panel 360 px (owner, 2026-11-27):** was 420 (`FILTERS_W` in `Dashboard.tsx` and `FiltersPanel.tsx`). Create user keeps 420.

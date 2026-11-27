@@ -91,7 +91,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           <CardHeader className="flex w-full flex-row items-center gap-2.5 max-desk:mx-auto max-desk:max-w-[664px] desk:px-8"> {/* Figma title row (owner's Figma, 2026-11-17): 32 px at the sides, "Explore" (fills), the place (map-pin, "Bogotá, Colombia", a chevron; no menu yet) and the collapse button */}
             {/* with a recurrence open the title is its street (owner's Figma, 2026-11-24, Agent Panel · Empty · Recurrence) */}
             <CardTitle asChild className={`flex-1 text-label ${recurrence || incident ? 'text-(--fg-emphasis)' : 'text-(--fg-secondary)'}`}>
-              <h2 className="truncate" title={recurrence?.address}>{recurrence?.address ?? 'Explore'}</h2>
+              <h2 className="truncate" title={recurrence?.address}>{recurrence?.address ?? 'New Investigation'}</h2>
             </CardTitle>
             <span className="hidden items-center gap-2 px-4 text-body-sm text-(--fg-secondary) desk:flex">
               <span className="flex items-center gap-1"><MapPin weight="regular" className="size-3.5 text-(--neutral-300)" aria-hidden />Bogotá, Colombia</span>

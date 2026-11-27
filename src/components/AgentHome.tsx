@@ -17,7 +17,7 @@ const TOPIC_ICON: Icon[] = [Warning, MapPin, Clock, ArrowsClockwise, Compass]
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-6">
-      <h3 className="font-display-semi text-display-xs-strong text-(--fg-secondary)">{title}</h3> {/* `fg-secondary` again (owner's Figma, 2026-11-27, latest) */}
+      <h3 className="px-1 font-display-semi text-display-xs-strong text-(--fg-secondary)">{title}</h3> {/* `fg-secondary` again (owner's Figma, 2026-11-27, latest) */}
       {children}
     </section>
   )
