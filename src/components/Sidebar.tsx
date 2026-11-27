@@ -359,7 +359,7 @@ function AccountMenu({ onSignOut, side, avatar }: { onSignOut: () => void; side:
           {avatar}
         </button>
       ) : (
-        <Button variant="ghost" size="icon" aria-label="Account menu" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <Button variant="ghost" size="icon" className="-mx-2" /* the 20 px icon sits where Figma has it; the button keeps its hit area */ aria-label="Account menu" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
           <DotsThreeVertical className={`size-5 ${side === 'above' ? 'text-(--white)' : ''}`} />
         </Button>
       )}
@@ -483,13 +483,13 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
           </>
         )}
       </div>
-      <div className={`flex shrink-0 flex-col border-t-[0.5px] border-(--neutral-500) ${collapsed ? 'items-center justify-center py-5' : 'py-4'}`}> {/* the expanded user row has 20 px above and below (owner's Figma, 2026-11-17, it was 10), the large avatar and 16 px beside it (it was the default avatar and 12) */}
+      <div className={`flex shrink-0 flex-col border-t-[0.5px] border-(--neutral-600) py-5 ${collapsed ? 'items-center justify-center' : ''}`}> {/* Figma User (owner, 2026-11-27): 20 px above and below, 12 at the sides, a `neutral-600` line on top, the large avatar */}
         {collapsed ? (
           <>
             <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} title={name} />} />
           </>
         ) : (
-          <div className="flex items-center gap-3 px-4 py-1"> {/* Figma User > Main (owner, 2026-11-24): 16 px at the sides (it was 12), 12 px between the account details and the menu button; the avatar and the text are 20 px apart (it was 16) */}
+          <div className="flex items-center gap-3 px-3"> {/* 12 px between the account details and the menu icon; the avatar and the text are 20 px apart */}
             <div className="flex min-w-0 flex-1 items-center gap-5 px-1.5">
               <Avatar size="lg" name={profile?.full_name || 'Signed in'} /> {/* the large one, 38 px (owner's Figma, 2026-11-27) */}
               <div className="flex min-w-0 flex-1 flex-col pb-1">

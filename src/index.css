@@ -35,11 +35,11 @@
   --text-display-sm--letter-spacing: 0.02em;
   --text-display-xs: 16px; /* Figma 2026-11-12: the smallest display style, Section name, 16 / 20, tracking 1 % (it was 14 / 20 since 2026-11-06; first 16 / 24) */
   --text-display-xs--font-weight: calc(400 + var(--display-weight-offset));
-  --text-display-xs--line-height: 20px;
+  --text-display-xs--line-height: 22px; /* 22 since 2026-11-27 (owner's Figma) */
   --text-display-xs--letter-spacing: 0.01em;
   --text-display-xs-strong: 16px; /* Figma 2026-11-23: new style display-xs-strong, Zalando Sans SemiExpanded SemiBold 16 / 20, tracking 2 % (it was 1 % the same day): the section names of the agent panel (it was display-xs Regular) */
   --text-display-xs-strong--font-weight: calc(600 + var(--display-weight-offset));
-  --text-display-xs-strong--line-height: 20px;
+  --text-display-xs-strong--line-height: 22px;
   --text-display-xs-strong--letter-spacing: 0.02em;
   --text-stat: 36px; /* Figma stat (2026-11-23, later: 36 px, line 28; earlier that day 38 px, line 32; before 40 px; before: 40 px, line 30, SemiExpanded SemiBold, tracking -2 %; before, 2026-11-17: 32 px, line 28, it was 28; before: Zalando Sans SemiExpanded SemiBold 28 / 28, tracking -2 % (it was 24 / 24, 42 / 32 and 40 / 32 before) */
   --text-stat--font-weight: calc(600 + var(--stat-weight-offset));

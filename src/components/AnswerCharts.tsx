@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, XAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
 import { BarList } from '@/components/BarList'
@@ -6,8 +7,6 @@ import type { Answer } from '@/lib/agent'
 
 /** The agent's answer charts (shadcn Chart on Recharts), in the app's own colors. No grow-in animation (owner, 2026-11-05): the bars and the area appear at once, and do not replay when the panel is resized. Fetched right after the app loads (see InvestigatePanel), so no placeholder is needed. */
 const config = { value: { label: 'Incidents', color: 'var(--ai-border)' } } satisfies ChartConfig
-const tick = { fill: 'var(--muted-foreground)', fontSize: 12 }
-const grid = 'var(--secondary)'
 const tooltip = <ChartTooltipContent hideLabel />
 
 /** Screen readers get the numbers as text, since a chart is a picture. */
@@ -124,14 +123,22 @@ function Recurrences({ bars, onPick }: { bars: Answer['bars']; onPick?: (id: str
   )
 }
 
-function Time({ bars }: { bars: Answer['bars'] }) {
+/** Figma **Answer Chart · Time of Day** (owner, 2026-11-27): a `cobalt-200` line over an area at 45 % fading from `cobalt-400` to `cobalt-800`, thin `neutral-600` grid lines, `caption` hours. */
+export function Time({ bars }: { bars: Answer['bars'] }) {
+  const fill = useId()
   return (
     <ChartContainer config={config} className="h-[180px] w-full" role="img" aria-label={summary('Incidents by time of day', bars)}>
-      <AreaChart data={bars} margin={{ left: 8, right: 8, top: 8 }}>
-        <CartesianGrid vertical={false} stroke={grid} />
-        <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ ...tick, fontSize: 11 }} interval={0} />
+      <AreaChart data={bars} margin={{ left: 34, right: 34, top: 12 }}> {/* Figma: the first and last point sit 34 px in, so their hours are not cut */}
+        <defs>
+          <linearGradient id={fill} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="var(--cobalt-400)" />
+            <stop offset="1" stopColor="var(--cobalt-800)" />
+          </linearGradient>
+        </defs>
+        <CartesianGrid vertical={false} stroke="var(--neutral-600)" strokeWidth={0.5} />
+        <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fill: 'var(--fg-secondary)', fontSize: 12 }} interval={0} />
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-        <Area dataKey="value" isAnimationActive={false} type="monotone" stroke="var(--color-value)" fill="var(--color-value)" fillOpacity={0.2} />
+        <Area dataKey="value" isAnimationActive={false} type="monotone" stroke="var(--cobalt-200)" strokeWidth={1.5} fill={`url(#${fill})`} fillOpacity={0.45} />
       </AreaChart>
     </ChartContainer>
   )
@@ -141,10 +148,10 @@ function Period({ bars }: { bars: Answer['bars'] }) {
   return (
     <ChartContainer config={config} className="h-[150px] w-full" role="img" aria-label={summary('Two periods compared', bars)}>
       <BarChart data={bars} margin={{ top: 16 }}>
-        <XAxis dataKey="label" tickLine={false} axisLine={false} tick={tick} />
+        <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fill: 'var(--fg-secondary)', fontSize: 13 }} />
         <ChartTooltip cursor={false} content={tooltip} />
         <Bar dataKey="value" isAnimationActive={false} fill="var(--color-value)" radius={4} barSize={48}>
-          <LabelList dataKey="value" position="top" fill="var(--foreground)" fontSize={12} />
+          <LabelList dataKey="value" position="top" fill="var(--fg-primary)" fontSize={13} />
         </Bar>
       </BarChart>
     </ChartContainer>
@@ -154,9 +161,9 @@ function Period({ bars }: { bars: Answer['bars'] }) {
 /** The places around a recurrence (owner, 2026-11-23): one row each, nearest first, its name and its distance in metres. */
 function Places({ bars }: { bars: Answer['bars'] }) {
   return (
-    <ul className="flex flex-col" aria-label={summary('Distance in metres to each place', bars)}>
+    <ul className="flex flex-col gap-2" aria-label={summary('Distance in metres to each place', bars)}>
       {bars.map((b, i) => (
-        <li key={b.label + i} className={`flex items-center gap-3 py-2 ${i ? 'border-t border-(--neutral-600)' : ''}`}>
+        <li key={b.label + i} className={`flex items-center gap-3 py-2 ${i ? 'border-t border-(--neutral-700) pt-4' : ''}`}>
           <span className="size-2 shrink-0 rounded-[1px] bg-(--neutral-100)" aria-hidden />
           <span className="min-w-0 flex-1 truncate text-body-sm text-foreground" title={b.label}>{b.label}</span>
           <span className="shrink-0 text-body-sm tabular-nums text-(--neutral-300)">{b.value} m</span>
@@ -167,9 +174,10 @@ function Places({ bars }: { bars: Answer['bars'] }) {
 }
 
 export default function AnswerChart({ kind, bars, onFocus, onPick, onPickRecurrence }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars']; onPickRecurrence?: (id: string) => void } & Link) {
-  const dark = kind === 'donut' || kind === 'barlist' || kind === 'rows' || kind === 'recurrences' // owner's Figma, 2026-11-26: these sit on the darker card
+  // Figma Answer Charts (owner, 2026-11-27): most charts sit on the dark box; the dot matrix and the two periods keep the light one. Where Figma excludes the line from layout, the padding gives up its width.
+  const box = kind === 'dots' ? 'border-[0.5px] bg-(--neutral-700) p-4' : kind === 'period' ? 'border-[0.5px] bg-(--neutral-700) p-[15.5px]' : 'border bg-(--neutral-900) p-[15px]'
   return (
-    <div className={dark ? `rounded-lg border border-(--neutral-700) bg-(--neutral-900) ${kind === 'barlist' ? 'p-[15px]' : 'p-4'}` : 'rounded-lg border-[0.5px] border-(--neutral-700) bg-(--neutral-700) p-4'}>
+    <div className={`rounded-lg border-(--neutral-700) ${box}`}>
       {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : kind === 'dots' ? <Dots bars={bars} /> : kind === 'rows' ? <Rows bars={bars} /> : kind === 'places' ? <Places bars={bars} /> : kind === 'recurrences' ? <Recurrences bars={bars} onPick={onPickRecurrence} /> : kind === 'donut' ? <Donut bars={bars} onFocus={onFocus} onPick={onPick} /> : <BarList bars={bars} onFocus={onFocus} onPick={onPick} />}
     </div>
   )

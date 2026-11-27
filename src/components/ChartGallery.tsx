@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts'
+import { BarList } from '@/components/BarList'
 import { Bars } from '@/components/InvestigatePanel'
 import { QuestionCharts } from '@/components/QuestionCharts'
 import { StatCard } from '@/components/ui/stat-card'
@@ -28,12 +29,12 @@ const PERIOD = [
   { label: 'Last 30 days', value: 19 },
 ]
 
-const config = { value: { label: 'Incidents', color: 'var(--indigo-400)' } } satisfies ChartConfig
-const tick = { fill: 'var(--neutral-200)', fontSize: 12 }
+const config = { value: { label: 'Incidents', color: 'var(--cobalt-400)' } } satisfies ChartConfig
+const tick = { fill: 'var(--fg-secondary)', fontSize: 12 }
 
 export function Option({ name, note, children }: { name: string; note: string; children: ReactNode }) {
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-sm border border-input bg-ai p-4">
+    <div className="flex min-w-0 flex-col gap-2 rounded-lg border border-(--neutral-700) bg-(--neutral-900) p-4">
       <div>
         <p className="text-label">{name}</p>
         <p className="text-meta text-muted-foreground">{note}</p>
@@ -49,24 +50,6 @@ export function Row({ title, children }: { title: string; children: ReactNode })
       <h2 className="text-title">{title}</h2>
       <div className="grid gap-4 md:grid-cols-3">{children}</div>
     </section>
-  )
-}
-
-/** Tremor's BarList look, without the library: the bar sits behind the label, the number on the right. */
-function BarList({ data }: { data: { label: string; value: number }[] }) {
-  const max = Math.max(...data.map((d) => d.value))
-  return (
-    <ul className="flex flex-col gap-1.5 text-body-sm">
-      {data.map((d) => (
-        <li key={d.label} className="flex items-center gap-3">
-          <div className="relative h-8 flex-1 overflow-hidden rounded-sm bg-muted/40">
-            <div className="absolute inset-y-0 left-0 rounded-sm bg-ai-border/60" style={{ width: `${(d.value / max) * 100}%` }} />
-            <span className="relative flex h-full items-center px-2">{d.label}</span>
-          </div>
-          <span className="w-8 text-right tabular-nums">{d.value}</span>
-        </li>
-      ))}
-    </ul>
   )
 }
 
@@ -95,7 +78,7 @@ export function ChartGallery() {
       <header>
         <h1 className="text-heading">Chart options for the agent's answers</h1>
         <p className="text-body-sm text-muted-foreground">
-          Same data in each row. "Current" is what the app shows today; the others are alternatives. Colors are the app's own (indigo-400, neutrals).
+          Same data in each row. "Current" is what the app shows today; the others are alternatives. Colors are the app's own (Cobalt, neutrals).
         </p>
       </header>
 
@@ -113,8 +96,8 @@ export function ChartGallery() {
         <Option name="Current" note="Hand-made HTML bars. No dependency.">
           <Bars bars={RANKING} />
         </Option>
-        <Option name="Tremor-style BarList" note="Same idea, bigger rows with the name inside the bar. Still plain HTML.">
-          <BarList data={RANKING} />
+        <Option name="Tremor-style BarList" note="The app's bar list (Figma Answer Chart · Bar List).">
+          <BarList bars={RANKING} />
         </Option>
         <Option name="shadcn Chart · horizontal bar" note="Recharts under the hood. Tooltip on hover, values at the end of each bar.">
           <ChartContainer config={config} className="h-[220px] w-full">
@@ -123,7 +106,7 @@ export function ChartGallery() {
               <XAxis type="number" hide />
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
               <Bar dataKey="value" fill="var(--color-value)" radius={4}>
-                <LabelList dataKey="value" position="right" fill="var(--neutral-100)" fontSize={12} />
+                <LabelList dataKey="value" position="right" fill="var(--fg-primary)" fontSize={12} />
               </Bar>
             </BarChart>
           </ChartContainer>
@@ -137,11 +120,11 @@ export function ChartGallery() {
         <Option name="shadcn Chart · columns" note="Time runs left to right, so the evening peak is a shape you see at once.">
           <ChartContainer config={config} className="h-[200px] w-full">
             <BarChart data={TIME} margin={{ top: 16 }}>
-              <CartesianGrid vertical={false} stroke="var(--neutral-500)" />
+              <CartesianGrid vertical={false} stroke="var(--neutral-700)" />
               <XAxis dataKey="label" tickLine={false} axisLine={false} tick={tick} />
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
               <Bar dataKey="value" fill="var(--color-value)" radius={4}>
-                <LabelList dataKey="value" position="top" fill="var(--neutral-100)" fontSize={12} />
+                <LabelList dataKey="value" position="top" fill="var(--fg-primary)" fontSize={12} />
               </Bar>
             </BarChart>
           </ChartContainer>
@@ -149,7 +132,7 @@ export function ChartGallery() {
         <Option name="shadcn Chart · area" note="Smooth curve over the day. Looks good, but hides that the blocks are 4 hours wide.">
           <ChartContainer config={config} className="h-[200px] w-full">
             <AreaChart data={TIME} margin={{ left: 8, right: 8, top: 8 }}>
-              <CartesianGrid vertical={false} stroke="var(--neutral-500)" />
+              <CartesianGrid vertical={false} stroke="var(--neutral-700)" />
               <XAxis dataKey="label" tickLine={false} axisLine={false} tick={tick} />
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
               <Area dataKey="value" type="monotone" stroke="var(--color-value)" fill="var(--color-value)" fillOpacity={0.2} />
@@ -171,7 +154,7 @@ export function ChartGallery() {
               <XAxis dataKey="label" tickLine={false} axisLine={false} tick={tick} />
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
               <Bar dataKey="value" fill="var(--color-value)" radius={4} barSize={48}>
-                <LabelList dataKey="value" position="top" fill="var(--neutral-100)" fontSize={12} />
+                <LabelList dataKey="value" position="top" fill="var(--fg-primary)" fontSize={12} />
               </Bar>
             </BarChart>
           </ChartContainer>
