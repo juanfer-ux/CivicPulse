@@ -116,15 +116,16 @@ export const SUGGESTIONS = [
   'Which area might deserve further investigation tomorrow evening?',
 ]
 
-/** The three Worth investigating cards (Figma has three since 2026-11-12): a title and the question each one asks (the picture is a placeholder for now). */
+/** The three "Recurrences to investigate" cards (owner's Figma, 2026-11-27): each shows its question and asks it; `title` picks the icon. */
 export const WORTH_INVESTIGATING = [
-  { title: 'Illegal Dumping', category: 'Illegal Dumping', question: 'Which locations have repeated illegal dumping reports?' },
-  { title: 'Obstructive Parking', category: 'Parking Obstruction', question: 'Which locations have repeated parking obstruction reports?' },
-  { title: 'Damaged Infrastructure', category: 'Damaged Infrastructure', question: 'Which locations have repeated damaged infrastructure reports?' }, // no such category in the data yet (owner, 2026-11-12): the agent answers it as a general recurring question
+  { title: 'Obstructive Parking', question: 'When do parking obstruction incidents occur most frequently?' },
+  { title: 'Illegal Dumping', question: 'Which locations get construction debris again and again?' }, // ponytail: the waste type is not filtered yet, it answers for all dumping
+  { title: 'Accessibility', question: 'Where would fixing one ramp or sidewalk help the most people?' }, // not answerable: the data has no ramps or sidewalks, so the planner says so
 ]
 
 export function plan(question: string, localities: Locality[]): Plan | null {
   const q = norm(question)
+  if (/\bfix\w*\b.*\b(ramp|sidewalk)/.test(q)) return null // the data holds reports, not the state of ramps or sidewalks: say so, never rank incidents instead
   const locality =
     [...localities].sort((a, b) => b.name.length - a.name.length).find((l) => q.includes(norm(l.name))) ?? null
   const n = q.match(/(\d+)\s*days?/)
