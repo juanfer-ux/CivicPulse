@@ -75,7 +75,7 @@ interface Props {
 
 /** The Filters panel's way of opening (owner's test, 2026-11-14): true pushes the map and everything on it to the left like the menu sidebar does, false lays the panel over the map with a scrim. */
 const FILTERS_PUSH = true
-const FILTERS_W = 420
+const FILTERS_W = 360 // the Filters panel's width (owner, 2026-11-27; 420 before); FiltersPanel.tsx draws the same
 
 export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, spots, focusCode, zoomTo, onZoomLocality, onClearHighlight, closeCase, tab, onTab, onInspect, agentOff, onAgentOff, focus, onRows, onSelection, children }: Props) {
   const [data, setData] = useState<Data | null>(null)

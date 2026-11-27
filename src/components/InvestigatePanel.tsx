@@ -73,9 +73,9 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
           <svg ref={star} viewBox="0 0 502 502" className="absolute -bottom-[305px] left-1/2 size-[502px] -translate-x-1/2 opacity-40 blur-[60px]">
             <defs>
               <linearGradient id="agent-star" x1="0" y1="0" x2="0.64" y2="0.77">
-                <stop offset="0.1" stopColor="var(--cobalt-400)" />
-                <stop offset="0.61" stopColor="var(--red-300)" />
-                <stop offset="1" stopColor="var(--yellow-300)" />
+                <stop offset="0" stopColor="var(--cobalt-500)" /> {/* owner's Figma Star, 2026-11-27: cobalt-500, indigo-400, red-300 (cobalt-400, red-300, yellow-300 before) */}
+                <stop offset="0.27" stopColor="var(--indigo-400)" />
+                <stop offset="0.71" stopColor="var(--red-300)" />
               </linearGradient>
             </defs>
             <path fill="url(#agent-star)" d="M 0 0 L 70.65 41.67 C 181.92 107.31 320.07 107.31 431.34 41.67 L 502 0 L 460.32 70.65 C 394.68 181.92 394.68 320.07 460.32 431.34 L 502 502 L 431.34 460.32 C 320.07 394.68 181.92 394.68 70.65 460.32 L 0 502 L 41.67 431.34 C 107.31 320.07 107.31 181.92 41.67 70.65 L 0 0 Z" />
