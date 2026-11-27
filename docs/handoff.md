@@ -3,6 +3,9 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-27. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **Sidebar, New investigation (owner, 2026-11-27, Figma):** the row has no extra 10 px at its sides: 8 px from the sidebar edges, full width (`Sidebar.tsx`).
+- **Overview card and bar list (owner, 2026-11-27, Figma):** the four number tiles have **no icons**; the sort icon (Overview and History) is **`neutral-200`**; the bar list uses a **`cobalt-900`** track and **`cobalt-400`** bar (800, 300), also in agent answers; its box line is excluded from layout (15 px padding).
+- **Overview card 320 px (owner, 2026-11-27):** was 360 (`ProblemDetail.tsx`; Figma screen instance, the component was already 320).
 - **Sidebar spacing (owner, 2026-11-27, Figma):** **8 px** at the sides of the search, New investigation and the sections (6); no gap between the account name and email (2). `Sidebar.tsx`.
 - **Panel title and data cards (owner, 2026-11-27, latest):** "New Investigation" is **`fg-primary`** (was secondary); **20 px** between the small data cards and the localities card (12).
 - **Panel cards and note (owner, 2026-11-27, latest; replaces the card color and note notes below):** note **`neutral-800`**, no line. Investigate cards **`neutral-700`** (hover and focus `neutral-600`). Data cards **1 px** `neutral-700` line (112 and 229 px). Composer field line excluded from layout (19.5 px left padding). Figma differences left: Category_Card2 component and its module are still `neutral-800`, Data_Card_Small component 0.5 px, the Alert component black with a line.

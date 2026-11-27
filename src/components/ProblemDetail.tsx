@@ -56,7 +56,7 @@ export function ProblemDetail({
       role="region"
       data-float
       aria-label="Recurrence details"
-      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none ${WIDE ? 'desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-none desk:w-[360px] desk:flex-col desk:items-stretch desk:gap-2 desk:overflow-visible desk:rounded-none desk:border-0 desk:bg-transparent! desk:shadow-none' : 'desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[400px] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]'}`}
+      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none ${WIDE ? 'desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-none desk:w-[320px] desk:flex-col desk:items-stretch desk:gap-2 desk:overflow-visible desk:rounded-none desk:border-0 desk:bg-transparent! desk:shadow-none' : 'desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[400px] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]'}`}
     >
       {WIDE && <div className="hidden desk:block desk:rounded-lg desk:shadow-lg"><Overview problem={problem} event={event} {...sort} /></div>} {/* the numbers (last reported, occurrences, returns, reports, interventions) float at the top left on every recurrence (owner, 2026-11-24) */}
       <div className={`flex flex-col gap-4 px-4 py-6 ${WIDE ? 'desk:hidden' : ''}`}>
@@ -130,7 +130,7 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
 // ponytail: sample numbers from the Figma component, until the owner says what this list shows
 const SAMPLE_BARS = [{ label: 'Chapinero', value: 62 }, { label: 'Suba', value: 52 }, { label: 'Kennedy', value: 43 }, { label: 'Engativá', value: 36 }, { label: 'Others', value: 61 }]
 
-/** The numbers of an open recurrence (Figma Overview, owner 2026-11-26): a `neutral-900` box (8 px radius): the history title row, then, 8 px in and 12 px apart, last report and the latest status event (a `neutral-600` line between them), then four equal 88 px tiles in two columns (a 20 px icon and the label, 12 px, the number) and a bar list (sample data for now). */
+/** The numbers of an open recurrence (Figma Overview, owner 2026-11-26): a `neutral-900` box (8 px radius): the history title row, then, 8 px in and 12 px apart, last report and the latest status event (a `neutral-600` line between them), then four equal 84 px tiles in two columns (the label, 12 px, the number; no icons since 2026-11-27) and a bar list (sample data for now). */
 export function Overview({ problem, event, ...sort }: HistorySort & { problem: ProblemRow; event?: ProblemEvent }) {
   const [occ, ret, rep, int, last] = stats(problem)
   const rows = [{ Icon: last.Icon, label: last.label, value: last.value }, ...(event ? [{ Icon: event.kind === 'resolved' ? UserCheck : last.Icon, label: event.kind === 'resolved' ? 'Resolved by an operator' : 'Reopened by a new occurrence', value: day(event.created_at) }] : [])] // a person icon when an operator resolved it (owner, 2026-11-26)
@@ -153,15 +153,12 @@ export function Overview({ problem, event, ...sort }: HistorySort & { problem: P
         <dl className="grid grid-cols-2 gap-1 px-1">
           {[occ, ret, rep, int].map((x) => (
             <div key={x.label} className="flex flex-col gap-3 rounded-sm bg-(--neutral-700) px-4 py-3">
-              <dt className="flex items-center gap-2 text-body-sm text-(--fg-secondary)">
-                <x.Icon weight="regular" className="size-5 shrink-0 text-(--neutral-100)" aria-hidden />
-                {x.label}
-              </dt>
+              <dt className="text-body-sm text-(--fg-secondary)">{x.label}</dt>
               <dd className="font-display-semi text-stat text-[24px]! leading-7! text-(--fg-primary)">{x.value}</dd>
             </div>
           ))}
         </dl>
-        <div className="rounded-lg border border-(--neutral-700) p-4">
+        <div className="rounded-lg border border-(--neutral-700) p-[15px]"> {/* Figma: the line is excluded from layout, so 16 px from the outer edge */}
           <BarList bars={SAMPLE_BARS} />
         </div>
       </div>

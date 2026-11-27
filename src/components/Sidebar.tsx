@@ -436,7 +436,7 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
                   )}
                 </div></div>
                 {/* Explore takes you to the agent's landing (owner, 2026-11-05): a fresh empty investigation, and the map clears the last answer. An empty one already open is reused, so clicking it twice adds nothing. */}
-                <div className="mx-2 mt-4 px-2.5 py-2">
+                <div className="mx-2 mt-4 py-2"> {/* Figma (owner, 2026-11-27): the New investigation row fills the width, 8 px from the edges like the sections */}
                 <Button variant="ghost" aria-current={act.kind === 'explore' ? 'page' : undefined} className={`h-12 w-full justify-start gap-3 px-2 text-body-sm-medium text-(--fg-primary) ${act.kind === 'explore' ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} onClick={pickRow({ kind: 'explore' }, onNew)}>
                   <span className="grid size-6 shrink-0 place-items-center" aria-hidden><StarFour weight="regular" className="size-[18.3px] text-(--neutral-200)" /></span>
                   New investigation
