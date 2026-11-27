@@ -92,7 +92,7 @@ export function Content({ type, shape, c }: { type: ModuleType; shape: Shape; c:
 
 const Item = ({ label, on, pick }: { label: string; on: boolean; pick: () => void }) => (
   <Button role="menuitemradio" aria-checked={on} variant="ghost" className="h-8 w-full justify-start gap-2 px-2 text-body-sm hover:bg-(--neutral-800)" onClick={pick}>
-    <span className="flex size-4 items-center justify-center">{on && <Check weight="bold" className="size-3.5" aria-hidden />}</span>
+    <span className="flex size-4 items-center justify-center">{on && <Check className="size-3.5" aria-hidden />}</span>
     {label}
   </Button>
 )

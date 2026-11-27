@@ -5,9 +5,7 @@ import { useNoSelect, useReleaseGuard } from '@/lib/useNoSelect'
 import { Check, CaretDown, CaretRight, Chat, DotsThreeVertical, List, Plus, SidebarSimple, StarFour, FunnelSimple, SignOut, Warning, X } from '@phosphor-icons/react'
 import { gsap } from 'gsap'
 import mark from '@/assets/logo-mark.svg'
-import sidebarMark from '@/assets/logo-mark-sidebar.svg' // the mark in `brand-primary` (owner's Figma, 2026-11-25), for the expanded sidebar
 import wordmark from '@/assets/logo-wordmark.svg'
-import profilePhoto from '@/assets/profile-avatar.png' // the owner's photo, 160 px (owner, 2026-11-24): the avatar of the signed-in person in the sidebar until profiles have their own photo
 import { createPortal } from 'react-dom'
 import { useRailSlot } from '@/lib/railSlot'
 import { Avatar } from '@/components/ui/avatar'
@@ -137,7 +135,7 @@ function Groups<T extends { id: string | number }>({ items, group, order, labels
 /** The three row types of the sidebar (Figma 2026-11-05): Recurrence (warning icon in its status color), Incident (a dot in its status color) and Investigation. */
 type RecurrenceRow = { id: string | number; title: string; status: ProblemStatus; reference?: string; locality?: string; category?: string; address?: string }
 
-/** The second line of a row (owner's Figma, 2026-11-26): the incident type in `caption-medium`, 10 px, the reference. */
+/** The second line of a row (owner's Figma, 2026-11-26): the incident type in `caption-medium`, 10 px, the reference; both `fg-tertiary` since 2026-11-27. */
 const SubLine = ({ category, reference }: { category?: string; reference: string }) => (
   <span className="flex min-w-0 gap-2.5">
     {category && <span className="shrink-0 text-caption-medium">{category}</span>}
@@ -152,12 +150,12 @@ function TwoLineItem({ icon, title, sub, active, tip, onClick }: { icon: ReactNo
     if (active) row.current?.scrollIntoView?.({ block: 'nearest' }) // the open one is always in view, under the sticky section title (scroll-mt-10)
   }, [active])
   return (
-    <Button ref={row} variant="ghost" className={`scroll-mt-10 h-[60px] items-start justify-start gap-2.5 p-2 pr-5 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-(--neutral-300) ${active ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} title={tip} aria-current={active || undefined} onClick={onClick}>
+    <Button ref={row} variant="ghost" className={`scroll-mt-10 h-[60px] items-start justify-start gap-2.5 p-2 pr-5 focus-visible:border-(--neutral-300) ${active ? 'bg-(--neutral-900) hover:bg-(--neutral-900)' : 'hover:bg-(--neutral-600)'}`} title={tip} aria-current={active || undefined} onClick={onClick}>
       <span className={`flex h-10 w-4 shrink-0 items-start justify-center pt-0.5`}>{icon}</span>
       <span className={`flex h-11 justify-center min-w-0 flex-col text-left`}>
         <span className="flex min-w-0 flex-col gap-1">
           <span className={`truncate text-body-sm ${active ? 'text-(--fg-emphasis)' : 'text-(--fg-secondary)'}`}>{title}</span>
-          <span className="flex h-5 items-center truncate text-caption text-(--fg-secondary)"><span className="truncate">{sub}</span></span>
+          <span className="flex h-5 items-center truncate text-caption text-(--fg-tertiary)"><span className="truncate">{sub}</span></span>
         </span>
       </span>
     </Button>
@@ -337,9 +335,9 @@ const NARROW = '(max-width: 1799.98px)'
 /** The logo. The expand button is not here any more: collapsed, it is in the agent panel's title row, left of "Explore" (owner, 2026-11-17; before, the logo mark swapped for it on hover). */
 function Brand({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className={`flex items-center gap-[11.4px] ${collapsed ? '' : 'pl-[2.6px]'}`}>
-      <img src={collapsed ? mark : sidebarMark} alt="" width={collapsed ? 40 : 38} height={collapsed ? 40 : 38} className="shrink-0" /> {/* 38 px in the expanded sidebar (owner's Figma, 2026-11-24: the logo is 38 px, the wordmark 155.3 x 11.8, 11.4 px apart, 1.3 px in; 32 px, 130.76 x 9.93 and 9.6 px before); 32 px (owner's Figma, 2026-11-17; the logo is x 0.8: wordmark 130.76 x 9.93, 9.6 px apart, 1.1 px in); it was 40 px, expanded and collapsed (owner's Figma, 2026-11-17, the big sidebar pass; 42.94 collapsed and 38.92 expanded before; 37.57 earlier that day; 34 on 2026-11-16, 30.8 before), 38.92 expanded */}
-      {!collapsed && <span role="img" aria-label="Civic Pulse" className="h-[11.8px] w-[155.3px] shrink-0 bg-(--brand-primary)" style={{ mask: `url("${wordmark}") center / contain no-repeat` }} />} {/* the wordmark is the mask, so it takes the token's color */}
+    <div className={`flex items-center gap-[11.72px] ${collapsed ? '' : 'px-2'}`}> {/* Figma Sidebar > Logo (owner, 2026-11-27): expanded, a 34 px mark and the 138.93 x 10.55 wordmark, 11.72 px apart, 8 px at the sides; collapsed, the 40 px mark */}
+      <img src={mark} alt="" width={collapsed ? 40 : 34} height={collapsed ? 40 : 34} className="shrink-0" />
+      {!collapsed && <img src={wordmark} alt="Civic Pulse" width={138.93} height={10.55} className="shrink-0" />}
     </div>
   )
 }
@@ -488,12 +486,12 @@ function Menu_({ collapsed, chats, activeId, exploring, onPick, onNew, cases, on
       <div className={`flex shrink-0 flex-col border-t-[0.5px] border-(--neutral-500) ${collapsed ? 'items-center justify-center py-5' : 'py-4'}`}> {/* the expanded user row has 20 px above and below (owner's Figma, 2026-11-17, it was 10), the large avatar and 16 px beside it (it was the default avatar and 12) */}
         {collapsed ? (
           <>
-            <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar src={profilePhoto} name={profile?.full_name || 'Signed in'} title={name} />} />
+            <AccountMenu onSignOut={signOut} side="right" avatar={<Avatar name={profile?.full_name || 'Signed in'} title={name} />} />
           </>
         ) : (
           <div className="flex items-center gap-3 px-4 py-1"> {/* Figma User > Main (owner, 2026-11-24): 16 px at the sides (it was 12), 12 px between the account details and the menu button; the avatar and the text are 20 px apart (it was 16) */}
             <div className="flex min-w-0 flex-1 items-center gap-5 px-1.5">
-              <Avatar src={profilePhoto} name={profile?.full_name || 'Signed in'} />
+              <Avatar size="lg" name={profile?.full_name || 'Signed in'} /> {/* the large one, 38 px (owner's Figma, 2026-11-27) */}
               <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-1">
                 <p className="truncate text-body-sm-strong text-(--fg-primary)">{name}</p>
                 {email && <p className="truncate text-caption-medium text-(--fg-secondary)">{email}</p>}
