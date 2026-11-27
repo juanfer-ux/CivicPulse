@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
 import { BarList } from '@/components/BarList'
+import { HistoryTitle, type HistorySort } from '@/components/HistoryTitle'
 import { ModulesMenu, PanelMenuRow } from '@/components/modules/ModulesMenu'
 import { useModules } from '@/components/modules/ModulesProvider'
-import { useRef } from 'react'
+import { useRef, Fragment } from 'react'
 import { ArrowsClockwise, Calendar, FileText, Stack, Wrench, X, UserCheck } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -28,7 +29,8 @@ export function ProblemDetail({
   categoryName,
   event,
   onClose,
-}: {
+  ...sort
+}: HistorySort & {
   problem: ProblemRow
   event?: ProblemEvent // the latest status event, shown with the numbers
   localityName: string | undefined
@@ -56,7 +58,7 @@ export function ProblemDetail({
       aria-label="Recurrence details"
       className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none ${WIDE ? 'desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-none desk:w-[360px] desk:flex-col desk:items-stretch desk:gap-2 desk:overflow-visible desk:rounded-none desk:border-0 desk:bg-transparent! desk:shadow-none' : 'desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[400px] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]'}`}
     >
-      {WIDE && <div className="hidden desk:block desk:rounded-md desk:shadow-lg"><StatList problem={problem} event={event} /></div>} {/* the numbers (last reported, occurrences, returns, reports, interventions) float at the top left on every recurrence (owner, 2026-11-24) */}
+      {WIDE && <div className="hidden desk:block desk:rounded-lg desk:shadow-lg"><StatList problem={problem} event={event} {...sort} /></div>} {/* the numbers (last reported, occurrences, returns, reports, interventions) float at the top left on every recurrence (owner, 2026-11-24) */}
       <div className={`flex flex-col gap-4 px-4 py-6 ${WIDE ? 'desk:hidden' : ''}`}>
         <header className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-col gap-1">
@@ -128,34 +130,40 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
 // ponytail: sample numbers from the Figma component, until the owner says what this list shows
 const SAMPLE_BARS = [{ label: 'Chapinero', value: 62 }, { label: 'Suba', value: 52 }, { label: 'Kennedy', value: 43 }, { label: 'Engativá', value: 36 }, { label: 'Others', value: 61 }]
 
-/** The numbers of an open recurrence (Figma Recurrence Stats, owner 2026-11-26): a `neutral-900` box (6 px radius, 12 px padding, 20 px gap) with a row for the last report and one for the latest status event (56 px each, a `neutral-700` line under them), then four equal 88 px `neutral-700` tiles in two columns (a 20 px icon and the label, 12 px, the number) and a bar list (sample data for now). */
-export function StatList({ problem, event }: { problem: ProblemRow; event?: ProblemEvent }) {
+/** The numbers of an open recurrence (Figma Recurrence Stats, owner 2026-11-26): a `neutral-900` box (8 px radius): the history title row, then, 8 px in and 12 px apart, last report and the latest status event (a `neutral-600` line between them), then four equal 88 px tiles in two columns (a 20 px icon and the label, 12 px, the number) and a bar list (sample data for now). */
+export function StatList({ problem, event, ...sort }: HistorySort & { problem: ProblemRow; event?: ProblemEvent }) {
   const [occ, ret, rep, int, last] = stats(problem)
   const rows = [{ Icon: last.Icon, label: last.label, value: last.value }, ...(event ? [{ Icon: event.kind === 'resolved' ? UserCheck : last.Icon, label: event.kind === 'resolved' ? 'Resolved by an operator' : 'Reopened by a new occurrence', value: day(event.created_at) }] : [])] // a person icon when an operator resolved it (owner, 2026-11-26)
   return (
-    <div className="hidden flex-col gap-5 rounded-md border border-(--neutral-900) bg-(--neutral-900) p-3 desk:flex">
-      <div className="flex flex-col">
-        {rows.map((r) => (
-          <p key={r.label} className="flex items-center gap-2 border-b border-(--neutral-700) px-1 py-4">
-            <r.Icon weight="regular" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
-            <span className="flex-1 text-body text-(--fg-secondary)">{r.label}</span>
-            <span className="text-body-medium text-(--fg-primary)">{r.value}</span>
-          </p>
-        ))}
-      </div>
-      <dl className="grid grid-cols-2 gap-1 p-1">
-        {[occ, ret, rep, int].map((x) => (
-          <div key={x.label} className="flex flex-col gap-3 rounded-sm bg-(--neutral-700) px-4 py-3">
-            <dt className="flex items-center gap-2 text-body text-(--fg-secondary)">
-              <x.Icon weight="regular" className="size-5 shrink-0 text-(--neutral-100)" aria-hidden />
-              {x.label}
-            </dt>
-            <dd className="font-display-semi text-stat text-[24px]! leading-7! text-(--fg-primary)">{x.value}</dd>
-          </div>
-        ))}
-      </dl>
-      <div className="rounded-xl border border-(--neutral-700) p-4">
-        <BarList bars={SAMPLE_BARS} />
+    <div className="hidden flex-col gap-2 rounded-lg bg-(--neutral-900) desk:flex">
+      <HistoryTitle {...sort} />
+      <div className="flex flex-col gap-3 p-2">
+        <div className="flex flex-col gap-2 py-1">
+          {rows.map((r, i) => (
+            <Fragment key={r.label}>
+              {i > 0 && <div className="border-t border-(--neutral-600)" aria-hidden />}
+              <p className="flex items-center gap-2 p-2">
+                <r.Icon weight="regular" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
+                <span className="flex-1 text-body-sm text-(--fg-secondary)">{r.label}</span>
+                <span className="text-body-sm-medium text-(--fg-emphasis)">{r.value}</span>
+              </p>
+            </Fragment>
+          ))}
+        </div>
+        <dl className="grid grid-cols-2 gap-1 px-1">
+          {[occ, ret, rep, int].map((x) => (
+            <div key={x.label} className="flex flex-col gap-3 rounded-sm bg-(--neutral-700) px-4 py-3">
+              <dt className="flex items-center gap-2 text-body-sm text-(--fg-secondary)">
+                <x.Icon weight="regular" className="size-5 shrink-0 text-(--neutral-100)" aria-hidden />
+                {x.label}
+              </dt>
+              <dd className="font-display-semi text-stat text-[24px]! leading-7! text-(--fg-primary)">{x.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <div className="rounded-lg border border-(--neutral-700) p-4">
+          <BarList bars={SAMPLE_BARS} />
+        </div>
       </div>
     </div>
   )

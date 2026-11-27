@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { OccurrenceHistory } from '@/components/OccurrenceHistory'
 import type { ProblemDetailData } from '@/lib/problems'
@@ -19,7 +20,11 @@ const detail = {
 } as unknown as ProblemDetailData
 
 const headers = () => screen.getAllByRole('heading', { level: 4 }).map((h) => h.textContent)
-const show = () => render(<OccurrenceHistory category="parking" status="resolved" detail={detail} openReportId={null} onSelectIncident={() => {}} focus={null} viewport={{ current: null }} />)
+function History() {
+  const [oldestFirst, setOldestFirst] = useState(false)
+  return <OccurrenceHistory category="parking" status="resolved" detail={detail} openReportId={null} onSelectIncident={() => {}} focus={null} viewport={{ current: null }} oldestFirst={oldestFirst} onSort={() => setOldestFirst((o) => !o)} />
+}
+const show = () => render(<History />)
 
 describe('OccurrenceHistory', () => {
   it('shows every occurrence open, newest first, with its plate, reports and intervention', () => {

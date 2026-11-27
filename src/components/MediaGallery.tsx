@@ -54,8 +54,7 @@ export function MediaGallery({ incidentId, carousel = false }: { incidentId: str
   if (carousel) {
     const shown = tiles
     const tile = (m: Media | null, className: string, k: number) => (
-      <div key={m?.id ?? 'none'} className={`relative grid h-[246px] place-items-center rounded-md border border-dashed border-(--neutral-500) bg-(--neutral-800) text-muted-foreground ${className}`} title={m?.is_placeholder === false ? 'File stored' : 'Placeholder: no file yet'}>
-        {m?.kind === 'video' ? <VideoCamera className="size-6" aria-hidden /> : <Image className="size-6" aria-hidden />}
+      <div key={m?.id ?? 'none'} className={`relative h-[246px] rounded-md border border-dashed border-(--neutral-500) bg-(--neutral-800) text-muted-foreground ${className}`} title={m?.is_placeholder === false ? 'File stored' : 'Placeholder: no file yet'}>
         <span className="absolute bottom-2 left-2 text-caption-medium">
           {m?.kind === 'video' ? `Video${m.duration_seconds ? ` ${clock(m.duration_seconds)}` : ''}` : m ? `Photo ${k + 1}` : 'No file'}
         </span>

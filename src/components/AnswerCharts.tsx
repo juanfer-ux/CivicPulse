@@ -15,29 +15,33 @@ const summary = (title: string, bars: Answer['bars']) => `${title}: ${bars.map((
 
 type Link = { onFocus?: (code: number | null) => void; onPick?: (code: number) => void }
 type Bar = Answer['bars'][number]
-const COLOR = 'var(--ai-border)'
+/** The ranked shade of a bar, dot or slice, biggest first (owner's Figma, 2026-11-26). */
+const tone = (i: number) => ({ background: donutTone(i).color, opacity: donutTone(i).opacity })
+const NUMBER = 'grid size-10 shrink-0 place-items-center rounded-full bg-(--black) text-subtitle-strong'
 
 /** Localities of one category: parts of the whole, the smaller localities together as "Others". The legend shows the count and the share. */
 function Donut({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
   const total = bars.reduce((s, b) => s + b.value, 0)
   return (
-    <div className="flex items-center gap-4" role="img" aria-label={summary('Donut chart', bars)}>
-      <ChartContainer config={config} className="size-[150px] shrink-0">
-        <PieChart>
-          <ChartTooltip content={tooltip} />
-          <Pie data={bars} dataKey="value" nameKey="label" innerRadius={42} outerRadius={70} paddingAngle={2} isAnimationActive={false} stroke="none" cursor={onPick ? 'pointer' : undefined} onMouseEnter={(_, i) => onFocus?.(bars[i].code ?? null)} onMouseLeave={() => onFocus?.(null)} onClick={(_, i) => bars[i].code && onPick?.(bars[i].code!)}>
-            {bars.map((b, i) => (
-              <Cell key={b.label} fill={donutTone(i).color} fillOpacity={donutTone(i).opacity} />
-            ))}
-          </Pie>
-        </PieChart>
-      </ChartContainer>
-      <ul className="flex min-w-0 flex-1 flex-col gap-1 text-meta text-muted-foreground">
+    <div className="flex items-center gap-3 px-2" role="img" aria-label={summary('Donut chart', bars)}>
+      <div className="grid w-[180px] shrink-0 place-items-center">
+        <ChartContainer config={config} className="size-[150px]">
+          <PieChart>
+            <ChartTooltip content={tooltip} />
+            <Pie data={bars} dataKey="value" nameKey="label" innerRadius={42} outerRadius={70} paddingAngle={2} isAnimationActive={false} stroke="none" cursor={onPick ? 'pointer' : undefined} onMouseEnter={(_, i) => onFocus?.(bars[i].code ?? null)} onMouseLeave={() => onFocus?.(null)} onClick={(_, i) => bars[i].code && onPick?.(bars[i].code!)}>
+              {bars.map((b, i) => (
+                <Cell key={b.label} fill={donutTone(i).color} fillOpacity={donutTone(i).opacity} />
+              ))}
+            </Pie>
+          </PieChart>
+        </ChartContainer>
+      </div>
+      <ul className="flex min-w-0 flex-1 flex-col gap-3 px-2 text-meta text-muted-foreground">
         {bars.map((b, i) => (
           <li key={b.label} className="flex items-center gap-2" onMouseEnter={() => b.code && onFocus?.(b.code)} onMouseLeave={() => onFocus?.(null)}>
-            <span className="size-2 shrink-0 rounded-full" style={{ background: donutTone(i).color, opacity: donutTone(i).opacity }} />
+            <span className="size-2 shrink-0 rounded-full" style={tone(i)} />
             <span className="truncate">{b.label}</span>
-            <span className="ml-auto tabular-nums text-foreground">
+            <span className="ml-auto text-meta-medium tabular-nums text-foreground">
               {b.value} · {Math.round((b.value / total) * 100)} %
             </span>
           </li>
@@ -51,7 +55,7 @@ function Donut({ bars, onFocus, onPick }: { bars: Answer['bars'] } & Link) {
 function Dots({ bars }: { bars: Answer['bars'] }) {
   return (
     <ul className="flex flex-col gap-2.5" aria-label={summary('Reports per location', bars)}>
-      {bars.map((b) => (
+      {bars.map((b, row) => (
         <li key={b.label} className="flex flex-col gap-1">
           <span className="flex items-baseline gap-1.5 text-meta"> {/* Figma Dot Matrix: the count sits right after the name, 6 px (owner, 2026-11-17), it was pushed to the right */}
             <span className="truncate text-muted-foreground">{b.label}</span>
@@ -59,7 +63,7 @@ function Dots({ bars }: { bars: Answer['bars'] }) {
           </span>
           <span className="flex flex-wrap gap-1">
             {Array.from({ length: b.value }, (_, i) => (
-              <span key={i} className="size-2.5 rounded-full" style={{ background: COLOR }} />
+              <span key={i} className="size-2.5 rounded-full" style={tone(row)} />
             ))}
           </span>
         </li>
@@ -68,23 +72,23 @@ function Dots({ bars }: { bars: Answer['bars'] }) {
   )
 }
 
-/** Tomorrow's candidates: a numbered list, the full name on top, a thin bar under it and the count on the right (room for long names). */
+/** Tomorrow's candidates: numbered rows, the name on top, a thin bar under it and the count on the right (Figma **Answer Chart · Rows**). */
 function Rows({ bars }: { bars: Answer['bars'] }) {
   const max = Math.max(...bars.map((b) => b.value))
   return (
-    <ul className="flex flex-col" aria-label={summary('Evening incidents per candidate', bars)}>
+    <ul className="flex flex-col gap-1" aria-label={summary('Evening incidents per candidate', bars)}>
       {bars.map((b, i) => (
-        <li key={b.label} className={`flex items-center gap-3 py-2.5 ${i ? 'border-t border-(--neutral-600)' : ''}`}>
-          <span className="grid size-7 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--fg-primary)">{i + 1}</span>
-          <span className="flex min-w-0 flex-1 flex-col gap-1">
-            <span className="truncate text-body-sm text-foreground" title={b.label}>
+        <li key={b.label} className="flex items-center gap-4 py-2">
+          <span className={`${NUMBER} border-2 border-(--neutral-800) text-(--fg-primary)`}>{i + 1}</span>
+          <span className="flex min-w-0 flex-1 flex-col gap-2">
+            <span className="truncate text-meta text-foreground" title={b.label}>
               {b.label}
             </span>
-            <span className="h-1 rounded-full bg-(--neutral-600)">
-              <span className="block h-full rounded-full" style={{ width: `${(b.value / max) * 100}%`, background: COLOR }} />
+            <span className="h-2 overflow-hidden rounded-xs bg-(--neutral-600)">
+              <span className="block h-full" style={{ width: `${(b.value / max) * 100}%`, ...tone(i) }} />
             </span>
           </span>
-          <span className="w-8 text-right text-subtitle-strong tabular-nums text-foreground">{b.value}</span>
+          <span className="w-8 text-right text-body-strong tabular-nums text-foreground">{b.value}</span>
         </li>
       ))}
     </ul>
@@ -95,23 +99,23 @@ function Rows({ bars }: { bars: Answer['bars'] }) {
 function Recurrences({ bars, onPick }: { bars: Answer['bars']; onPick?: (id: string) => void }) {
   const max = Math.max(1, ...bars.map((b) => b.value))
   return (
-    <ul className="flex flex-col" aria-label={summary('Returns per recurrence', bars)}>
+    <ul className="flex flex-col gap-1" aria-label={summary('Returns per recurrence', bars)}>
       {bars.map((b, i) => (
-        <li key={b.problemId ?? b.label} className={i ? 'border-t border-(--neutral-600)' : ''}>
-          <button type="button" onClick={() => b.problemId && onPick?.(b.problemId)} className="-mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-sm px-2 py-2.5 text-left hover:bg-(--neutral-800) focus-visible:bg-(--neutral-800)">
-            <span className="grid size-7 shrink-0 place-items-center rounded-sm bg-(--neutral-600) text-caption-strong text-(--fg-primary)">{i + 1}</span>
-            <span className="flex min-w-0 flex-1 flex-col gap-1">
-              <span className="truncate text-body-sm text-foreground" title={b.label}>
+        <li key={b.problemId ?? b.label}>
+          <button type="button" onClick={() => b.problemId && onPick?.(b.problemId)} className="flex w-full items-center gap-4 rounded-sm px-1 py-2 text-left hover:bg-(--neutral-800) focus-visible:bg-(--neutral-800)">
+            <span className={`${NUMBER} border-2 border-(--cobalt-700) text-(--fg-secondary)`}>{i + 1}</span>
+            <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <span className="truncate text-meta text-foreground" title={b.label}>
                 {b.label}
               </span>
-              {b.sub && <span className="truncate text-meta text-muted-foreground">{b.sub}</span>}
-              <span className="h-1 rounded-full bg-(--neutral-600)">
-                <span className="block h-full rounded-full" style={{ width: `${(b.value / max) * 100}%`, background: 'var(--indigo-300)' }} />{/* recurrence returns: stays indigo, like the Resolved status colors (owner, 2026-11-26) */}
+              <span className="h-1 rounded-xs bg-(--neutral-600)">
+                <span className="block h-full rounded-xs" style={{ width: `${(b.value / max) * 100}%`, ...tone(i) }} />
               </span>
+              {b.sub && <span className="truncate text-caption-medium text-(--fg-tertiary)">{b.sub}</span>}
             </span>
-            <span className="flex w-[47px] flex-col items-end">
-              <span className="text-body-sm tabular-nums text-foreground">{b.value}</span>
-              <span className="text-meta text-muted-foreground">returns</span>
+            <span className="flex w-14 flex-col items-center justify-between self-stretch px-1">
+              <span className="text-body-strong tabular-nums text-foreground">{b.value}</span>
+              <span className="text-body-sm text-muted-foreground">returns</span>
             </span>
           </button>
         </li>
@@ -163,9 +167,9 @@ function Places({ bars }: { bars: Answer['bars'] }) {
 }
 
 export default function AnswerChart({ kind, bars, onFocus, onPick, onPickRecurrence }: { kind: NonNullable<Answer['chart']>; bars: Answer['bars']; onPickRecurrence?: (id: string) => void } & Link) {
-  const dark = kind === 'donut' || kind === 'barlist' // owner's Figma, 2026-11-26: the donut and the bar list sit on a darker, rounder card
+  const dark = kind === 'donut' || kind === 'barlist' || kind === 'rows' || kind === 'recurrences' // owner's Figma, 2026-11-26: these sit on the darker card
   return (
-    <div className={`p-4 ${dark ? 'rounded-xl border border-(--neutral-700) bg-(--neutral-900)' : 'rounded-[6px] border-[0.5px] border-(--neutral-500) bg-(--neutral-700)'}`}>
+    <div className={dark ? 'rounded-lg border border-(--neutral-700) bg-(--neutral-900) p-4' : 'rounded-lg border-[0.5px] border-(--neutral-700) bg-(--neutral-700) p-4'}>
       {kind === 'time' ? <Time bars={bars} /> : kind === 'period' ? <Period bars={bars} /> : kind === 'dots' ? <Dots bars={bars} /> : kind === 'rows' ? <Rows bars={bars} /> : kind === 'places' ? <Places bars={bars} /> : kind === 'recurrences' ? <Recurrences bars={bars} onPick={onPickRecurrence} /> : kind === 'donut' ? <Donut bars={bars} onFocus={onFocus} onPick={onPick} /> : <BarList bars={bars} onFocus={onFocus} onPick={onPick} />}
     </div>
   )
