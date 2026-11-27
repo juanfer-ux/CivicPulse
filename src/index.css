@@ -21,10 +21,10 @@
   --text-display-lg--font-weight: calc(200 + var(--display-weight-offset));
   --text-display-lg--line-height: 56px;
   --text-display-lg--letter-spacing: 0;
-  --text-display-md: 38px; /* Figma 2026-11-23: the greeting is 38 / 28 (it was 32); Figma 2026-11-17: the agent panel's greeting, Zalando Sans Expanded Regular 32 with a 28 px line, tracking 1 % (it was 24 / 28) */
+  --text-display-md: 32px; /* the greeting (owner's Figma, 2026-11-27): 32 / 28, 2 % (38 and 1 % since 2026-11-23) */
   --text-display-md--font-weight: calc(400 + var(--display-weight-offset));
   --text-display-md--line-height: 28px;
-  --text-display-md--letter-spacing: 0.01em;
+  --text-display-md--letter-spacing: 0.02em;
   --text-display: 24px; /* Figma 2026-11-05: 24 (it was 20) */
   --text-display--font-weight: calc(400 + var(--display-weight-offset));
   --text-display--line-height: 42px;
@@ -103,15 +103,15 @@
   --text-body: var(--fs-body);
   --text-body--font-weight: calc(400 + var(--weight-offset));
   --text-body--line-height: var(--lh-body);
-  --text-body--letter-spacing: 0.022em;
+  --text-body--letter-spacing: 0.035em; /* Figma 2026-11-27, latest */
   --text-body-medium: var(--fs-body);
   --text-body-medium--font-weight: calc(500 + var(--weight-offset));
   --text-body-medium--line-height: var(--lh-body);
-  --text-body-medium--letter-spacing: 0.02em;
+  --text-body-medium--letter-spacing: 0.035em; /* Figma 2026-11-27, latest */
   --text-body-strong: var(--fs-body);
   --text-body-strong--font-weight: calc(600 + var(--weight-offset));
   --text-body-strong--line-height: var(--lh-body-strong);
-  --text-body-strong--letter-spacing: 0.02em; /* Figma 2026-11-17: 2 % (it was 1 %) */
+  --text-body-strong--letter-spacing: 0.035em; /* Figma 2026-11-27, latest */
   --text-meta: var(--fs-meta);
   --text-meta--font-weight: calc(400 + var(--weight-offset));
   --text-meta--line-height: var(--lh-meta);
@@ -139,15 +139,15 @@
   --text-caption-sm: 11px;
   --text-caption-sm--font-weight: calc(400 + var(--weight-offset));
   --text-caption-sm--line-height: 16px;
-  --text-caption-sm--letter-spacing: 0.05em;
+  --text-caption-sm--letter-spacing: 0.18em; /* Figma 2026-11-27, latest */
   --text-caption-sm-medium: 11px;
   --text-caption-sm-medium--font-weight: calc(500 + var(--weight-offset));
   --text-caption-sm-medium--line-height: 16px;
-  --text-caption-sm-medium--letter-spacing: 0.024em;
+  --text-caption-sm-medium--letter-spacing: 0.18em; /* Figma 2026-11-27, latest */
   --text-caption-sm-strong: 11px;
   --text-caption-sm-strong--font-weight: calc(600 + var(--weight-offset));
   --text-caption-sm-strong--line-height: 16px;
-  --text-caption-sm-strong--letter-spacing: 0.024em;
+  --text-caption-sm-strong--letter-spacing: 0.18em; /* Figma 2026-11-27, latest */
   --text-section-label: 11px; /* the small uppercase title above a group of sidebar items (Figma section-label, 2026-10-28): Bold 11 / 16, spacing 18 %; the same on every screen size */
   --text-section-label--font-weight: calc(700 + var(--weight-offset));
   --text-section-label--line-height: 16px;
@@ -170,7 +170,7 @@
   --lh-body-sm-md: 24px;
   --fs-body: 16px;
   --lh-body: 24px;
-  --lh-body-strong: 20px; /* Figma body-strong: 14 / 20, spacing 1 % (2026-11-06) */
+  --lh-body-strong: 24px; /* Figma body-strong: 14 / 24 (2026-11-27; 20 before) */
   --fs-label: 16px;
   --lh-label: 24px;
   --lh-button: 24px;
@@ -331,10 +331,10 @@
   --yellow-100: #FEFBE4;
   --plate-yellow: #C3AB3E; /* the license plate badge in the history column (owner's Figma, 2026-11-26; #ACA034 before); Figma variable `yellow/plate-yellow` */
   /* Green scale (owner's ask, 2026-11-17; Figma green-900 to green-100): the red scale's saturation and lightness at hue 140, same idea as the neutrals; not used on screen yet. */
-  --green-900: #0D2615;
-  --green-800: #23482F;
-  --green-700: #37724A;
-  --green-600: #46A466;
+  --green-900: #08170D;
+  --green-800: #1E3E29;
+  --green-700: #326744;
+  --green-600: #45A163;
   --green-500: #6DC089;
   --green-400: #98DDAF;
   --green-300: #B1ECC5;
@@ -354,8 +354,8 @@
   /* Text colors (owner's Figma Text collection, 2026-11-26): text only; icons, lines and fills stay on the neutrals. Brightest text: --fg-emphasis. */
   --fg-primary: #B6B6BE;
   --fg-secondary: #A3A3AE;
-  --fg-tertiary: #858593;
-  --fg-emphasis: #C8C8D0; /* its own value since 2026-11-26 (it was --brand-primary) */
+  --fg-tertiary: #8B8B98; /* Figma 2026-11-27 (#858593 before) */
+  --fg-emphasis: #D0D0D7; /* Figma 2026-11-27 (#C8C8D0 before); its own value since 2026-11-26 (it was --brand-primary) */
   --muted-foreground: var(--fg-secondary);
   --foreground: var(--fg-primary);
   --ai: var(--neutral-900); /* the agent panel's background (owner, 2026-10-29; it was neutral-800) */
@@ -374,7 +374,7 @@
   /* Persistent-problem status colors (decision 0030; Figma Map collection): their own set, not the incident status colors. Aliases of palette colors, so no color was added. */
   --map-problem-active: var(--red-300); /* owner, 2026-11-01: every problem status uses a 300 step (the marker's own inner outline uses the 600 step, PROBLEM_STATUS.outline) */
   --map-problem-monitoring: var(--yellow-300);
-  --map-problem-resolved: var(--green-300); /* green since 2026-11-27 (owner; indigo-300 before) */
+  --map-problem-resolved: var(--blue-300); /* a try: blue (owner, 2026-11-27; green earlier that day, indigo before) */
   --map-problem-archived: var(--neutral-300);
   --map-dot-outline: var(--neutral-700);
   --map-answer-ring: var(--ai-banner);
@@ -385,20 +385,20 @@
   --map-locality-line: var(--cobalt-300); /* the 1.4 px outline of the localities an agent answer outlines. Figma map/locality-line */
   --map-selected-ring: var(--neutral-100);
   --map-roads: #363644; /* rolled back (owner, 2026-11-24): it was red-500 and neutral-400 for a few hours */ /* map only, outside the palette (owner, 2026-10-26): minor and secondary streets; CARTO's is #414758. Figma map/roads */
-  --map-buildings: #3F4550; /* map only, outside the palette (owner, 2026-10-26): building tops, they fade in from zoom 13 to 16. CARTO's is #393939. Figma map/buildings */
+  --map-buildings: var(--neutral-600); /* owner, 2026-11-27 (#3F4550 before) */ /* map only, outside the palette (owner, 2026-10-26): building tops, they fade in from zoom 13 to 16. CARTO's is #393939. Figma map/buildings */
   --map-road-outlines-minor: #1A1A1A; /* map only (owner, 2026-10-26): outline under tunnels, minor roads and bridges; CARTO's own. Figma map/road-outlines-minor */
   --map-building-outlines: #0E0E0E; /* map only: 1 px outline of each building; CARTO's own. Figma map/building-outlines */
   --map-label-halo: #222222; /* map only: 1 px outline around place and street names; CARTO uses #222, #111 and #181818, now one color. Figma map/label-halo */
   --map-paths: #262626; /* map only: pedestrian paths and service lanes; CARTO's own. Figma map/paths */
   --map-boundary-county: #222222; /* map only: county line; CARTO's own. Figma map/boundary-county */
-  --map-boundary-country: #2C353C; /* map only: country border glow; CARTO's own. Figma map/boundary-country */
+  --map-boundary-country: #2F2F3A; /* purple-grey, owner 2026-11-27 (was #2C353C) */ /* map only: country border glow; CARTO's own. Figma map/boundary-country */
   --map-rail: #1A1A1A; /* map only: railways; CARTO's own. Figma map/rail */
   --map-airport: #111111; /* map only: runways and taxiways; CARTO's own. Figma map/airport */
   --map-road-outlines: #363644; /* rolled back (owner, 2026-11-24) */ /* map only, outside the palette (owner, 2026-10-26): the thin outline under roads; CARTO's is #232323. Figma map/road-outlines */
   --map-main-roads: #2B2B36; /* rolled back (owner, 2026-11-24) */ /* map only: primary roads; CARTO's is #535666. Figma map/main-roads (neutral-400 was tried on 2026-11-14 and rolled back) */
   --map-boundary: #32323E; /* map only, outside the palette (owner, 2026-10-26): state borders; CARTO's is #676772. Figma map/boundary */
-  --map-water: #2C353C; /* map only (owner, 2026-10-27): rivers and lakes; CARTO's own color, now a token. Figma map/water */
-  --map-waterway: #21303B; /* map only (owner, 2026-10-27): thin river lines; CARTO's is #3F5A6D. Figma map/waterway */
+  --map-water: #2F2F3A; /* purple-grey, owner 2026-11-27 (was #2C353C) */ /* map only (owner, 2026-10-27): rivers and lakes; CARTO's own color, now a token. Figma map/water */
+  --map-waterway: #262630; /* purple-grey, owner 2026-11-27 (was #21303B) */ /* map only (owner, 2026-10-27): thin river lines; CARTO's is #3F5A6D. Figma map/waterway */
   --map-bogota-border: var(--neutral-200); /* map only (owner, 2026-10-26): the outline of the city of Bogotá, from OpenStreetMap. Not in Figma yet */
   --screen-gradient: radial-gradient(circle farthest-corner at 0% 0%, var(--neutral-300) 0%, var(--neutral-700) 52%, #000 115%); /* owner, 2026-11-15: middle stop at 52 %, last stop black at 115 % (it was neutral-900 at 100 %) */ /* the background of the whole screen (owner, 2026-10-30; the first stop was neutral-300, now neutral-400): neutral-400 exactly at the screen's 0, 0 (top left corner), neutral-700 at 50 % of the way, neutral-800 at the opposite corner (bottom right). A true circle (the same on every screen shape, owner 2026-10-30), so its radius is the screen's diagonal. The map has no background of its own and shows this through. Figma paint style screen_background */
   --map-background: var(--neutral-800); /* What shows behind the map while the land is off, i.e. the map screen background (owner, 2026-10-26). Figma map/background */

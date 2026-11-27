@@ -38,13 +38,9 @@ describe('plan (mock planner)', () => {
     expect(plan('Which locations have repeated parking obstruction reports?', localities)?.kind).toBe('recurring') // unchanged
   })
 
-  it('routes the first two Worth investigating cards to the recurring investigation, each with its category, and the third to a plan too', () => {
+  it('routes the parking and dumping cards to their investigations and says no to the accessibility one', () => {
     expect(WORTH_INVESTIGATING).toHaveLength(3)
-    expect(plan(WORTH_INVESTIGATING[2].question, localities)).not.toBeNull()
-    expect(WORTH_INVESTIGATING.slice(0, 2).map((c) => plan(c.question, localities))).toMatchObject([
-      { kind: 'recurring', category: 'illegal_dumping' },
-      { kind: 'recurring', category: 'parking' },
-    ])
+    expect(WORTH_INVESTIGATING.map((c) => plan(c.question, localities))).toMatchObject([{ kind: 'time', category: 'parking' }, { kind: 'recurring', category: 'illegal_dumping' }, null])
   })
 
   it('finds a locality regardless of accents and case', () => {

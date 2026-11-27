@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
-import { Car, CarSimple, Trash, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wrench, type Icon } from '@phosphor-icons/react'
+import { Car, Trash, Warning, MapPin, Clock, ArrowsClockwise, Compass, Wheelchair, type Icon } from '@phosphor-icons/react'
 import { donutTone } from '@/lib/donutTones'
 import { SUGGESTIONS, WORTH_INVESTIGATING } from '@/lib/agent'
 import { useAuth } from '@/lib/auth'
@@ -17,18 +17,18 @@ const TOPIC_ICON: Icon[] = [Warning, MapPin, Clock, ArrowsClockwise, Compass]
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-6">
-      <h3 className="font-display-semi text-display-xs-strong text-(--fg-secondary)">{title}</h3>
+      <h3 className="font-display-semi text-display-xs-strong text-(--fg-tertiary)">{title}</h3> {/* `fg-tertiary` (owner's Figma, 2026-11-27, latest) */}
       {children}
     </section>
   )
 }
 
-/** The category cards' icons (owner's Figma, 2026-11-14): Phosphor duotone, 25.6 px, `neutral-100` since 2026-11-17 (it was `cobalt-300`), on a `neutral-900` block. */
-const CATEGORY_ICON: Record<string, Icon> = { 'Obstructive Parking': CarSimple, 'Illegal Dumping': Trash, 'Damaged Infrastructure': Wrench }
+/** The investigate cards' icons (owner, 2026-11-27): Phosphor **regular** (a try, owner 2026-11-27; fill just before), 24 px, `neutral-300` (`neutral-100` before 2026-11-27); hover and focus change only the card. (Duotone since 2026-11-14.) */
+const CATEGORY_ICON: Record<string, Icon> = { 'Obstructive Parking': Car, 'Illegal Dumping': Trash, Accessibility: Wheelchair }
 
 /** Figma Data_Card_Small / Data_Card_Medium: 6 px radius, `neutral-900` fill, 0.5 px `neutral-600` line, 8 px padding and a name in `body-sm`. */
 const dataCard = 'flex flex-col gap-1 rounded-md border-[0.5px] border-(--neutral-700) bg-(--neutral-900)' // Figma data cards (owner, 2026-11-16): a `neutral-900` fill again (it was none since 2026-11-15) and a 0.5 px `neutral-600` line inside (it was `neutral-500`)
-const cardName = 'p-1 text-meta text-(--fg-secondary)'
+const cardName = 'p-1 text-body-medium text-(--fg-secondary)' // both card sizes (owner's Figma, 2026-11-27; `meta` before)
 
 function Donut() {
   const R = 52.28 // the ring's middle radius: outer diameter 130.7, inner radius 60 % of it (the owner's Figma donut, 2026-11-12), in a 131 box (it was 140, owner's Figma 2026-11-14)
@@ -63,7 +63,7 @@ export function AgentHome({ ask, note }: { ask: (q: string) => void; note?: Reac
   return (
     <div className="flex flex-1 flex-col gap-20"> {/* Figma Conversation body: the Dashboard group, which holds the alert first (owner, 2026-11-23) */}
       <div className="flex flex-1 flex-col justify-start gap-16 px-2.5 py-4"> {/* Figma Dashboard: 40 px above and below (owner, 2026-11-23, it was 16; the alert left the body for a banner under the title row). Before: (owner, 2026-11-23, latest: content aligned to the TOP again, primary axis MIN; an hour before it was the BOTTOM, justify-end, and before that top). Before: Fill height with its content aligned to the BOTTOM (primary axis MAX), so a taller panel adds the space between the alert and the greeting; it was top-aligned (justify-start). Figma (owner, 2026-11-16): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
-      <div className="flex flex-col gap-8"> {/* Figma Welcome section (owner, 2026-11-26): the greeting, 32 px, the AI note. Before: (the line under the greeting is hidden in Figma now, owner 2026-11-17, so it is gone) Figma Frame 2147225884 (owner, 2026-11-17): the greeting, then "You're ready to investigate and coordinate incident response" in `display-sm` / `neutral-200`, 16 px apart; the place text left the header */}
+      <div className="flex flex-col gap-12"> {/* 48 px here; 64 px to the sections below (owner's Figma, 2026-11-27, latest). Figma Welcome section (owner, 2026-11-26): the greeting, 32 px, the AI note. Before: (the line under the greeting is hidden in Figma now, owner 2026-11-17, so it is gone) Figma Frame 2147225884 (owner, 2026-11-17): the greeting, then "You're ready to investigate and coordinate incident response" in `display-sm` / `neutral-200`, 16 px apart; the place text left the header */}
         <h2 className="font-display text-display-md text-(--fg-emphasis)"> {/* Figma greeting (owner, 2026-11-23): 38 / 28 in `brand-primary` (it was 32 and `neutral-100`) */}Welcome back,{first ? ` ${first},` : ''}</h2>
         {note}
       </div>
@@ -72,25 +72,25 @@ export function AgentHome({ ask, note }: { ask: (q: string) => void; note?: Reac
           <div className="flex flex-wrap-reverse items-center gap-3"> {/* wrap-reverse (owner, 2026-11-23): when the row is too narrow the medium card, Today's top localities, wraps ABOVE the data cards group, not under it. Figma CatchUp_Module2 (owner, 2026-11-23, latest: 12 px between the small cards and the medium one again; 16 for an hour) (owner, 2026-11-15, checked again later that day): a wrapping row, 12 px across and 12 px between wrapped rows, items centered; a column of the two small cards (at least 180 px) beside the medium card (at least 372 px), and under 568 px of room the medium card drops below, both full width */}
             <div className="@container min-w-[360px] flex-1 basis-0"> {/* Figma Data cards group (owner, 2026-11-23): minimum width 360 px (it was 180); the medium card keeps 372 */}
               {/* The two small cards stack in a column beside the medium card, and sit side by side once the group has the whole width, i.e. when the medium card has dropped below (owner, 2026-11-15; the panel at its minimum width) */}
-              <div className="flex flex-col gap-3 @min-[420px]:flex-row">
+              <div className="flex flex-col gap-2 @min-[420px]:flex-row">
                 {[0, 1].map((i) => (
-                  <div key={i} className={`${dataCard} p-2 @min-[420px]:flex-1`}>
+                  <div key={i} className={`${dataCard} gap-2 p-2 @min-[420px]:flex-1`}>
                     <p className={cardName}>Data card name</p>
-                    <div className="h-[52px]" aria-hidden /> {/* Figma Data_Chart of the small card (owner, 2026-11-23: 52 px, a card is 101 px high and the two with 12 between are 214; it was 49):  its neutral-800 fill is hidden now (2026-11-14), the 50 px block stays */}
+                    <div className="h-[54px]" aria-hidden /> {/* 54 px, the card 111, 8 px between the two cards (owner's Figma, 2026-11-27, latest) */} {/* Figma Data_Chart of the small card (owner, 2026-11-23: 52 px, a card is 101 px high and the two with 12 between are 214; it was 49):  its neutral-800 fill is hidden now (2026-11-14), the 50 px block stays */}
                   </div>
                 ))}
               </div>
             </div>
-            <div className={`${dataCard} min-h-[218px] min-w-[372px] flex-1 basis-0 gap-2 p-2.5`}>
+            <div className={`${dataCard} min-h-[228px] min-w-[372px] flex-1 basis-0 p-2.5`}>
               <p className={cardName}>Today&apos;s top localities</p>
-              <div className="flex flex-1 items-center justify-center gap-6 p-2"> {/* Figma Data_Chart: Fill in height and width, its content centered, 24 px between the donut and the legend (owner, 2026-11-14) */}
+              <div className="flex flex-1 items-center justify-center gap-6 px-2 py-5"> {/* Figma Data_Chart: Fill in height and width, its content centered, 24 px between the donut and the legend (owner, 2026-11-14) */}
                 <div className="flex max-w-[164px] min-w-0 flex-1 basis-0 justify-center"> {/* Figma Graph: Fill, 164 px at most, centers the 131 px donut */}
                   <div className="relative shrink-0">
                     <Donut />
                     <Car weight="regular" className="absolute top-1/2 left-1/2 size-8 -translate-x-1/2 -translate-y-1/2 text-(--neutral-300)" aria-hidden />
                   </div>
                 </div>
-                <ul className="flex max-w-[240px] min-w-0 flex-1 basis-0 flex-col justify-between gap-1 self-stretch px-2 text-meta"> {/* Figma Legend (owner, 2026-11-15): Fill in width and height, 240 px at most, 8 px at its sides, its five rows spread from top to bottom (space between), each row `meta` 23 px high */}
+                <ul className="flex max-w-[240px] min-w-0 flex-1 basis-0 flex-col justify-between gap-1 self-stretch px-2.5 text-meta"> {/* Figma Legend (owner, 2026-11-15): Fill in width and height, 240 px at most, 8 px at its sides, its five rows spread from top to bottom (space between), each row `meta` 23 px high */}
                   {SHARE.map(([name, n], i) => (
                     <li key={name} className="flex items-center gap-2">
                       <span className="size-2 shrink-0 rounded-full" style={{ background: donutTone(i).color, opacity: donutTone(i).opacity }} aria-hidden />
@@ -109,14 +109,11 @@ export function AgentHome({ ask, note }: { ask: (q: string) => void; note?: Reac
               {WORTH_INVESTIGATING.map((c) => {
                 const Icon = CATEGORY_ICON[c.title]
                 return (
-                  <button key={c.title} type="button" className="group flex min-w-[120px] flex-1 cursor-pointer flex-col items-start justify-end gap-4 rounded-md bg-(--neutral-700) p-3 text-left outline-none hover:bg-(--neutral-600) focus-visible:bg-(--neutral-600) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(c.question)}> {/* Figma Category_Card2 (owner, 2026-11-15): vertical, neutral-700, 6 px radius, 12 px padding, 16 px between the icon (24 px, top left) and the name (Fill width, Hug height, neutral-200, wraps) and the name; no inner block. Rollover (owner's try): neutral-600 and the icon turns filled */}
+                  <button key={c.title} type="button" className="group flex min-w-[120px] flex-1 cursor-pointer flex-col items-start justify-end gap-5 rounded-md bg-(--neutral-800) p-5 text-left outline-none hover:bg-(--neutral-700) focus-visible:bg-(--neutral-700) focus-visible:ring-3 focus-visible:ring-ring/50" onClick={() => ask(c.question)}> {/* `neutral-800`, one step lighter on hover and focus (owner's Figma, 2026-11-27) */} {/* Figma Category_Card2 (owner, 2026-11-15): vertical, neutral-700, 6 px radius, 12 px padding, 16 px between the icon (24 px, top left) and the name (Fill width, Hug height, neutral-200, wraps) and the name; no inner block. Rollover (owner's try): neutral-600 and the icon turns filled */}
                     {Icon && (
-                      <span className="grid size-6 place-items-center">
-                        <Icon weight="duotone" className="size-6 text-(--neutral-100) group-hover:hidden group-focus-visible:hidden" aria-hidden />
-                        <Icon weight="fill" className="hidden size-6 text-(--neutral-100) group-hover:block group-focus-visible:block" aria-hidden />
-                      </span>
+                      <Icon weight="regular" className="size-6 shrink-0 text-(--neutral-300)" aria-hidden />
                     )}
-                    <span className="w-full max-w-[88px] text-body-sm-medium text-(--fg-secondary)">{c.title}</span>
+                    <span className="w-full max-w-[200px] text-body-sm-medium text-(--fg-secondary)">{c.question}</span> {/* the card shows its question, at most 200 px wide (owner's Figma, 2026-11-27, latest) */}
                   </button>
                 )
               })}

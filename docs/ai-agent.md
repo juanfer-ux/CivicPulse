@@ -51,6 +51,33 @@ How these answers behave:
 - 🔁 **Same machinery.** Same tool, same "Show places on map" button, same map layer; the planner (rule-based) maps these phrasings to the new answers, and "what is around this recurrence?" stays as the general fallback.
 - ⬜ **Build order:** 1. the priority question ("blocking or affecting anything important?"), which is about what the operator decides; 2. the cause question; 3. the help question. Not built: today only the fallback exists (`nearby` in `lib/agent.ts`).
 
+## 🗑️ Dumping questions from other angles (mock-up, 2026-11-27; not built)
+In Figma: **Quick Questions · Dumping Angles** (page Map & agent). Basis: the owner's research notes, the app's data and a web search (road access and vacant land appear as predictors in studies abroad; nothing solid on how often dumping returns after cleanup).
+
+| Question | In the app today |
+|---|---|
+| Has illegal dumping increased in Bosa in the last 30 days? | Yes |
+| When do illegal dumping incidents occur most frequently in Ciudad Bolívar? | Yes |
+| Which area might deserve a dumping inspection tomorrow evening? | Yes |
+| Which locations get construction debris again and again? | Partly: the subtype is ignored |
+| What kind of waste is most common in Kennedy? | No (subtypes exist: household waste, construction debris, bulky items) |
+| Which dumping spots came back after a cleanup, and how fast? | No (cleanups and returns are recorded; suggested first) |
+| Where did a cleanup only remove part of the waste? | No (outcome `partial` is recorded) |
+| What nearby could be producing this waste? | No (designed above) |
+| Can a truck stop here easily, or is there open land? | No (the stored places may not cover it) |
+| Which spots could use outreach about collection times before fines? | No |
+
+## ♿ Accessibility gap questions (mock-up, 2026-11-27; not built)
+In Figma: **Quick Questions · Accessibility** (page Map & agent). The angle (owner): what is **missing** for people to get around, not what is blocked. Basis: secondary reports of a 2026 Mobility Secretariat study of the historic centre (very uneven sidewalk widths, damaged sidewalks, too few ramps) and a 2026 project diagnosis of routes for people with reduced mobility. Verify against the original documents before quoting.
+
+| Question | Needs |
+|---|---|
+| Where does the accessible route break: missing ramps, or narrow or damaged sidewalks? | An inventory of ramps and sidewalks |
+| Which schools, clinics and bus stops cannot be reached without steps? | The same, plus clinics as their own place type |
+| Where would fixing one ramp or sidewalk help the most people? | The same, plus a stated ranking rule (a proposal for a person, not a score) |
+
+None is answerable today: the data holds parking and dumping reports, not the street's infrastructure. Possible sources to check: the city's sidewalk inventory and mobility observatory, and OpenStreetMap's kerb, ramp and tactile paving tags (coverage unknown).
+
 ## 📦 What every answer contains
 `text` · `bars` (a bar that is a locality carries its `code`: hovering it lights that locality's outline on the map, clicking it zooms there; small chart; `chart` says how it is drawn: a donut for localities of one category and a Tremor-style bar list for localities of all categories (both show the biggest localities and the rest together as "Others": a locality answer always has an Others slice), an area chart over the day for time of day with AM/PM blocks, two columns for a period comparison, a dot matrix (one dot per report) for repeated locations, numbered rows with a thin bar and the count for tomorrow's candidates (owner changed it from cards, 2026-11-08), plain bars otherwise. Chosen by the owner from the gallery on 2026-11-08. shadcn Chart on Recharts, loaded with the first answer; chart options are compared at `/#charts`) · `evidence` (tool, scope, period, incident count, example references) · `limitations` (always) · `highlightIds` (incidents behind the answer, shown inside incident radii on the map; each gets a stem with its marker open above it, or, for an answer about locations, one stem and marker per location, owner 2026-11-15) · `areas` (localities to outline: an answer about localities, about one named locality, about where to look tomorrow outlines and fills the localities (the same shade for each) instead of drawing circles; an answer about repeated locations sets `spots` instead: no locality outlines, one small radius (at least 120 m, one circle per location) around each spot, owner 2026-11-08) · optional `proposal` (a recommendation draft, investigation E only).
 
@@ -75,6 +102,7 @@ How these answers behave:
 | ⬜ | "Why are you recommending this?" follow-up that explains from the stored evidence. |
 
 ## 🟥 Known gaps
-- The planner understands a limited set of phrasings (the five Quick questions, the two Worth investigating cards and close variants, including the "increased in Chapinero" question that is no longer a suggestion).
+- **Investigate cards (2026-11-27):** the dumping card asks about construction debris but the waste type is **not filtered** (it answers for all dumping). The accessibility card ("fixing one ramp or sidewalk") returns "I cannot answer that yet" on purpose: the data holds no ramps or sidewalks.
+- The planner understands a limited set of phrasings (the five Quick questions, the parking and dumping investigate cards and close variants, including the "increased in Chapinero" question that is no longer a suggestion).
 - It cannot yet follow up on a previous answer.
 - **Offers a module (owner, 2026-11-09, behind `/?modules=1`; decision [0049](decisions/0049-agent-modules-dock-and-library.md)):** two new plans. **Attention:** "Which parking obstruction recurrences need the most attention?" ranks the recurrences by a stated rule in code (`rankForAttention` in `agent.ts`: Active before Monitoring, then the most returns, then the latest report; top three; a rule, not a risk score), answers with pickable numbered rows (chart kind `recurrences`) and lights the incidents of those recurrences on the map; picking a row opens that recurrence. **Timeline:** with a recurrence open, a question like "I would like to see the occurrences in a different way" describes its history from the recurrence's numbers and offers the timeline module (`Answer.offers`): a deterministic suggestion with a reason and a zone shape (4:2 when it has more than 8 reports, else 4:3) that the person accepts (Yes), previews as a chart card and docks by dragging or with "Add to side panel". The agent never invents UI or numbers; without an open recurrence it asks to pick one.
