@@ -114,7 +114,7 @@ export function InvestigatePanel({ chatId, turns, onTurns, onHighlight, highligh
         <div className={`flex w-full flex-1 flex-col`}>
         <div className={`flex w-full flex-col gap-3 text-body ${turns.length === 0 ? 'flex-1' : ''} max-desk:mx-auto max-desk:max-w-[800px] desk:mx-auto desk:max-w-[calc(var(--agent-content-w)+32px)] desk:gap-8 desk:px-4 desk:py-12`}> {/* the landing's body is top-aligned (owner's Figma, 2026-11-17): the summary card sits at the top and the dashboard fills the rest and centers its own content */}
           {turns.length === 0 && !emptyFor && <AgentHome ask={(q) => void ask(q)} note={noteOpen && (
-            <Alert className="hidden border-0 bg-(--neutral-800) desk:flex" icon={<Sparkle weight="fill" className="size-5" aria-hidden />} onClose={() => setNoteOpen(false)}>
+            <Alert className="hidden border-0 bg-(--neutral-800)/60 [--alert-icon:var(--cobalt-200)] desk:flex" icon={<Sparkle weight="fill" className="size-5" aria-hidden />} onClose={() => setNoteOpen(false)}>
               CivicPulse AI groups related reports into patterns. Nothing goes to the authorities until you’ve reviewed it. Final decision rests with the responsible official.
             </Alert>
           )} />}

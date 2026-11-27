@@ -3,6 +3,8 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-27. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **Time of day area (owner, 2026-11-27, Figma):** **`cobalt-300`** to `cobalt-800` at **35 %** (400 at 45 %).
+- **Panel note and Overview spacing (owner, 2026-11-27, Figma):** note fill **`neutral-800` at 60 %**, icon **`cobalt-200`**, **64 px** under the greeting (48). Overview: address `fg-emphasis`, **16 px** between blocks (12), status rows 4 px box and 2 px sides, **no placeholder note** under the photos.
 - **Overview card, latest (owner, 2026-11-27, Figma):** **12 px** all around the address; the two dates in **`fg-primary`** (was emphasis).
 - **`display-xs` and `display-xs-strong` line height 22 (owner, 2026-11-27, Figma):** was 20 (`index.css`, foundations.md). Used by the panel section titles, the Overview address and the map hover card.
 - **Overview card, address (owner, 2026-11-27, Figma):** the recurrence's address on two lines under the title row; **12 px** around the content (8). `ProblemDetail.tsx`.

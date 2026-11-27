@@ -123,7 +123,7 @@ function Recurrences({ bars, onPick }: { bars: Answer['bars']; onPick?: (id: str
   )
 }
 
-/** Figma **Answer Chart · Time of Day** (owner, 2026-11-27): a `cobalt-200` line over an area at 45 % fading from `cobalt-400` to `cobalt-800`, thin `neutral-600` grid lines, `caption` hours. */
+/** Figma **Answer Chart · Time of Day** (owner, 2026-11-27): a `cobalt-200` line over an area at 35 % fading from `cobalt-300` to `cobalt-800`, thin `neutral-600` grid lines, `caption` hours. */
 export function Time({ bars }: { bars: Answer['bars'] }) {
   const fill = useId()
   return (
@@ -131,14 +131,14 @@ export function Time({ bars }: { bars: Answer['bars'] }) {
       <AreaChart data={bars} margin={{ left: 34, right: 34, top: 12 }}> {/* Figma: the first and last point sit 34 px in, so their hours are not cut */}
         <defs>
           <linearGradient id={fill} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="var(--cobalt-400)" />
+            <stop offset="0" stopColor="var(--cobalt-300)" />
             <stop offset="1" stopColor="var(--cobalt-800)" />
           </linearGradient>
         </defs>
         <CartesianGrid vertical={false} stroke="var(--neutral-600)" strokeWidth={0.5} />
         <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fill: 'var(--fg-secondary)', fontSize: 12 }} interval={0} />
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-        <Area dataKey="value" isAnimationActive={false} type="monotone" stroke="var(--cobalt-200)" strokeWidth={1.5} fill={`url(#${fill})`} fillOpacity={0.45} />
+        <Area dataKey="value" isAnimationActive={false} type="monotone" stroke="var(--cobalt-200)" strokeWidth={1.5} fill={`url(#${fill})`} fillOpacity={0.35} />
       </AreaChart>
     </ChartContainer>
   )

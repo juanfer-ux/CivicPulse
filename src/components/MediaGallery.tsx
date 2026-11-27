@@ -92,7 +92,7 @@ export function MediaGallery({ incidentId, carousel: asStrip = false, cover = fa
             ))}
           </div>
         )}
-        {note}
+        {!cover && note} {/* the Overview has no note, as in Figma (owner, 2026-11-27); its tiles say "Placeholder: no file yet" on hover */}
       </div>
     )
   }

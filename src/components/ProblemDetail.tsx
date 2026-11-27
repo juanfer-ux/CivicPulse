@@ -140,14 +140,14 @@ export function Overview({ problem, event, photoOf, ...sort }: HistorySort & { p
   return (
     <div className="hidden flex-col gap-2 rounded-lg bg-(--neutral-900) desk:flex">
       <HistoryTitle title="Overview" {...sort} />
-      <h4 className="p-3 font-display-semi text-display-xs-strong whitespace-pre-line text-(--fg-primary)">{twoLines(problem.location_description)}</h4> {/* the address, on two lines, under the title row (owner's Figma, 2026-11-27) */}
-      <div className="flex flex-col gap-3 p-3">
+      <h4 className="p-3 font-display-semi text-display-xs-strong whitespace-pre-line text-(--fg-emphasis)">{twoLines(problem.location_description)}</h4> {/* the address, on two lines, under the title row (owner's Figma, 2026-11-27) */}
+      <div className="flex flex-col gap-4 p-3">
         {photoOf && <MediaGallery key={photoOf} incidentId={photoOf} cover />} {/* the photos of the newest report (owner, 2026-11-27) */}
-        <div className="flex flex-col gap-2 py-1">
+        <div className="flex flex-col gap-2 p-1">
           {rows.map((r, i) => (
             <Fragment key={r.label}>
               {i > 0 && <div className="border-t border-(--neutral-600)" aria-hidden />}
-              <p className="flex items-center gap-2 p-2">
+              <p className="flex items-center gap-2 px-0.5 py-2">
                 <r.Icon weight="regular" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
                 <span className="flex-1 text-body-sm text-(--fg-secondary)">{r.label}</span>
                 <span className="text-body-sm-medium text-(--fg-primary)">{r.value}</span>
