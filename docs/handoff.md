@@ -3,6 +3,14 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-27. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **Overview card, latest (owner, 2026-11-27, Figma):** **12 px** all around the address; the two dates in **`fg-primary`** (was emphasis).
+- **`display-xs` and `display-xs-strong` line height 22 (owner, 2026-11-27, Figma):** was 20 (`index.css`, foundations.md). Used by the panel section titles, the Overview address and the map hover card.
+- **Overview card, address (owner, 2026-11-27, Figma):** the recurrence's address on two lines under the title row; **12 px** around the content (8). `ProblemDetail.tsx`.
+- **Answer charts, owner's Figma changes (2026-11-27, latest):** time of day and places on the dark box, new area colors, plain ranking restyled with its box, places spacing; applies to agent answers and `/#charts`. Details in components.md.
+- **Missing charts built in Figma (owner, 2026-11-27):** Time of Day, Two Periods, Places, Pie, Radar, Radial and Stacked Bars, in the Answer Charts frame (now two columns). Pie, Radar, Radial and Stacked Bars are Figma only, with sample numbers.
+- **Chart gallery in the Figma style (owner, 2026-11-27):** `/#charts` now opens with the app's own answer charts, and the options use the Figma boxes and ranked Cobalt shades (`QuestionCharts.tsx`, `ChartGallery.tsx`).
+- **Overview photos (owner, 2026-11-27):** above "Last reported", a carousel with up to **three** photos of the newest report, **180 px** high (History stays 246). Placeholders until real files exist. The card scrolls if the screen is too short. Figma: new component **Report Photos Carousel · Cover** in the Overview.
+- **Sidebar account row (owner, 2026-11-27, Figma):** **20 px** above and below, **12** at the sides (20 and 16), the top line **`neutral-600`** (500), the menu icon 12 px from the edge (`Sidebar.tsx`).
 - **Sidebar, New investigation (owner, 2026-11-27, Figma):** the row has no extra 10 px at its sides: 8 px from the sidebar edges, full width (`Sidebar.tsx`).
 - **Overview card and bar list (owner, 2026-11-27, Figma):** the four number tiles have **no icons**; the sort icon (Overview and History) is **`neutral-200`**; the bar list uses a **`cobalt-900`** track and **`cobalt-400`** bar (800, 300), also in agent answers; its box line is excluded from layout (15 px padding).
 - **Overview card 320 px (owner, 2026-11-27):** was 360 (`ProblemDetail.tsx`; Figma screen instance, the component was already 320).

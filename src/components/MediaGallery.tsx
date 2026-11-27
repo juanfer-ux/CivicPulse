@@ -21,9 +21,11 @@ const placeholderPhotos = (incidentId: string, have: Media[]): Media[] => {
   return Array.from({ length: n }, (_, k) => have[k] ?? { id: `placeholder-${incidentId}-${k}`, kind: 'photo' as const, duration_seconds: null, is_placeholder: true })
 }
 const CAROUSEL_MAX = 6 // a report card shows at most six items (owner, 2026-11-09)
+const COVER_MAX = 3
 
 /** `carousel` (owner, 2026-11-09, the report card in the Occurrences History): 246 px tiles (Figma Opened Report, 2026-11-26; 4:3 before) at the full width, at most six, one at a time. The strip's own scrollbar is hidden because the arrows and the dots do its job. */
-export function MediaGallery({ incidentId, carousel = false }: { incidentId: string; carousel?: boolean }) {
+export function MediaGallery({ incidentId, carousel: asStrip = false, cover = false }: { incidentId: string; carousel?: boolean; cover?: boolean }) {
+  const carousel = asStrip || cover // `cover` (owner, 2026-11-27, the Overview card): the same carousel, photos only, three at most, 180 px high
   const [loaded, setLoaded] = useState<{ id: string; rows: Media[] } | null>(null)
   const strip = useRef<HTMLDivElement>(null)
   const [at, setAt] = useState(0)
@@ -49,12 +51,13 @@ export function MediaGallery({ incidentId, carousel = false }: { incidentId: str
   const photos = loaded.rows.filter((m) => m.kind === 'photo')
   // The seed gives a report at most one placeholder photo, so the carousel would never show (owner, 2026-11-09): until real files exist, a report with fewer than two items shows two to five placeholder tiles, a number fixed by its id. Set PROTOTYPE_PLACEHOLDERS to false to show only what the database has.
   const rows = carousel && PROTOTYPE_PLACEHOLDERS && loaded.rows.length < 2 ? placeholderPhotos(incidentId, loaded.rows) : loaded.rows
-  const tiles = (rows.length ? rows : [null]).slice(0, carousel ? CAROUSEL_MAX : undefined)
+  const wanted = cover ? rows.filter((m) => m.kind === 'photo') : rows
+  const tiles = (wanted.length ? wanted : [null]).slice(0, cover ? COVER_MAX : carousel ? CAROUSEL_MAX : undefined)
 
   if (carousel) {
     const shown = tiles
     const tile = (m: Media | null, className: string, k: number) => (
-      <div key={m?.id ?? 'none'} className={`relative h-[246px] rounded-md border border-dashed border-(--neutral-500) bg-(--neutral-800) text-muted-foreground ${className}`} title={m?.is_placeholder === false ? 'File stored' : 'Placeholder: no file yet'}>
+      <div key={m?.id ?? 'none'} className={`relative ${cover ? 'h-[180px]' : 'h-[246px]'} rounded-md border border-dashed border-(--neutral-500) bg-(--neutral-800) text-muted-foreground ${className}`} title={m?.is_placeholder === false ? 'File stored' : 'Placeholder: no file yet'}>
         <span className="absolute bottom-2 left-2 text-caption-medium">
           {m?.kind === 'video' ? `Video${m.duration_seconds ? ` ${clock(m.duration_seconds)}` : ''}` : m ? `Photo ${k + 1}` : 'No file'}
         </span>

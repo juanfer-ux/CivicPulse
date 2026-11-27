@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react'
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, LabelList, Line, LineChart, Pie, PieChart, Treemap, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, Line, LineChart, Pie, PieChart, Treemap, XAxis, YAxis } from 'recharts'
+import AnswerChart, { Time } from '@/components/AnswerCharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
+import { donutTone } from '@/lib/donutTones'
+import type { Answer } from '@/lib/agent'
 
 /**
  * Chart options for each predefined question of the agent panel (owner's request, 2026-11-08): the same sample data drawn several ways, so one can be picked for each kind of answer.
@@ -9,8 +12,11 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } f
 
 const COLOR = 'var(--ai-border)' // cobalt-400, the answer charts' color
 const config = { value: { label: 'Incidents', color: COLOR } } satisfies ChartConfig
-const tick = { fill: 'var(--muted-foreground)', fontSize: 12 }
-const grid = 'var(--secondary)'
+const tick = { fill: 'var(--fg-secondary)', fontSize: 12 }
+const grid = 'var(--neutral-700)'
+/** The ranked Cobalt shades of the Figma Answer Charts, biggest first. */
+const tone = (i: number) => ({ background: donutTone(i).color, opacity: donutTone(i).opacity })
+const cells = (d: { label: string }[]) => d.map((x, i) => <Cell key={x.label} fill={donutTone(i).color} fillOpacity={donutTone(i).opacity} />)
 const tip = <ChartTooltipContent hideLabel />
 
 const LOCALITIES = [
@@ -61,9 +67,10 @@ const SERIES = {
   Kennedy: [4, 5, 4, 6, 5, 6, 7, 6, 8, 7, 8, 9],
 }
 
-function Card({ name, note, children }: { name: string; note: string; children: ReactNode }) {
+/** The box of the Figma Answer Charts: `neutral-900`, a `neutral-700` line, 8 px radius, 16 px padding; the Dot Matrix keeps the lighter one (`light`). */
+function Card({ name, note, light, children }: { name: string; note: string; light?: boolean; children: ReactNode }) {
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-[6px] border-[0.5px] border-(--neutral-500) bg-(--neutral-700) p-4">
+    <div className={`flex min-w-0 flex-col gap-2 rounded-lg border-(--neutral-700) p-4 ${light ? 'border-[0.5px] bg-(--neutral-700)' : 'border bg-(--neutral-900)'}`}>
       <div>
         <p className="text-label">{name}</p>
         <p className="min-h-[34px] text-meta text-muted-foreground">{note}</p>
@@ -98,14 +105,15 @@ function HBars({ data }: { data: { label: string; value: number }[] }) {
         <YAxis dataKey="label" type="category" tickLine={false} axisLine={false} width={92} tick={tick} interval={0} />
         <XAxis type="number" hide />
         <ChartTooltip cursor={false} content={tip} />
-        <Bar dataKey="value" isAnimationActive={false} fill="var(--color-value)" radius={4}>
-          <LabelList dataKey="value" position="right" fill="var(--foreground)" fontSize={12} />
+        <Bar dataKey="value" isAnimationActive={false} radius={4}>
+          {cells(data)}
+          <LabelList dataKey="value" position="right" fill="var(--fg-primary)" fontSize={12} />
         </Bar>
       </BarChart>
     </ChartContainer>
   )
 }
-function Columns({ data, height = 200, angle = -30 }: { data: { label: string; value: number }[]; height?: number; angle?: number }) {
+function Columns({ data, height = 200, angle = -30, ranked = true }: { data: { label: string; value: number }[]; height?: number; angle?: number; ranked?: boolean }) {
   return (
     <ChartContainer config={config} className="w-full" style={{ height }}>
       <BarChart data={data} margin={{ top: 16, bottom: angle ? 24 : 0 }}>
@@ -113,7 +121,8 @@ function Columns({ data, height = 200, angle = -30 }: { data: { label: string; v
         <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ ...tick, fontSize: 11 }} interval={0} angle={angle} textAnchor={angle ? 'end' : 'middle'} height={angle ? 56 : 24} />
         <ChartTooltip cursor={false} content={tip} />
         <Bar dataKey="value" isAnimationActive={false} fill="var(--color-value)" radius={[4, 4, 0, 0]}>
-          <LabelList dataKey="value" position="top" fill="var(--foreground)" fontSize={12} />
+          {ranked && cells(data)}
+          <LabelList dataKey="value" position="top" fill="var(--fg-primary)" fontSize={12} />
         </Bar>
       </BarChart>
     </ChartContainer>
@@ -123,12 +132,12 @@ function Lollipop({ data }: { data: { label: string; value: number }[] }) {
   const m = max(data)
   return (
     <ul className="flex flex-col gap-2.5 text-body-sm">
-      {data.map((d) => (
+      {data.map((d, i) => (
         <li key={d.label} className="flex items-center gap-3">
           <span className="w-24 shrink-0 truncate text-muted-foreground">{d.label}</span>
           <span className="relative h-4 flex-1">
             <span className="absolute top-1/2 left-0 h-px -translate-y-1/2 bg-(--neutral-400)" style={{ width: `${(d.value / m) * 100}%` }} />
-            <span className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ left: `${(d.value / m) * 100}%`, background: COLOR }} />
+            <span className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ left: `${(d.value / m) * 100}%`, ...tone(i) }} />
           </span>
           <span className="w-7 text-right tabular-nums text-foreground">{d.value}</span>
         </li>
@@ -141,7 +150,7 @@ function ShareBars({ data }: { data: { label: string; value: number }[] }) {
   const m = max(data)
   return (
     <ul className="flex flex-col gap-2 text-body-sm">
-      {data.map((d) => (
+      {data.map((d, i) => (
         <li key={d.label} className="flex flex-col gap-1">
           <span className="flex justify-between">
             <span className="text-foreground">{d.label}</span>
@@ -150,7 +159,7 @@ function ShareBars({ data }: { data: { label: string; value: number }[] }) {
             </span>
           </span>
           <span className="h-1.5 rounded-full bg-(--neutral-600)">
-            <span className="block h-full rounded-full" style={{ width: `${(d.value / m) * 100}%`, background: COLOR }} />
+            <span className="block h-full rounded-full" style={{ width: `${(d.value / m) * 100}%`, ...tone(i) }} />
           </span>
         </li>
       ))}
@@ -164,18 +173,19 @@ function Tree({ data }: { data: { label: string; value: number }[] }) {
         data={data.map((d) => ({ name: d.label, size: d.value }))}
         dataKey="size"
         isAnimationActive={false}
-        stroke="var(--neutral-700)"
+        stroke="var(--neutral-900)"
         content={(p) => {
           const { x = 0, y = 0, width = 0, height = 0, name, size, index = 0 } = p as { x?: number; y?: number; width?: number; height?: number; name?: string; size?: number; index?: number }
+          const ink = index < 3 ? 'var(--black)' : 'var(--white)' // dark text on the light Cobalt tiles, light text on the dim ones
           return (
             <g>
-              <rect x={x} y={y} width={width} height={height} rx={3} fill={COLOR} fillOpacity={0.9 - index * 0.11} stroke="var(--neutral-700)" strokeWidth={2} />
+              <rect x={x} y={y} width={width} height={height} rx={3} fill={donutTone(index).color} fillOpacity={donutTone(index).opacity} stroke="var(--neutral-900)" strokeWidth={2} />
               {width > 56 && height > 34 && (
                 <>
-                  <text x={x + 8} y={y + 18} fill="var(--foreground)" fontSize={12}>
+                  <text x={x + 8} y={y + 18} fill={ink} fontSize={12}>
                     {name}
                   </text>
-                  <text x={x + 8} y={y + 34} fill="var(--foreground)" fontSize={12} fillOpacity={0.8}>
+                  <text x={x + 8} y={y + 34} fill={ink} fontSize={12}>
                     {size}
                   </text>
                 </>
@@ -194,16 +204,14 @@ function Donut({ data }: { data: { label: string; value: number }[] }) {
         <PieChart>
           <ChartTooltip content={tip} />
           <Pie data={data} dataKey="value" nameKey="label" innerRadius={42} outerRadius={70} paddingAngle={2} isAnimationActive={false} stroke="none">
-            {data.map((d, i) => (
-              <Cell key={d.label} fill={COLOR} fillOpacity={1 - i * 0.14} />
-            ))}
+            {cells(data)}
           </Pie>
         </PieChart>
       </ChartContainer>
       <ul className="flex flex-col gap-1 text-meta text-muted-foreground">
         {data.map((d, i) => (
           <li key={d.label} className="flex items-center gap-2">
-            <span className="size-2 rounded-full" style={{ background: COLOR, opacity: 1 - i * 0.14 }} />
+            <span className="size-2 rounded-full" style={tone(i)} />
             {d.label} <span className="tabular-nums text-foreground">{d.value}</span>
           </li>
         ))}
@@ -213,18 +221,6 @@ function Donut({ data }: { data: { label: string; value: number }[] }) {
 }
 
 /* ───────── time of day ───────── */
-function AreaDay({ data }: { data: { label: string; value: number }[] }) {
-  return (
-    <ChartContainer config={config} className="h-[180px] w-full">
-      <AreaChart data={data} margin={{ left: 8, right: 8, top: 8 }}>
-        <CartesianGrid vertical={false} stroke={grid} />
-        <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ ...tick, fontSize: 11 }} interval={0} />
-        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-        <Area dataKey="value" isAnimationActive={false} type="monotone" stroke="var(--color-value)" fill="var(--color-value)" fillOpacity={0.2} />
-      </AreaChart>
-    </ChartContainer>
-  )
-}
 function LineDots({ data }: { data: { label: string; value: number }[] }) {
   return (
     <ChartContainer config={config} className="h-[180px] w-full">
@@ -273,7 +269,7 @@ function Clock({ data }: { data: { label: string; value: number }[] }) {
         <circle key={k} cx={100} cy={100} r={14 + k * (R - 14)} fill="none" stroke={grid} />
       ))}
       {data.map((d, i) => (
-        <path key={d.label} d={wedge(i, d.value)} fill={COLOR} fillOpacity={0.85} stroke="var(--neutral-700)" strokeWidth={1.5}>
+        <path key={d.label} d={wedge(i, d.value)} fill={COLOR} fillOpacity={0.85} stroke="var(--neutral-900)" strokeWidth={1.5}>
           <title>{`${d.label}: ${d.value}`}</title>
         </path>
       ))}
@@ -297,7 +293,7 @@ function SpotRows({ data }: { data: (typeof SPOTS)[number][] }) {
           <span className="flex min-w-0 flex-1 flex-col gap-1">
             <span className="truncate text-body-sm text-foreground">{d.label}</span>
             <span className="h-1 rounded-full bg-(--neutral-600)">
-              <span className="block h-full rounded-full" style={{ width: `${(d.value / m) * 100}%`, background: COLOR }} />
+              <span className="block h-full rounded-full" style={{ width: `${(d.value / m) * 100}%`, ...tone(i) }} />
             </span>
           </span>
           <span className="w-8 text-right tabular-nums text-foreground">{d.value}</span>
@@ -309,12 +305,12 @@ function SpotRows({ data }: { data: (typeof SPOTS)[number][] }) {
 function DotMatrix({ data }: { data: (typeof SPOTS)[number][] }) {
   return (
     <ul className="flex flex-col gap-2.5">
-      {data.map((d) => (
+      {data.map((d, row) => (
         <li key={d.label} className="flex flex-col gap-1">
           <span className="truncate text-meta text-muted-foreground">{d.short}</span>
           <span className="flex flex-wrap gap-1">
             {Array.from({ length: d.value }, (_, i) => (
-              <span key={i} className="size-2.5 rounded-full" style={{ background: COLOR }} />
+              <span key={i} className="size-2.5 rounded-full" style={tone(row)} />
             ))}
           </span>
         </li>
@@ -352,14 +348,14 @@ function Bullet({ data }: { data: { label: string; value: number }[] }) {
   const m = 16
   return (
     <ul className="flex flex-col gap-3 text-body-sm">
-      {data.map((d) => (
+      {data.map((d, i) => (
         <li key={d.label} className="flex flex-col gap-1">
           <span className="flex justify-between">
             <span className="text-foreground">{d.label}</span>
             <span className="tabular-nums text-muted-foreground">{d.value} expected</span>
           </span>
           <span className="relative h-3 rounded-sm bg-(--neutral-600)">
-            <span className="absolute inset-y-0 left-0 rounded-sm" style={{ width: `${(d.value / m) * 100}%`, background: COLOR }} />
+            <span className="absolute inset-y-0 left-0 rounded-sm" style={{ width: `${(d.value / m) * 100}%`, ...tone(i) }} />
             <span className="absolute inset-y-[-2px] w-0.5 bg-(--neutral-100)" style={{ left: `${(10 / m) * 100}%` }} title="Usual: 10" />
           </span>
         </li>
@@ -386,13 +382,36 @@ function ForecastCards() {
   )
 }
 
+/** The charts the app draws today, from the same component as the answers, so they cannot drift from the code. */
+const APP: { kind: NonNullable<Answer['chart']>; name: string; bars: Answer['bars'] }[] = [
+  { kind: 'donut', name: 'Donut', bars: LOCALITIES.slice(0, 5) },
+  { kind: 'barlist', name: 'Bar list', bars: LOCALITIES.slice(0, 5) },
+  { kind: 'rows', name: 'Rows', bars: SPOTS.slice(0, 4) },
+  { kind: 'recurrences', name: 'Recurrences', bars: SPOTS.slice(0, 3).map((s, i) => ({ label: s.label, value: 4 - i, sub: `PR-000${88 + i} · Active` })) },
+  { kind: 'dots', name: 'Dot matrix', bars: SPOTS.slice(0, 4).map((s) => ({ label: s.short, value: s.value })) },
+  { kind: 'time', name: 'Time of day', bars: TIME },
+  { kind: 'period', name: 'Two periods', bars: [{ label: 'Previous 30 days', value: 20 }, { label: 'Last 30 days', value: 19 }] },
+]
+
 export function QuestionCharts() {
   return (
     <div className="flex flex-col gap-10">
       <header>
         <h1 className="text-heading">Charts for the predefined questions</h1>
-        <p className="max-w-[760px] text-meta text-muted-foreground">One group per question of the agent panel, the same sample numbers drawn several ways. The first card of each group is what the agent draws today. Pick one per kind of answer; nothing here changes the app yet.</p>
+        <p className="max-w-[760px] text-meta text-muted-foreground">One group per question of the agent panel, the same sample numbers drawn several ways. The first section is what the app draws today; the groups below are options in the same Figma style. Nothing here changes the app.</p>
       </header>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-title">In the app today</h2>
+        <div className="grid items-start gap-4 rounded-lg bg-(--neutral-900) p-4 lg:grid-cols-2"> {/* on the agent panel's color, as the answers sit */}
+          {APP.map((c) => (
+            <figure key={c.kind} className="flex w-full max-w-(--chart-max-w) min-w-0 flex-col gap-2">
+              <figcaption className="text-label">{c.name}</figcaption>
+              <AnswerChart kind={c.kind} bars={c.bars} />
+            </figure>
+          ))}
+        </div>
+      </section>
 
       <Question n="1" question="Which localities have the most parking obstruction incidents?" kind="A ranking of localities. The same chart serves question 5 (illegal dumping localities).">
         <Card name="Horizontal bars (today)" note="Names on the left, a bar and the count. Reads as a ranking at once.">
@@ -417,10 +436,10 @@ export function QuestionCharts() {
 
       <Question n="2" question="When do parking obstruction incidents occur most frequently in Usaquén?" kind="Time of day, six blocks of four hours.">
         <Card name="Area (today)" note="A smooth curve over the day. Looks good, hides that each block is four hours.">
-          <AreaDay data={TIME} />
+          <Time bars={TIME} />
         </Card>
         <Card name="Columns by block" note="One column per four-hour block, left to right through the day.">
-          <Columns data={TIME} height={200} angle={0} />
+          <Columns data={TIME} height={200} angle={0} ranked={false} />
         </Card>
         <Card name="Line with dots" note="The same shape as the area, with a dot per block so the blocks show.">
           <LineDots data={TIME} />
@@ -440,7 +459,7 @@ export function QuestionCharts() {
         <Card name="Rows with a thin bar" note="A numbered list: the full name on top, a thin bar under it, the count. Room for long names.">
           <SpotRows data={SPOTS} />
         </Card>
-        <Card name="Dot matrix" note="One dot per report: the count is something you can count, no axis needed.">
+        <Card light name="Dot matrix" note="One dot per report: the count is something you can count, no axis needed.">
           <DotMatrix data={SPOTS} />
         </Card>
         <Card name="Columns" note="Short names under the columns; the long address goes in the tooltip.">

@@ -507,6 +507,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
         item && (
           <>
             <ProblemDetail
+              photoOf={item.detail?.incidents.at(-1)?.id} // oldest first, so the last is the newest report
               key={item.problem.id}
               problem={item.problem}
               localityName={localityName.get(item.problem.locality_code)}

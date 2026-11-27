@@ -171,23 +171,30 @@ function Feedback() {
 /** `shown`: this answer is the one ringed on the map. The button clears it, or brings it back after clearing (or from an older answer). */
 
 /** The answer's small bar list: a label, a bar sized by value, and the number. */
+/** The shades of the plain ranking, biggest first (Figma **Answer Chart**); rows past the fourth take the last one. */
+const RANK = [['--cobalt-400', 1], ['--cobalt-300', 0.8], ['--cobalt-200', 0.6], ['--cobalt-100', 0.3]] as const
+const rankTone = (i: number) => {
+  const [token, opacity] = RANK[Math.min(i, RANK.length - 1)]
+  return { background: `var(${token})`, opacity }
+}
+
 export function Bars({ bars, onFocus, onPick }: { bars: Answer['bars']; onFocus?: (code: number | null) => void; onPick?: (code: number) => void }) {
   const max = Math.max(1, ...bars.map((b) => b.value))
   return (
-    <ul className="flex flex-col gap-1">
-      {bars.map((b) => (
+    <ul className="flex flex-col gap-2 rounded-lg border border-(--neutral-700) bg-(--neutral-900) p-[15px]"> {/* Figma **Answer Chart** (owner, 2026-11-27) */}
+      {bars.map((b, i) => (
         <li
           key={b.label}
-          className={`grid grid-cols-[7.5rem_1fr_2rem] items-center gap-2 text-meta ${b.code && onPick ? 'cursor-pointer' : ''}`}
+          className={`grid h-5 grid-cols-[7.5rem_1fr_2rem] items-center gap-2 ${b.code && onPick ? 'cursor-pointer' : ''}`}
           onMouseEnter={() => b.code && onFocus?.(b.code)}
           onMouseLeave={() => onFocus?.(null)}
           onClick={() => b.code && onPick?.(b.code)}
         >
-          <span className="truncate text-muted-foreground">{b.label}</span>
-          <span className="h-2 rounded-full bg-muted">
-            <span className="block h-2 rounded-full bg-ai-border" style={{ width: `${(b.value / max) * 100}%` }} />
+          <span className="truncate text-body-sm text-(--fg-secondary)">{b.label}</span>
+          <span className="h-3.5">
+            <span className="block h-full rounded-sm" style={{ width: `${(b.value / max) * 100}%`, ...rankTone(i) }} />
           </span>
-          <span className="text-right">{b.value}</span>
+          <span className="text-right text-meta-medium tabular-nums text-(--fg-primary)">{b.value}</span>
         </li>
       ))}
     </ul>
