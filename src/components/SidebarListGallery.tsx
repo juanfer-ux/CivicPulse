@@ -87,7 +87,7 @@ const IncC = ({ i, c }: { i: Inc; c: string }) => <Row icon={<span className="mt
 /** A collapsed status group: its title with a caret and the count. */
 const Grp = ({ title }: { title: string }) => (
   <p className="flex shrink-0 items-center gap-1 px-3 py-1.5 text-caption-medium text-(--neutral-200)">
-    <CaretRight weight="bold" className="size-3" />
+    <CaretRight className="size-3" />
     {title}
   </p>
 )

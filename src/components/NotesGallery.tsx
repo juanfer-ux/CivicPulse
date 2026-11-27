@@ -110,12 +110,12 @@ export function NotesGallery() {
 
         <Frame name="7 · Collapsed, like Evidence" note="One line, 'Notes · 5', that opens the rows (option 2). Keeps the answer short; the notes are one click away.">
           <p className="flex items-center gap-1.5 text-meta text-muted-foreground">
-            <CaretRight weight="bold" className="size-3" aria-hidden /> Notes · 5
+            <CaretRight className="size-3" aria-hidden /> Notes · 5
           </p>
           <ul className="mt-3 hidden" aria-hidden />
           <p className="mt-4 text-caption-medium text-(--neutral-300)">Open:</p>
           <p className="mt-1 flex items-center gap-1.5 text-meta text-muted-foreground">
-            <CaretRight weight="bold" className="size-3 rotate-90" aria-hidden /> Notes · 5
+            <CaretRight className="size-3 rotate-90" aria-hidden /> Notes · 5
           </p>
           <ul className="mt-2 flex flex-col gap-1.5 text-meta text-muted-foreground">
             {NOTES.slice(0, 3).map((n) => (
