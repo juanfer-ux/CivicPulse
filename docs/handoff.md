@@ -3,6 +3,8 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-05. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **Agent panel note moved (owner, 2026-11-26, Figma 897:5965, whole subtree read):** the AI note left the Chat Area and sits **under the greeting** (32 px), a normal box with all corners 8 px; its last sentence is `body-sm-strong`. The composer has nothing above it now. Header, detail strip, dashboard, modules and empty variants matched. Not committed.
+- **Composer field line (owner, 2026-11-26, Figma 1088:1847):** 0.5 px `neutral-400`; with focus **1 px** `neutral-400` (it was `neutral-300`). Not committed. `Composer.tsx`.
 - **Investigation rows (owner, 2026-11-26, Figma 102:218):** 20 px on the right; focus is a 1 px `neutral-300` line with the app's 3 px grey ring (it was an inner 1 px ring). Not committed. `Sidebar.tsx`.
 - **Selector chips (owner, 2026-11-26, Figma 1173:4638):** pills; default has no line; hover `neutral-500` with a `neutral-400` line; selected **`cobalt-900`** with a 1 px `cobalt-700` line and a 4 px dark icon outline; focus `neutral-100` line and a `cobalt-400` ring; icons `neutral-100`. **Count Badge** is `neutral-900` everywhere (filters too), as its main component. Not committed.
 - **Title row on the numbers card (owner, 2026-11-26, Figma 847:415; settles the question below):** "Occurrence history" with the sort button (`HistoryTitle.tsx`, shared with the right column). Both buttons sort the same history; another recurrence starts newest first. Not committed.
