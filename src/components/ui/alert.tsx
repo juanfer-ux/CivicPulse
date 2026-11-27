@@ -9,7 +9,7 @@ const alert = cva('flex w-full items-start text-body-sm', {
       default: 'gap-3 rounded-lg border-[0.5px] border-(--neutral-500) bg-(--neutral-600) px-4 py-3 text-(--fg-secondary)',
       destructive: 'gap-3 rounded-lg bg-(--red-400) px-4 py-3 text-(--neutral-900)',
       ai: 'gap-3 rounded-lg border-[0.5px] border-(--cobalt-400) bg-(--neutral-800) px-4 py-3 text-(--fg-primary)',
-      info: 'items-start gap-4 rounded-t-lg bg-(--cobalt-900) p-4 text-(--fg-secondary)', // owner's Figma, 2026-11-26: solid, no line, only the top corners round (it sits on the composer)
+      info: 'items-start gap-4 rounded-lg bg-(--cobalt-900) p-4 text-(--fg-secondary)', // owner's Figma, 2026-11-26: solid, no line, 8 px corners (it sits under the greeting)
     },
   },
   defaultVariants: { variant: 'default' },

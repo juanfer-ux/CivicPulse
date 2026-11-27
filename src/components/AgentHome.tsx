@@ -44,7 +44,7 @@ function Donut() {
   )
 }
 
-export function AgentHome({ ask }: { ask: (q: string) => void }) {
+export function AgentHome({ ask, note }: { ask: (q: string) => void; note?: ReactNode }) {
   const first = useAuth().profile?.full_name?.trim().split(/\s+/)[0] // the greeting names the person (owner's Figma, 2026-11-17: "Welcome back Peter,")
   useEffect(() => {
     if (!QUICK_SUGGESTIONS_ON) return
@@ -63,8 +63,9 @@ export function AgentHome({ ask }: { ask: (q: string) => void }) {
   return (
     <div className="flex flex-1 flex-col gap-20"> {/* Figma Conversation body: the Dashboard group, which holds the alert first (owner, 2026-11-23) */}
       <div className="flex flex-1 flex-col justify-start gap-16 px-2.5 py-4"> {/* Figma Dashboard: 40 px above and below (owner, 2026-11-23, it was 16; the alert left the body for a banner under the title row). Before: (owner, 2026-11-23, latest: content aligned to the TOP again, primary axis MIN; an hour before it was the BOTTOM, justify-end, and before that top). Before: Fill height with its content aligned to the BOTTOM (primary axis MAX), so a taller panel adds the space between the alert and the greeting; it was top-aligned (justify-start). Figma (owner, 2026-11-16): the greeting, "Let's catch up" and the modules are one group, 24 px apart with 16 px above and below and 10 at the sides (700 px wide); the composer is under the group, 64 px away */}
-      <div className="flex flex-col gap-4"> {/* (the line under the greeting is hidden in Figma now, owner 2026-11-17, so it is gone) Figma Frame 2147225884 (owner, 2026-11-17): the greeting, then "You're ready to investigate and coordinate incident response" in `display-sm` / `neutral-200`, 16 px apart; the place text left the header */}
+      <div className="flex flex-col gap-8"> {/* Figma Welcome section (owner, 2026-11-26): the greeting, 32 px, the AI note. Before: (the line under the greeting is hidden in Figma now, owner 2026-11-17, so it is gone) Figma Frame 2147225884 (owner, 2026-11-17): the greeting, then "You're ready to investigate and coordinate incident response" in `display-sm` / `neutral-200`, 16 px apart; the place text left the header */}
         <h2 className="font-display text-display-md text-(--fg-emphasis)"> {/* Figma greeting (owner, 2026-11-23): 38 / 28 in `brand-primary` (it was 32 and `neutral-100`) */}Welcome back,{first ? ` ${first},` : ''}</h2>
+        {note}
       </div>
       <div className="flex flex-col gap-12"> {/* Figma Dashboard modules (owner, 2026-11-23, latest: 48 px between the two modules, and 64 px between the greeting and the modules) (owner's Figma, 2026-11-17, latest): 64 px between the two modules (48 an hour before);  (owner's Figma, 2026-11-17, checked): "Here's what's happening" and "Recurrences to investigate" are 48 px apart (the code had 32); before that, Figma Frame 2147225871 (2026-11-16): the modules 32 px apart (it was 24); the greeting is 64 px above them, the group has 16 px above and below and 10 at the sides (700 px wide) */}
       <Section title="Here's what's happening">
