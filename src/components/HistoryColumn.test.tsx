@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { OccurrenceHistory } from '@/components/OccurrenceHistory'
+import { HistoryColumn } from '@/components/HistoryColumn'
 import type { ProblemDetailData } from '@/lib/problems'
 
 vi.mock('@/components/MediaGallery', () => ({ MediaGallery: () => null }))
@@ -22,11 +22,11 @@ const detail = {
 const headers = () => screen.getAllByRole('heading', { level: 4 }).map((h) => h.textContent)
 function History() {
   const [oldestFirst, setOldestFirst] = useState(false)
-  return <OccurrenceHistory category="parking" status="resolved" detail={detail} openReportId={null} onSelectIncident={() => {}} focus={null} viewport={{ current: null }} oldestFirst={oldestFirst} onSort={() => setOldestFirst((o) => !o)} />
+  return <HistoryColumn category="parking" status="resolved" detail={detail} openReportId={null} onSelectIncident={() => {}} focus={null} viewport={{ current: null }} oldestFirst={oldestFirst} onSort={() => setOldestFirst((o) => !o)} />
 }
 const show = () => render(<History />)
 
-describe('OccurrenceHistory', () => {
+describe('HistoryColumn', () => {
   it('shows every occurrence open, newest first, with its plate, reports and intervention', () => {
     show()
     expect(headers()).toEqual(['Occurrence12 AugFIC 602', 'Occurrence2 Aug'])

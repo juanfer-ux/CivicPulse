@@ -283,16 +283,16 @@
   --indigo-300: #9593FF;
   --indigo-200: #C1C0FF;
   --indigo-100: #E7E6FF;
-  /* Cobalt (owner's Figma, 2026-11-26; first named Indigo 2): the interface and agent color (everything that was indigo except the Resolved recurrence status, which stays indigo). */
-  --cobalt-900: #10134C;
-  --cobalt-800: #151965;
-  --cobalt-700: #1D238B;
-  --cobalt-600: #1F27B2;
-  --cobalt-500: #1E29EA;
-  --cobalt-400: #444DEE;
-  --cobalt-300: #7278EE;
-  --cobalt-200: #8E92F1;
-  --cobalt-100: #A1A5F2;
+  /* Cobalt (owner's Figma, 2026-11-26; first named Indigo 2): the interface and agent color (everything that was indigo; the Resolved recurrence status, the last indigo, is green since 2026-11-27). */
+  --cobalt-900: #151737;
+  --cobalt-800: #1C1E4A;
+  --cobalt-700: #202360;
+  --cobalt-600: #282D8A;
+  --cobalt-500: #2931C2;
+  --cobalt-400: #3C44DD;
+  --cobalt-300: #7076EB;
+  --cobalt-200: #9398FB;
+  --cobalt-100: #B3B6FF;
   --red-900: #270D0E;
   --red-800: #4B2122;
   --red-700: #743537;
@@ -311,15 +311,15 @@
   --orange-300: #FFBA86;
   --orange-200: #FED3B3;
   --orange-100: #FFEADC;
-  --blue-900: #101623;
-  --blue-800: #1A2236;
-  --blue-700: #24304D;
-  --blue-600: #2F3E63;
-  --blue-500: #3B4C78;
-  --blue-400: #495C8B;
-  --blue-300: #7B8BB0;
-  --blue-200: #B1BCD4;
-  --blue-100: #E9EEFA;
+  --blue-900: #0B2250;
+  --blue-800: #0F2E6B;
+  --blue-700: #133986;
+  --blue-600: #1847A5;
+  --blue-500: #1D56C9;
+  --blue-400: #3F76E4;
+  --blue-300: #6C96EA;
+  --blue-200: #95B3F0;
+  --blue-100: #C5D6F7;
   --yellow-900: #1A1600;
   --yellow-800: #423B00;
   --yellow-700: #6E6301;
@@ -329,16 +329,16 @@
   --yellow-300: #FFF398;
   --yellow-200: #FEF7C3;
   --yellow-100: #FEFBE4;
-  --plate-yellow: #C3AB3E; /* the license plate badge in the occurrence history (owner's Figma, 2026-11-26; #ACA034 before); Figma variable `yellow/plate-yellow` */
+  --plate-yellow: #C3AB3E; /* the license plate badge in the history column (owner's Figma, 2026-11-26; #ACA034 before); Figma variable `yellow/plate-yellow` */
   /* Green scale (owner's ask, 2026-11-17; Figma green-900 to green-100): the red scale's saturation and lightness at hue 140, same idea as the neutrals; not used on screen yet. */
   --green-900: #0D2615;
-  --green-800: #214A2F;
-  --green-700: #35734A;
-  --green-600: #4C9E68;
-  --green-500: #66C786;
-  --green-400: #87EEA9;
-  --green-300: #A6F7C1;
-  --green-200: #C6FBD8;
+  --green-800: #23482F;
+  --green-700: #37724A;
+  --green-600: #46A466;
+  --green-500: #6DC089;
+  --green-400: #98DDAF;
+  --green-300: #B1ECC5;
+  --green-200: #CEF3DA;
   --green-100: #E7FEEE;
   /* Brand colors (owner, 2026-11-02; Figma brand-primary and brand-secondary): the primary button's background, and its hover. Not aliases of other colors. */
   --brand-primary: #D9D9DE; /* Figma (2026-11-12); it was #E3E3E7 */
@@ -374,7 +374,7 @@
   /* Persistent-problem status colors (decision 0030; Figma Map collection): their own set, not the incident status colors. Aliases of palette colors, so no color was added. */
   --map-problem-active: var(--red-300); /* owner, 2026-11-01: every problem status uses a 300 step (the marker's own inner outline uses the 600 step, PROBLEM_STATUS.outline) */
   --map-problem-monitoring: var(--yellow-300);
-  --map-problem-resolved: var(--indigo-300);
+  --map-problem-resolved: var(--green-300); /* green since 2026-11-27 (owner; indigo-300 before) */
   --map-problem-archived: var(--neutral-300);
   --map-dot-outline: var(--neutral-700);
   --map-answer-ring: var(--ai-banner);

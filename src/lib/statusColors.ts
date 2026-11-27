@@ -16,6 +16,6 @@ export const PROBLEM_STATUSES: ProblemStatus[] = ['active', 'monitoring', 'resol
 export const PROBLEM_STATUS: Record<ProblemStatus, { label: string; token: string; outline: string; pill: { bg: string; text: string } }> = {
   active: { label: 'Active', token: '--map-problem-active', outline: '--red-600', pill: { bg: '--red-900', text: '--red-400' } },
   monitoring: { label: 'Monitoring', token: '--map-problem-monitoring', outline: '--yellow-600', pill: { bg: '--yellow-900', text: '--yellow-500' } },
-  resolved: { label: 'Resolved', token: '--map-problem-resolved', outline: '--indigo-600', pill: { bg: '--indigo-900', text: '--indigo-300' } },
+  resolved: { label: 'Resolved', token: '--map-problem-resolved', outline: '--green-600', pill: { bg: '--green-900', text: '--green-300' } },
   archived: { label: 'Archived', token: '--map-problem-archived', outline: '--neutral-600', pill: { bg: '--neutral-600', text: '--fg-secondary' } },
 }

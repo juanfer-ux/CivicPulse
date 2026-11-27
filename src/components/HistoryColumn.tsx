@@ -15,9 +15,9 @@ const clock = (iso: string) => new Date(iso).toLocaleTimeString('en-GB', { hour:
 const RING = ' rounded-sm outline outline-1 outline-offset-4 outline-(--neutral-200)'
 
 /**
- * The right column of an open recurrence (owner's Figma Recurrence Right Column, node 1418:7408, 2026-11-25): the title with the sort button, a search field, then one group per occurrence, newest first, all open (no collapsing, owner 2026-11-25). Each group has a header (date and plate), its reports (a dot in the recurrence's status color, as on the map, the reference over the source, the date over the time) and, attached under them, the interventions that followed it. Replaces the flat list of all occurrences.
+ * The right column of an open recurrence (owner's Figma History, node 1418:7408, 2026-11-25): the title with the sort button, a search field, then one group per occurrence, newest first, all open (no collapsing, owner 2026-11-25). Each group has a header (date and plate), its reports (a dot in the recurrence's status color, as on the map, the reference over the source, the date over the time) and, attached under them, the interventions that followed it. Replaces the flat list of all occurrences.
  */
-export function OccurrenceHistory({ category, status, detail, openReportId, onSelectIncident, focus, viewport, oldestFirst, onSort }: HistorySort & { category: string; status: ProblemStatus; detail: ProblemDetailData | null; openReportId: string | null; onSelectIncident: (id: string) => void; focus: string | null; viewport: RefObject<HTMLDivElement | null> }) {
+export function HistoryColumn({ category, status, detail, openReportId, onSelectIncident, focus, viewport, oldestFirst, onSort }: HistorySort & { category: string; status: ProblemStatus; detail: ProblemDetailData | null; openReportId: string | null; onSelectIncident: (id: string) => void; focus: string | null; viewport: RefObject<HTMLDivElement | null> }) {
   const [query, setQuery] = useState('')
   const groups = detail ? groupHistory(detail.occurrences, detail.interventions, detail.events) : []
   const links = detail?.links ?? []
@@ -85,9 +85,9 @@ export function OccurrenceHistory({ category, status, detail, openReportId, onSe
 
   return (
     <>
-      <HistoryTitle oldestFirst={oldestFirst} onSort={onSort} />
+      <HistoryTitle title="History" oldestFirst={oldestFirst} onSort={onSort} />
       <div className="shrink-0 px-3"> {/* the search has 12 px at its sides (owner's Figma, 2026-11-26, later; edge to edge before) */}
-        <Input type="search" aria-label="Search the occurrence history" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] border-(--neutral-400) bg-(--neutral-800) text-body-sm" />
+        <Input type="search" aria-label="Search the history" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] border-(--neutral-400) bg-(--neutral-800) text-body-sm" />
       </div>
       <ScrollArea viewportRef={viewport} className="min-h-0 flex-1" viewportClassName="max-desk:max-h-[40svh] [&>div]:!block">
         <div className="flex flex-col gap-6">
