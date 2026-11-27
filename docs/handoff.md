@@ -3,6 +3,11 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-27. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **Sidebar spacing (owner, 2026-11-27, Figma):** **8 px** at the sides of the search, New investigation and the sections (6); no gap between the account name and email (2). `Sidebar.tsx`.
+- **Panel title and data cards (owner, 2026-11-27, latest):** "New Investigation" is **`fg-primary`** (was secondary); **20 px** between the small data cards and the localities card (12).
+- **Panel cards and note (owner, 2026-11-27, latest; replaces the card color and note notes below):** note **`neutral-800`**, no line. Investigate cards **`neutral-700`** (hover and focus `neutral-600`). Data cards **1 px** `neutral-700` line (112 and 229 px). Composer field line excluded from layout (19.5 px left padding). Figma differences left: Category_Card2 component and its module are still `neutral-800`, Data_Card_Small component 0.5 px, the Alert component black with a line.
+- **Agent panel note, no line (owner, 2026-11-27, latest; replaces the stroke note below):** the panel's Alert has **no stroke** now: 20 / 16 px padding, 88 px (`InvestigatePanel.tsx`). The default Alert component keeps its line.
+- **Section title padding back to 2 px (owner, 2026-11-27, latest; replaces the 4 px note below):** Figma and code (`AgentHome.tsx`).
 - **Agent panel note stroke (owner, 2026-11-27, Figma):** the panel's Alert has its inside stroke **excluded** from layout, so it is 88 px high: the code uses 19 / 15 px padding plus the 1 px line (`InvestigatePanel.tsx`). The Alert component variants keep it included.
 - **Section title padding (owner, 2026-11-27):** the agent panel section titles have **4 px** at both sides (Figma had 2, the code none). Figma and code (`AgentHome.tsx`).
 - **Agent panel title (owner, 2026-11-27, Figma):** "Explore" is now **"New Investigation"** (`InvestigatePanel.tsx`); a recurrence still shows its address. Figma changed the default variant only.
