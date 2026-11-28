@@ -4,7 +4,7 @@ import { HistoryTitle, type HistorySort } from '@/components/HistoryTitle'
 import { ModulesMenu, PanelMenuRow } from '@/components/modules/ModulesMenu'
 import { useModules } from '@/components/modules/ModulesProvider'
 import { useRef, Fragment } from 'react'
-import { ArrowsClockwise, Calendar, Clock, FileText, Stack, Wrench, X, UserCheck, type Icon } from '@phosphor-icons/react'
+import { ArrowsClockwise, Bus, Calendar, CalendarCheck, CarProfile, FileText, Motorcycle, Stack, SteeringWheel, Truck, Van, Wrench, X, UserCheck, type Icon, type IconWeight } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ProblemStatusPill } from '@/components/ProblemStatusPill'
@@ -31,11 +31,11 @@ export function ProblemDetail({
   localityName,
   categoryName,
   event,
-  photoOf,
+  newest,
   onClose,
   ...sort
 }: HistorySort & {
-  photoOf?: string // the newest report, whose photos head the Overview card
+  newest?: Incident // the newest report, whose description and photos head the Overview card
   problem: ProblemRow
   event?: ProblemEvent // the latest status event, shown with the numbers
   localityName: string | undefined
@@ -53,9 +53,9 @@ export function ProblemDetail({
       role="region"
       data-float
       aria-label="Recurrence details"
-      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none ${WIDE ? 'desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-[calc(100%-24px)] desk:w-[320px] desk:flex-col desk:items-stretch desk:gap-2 desk:overflow-visible desk:rounded-none desk:border-0 desk:bg-transparent! desk:shadow-none' : 'desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[400px] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]'}`}
+      className={`max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none ${WIDE ? 'desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-[calc(100%-24px)] desk:w-[330px] desk:flex-col desk:items-stretch desk:gap-2 desk:overflow-visible desk:rounded-none desk:border-0 desk:bg-transparent! desk:shadow-none' : 'desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[400px] desk:rounded-sm desk:border desk:border-(--neutral-600) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]'}`}
     >
-      {WIDE && <div className="hidden desk:block desk:min-h-0 desk:overflow-y-auto desk:rounded-lg desk:shadow-lg"><Overview problem={problem} event={event} photoOf={photoOf} {...sort} /></div>} {/* the numbers (last reported, occurrences, returns, reports, interventions) float at the top left on every recurrence (owner, 2026-11-24) */}
+      {WIDE && <div className="hidden desk:block desk:min-h-0 desk:overflow-y-auto desk:rounded-lg desk:shadow-lg"><Overview problem={problem} event={event} newest={newest} {...sort} /></div>} {/* the numbers (last reported, occurrences, returns, reports, interventions) float at the top left on every recurrence (owner, 2026-11-24) */}
       <div className={`flex flex-col gap-4 px-4 py-6 ${WIDE ? 'desk:hidden' : ''}`}>
         <header className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-col gap-1">
@@ -140,21 +140,21 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
 // ponytail: sample numbers from the Figma component, until the owner says what this list shows
 const SAMPLE_BARS = [{ label: 'Chapinero', value: 62 }, { label: 'Suba', value: 52 }, { label: 'Kennedy', value: 43 }, { label: 'Engativá', value: 36 }, { label: 'Others', value: 61 }]
 
-/** The icon rows of an Overview card, a line between them. */
-function OverviewRows({ rows, closed }: { rows: { Icon: Icon; label: string; value: ReactNode }[]; closed?: boolean }) {
+/** The icon rows of an Overview card, a line between them. They only inform, so their icons are solid, in `neutral-300` (owner, 2026-11-28, decision 0050). */
+export function OverviewRows({ rows, closed, weight = 'fill' }: { rows: { Icon: Icon; label: string; value: ReactNode }[]; closed?: boolean; weight?: IconWeight /* only the icon gallery changes it */ }) {
   return (
     <div className="flex flex-col gap-2 p-1">
       {rows.map((r, i) => (
         <Fragment key={r.label}>
-          {i > 0 && <div className="border-t border-(--neutral-600)" aria-hidden />}
+          {i > 0 && <div className="-mb-px border-t border-(--neutral-600)" aria-hidden />} {/* Figma: the lines take no height */}
           <div className="flex items-center gap-2 px-0.5 py-2">
-            <r.Icon weight="regular" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
+            <r.Icon weight={weight} className="size-5 shrink-0 text-(--neutral-300)" aria-hidden />
             <span className="flex-1 text-body-sm text-(--fg-secondary)">{r.label}</span>
             <span className="text-body-sm-medium text-(--fg-primary)">{r.value}</span>
           </div>
         </Fragment>
       ))}
-      {closed && <div className="border-t border-(--neutral-600)" aria-hidden />} {/* the incident's rows also have a line under the last one */}
+      {closed && <div className="-mb-px border-t border-(--neutral-600)" aria-hidden />} {/* a line under the last row too (both Overview cards, 2026-11-28) */}
     </div>
   )
 }
@@ -162,7 +162,7 @@ function OverviewRows({ rows, closed }: { rows: { Icon: Icon; label: string; val
 /** The four fact tiles of an Overview card, two by two: a number is `big`, words are `body-strong`. */
 function OverviewTiles({ tiles }: { tiles: { label: string; value: string; big?: boolean; note?: string }[] }) {
   return (
-    <dl className="grid grid-cols-2 gap-1 px-1">
+    <dl className="grid grid-cols-2 gap-1 p-1">
       {tiles.map((x) => (
         <div key={x.label} className="flex flex-col gap-3 rounded-sm bg-(--neutral-700) px-4 py-3">
           <dt className="text-body-sm text-(--fg-secondary)">{x.label}</dt>
@@ -174,10 +174,13 @@ function OverviewTiles({ tiles }: { tiles: { label: string; value: string; big?:
   )
 }
 
+/** The Vehicle row's icon follows the report's vehicle type (owner, 2026-11-28); anything else is a steering wheel. */
+const VEHICLE_ICON: Record<string, Icon> = { car: CarProfile, motorcycle: Motorcycle, van: Van, truck: Truck, bus: Bus }
+
 const moment = (iso: string) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
-/** The summary of an open incident (Figma **Incident Overview**, owner 2026-11-27): the recurrence Overview's style with the incident's facts. The reference, the AI's classification, uncertainty flags and the outcome are not in the Figma component; they stay so nothing the person needs to judge a report is lost. */
-export function IncidentOverview({ incident, localityName, categoryName }: { incident: Incident; localityName: string | undefined; categoryName: string | undefined }) {
+/** The summary of an open incident (Figma **Incident Overview**, owner 2026-11-28): the recurrence Overview's style with the incident's facts: three rows (occurred, reported, vehicle) and two tiles (AI confidence, validation). The reference, the AI's classification, uncertainty flags and the outcome are not in the Figma component; they stay so nothing the person needs to judge a report is lost. */
+export function IncidentOverview({ incident, localityName }: { incident: Incident; localityName: string | undefined }) {
   return (
     <div className="flex flex-col gap-2 rounded-lg bg-(--neutral-900)">
       <HistoryTitle title="Overview" />
@@ -201,11 +204,10 @@ export function IncidentOverview({ incident, localityName, categoryName }: { inc
         <MediaGallery incidentId={incident.id} cover />
         <OverviewRows closed rows={[
           { Icon: Calendar, label: 'Occurred', value: moment(incident.occurred_at) },
-          { Icon: Clock, label: 'Reported', value: moment(incident.reported_at) },
+          { Icon: CalendarCheck, label: 'Reported', value: moment(incident.reported_at) },
+          { Icon: VEHICLE_ICON[incident.vehicle_type] ?? SteeringWheel, label: 'Vehicle', value: label(incident.vehicle_type) },
         ]} />
         <OverviewTiles tiles={[
-          { label: 'Category', value: categoryName ?? label(incident.category) },
-          { label: 'Vehicle', value: label(incident.vehicle_type) },
           { label: 'AI confidence', value: incident.ai_confidence == null ? '-' : `${Math.round(incident.ai_confidence * 100)} %`, big: true, note: incident.ai_classification ?? undefined },
           { label: 'Validation', value: label(incident.validation_status) },
         ]} />
@@ -215,16 +217,19 @@ export function IncidentOverview({ incident, localityName, categoryName }: { inc
 }
 
 /** The numbers of an open recurrence (Figma Overview, owner 2026-11-26): a `neutral-900` box (8 px radius): the history title row, then, 8 px in and 12 px apart, last report and the latest status event (a `neutral-600` line between them), then four equal 84 px tiles in two columns (the label, 12 px, the number; no icons since 2026-11-27) and a bar list (sample data for now). */
-export function Overview({ problem, event, photoOf, ...sort }: HistorySort & { problem: ProblemRow; event?: ProblemEvent; photoOf?: string }) {
+export function Overview({ problem, event, newest, ...sort }: HistorySort & { problem: ProblemRow; event?: ProblemEvent; newest?: Incident }) {
   const [occ, ret, rep, int, last] = stats(problem)
   const rows = [{ Icon: last.Icon, label: last.label, value: last.value }, ...(event ? [{ Icon: event.kind === 'resolved' ? UserCheck : last.Icon, label: event.kind === 'resolved' ? 'Resolved by an operator' : 'Reopened by a new occurrence', value: day(event.created_at) }] : [])] // a person icon when an operator resolved it (owner, 2026-11-26)
   return (
     <div className="hidden flex-col gap-2 rounded-lg bg-(--neutral-900) desk:flex">
       <HistoryTitle title="Recurrence Overview" {...sort} />
-      <h4 className="p-3 font-display-semi text-display-xs-strong whitespace-pre-line text-(--fg-emphasis)">{twoLines(problem.location_description)}</h4> {/* the address, on two lines, under the title row (owner's Figma, 2026-11-27) */}
+      <div className="flex flex-col gap-2.5 p-3"> {/* the address, on two lines, and the newest report's description (owner's Figma, 2026-11-28; a recurrence has no description of its own) */}
+        <h4 className="font-display-semi text-display-xs-strong whitespace-pre-line text-(--fg-emphasis)">{twoLines(problem.location_description)}</h4>
+        {newest && <p className="text-body-sm text-(--fg-primary)">{newest.description}</p>}
+      </div>
       <div className="flex flex-col gap-4 p-3">
-        {photoOf && <MediaGallery key={photoOf} incidentId={photoOf} cover />} {/* the photos of the newest report (owner, 2026-11-27) */}
-        <OverviewRows rows={rows} />
+        {newest && <MediaGallery key={newest.id} incidentId={newest.id} cover />} {/* the photos of the newest report (owner, 2026-11-27) */}
+        <OverviewRows closed rows={rows} />
         <OverviewTiles tiles={[occ, ret, rep, int].map((x) => ({ label: x.label, value: x.value, big: true }))} />
         <div className="rounded-lg border border-(--neutral-700) p-[15px]"> {/* Figma: the line is excluded from layout, so 16 px from the outer edge */}
           <BarList bars={SAMPLE_BARS} />
