@@ -191,7 +191,7 @@ function ViewMenu({ view, onChange, onClose, groups = true }: { view: View; onCh
   )
   const Label = ({ children }: { children: ReactNode }) => <p className="px-2 pt-1 pb-0.5 text-caption-medium text-(--neutral-300)">{children}</p>
   return (
-    <div ref={box} role="menu" aria-label="View options" className="absolute top-full right-0 z-20 mt-1 w-52 rounded-sm border border-(--neutral-500) bg-(--neutral-800) p-1 shadow-lg">
+    <div ref={box} role="menu" aria-label="View options" className="absolute top-full right-0 z-20 mt-1 w-52 rounded-sm border border-(--neutral-500) bg-(--neutral-900) p-1 shadow-lg">
       {groups && (
         <>
           <Label>View</Label>
@@ -364,7 +364,7 @@ function AccountMenu({ onSignOut, side, avatar }: { onSignOut: () => void; side:
         </Button>
       )}
       {open && (
-        <div role="menu" className={`absolute z-40 w-48 rounded-sm border bg-card p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
+        <div role="menu" className={`absolute z-40 w-48 rounded-sm border bg-popover p-1 ${side === 'above' ? 'right-0 bottom-full mb-2' : 'bottom-0 left-full ml-3'}`}>
           <Button role="menuitem" variant="ghost" className="h-8 w-full justify-start gap-2 px-3 hover:bg-sidebar" onClick={onSignOut}>
             <SignOut className="size-5 shrink-0" /> Sign out
           </Button>

@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { gsap } from 'gsap'
+import { ViewportBadge } from '@/components/ViewportBadge'
 import { mockChats } from '@/lib/mockChats'
 import { Dashboard, type Tab } from '@/components/Dashboard'
 import type { Area } from '@/lib/agent'
@@ -143,6 +144,7 @@ export default function App() {
   return (
     <ModulesProvider>
     <div className="flex h-svh overflow-hidden bg-(image:--screen-gradient)">
+      {import.meta.env.DEV && <ViewportBadge />}
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-sm focus:bg-card focus:px-3 focus:py-2 focus:text-body-sm focus:text-foreground focus:outline focus:outline-2 focus:outline-ring">
         Skip to main content
       </a>

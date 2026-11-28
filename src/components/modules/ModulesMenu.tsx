@@ -58,7 +58,7 @@ export function ModulesMenu({ kind }: { kind: 'recurrence' | 'incident' }) {
         Modules
       </Button>
       {open && createPortal(
-        <div ref={box} role="menu" aria-label="Modules" style={{ top: at.top, left: at.left }} className="fixed z-50 w-60 rounded-sm border border-(--neutral-500) bg-(--neutral-800) p-1 shadow-lg">
+        <div ref={box} role="menu" aria-label="Modules" style={{ top: at.top, left: at.left }} className="fixed z-50 w-60 rounded-sm border border-(--neutral-500) bg-(--neutral-900) p-1 shadow-lg">
           <p className="px-2 pt-1 pb-0.5 text-caption-medium text-(--neutral-300)">Drag to the map, or click to add</p>
           {modulesFor(kind).map(row)}
           <div className="my-1 h-px bg-(--neutral-600)" aria-hidden />

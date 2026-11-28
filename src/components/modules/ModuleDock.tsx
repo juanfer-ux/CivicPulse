@@ -97,7 +97,7 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind, open
           data-col="bottom"
           data-float={bottom.length ? '' : undefined}
           className="pointer-events-none absolute z-20 hidden gap-3 desk:flex"
-          style={{ left: 'var(--col-left)', right: flush ? `calc(var(--col-right) + ${HISTORY_W + DOCK_GAP}px)` : 'calc(var(--col-right) + 44px)', bottom: 'var(--map-pad)', height: BOTTOM_H }}
+          style={{ left: 'var(--col-left)', right: recurrenceOpen || (flush && right.length) ? `calc(var(--col-right) + ${HISTORY_W + DOCK_GAP}px)` : flush ? 'var(--col-right)' : 'calc(var(--col-right) + 44px)', bottom: 'var(--map-pad)', height: BOTTOM_H }}
         >
           {bottom.map((m) => card(m, 'bottom'))}
           {overlay('bottom')}

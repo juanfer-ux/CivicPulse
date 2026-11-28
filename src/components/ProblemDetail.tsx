@@ -4,13 +4,15 @@ import { HistoryTitle, type HistorySort } from '@/components/HistoryTitle'
 import { ModulesMenu, PanelMenuRow } from '@/components/modules/ModulesMenu'
 import { useModules } from '@/components/modules/ModulesProvider'
 import { useRef, Fragment } from 'react'
-import { ArrowsClockwise, Calendar, FileText, Stack, Wrench, X, UserCheck } from '@phosphor-icons/react'
+import { ArrowsClockwise, Calendar, Clock, FileText, Stack, Wrench, X, UserCheck, type Icon } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ProblemStatusPill } from '@/components/ProblemStatusPill'
 import { MediaGallery } from '@/components/MediaGallery'
 import { twoLines } from '@/lib/address'
-import { label } from '@/lib/incidents'
+import { Badge } from '@/components/ui/badge'
+import { IncidentStatusPill } from '@/components/IncidentStatusPill'
+import { groupOf, label, type Incident } from '@/lib/incidents'
 import type { ProblemRow, ProblemEvent } from '@/lib/problems'
 import { useRestoreFocus } from '@/lib/useRestoreFocus'
 
@@ -98,7 +100,7 @@ export function ProblemDetail({
 export function CaseActions({ kind, onClose }: { kind: 'recurrence' | 'incident'; onClose: () => void }) {
   const { on } = useModules()
   return (
-    <div className="hidden items-center gap-2 desk:absolute desk:top-3 desk:right-[calc(var(--col-right)+326px+12px)] desk:z-20 desk:flex">
+    <div className="hidden items-center gap-2 desk:absolute desk:top-3 desk:right-[calc(var(--col-right)+var(--case-right))] desk:z-20 desk:flex">
       {on && <div className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg"><ModulesMenu kind={kind} /></div>}
       <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg hover:bg-(--neutral-700)">
         <X />
@@ -138,36 +140,92 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
 // ponytail: sample numbers from the Figma component, until the owner says what this list shows
 const SAMPLE_BARS = [{ label: 'Chapinero', value: 62 }, { label: 'Suba', value: 52 }, { label: 'Kennedy', value: 43 }, { label: 'Engativá', value: 36 }, { label: 'Others', value: 61 }]
 
+/** The icon rows of an Overview card, a line between them. */
+function OverviewRows({ rows, closed }: { rows: { Icon: Icon; label: string; value: ReactNode }[]; closed?: boolean }) {
+  return (
+    <div className="flex flex-col gap-2 p-1">
+      {rows.map((r, i) => (
+        <Fragment key={r.label}>
+          {i > 0 && <div className="border-t border-(--neutral-600)" aria-hidden />}
+          <div className="flex items-center gap-2 px-0.5 py-2">
+            <r.Icon weight="regular" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
+            <span className="flex-1 text-body-sm text-(--fg-secondary)">{r.label}</span>
+            <span className="text-body-sm-medium text-(--fg-primary)">{r.value}</span>
+          </div>
+        </Fragment>
+      ))}
+      {closed && <div className="border-t border-(--neutral-600)" aria-hidden />} {/* the incident's rows also have a line under the last one */}
+    </div>
+  )
+}
+
+/** The four fact tiles of an Overview card, two by two: a number is `big`, words are `body-strong`. */
+function OverviewTiles({ tiles }: { tiles: { label: string; value: string; big?: boolean; note?: string }[] }) {
+  return (
+    <dl className="grid grid-cols-2 gap-1 px-1">
+      {tiles.map((x) => (
+        <div key={x.label} className="flex flex-col gap-3 rounded-sm bg-(--neutral-700) px-4 py-3">
+          <dt className="text-body-sm text-(--fg-secondary)">{x.label}</dt>
+          <dd className={x.big ? 'font-display-semi text-stat text-[24px]! leading-7! text-(--fg-primary)' : 'text-body-strong text-(--fg-primary)'}>{x.value}</dd>
+          {x.note && <dd className="-mt-2 text-meta text-(--fg-secondary)">{x.note}</dd>}
+        </div>
+      ))}
+    </dl>
+  )
+}
+
+const moment = (iso: string) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+
+/** The summary of an open incident (Figma **Incident Overview**, owner 2026-11-27): the recurrence Overview's style with the incident's facts. The reference, the AI's classification, uncertainty flags and the outcome are not in the Figma component; they stay so nothing the person needs to judge a report is lost. */
+export function IncidentOverview({ incident, localityName, categoryName }: { incident: Incident; localityName: string | undefined; categoryName: string | undefined }) {
+  return (
+    <div className="flex flex-col gap-2 rounded-lg bg-(--neutral-900)">
+      <HistoryTitle title="Overview" />
+      <div className="flex flex-col gap-2.5 p-3"> {/* Figma (owner, 2026-11-27): the address with the status pill at its right, then the description */}
+        <div className="flex items-start gap-2.5">
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <h4 className="font-display-semi text-display-xs-strong whitespace-pre-line text-(--fg-emphasis)">{twoLines(incident.location_description)}</h4>
+            <p className="text-meta text-(--fg-secondary)">{incident.reference}{localityName ? ` · ${localityName}` : ''}</p>
+          </div>
+          <IncidentStatusPill group={groupOf(incident.status)} />
+        </div>
+        <p className="text-body-sm text-(--fg-primary)">{incident.description}</p>
+        {incident.outcome && <p className="text-body-sm text-(--fg-primary)"><span className="text-(--fg-secondary)">Outcome: </span>{incident.outcome}</p>}
+        {incident.uncertainty_flags.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {incident.uncertainty_flags.map((f) => <Badge key={f} variant="outline">{label(f)}</Badge>)}
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col gap-4 p-3">
+        <MediaGallery incidentId={incident.id} cover />
+        <OverviewRows closed rows={[
+          { Icon: Calendar, label: 'Occurred', value: moment(incident.occurred_at) },
+          { Icon: Clock, label: 'Reported', value: moment(incident.reported_at) },
+        ]} />
+        <OverviewTiles tiles={[
+          { label: 'Category', value: categoryName ?? label(incident.category) },
+          { label: 'Vehicle', value: label(incident.vehicle_type) },
+          { label: 'AI confidence', value: incident.ai_confidence == null ? '-' : `${Math.round(incident.ai_confidence * 100)} %`, big: true, note: incident.ai_classification ?? undefined },
+          { label: 'Validation', value: label(incident.validation_status) },
+        ]} />
+      </div>
+    </div>
+  )
+}
+
 /** The numbers of an open recurrence (Figma Overview, owner 2026-11-26): a `neutral-900` box (8 px radius): the history title row, then, 8 px in and 12 px apart, last report and the latest status event (a `neutral-600` line between them), then four equal 84 px tiles in two columns (the label, 12 px, the number; no icons since 2026-11-27) and a bar list (sample data for now). */
 export function Overview({ problem, event, photoOf, ...sort }: HistorySort & { problem: ProblemRow; event?: ProblemEvent; photoOf?: string }) {
   const [occ, ret, rep, int, last] = stats(problem)
   const rows = [{ Icon: last.Icon, label: last.label, value: last.value }, ...(event ? [{ Icon: event.kind === 'resolved' ? UserCheck : last.Icon, label: event.kind === 'resolved' ? 'Resolved by an operator' : 'Reopened by a new occurrence', value: day(event.created_at) }] : [])] // a person icon when an operator resolved it (owner, 2026-11-26)
   return (
     <div className="hidden flex-col gap-2 rounded-lg bg-(--neutral-900) desk:flex">
-      <HistoryTitle title="Overview" {...sort} />
+      <HistoryTitle title="Recurrence Overview" {...sort} />
       <h4 className="p-3 font-display-semi text-display-xs-strong whitespace-pre-line text-(--fg-emphasis)">{twoLines(problem.location_description)}</h4> {/* the address, on two lines, under the title row (owner's Figma, 2026-11-27) */}
       <div className="flex flex-col gap-4 p-3">
         {photoOf && <MediaGallery key={photoOf} incidentId={photoOf} cover />} {/* the photos of the newest report (owner, 2026-11-27) */}
-        <div className="flex flex-col gap-2 p-1">
-          {rows.map((r, i) => (
-            <Fragment key={r.label}>
-              {i > 0 && <div className="border-t border-(--neutral-600)" aria-hidden />}
-              <p className="flex items-center gap-2 px-0.5 py-2">
-                <r.Icon weight="regular" className="size-5 shrink-0 text-(--neutral-200)" aria-hidden />
-                <span className="flex-1 text-body-sm text-(--fg-secondary)">{r.label}</span>
-                <span className="text-body-sm-medium text-(--fg-primary)">{r.value}</span>
-              </p>
-            </Fragment>
-          ))}
-        </div>
-        <dl className="grid grid-cols-2 gap-1 px-1">
-          {[occ, ret, rep, int].map((x) => (
-            <div key={x.label} className="flex flex-col gap-3 rounded-sm bg-(--neutral-700) px-4 py-3">
-              <dt className="text-body-sm text-(--fg-secondary)">{x.label}</dt>
-              <dd className="font-display-semi text-stat text-[24px]! leading-7! text-(--fg-primary)">{x.value}</dd>
-            </div>
-          ))}
-        </dl>
+        <OverviewRows rows={rows} />
+        <OverviewTiles tiles={[occ, ret, rep, int].map((x) => ({ label: x.label, value: x.value, big: true }))} />
         <div className="rounded-lg border border-(--neutral-700) p-[15px]"> {/* Figma: the line is excluded from layout, so 16 px from the outer edge */}
           <BarList bars={SAMPLE_BARS} />
         </div>

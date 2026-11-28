@@ -405,7 +405,7 @@
   --map-land: #19191F; /* Figma map/land is #19191F now (owner, 2026-11-24; it was neutral-700) */ /* The land is OFF for now (owner, 2026-10-26): its layers are hidden and the page color shows through, so this is only what dimmed pins blend toward. To use a land color, set LAND_ON in IncidentMap.tsx and this value (the one picked in Figma was #19191F). */
 
   /* Names shadcn components expect, reusing the colors above. */
-  --popover: var(--card);
+  --popover: var(--neutral-700); /* dropdowns one step darker (owner, 2026-11-27; the card color, neutral-600, before) */
   --primary: var(--foreground);
   --primary-foreground: var(--sidebar); /* text on a light fill is the sidebar color */
   --secondary-foreground: var(--foreground);
@@ -430,6 +430,8 @@
   --col-left: calc(var(--col-l) + (100% - var(--col-l) - var(--map-pad) - var(--dock-w, 0px) - var(--col-w)) / 2);
   --col-right: calc(var(--map-pad) + var(--dock-w, 0px) + (100% - var(--col-l) - var(--map-pad) - var(--dock-w, 0px) - var(--col-w)) / 2);
 }
+.map-col { --case-right: 12px; } /* from the right edge to the Modules button, the X and the map controls of an open case */
+.map-col[data-rcol] { --case-right: calc(326px + 12px); } /* ... past the right column when there is one */
 .map-col[data-rp] { --map-pad: 0px; --map-max: 100000px; --group-gap: 0px; } /* a recurrence is open (owner's Figma Map · Recurrence selected, 2026-11-23): the header and the right column touch the map area's top, left, right and bottom edges, no padding and no maximum width (owner, 2026-11-23: they fill the map area at any window size) */
 
 @utility gradient-border {
@@ -478,9 +480,9 @@
 .map-zoom { bottom: 77px; transition: bottom 0.3s, right 0.3s; }
 .map-col .map-zoom { right: calc(var(--col-right) - var(--filters-push, 0px)); } /* aligned with the map column's right edge, the same line as the stat cards and the Filters button (owner, 2026-11-15; it was 14 px from the map's edge); the Filters panel (--filters-push, inside --dock-w) already narrows the map wrapper this control sits in, so it must not be counted twice: it stays at the map's right edge, next to the panel (owner's bug report, 2026-11-15) */
 @media (min-width: 90rem) { .map-col:not([data-history]) .map-zoom { bottom: var(--map-pad); } } /* the zoom control sits at the very bottom on desktop (owner, 2026-11-09): the on-map credit is gone from that corner */
-@media (min-width: 90rem) { .map-col[data-rp] .map-zoom { right: calc(var(--col-right) + 326px + 12px - var(--filters-push, 0px)); } } /* a recurrence is open (owner, 2026-11-09): the history column is flush right and the zoom control sits inside the map, left of it */ /* the modules' right column (decision 0049) sits left of the zoom control */
+@media (min-width: 90rem) { .map-col[data-rp] .map-zoom { right: calc(var(--col-right) + var(--case-right) - var(--filters-push, 0px)); } } /* a recurrence is open (owner, 2026-11-09): the history column is flush right and the zoom control sits inside the map, left of it */ /* the modules' right column (decision 0049) sits left of the zoom control */
 @media (min-width: 90rem) { [data-history] .map-zoom { bottom: calc(77px + 384px); } }
-.zoom-slider { appearance: none; -webkit-appearance: none; writing-mode: vertical-lr; direction: rtl; width: 29px; height: 100%; margin: 0; background: transparent; cursor: pointer; }
+.zoom-slider { appearance: none; -webkit-appearance: none; writing-mode: vertical-lr; direction: rtl; width: 34px; height: 100%; margin: 0; background: transparent; cursor: pointer; }
 .zoom-slider::-webkit-slider-runnable-track { width: 2px; border-radius: 1px; background: var(--neutral-300); }
 .zoom-slider::-moz-range-track { width: 2px; border-radius: 1px; background: var(--neutral-300); }
 .zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 6px; margin-left: -7px; border-radius: 2px; background: var(--neutral-100); }

@@ -74,6 +74,7 @@ describe('modules', () => {
 
 describe('History column width', () => {
   it('matches the room the map controls and the Modules buttons leave for it', () => {
-    for (const f of ['src/index.css', 'src/components/ProblemDetail.tsx']) expect(readFileSync(f, 'utf8')).toContain(`${HISTORY_W}px`)
+    expect(readFileSync('src/index.css', 'utf8')).toContain(`--case-right: calc(${HISTORY_W}px + 12px)`) // the one place the width is repeated
+    expect(readFileSync('src/components/ProblemDetail.tsx', 'utf8')).toContain('var(--case-right)')
   })
 })
