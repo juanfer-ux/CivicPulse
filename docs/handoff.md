@@ -1,8 +1,10 @@
 # 🤝 Handoff: where we are and how we work
 
-For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-27. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
+For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-28. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **History dates on one line (owner's bug, 2026-11-28):** "20 Sept" wrapped in the 52 px date column; the column is now at least 52 px and never wraps (`HistoryColumn.tsx`). Released 2026-11-28.
+- **History width (owner, 2026-11-28, Figma):** the recurrence's History column is **331 px** (326): 330 px of content plus the 1 px left line. `HISTORY_W` in `lib/modules.ts`, `--case-right` in `index.css`, `ProblemTimelineCard.tsx`. Released 2026-11-28.
 - **History reports open with a GSAP push (owner, 2026-11-27):** clicking a report (for example a PRK reference) grows its details and pushes the rows below down; closing, or opening another one, pulls them up (0.32 s, `power2.out`; instant with reduced motion). It scrolls into view once open. `Collapse` in `HistoryColumn.tsx`; the loading photo box reserves 300 px so the height does not jump. The owner approved it and it was released the same day.
 - **Released (owner, 2026-11-27):** everything in the 2026-11-27 entries below was committed, merged and deployed together, with the docs and Figma synced. Still code only (not drawn in Figma): the reference, AI classification, uncertainty flags and outcome on the Incident Overview.
 - **Map controls updated in Figma (owner, 2026-11-27):** both groups 36 px wide, zoom group stroke `neutral-700`, slider 34 px with the tick 1 px from the left; compass and tilt are now in Figma too. Replaces the widths in the entry below.
