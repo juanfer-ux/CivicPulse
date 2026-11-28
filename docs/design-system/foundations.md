@@ -89,7 +89,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 | 3 | `neutral-900` | `#111113` | `sidebar` (`inset`), `ai` | Outline buttons, suggestions, role badge, agent panel background (`ai`, since 2026-10-29), mobile bars, deepest surface; text on a light fill |
 | 4 | `neutral-800` | `#18181B` | none | Was the agent surface (`ai`) until 2026-10-29; free for now |
 | 5 | `neutral-700` | `#1F1F23` | `background` | Page (Figma 2026-10-26) |
-| 6 | `neutral-600` | `#29292E` | `card` (`popover`) | Cards, inputs, panels, dropdowns, desktop sidebar (since 2026-10-27) |
+| 6 | `neutral-600` | `#29292E` | `card` | Cards, inputs, panels, desktop sidebar (since 2026-10-27). Dropdown panels (`popover`) are `neutral-700` since 2026-11-27 |
 | 7 | `neutral-500` | `#323239` | `secondary` (`muted`, `accent`, `border`) | Borders, dividers, hover, secondary fills |
 | 8 | `neutral-400` | `#3E3E46` | `input` | `input` (borders of every control: inputs, dropdowns, chips, suggestions, outline buttons; since 2026-10-26, [decision 0026](../decisions/0026-control-border-neutral-400.md)); divider before the count in the section header |
 | 9 | `neutral-300` | `#737381` | `closed` (`ring`) | Focus ring, border of an active or pressed chip. Until 2026-10-26 it was also `input` (see [Borders](#borders)) |

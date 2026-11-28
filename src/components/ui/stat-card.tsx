@@ -4,7 +4,7 @@ import { ArrowDown, ArrowRight, ArrowUp, TrendDown } from '@phosphor-icons/react
 import { smoothPath, sparkPoints } from '@/lib/sparkline'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
-/** The trend mark (Figma Stat Trend, owner 2026-11-27): the **bold** arrow alone in a 24 px box at the right of the name, no fill: 16 px: above `red-400`, about `blue-400`, low `yellow-400`, below `green-500`. */
+/** The trend mark (Figma Stat Trend, owner 2026-11-27): the **bold** arrow alone in a 24 px `neutral-700` box (6 px radius) at the right of the name: 16 px: above `red-400`, about `blue-400`, low `yellow-400`, below `green-500`. */
 // whole class strings, so Tailwind sees them
 const SPARK = '[--spark:linear-gradient(90deg,var(--cobalt-700),var(--cobalt-300)_46.6%)]'
 const SPARK_HOVER = 'enabled:hover:shadow-[0_0_0_2px_var(--neutral-400)] enabled:hover:[--spark:linear-gradient(90deg,var(--cobalt-500),var(--cobalt-300)_83.9%)]'
@@ -17,7 +17,7 @@ const TREND = {
   below: { Icon: ArrowDown, text: 'Below usual', why: 'Reports in the last 30 days are 20 % or more lower than in the 30 days before.', icon: 'size-4 text-(--green-500)' },
 } as const
 
-/** A number with its name (Figma Stat Card, owner 2026-11-27): `neutral-900`, 6 px radius, 16 px padding inside the 1 px line (17 px in code, the same in every state so nothing jumps), 12 px between the header (name and trend mark) and the number row (the number with "Reports" under it, and a 40 px graph). Default: a 1 px `neutral-500` line inside, the graph line `cobalt-700` to `cobalt-300` at the middle. Hover or selected: a 2 px `neutral-400` ring outside (so the grid must not clip it, `desk:overflow-visible` in `Dashboard.tsx`), the line `cobalt-500` to `cobalt-300`. The peak is a 4 px `cobalt-100` dot with a 2 px `neutral-900` ring. */
+/** A number with its name (Figma Stat Card, owner 2026-11-27): `neutral-900`, 6 px radius, 16 px padding inside the 1 px line, 12 px at the bottom (17 and 13 px in code, the same in every state so nothing jumps), 8 px between the header (name and trend mark) and the number row (the number with "Reports" under it, and a 40 px graph). Default: a 1 px `neutral-500` line inside, the graph line `cobalt-700` to `cobalt-300` at the middle. Hover or selected: a 2 px `neutral-400` ring outside (so the grid must not clip it, `desk:overflow-visible` in `Dashboard.tsx`), the line `cobalt-500` to `cobalt-300`. The peak is a 4 px `cobalt-100` dot with a 2 px `neutral-900` ring. */
 export function StatCard({ label, value, trend, selected, onClick, series }: { label: ReactNode; value: ReactNode; trend?: Trend; selected?: boolean; onClick?: () => void; series?: number[] }) {
   const Tag = onClick ? 'button' : 'div'
   const t = trend && TREND[trend]
@@ -34,14 +34,14 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
   const g = series && w > 0 ? sparkPoints(series, w, GRAPH_H) : null
   return (
     <Tag
-      className={`@container flex min-w-0 flex-col gap-3 rounded-[6px] bg-(--neutral-900) p-[17px] text-left ${selected ? SPARK_ON : `shadow-[inset_0_0_0_1px_var(--neutral-500)] ${SPARK} ${SPARK_HOVER}`}`}
+      className={`@container flex min-w-0 flex-col gap-2 rounded-[6px] bg-(--neutral-900) p-[17px] pb-[13px] text-left ${selected ? SPARK_ON : `shadow-[inset_0_0_0_1px_var(--neutral-500)] ${SPARK} ${SPARK_HOVER}`}`}
       {...(onClick ? { type: 'button' as const, onClick, 'aria-pressed': !!selected } : {})}
     >
       <span className="flex h-6 items-center justify-between gap-2 px-px"> {/* Figma Header (owner's Figma, 2026-11-20, fifth look): the name and the trend mark only, 24 px high ("Reports" went back down to the number row) */}
         <span className="truncate text-subtitle text-(--fg-primary)">{label}</span>
         {t && (
           <TooltipProvider><Tooltip><TooltipTrigger asChild>
-          <span className="grid size-6 shrink-0 place-items-center"> {/* Figma Stat Trend (owner, 2026-11-17, latest): a small filled box (radius 2) with the trend icon: above 24 px, `red-900` and `red-400`; about, low and below 20 px, `blue-900` / `blue-200`, `yellow-900` / `yellow-300`, `green-900` / `green-400`; the icon is 14 px in above and 12 in the rest; the Figma glyph `trend-top` is an up arrow (turned to the right for about and down for below), and low is the zigzag `trend-down`: Phosphor `ArrowUp`, `ArrowRight`, `TrendDown`, `ArrowDown` */}
+          <span className="grid size-6 shrink-0 place-items-center rounded-[6px] bg-(--neutral-700)"> {/* Figma Stat Trend (owner, 2026-11-17, latest): a small filled box (radius 2) with the trend icon: above 24 px, `red-900` and `red-400`; about, low and below 20 px, `blue-900` / `blue-200`, `yellow-900` / `yellow-300`, `green-900` / `green-400`; the icon is 14 px in above and 12 in the rest; the Figma glyph `trend-top` is an up arrow (turned to the right for about and down for below), and low is the zigzag `trend-down`: Phosphor `ArrowUp`, `ArrowRight`, `TrendDown`, `ArrowDown` */}
             <t.Icon weight="bold" className={t.icon} aria-hidden />
             <span className="sr-only">{t.text}</span>
           </span>
@@ -51,7 +51,7 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
       <span className="flex items-center gap-10 py-1.5"> {/* Figma Data (owner's Figma, 2026-11-20, ninth look, "surgical": items centered, 40 px between the number column and the graph, 6 px of padding above and under it (only under it before), 12 px under the header (20 before); the column is the number (32 px line) with "Reports" (caption) under it, 6 px apart (54 px), the graph 50 px high, so the row is 66 px */}
           <span className="flex flex-1 basis-0 flex-col gap-1.5">
             <span className="font-display-semi text-stat text-(--fg-emphasis)">{value}</span>
-            <span className="px-px text-caption text-(--neutral-300)">Reports</span> {/* Figma wraps the label in a frame with 1 px at each side */}
+            <span className="px-px text-caption text-(--fg-secondary)">Reports</span> {/* Figma wraps the label in a frame with 1 px at each side */}
           </span>
           {series && (
             <span className="hidden h-[40px] min-w-0 flex-1 basis-0 pr-2 @min-[140px]:block"> {/* Figma Graph (owner, 2026-11-15): 164 px at most, padding included */}

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import { CaretDown, CaretUp, ChatCircleDots, SlidersHorizontal, Sparkle, X } from '@phosphor-icons/react'
 import { ModuleDock } from '@/components/modules/ModuleDock'
 import { useModules } from '@/components/modules/ModulesProvider'
-import { pushOf } from '@/lib/modules'
+import { inArea, pushOf } from '@/lib/modules'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
 import { buckets } from '@/lib/sparkline'
@@ -13,7 +13,7 @@ import { twoLines } from '@/lib/address'
 /** DEMO (owner, 2026-11-05, released): the four cards show the four trend statuses, one each (Above, About, Below usual, Low reporting), whatever the data says, so the design can be reviewed. The incident data is synthetic anyway. Delete this line and `DEMO_TRENDS[i] ??` below to show the real trends again. */
 const DEMO_TRENDS: Trend[] = ['above', 'about', 'below', 'low']
 import { MediaGallery } from '@/components/MediaGallery'
-import { CaseActions, CaseHeader, HEADER, ProblemDetail } from '@/components/ProblemDetail'
+import { CaseActions, CaseHeader, HEADER, IncidentOverview, ProblemDetail } from '@/components/ProblemDetail'
 import { ProblemTimelineCard } from '@/components/ProblemTimelineCard'
 import { Badge } from '@/components/ui/badge'
 import { MapTypeChips, NO_FILTERS, type Filters } from '@/components/FilterBar'
@@ -271,6 +271,8 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
   const open = !!selected || !!panelProblem
   // The open panel (incident or recurrence). It leaves the screen the moment it closes (owner, 2026-11-26): the 350 ms hold for the old slide-out left the numbers card stuck on the map.
   const item = useMemo(() => (selected ? { kind: 'incident' as const, incident: selected } : panelProblem ? { kind: 'problem' as const, problem: panelProblem, detail: problemDetail } : null), [selected, panelProblem, problemDetail])
+  // Is something in the right column? A recurrence always (its History); an incident only with a module docked there. The Modules button, the X and the map controls sit beside it, otherwise at the right edge (owner, 2026-11-27).
+  const rightCol = item?.kind === 'problem' || (item?.kind === 'incident' && modules.on && inArea(modules.placed, 'right', modules.follow, item.incident.id).length > 0)
   useEffect(() => {
     const t = setTimeout(() => onInspect(open), open && !selected ? 0 : SIDEBAR_DELAY_MS)
     return () => clearTimeout(t)
@@ -365,7 +367,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
   const historySort = (id: string) => ({ oldestFirst: oldestFirstFor === id, onSort: () => setOldestFirstFor((v) => (v === id ? null : id)) })
 
   return (
-    <div className="contents map-col" data-history={item?.kind === 'problem' && HEADER !== '3' ? '' : undefined} data-rp={item && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': `${dockW + filtersPush}px`, '--filters-push': `${filtersPush}px`, '--dock-l': `${dockL}px`, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
+    <div className="contents map-col" data-history={item?.kind === 'problem' && HEADER !== '3' ? '' : undefined} data-rp={item && HEADER === '3' ? '' : undefined} data-rcol={rightCol ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': `${dockW + filtersPush}px`, '--filters-push': `${filtersPush}px`, '--dock-l': `${dockL}px`, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -537,8 +539,10 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
       role="region"
       data-float
       aria-label="Incident details"
-      className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-[calc(100%-24px)] desk:w-[320px] desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]" /* the same place and width as the recurrence's Overview card (owner, 2026-11-27) */
+      className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-[calc(100%-24px)] desk:w-[320px] desk:rounded-lg desk:border-0 desk:bg-transparent desk:shadow-lg" /* the same place and width as the recurrence's Overview card (owner, 2026-11-27) */
     >
+      <div className="hidden desk:block"><IncidentOverview incident={incident} localityName={localityName} categoryName={categoryName} /></div>
+      <div className="desk:hidden">
       <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="absolute top-5 right-5 z-10 desk:hidden">
         <X />
       </Button>
@@ -579,6 +583,7 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
           )}
         </dl>
       </CardContent>
+      </div>
     </Card>
     </>
   )
