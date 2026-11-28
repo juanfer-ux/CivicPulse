@@ -3,6 +3,7 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-27. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **History reports open with a GSAP push (owner, 2026-11-27):** clicking a report (for example a PRK reference) grows its details and pushes the rows below down; closing, or opening another one, pulls them up (0.32 s, `power2.out`; instant with reduced motion). It scrolls into view once open. `Collapse` in `HistoryColumn.tsx`; the loading photo box reserves 300 px so the height does not jump. The owner approved it and it was released the same day.
 - **Released (owner, 2026-11-27):** everything in the 2026-11-27 entries below was committed, merged and deployed together, with the docs and Figma synced. Still code only (not drawn in Figma): the reference, AI classification, uncertainty flags and outcome on the Incident Overview.
 - **Map controls updated in Figma (owner, 2026-11-27):** both groups 36 px wide, zoom group stroke `neutral-700`, slider 34 px with the tick 1 px from the left; compass and tilt are now in Figma too. Replaces the widths in the entry below.
 - **Selector Chip as in Figma (owner, 2026-11-27):** hover line is now 1 px `neutral-300` outside (was `neutral-400` inside); selected line is 2 px `black` outside (was 1 px inside). Other states already matched. The Figma component description was updated too.

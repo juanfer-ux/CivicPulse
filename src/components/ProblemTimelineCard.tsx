@@ -21,11 +21,6 @@ export function ProblemTimelineCard({ problem, detail, onSelectIncident, openRep
     const el = focus ? box?.querySelector<HTMLElement>(`[data-step="${focus}"]`) : null
     if (box && el) box.scrollTo({ top: box.scrollTop + el.getBoundingClientRect().top - box.getBoundingClientRect().top - 16, behavior: 'smooth' })
   }, [focus])
-  useEffect(() => {
-    // a report opened from the map (or from its row) scrolls into view in this list
-    const el = openReportId ? list.current?.querySelector<HTMLElement>(`[data-report="${openReportId}"]`) : null
-    el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-  }, [openReportId])
   const M3 = HEADER === '3' // option 3: a 360 px right column (numbers + occurrences history); the timeline is a module
   const { rightSlot } = useModules() // with /?modules=1 the history card lives in the right column, above the modules docked there, and shrinks for them
   const inSlot = M3 && !!rightSlot
