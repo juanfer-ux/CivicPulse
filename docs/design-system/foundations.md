@@ -84,7 +84,7 @@ Every other token name (`primary`, `muted`, `accent`, `border`…) is only an al
 
 | # | Name (Figma and `index.css`) | Color | Usage name (aliases) | Used for |
 |---|---|---|---|---|
-| 1 | `white` | `#E7E7E9` | none | New in Figma (2026-10-29): brighter than `neutral-100`; the plus buttons and the account menu icon in the sidebar use it |
+| 1 | `white` | `#F4F4F5` | none | New in Figma (2026-10-29), `#F4F4F5` since 2026-11-29: brighter than `neutral-100`; the logo, the plus buttons and the account menu icon in the sidebar use it |
 | 2 | `black` | `#09090B` (since 2026-11-26) | none | New in Figma (2026-11-12), darker than `neutral-900`; not used on screen yet |
 | 3 | `neutral-900` | `#111113` | `sidebar` (`inset`), `ai` | Outline buttons, suggestions, role badge, agent panel background (`ai`, since 2026-10-29), mobile bars, deepest surface; text on a light fill |
 | 4 | `neutral-800` | `#18181B` | none | Was the agent surface (`ai`) until 2026-10-29; free for now |

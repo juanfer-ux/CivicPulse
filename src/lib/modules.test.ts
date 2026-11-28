@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { COLUMN_PUSH, MAX_PER_AREA, canDock, fitsArea, inArea, insertPos, isVisible, parseLayout, place, pushOf, shapeFor, suggestedArea, type Placed, HISTORY_W } from '@/lib/modules'
+import { homeModules, modulesOnTop, COLUMN_PUSH, MAX_PER_AREA, canDock, fitsArea, inArea, insertPos, isVisible, parseLayout, place, pushOf, shapeFor, suggestedArea, type Placed, HISTORY_W } from '@/lib/modules'
 
 describe('modules', () => {
   it('lights only the areas a module supports and suggests its first choice', () => {
@@ -73,8 +73,21 @@ describe('modules', () => {
 })
 
 describe('History column width', () => {
-  it('matches the room the map controls and the Modules buttons leave for it', () => {
+  it('matches the room the map controls and the X leave for it', () => {
     expect(readFileSync('src/index.css', 'utf8')).toContain(`--case-right: calc(${HISTORY_W}px + 12px)`) // the one place the width is repeated
     expect(readFileSync('src/components/ProblemDetail.tsx', 'utf8')).toContain('var(--case-right)')
+  })
+})
+
+describe('the right sidebar', () => {
+  it('puts the moved window where it was sent', () => {
+    expect(modulesOnTop('modules', 'top')).toBe(true)
+    expect(modulesOnTop('history', 'top')).toBe(false)
+    expect(modulesOnTop('history', 'bottom')).toBe(true)
+  })
+  it('keeps every module at home until one is dragged to the left or the bottom', () => {
+    expect(homeModules('recurrence', [], true, 'p1')).toEqual(['timeline', 'numbers'])
+    expect(homeModules('recurrence', [{ type: 'timeline', area: 'bottom', target: 'p1', pos: 1 }], true, 'p1')).toEqual(['numbers'])
+    expect(homeModules('incident', [], true, 'i1')).toEqual(['numbers'])
   })
 })

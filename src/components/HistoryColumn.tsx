@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { groupHistory } from '@/lib/history'
+import { PANEL_TITLE } from '@/lib/modules'
 import { label, type Incident } from '@/lib/incidents'
 import { PROBLEM_STATUS, type ProblemStatus } from '@/lib/statusColors'
 import type { LinkRow, ProblemDetailData } from '@/lib/problems'
@@ -111,7 +112,7 @@ export function HistoryColumn({ category, status, detail, openReportId, onSelect
 
   return (
     <>
-      <HistoryTitle title="History" oldestFirst={oldestFirst} onSort={onSort} />
+      <HistoryTitle title={PANEL_TITLE.history} icon="history" panel="history" oldestFirst={oldestFirst} onSort={onSort} />
       <div className="shrink-0 px-3"> {/* the search has 12 px at its sides (owner's Figma, 2026-11-26, later; edge to edge before) */}
         <Input type="search" aria-label="Search the history" placeholder="Search..." value={query} onChange={(e) => setQuery(e.target.value)} className="h-11 border-[0.5px] border-(--neutral-400) bg-(--neutral-800) text-body-sm" />
       </div>

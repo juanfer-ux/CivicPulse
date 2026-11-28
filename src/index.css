@@ -262,7 +262,7 @@
   --border-width: 0.5px; /* every border and divider; same name as the Figma variable */
   /* The whole palette is these 58 colors, named by what they are (family and lightness), not by where they are used. Same names and values as the Figma Colors collection. */
   /* Neutrals: always 100–900, listed 900 (darkest) down to 100 (lightest) */
-  --white: #E7E7E9; /* #E7E7E9 since 2026-11-26 (it was #ECECEE); new in Figma (2026-10-29), brighter than neutral-100; not used on screen yet */
+  --white: #F4F4F5; /* #F4F4F5 since 2026-11-29 (owner's Figma; #E7E7E9 from 2026-11-26, #ECECEE before); new in Figma (2026-10-29), brighter than neutral-100; the logo uses it too */
   --black: #09090B; /* #09090B since 2026-11-26 (owner's Figma; #0C0C0E before, 2026-11-25 (owner's Figma; it was #050505); new in Figma (2026-11-12), darker than neutral-900; the collapsed sidebar rail header and the composer when active */
   --neutral-900: #111113; /* Figma (2026-11-12): the neutrals 900 to 400 got a step lighter (900 was #0E0E10) */
   --neutral-800: #18181B; /* was #111113 */
@@ -430,7 +430,7 @@
   --col-left: calc(var(--col-l) + (100% - var(--col-l) - var(--map-pad) - var(--dock-w, 0px) - var(--col-w)) / 2);
   --col-right: calc(var(--map-pad) + var(--dock-w, 0px) + (100% - var(--col-l) - var(--map-pad) - var(--dock-w, 0px) - var(--col-w)) / 2);
 }
-.map-col { --case-right: 12px; } /* from the right edge to the Modules button, the X and the map controls of an open case */
+.map-col { --case-right: 12px; } /* from the right edge to the X and the map controls of an open case */
 .map-col[data-rcol] { --case-right: calc(331px + 12px); } /* ... past the right column when there is one */
 .map-col[data-rp] { --map-pad: 0px; --map-max: 100000px; --group-gap: 0px; } /* a recurrence is open (owner's Figma Map · Recurrence selected, 2026-11-23): the header and the right column touch the map area's top, left, right and bottom edges, no padding and no maximum width (owner, 2026-11-23: they fill the map area at any window size) */
 

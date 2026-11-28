@@ -1,5 +1,5 @@
 /**
- * Modules (decision 0049; owner 2026-11-09): read-only panels (a recurrence's timeline, its numbers) the operator drags from the Modules menu in the open case's header, or accepts from the agent's offer, into one of three docking areas on the map: a column on the left, a column on the right and a strip along the bottom. Pure data and rules, no Supabase and no React, so tests can import it. Behind the `?modules=1` switch until the owner approves.
+ * Modules (decision 0049; owner 2026-11-09): read-only panels (a recurrence's timeline, its numbers) the operator finds in the right sidebar's Modules window and can drag out, or accepts from the agent's offer, into one of three docking areas on the map: a column on the left, a column on the right and a strip along the bottom. Pure data and rules, no Supabase and no React, so tests can import it. Behind the `?modules=1` switch until the owner approves.
  *
  * How an area lays its modules out (owner's drawing, 2026-11-09): the bottom strip divides its width equally (one module fills it, two share it 50 / 50); a column keeps each module at its natural height and, when they do not fit, the modules already there shrink to make room (the right column also holds the recurrence's history, which shrinks first).
  */
@@ -14,11 +14,19 @@ export const MODULES: Record<ModuleType, { title: string; areas: Area[]; about: 
   numbers: { title: 'Numbers', areas: ['right', 'left', 'bottom'], about: 'any' },
 }
 
-/** The modules the open case offers (the Modules menu in its header): a recurrence gets both, an incident only the numbers. */
+/** The right sidebar's two windows (owner, 2026-11-29): History and Modules, in either order. */
+export type PanelId = 'history' | 'modules'
+export const PANEL_TITLE: Record<PanelId, string> = { history: 'History', modules: 'AI modules' }
+/** Which window is on top after `moved` is dropped on, or arrowed toward, the top or the bottom place. */
+export const modulesOnTop = (moved: PanelId, to: 'top' | 'bottom') => (moved === 'modules') === (to === 'top')
+/** The modules that live in the sidebar: the case's modules, minus those dragged out to the left or the bottom of the map. */
+export const homeModules = (kind: 'recurrence' | 'incident', placed: Placed[], follow: boolean, openId: string | null) => modulesFor(kind).filter((t) => !placed.some((p) => p.type === t && p.area !== 'right' && isVisible(p, follow, openId)))
+
+/** The modules the open case offers: a recurrence gets both, an incident only the numbers. */
 export const modulesFor = (kind: 'recurrence' | 'incident') => (Object.keys(MODULES) as ModuleType[]).filter((t) => MODULES[t].about === 'any' || kind === 'recurrence')
 
 export const COLUMN_W = 360 // px: a column's width
-export const HISTORY_W = 331 // px: the right column while a recurrence is open (Figma History). The map controls and the Modules buttons sit beside it (`--case-right` in index.css)
+export const HISTORY_W = 331 // px: the right column while a recurrence is open (Figma History). The map controls and the X sit beside it (`--case-right` in index.css)
 export const DOCK_GAP = 12
 export const BOTTOM_H = 200 // px: the bottom strip's height
 export const COLUMN_NATURAL_H = 270 // px: a module's height in a column before anything has to shrink
