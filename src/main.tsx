@@ -31,6 +31,8 @@ const filtersPanel = location.hash === '#filters-panel' // the Filters side pane
 const categoryIcons = location.hash === '#category-icons' // duotone icons for the category cards of the agent panel
 const PlaceBlocksGallery = lazy(() => import('@/components/PlaceBlocksGallery').then((m) => ({ default: m.PlaceBlocksGallery })))
 const placeBlocks = location.hash === '#place-blocks' // the block under an OSM place's stem in 16 tones and shadings
+const OverviewIconGallery = lazy(() => import('@/components/OverviewIconGallery').then((m) => ({ default: m.OverviewIconGallery })))
+const overviewIcons = location.hash === '#overview-icons' // icon options for the Reported and Vehicle rows of the Incident Overview
 const App = lazy(() => import('./App.tsx'))
 const Gallery = lazy(() => import('@/components/Gallery').then((m) => ({ default: m.Gallery })))
 const ChartGallery = lazy(() => import('@/components/ChartGallery').then((m) => ({ default: m.ChartGallery })))
@@ -100,6 +102,10 @@ createRoot(document.getElementById('root')!).render(
         ) : categoryFamilies ? (
           <Suspense fallback={null}>
             <CategoryIconFamiliesGallery />
+          </Suspense>
+        ) : overviewIcons ? (
+          <Suspense fallback={null}>
+            <OverviewIconGallery />
           </Suspense>
         ) : categoryIcons ? (
           <Suspense fallback={null}>

@@ -508,7 +508,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
         item && (
           <>
             <ProblemDetail
-              photoOf={item.detail?.incidents.at(-1)?.id} // oldest first, so the last is the newest report
+              newest={item.detail?.incidents.at(-1)} // oldest first, so the last is the newest report
               key={item.problem.id}
               problem={item.problem}
               localityName={localityName.get(item.problem.locality_code)}
@@ -539,9 +539,9 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
       role="region"
       data-float
       aria-label="Incident details"
-      className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-[calc(100%-24px)] desk:w-[320px] desk:rounded-lg desk:border-0 desk:bg-transparent desk:shadow-lg" /* the same place and width as the recurrence's Overview card (owner, 2026-11-27) */
+      className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-[calc(100%-24px)] desk:w-[330px] desk:rounded-lg desk:border-0 desk:bg-transparent desk:shadow-lg" /* the same place and width as the recurrence's Overview card (owner, 2026-11-27) */
     >
-      <div className="hidden desk:block"><IncidentOverview incident={incident} localityName={localityName} categoryName={categoryName} /></div>
+      <div className="hidden desk:block"><IncidentOverview incident={incident} localityName={localityName} /></div>
       <div className="desk:hidden">
       <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="absolute top-5 right-5 z-10 desk:hidden">
         <X />

@@ -55,6 +55,7 @@ Role and permission decisions have their own dated log in [../roles-and-permissi
 | [0046](0046-stat-card-state-variants-and-stat-trend.md) | Stat Card in two states, the trend as its own component | ✅ Accepted |
 | [0047](0047-recurrence-glow-and-pulse.md) | glows and a pulse on the recurrences and the selected incident | ✅ Accepted |
 | [0049](0049-agent-modules-dock-and-library.md) | agent-offered modules, a right-side dock and a Modules library (browser-only, no database change) | 🟡 Proposed |
+| [0050](0050-icon-weight-informing-or-action.md) | Icons that only inform may be solid; icons in an action or interaction are regular | ✅ Accepted |
 
 ## ✍️ Template
 ```
