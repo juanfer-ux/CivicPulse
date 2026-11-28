@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react'
 import { BarList } from '@/components/BarList'
 import { HistoryTitle, type HistorySort } from '@/components/HistoryTitle'
-import { ModulesMenu, PanelMenuRow } from '@/components/modules/ModulesMenu'
-import { useModules } from '@/components/modules/ModulesProvider'
 import { useRef, Fragment } from 'react'
 import { ArrowsClockwise, Bus, Calendar, CalendarCheck, CarProfile, FileText, Motorcycle, Stack, SteeringWheel, Truck, Van, Wrench, X, UserCheck, type Icon, type IconWeight } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
@@ -46,7 +44,7 @@ export function ProblemDetail({
   useRestoreFocus(panel)
   return (
     <>
-    {WIDE && <CaseActions kind="recurrence" onClose={onClose} />}
+    {WIDE && <CaseActions onClose={onClose} />}
     <Card
       ref={panel}
       tabIndex={-1}
@@ -69,7 +67,6 @@ export function ProblemDetail({
             <X />
           </Button>
         </header>
-        <PanelMenuRow kind="recurrence" className="-mx-4 border-y" />
         <ProblemStatusPill status={problem.status} />
         <dl className="grid grid-cols-[6rem_1fr] gap-x-3 gap-y-2 text-muted-foreground [&>dd]:text-body-sm-strong [&>dt]:text-body-sm-medium">
           <dt className="text-muted-foreground">Occurrences</dt>
@@ -96,12 +93,10 @@ export function ProblemDetail({
   )
 }
 
-/** The Modules button and the close X at the map's top right corner, just left of the right column (owner, 2026-11-26), the same place for a recurrence and an incident (owner, 2026-11-27). */
-export function CaseActions({ kind, onClose }: { kind: 'recurrence' | 'incident'; onClose: () => void }) {
-  const { on } = useModules()
+/** The close X at the map's top right corner, just left of the right sidebar (owner, 2026-11-26), the same place for a recurrence and an incident. The Modules button that sat beside it is gone: modules are always in the sidebar (owner, 2026-11-29). */
+export function CaseActions({ onClose }: { onClose: () => void }) {
   return (
     <div className="hidden items-center gap-2 desk:absolute desk:top-3 desk:right-[calc(var(--col-right)+var(--case-right))] desk:z-20 desk:flex">
-      {on && <div className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg"><ModulesMenu kind={kind} /></div>}
       <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg hover:bg-(--neutral-700)">
         <X />
       </Button>
@@ -117,8 +112,8 @@ export const stats = (p: ProblemRow) => [
   { Icon: Calendar, label: 'Last reported', value: p.last_seen ? day(p.last_seen) : '-' },
 ]
 
-/** The header of an open case (owner, 2026-11-15: the same for a recurrence and an incident): the big title, a line with the category and the reference, a status at the right and, under them, the menu row with the Modules button. The close button is placed by the panel, at its top right. */
-export function CaseHeader({ title, category, reference, locality, pill, kind }: { title: string; category: string; reference: string; locality: string | undefined; pill: ReactNode; kind: 'recurrence' | 'incident' }) {
+/** The header of an open case (owner, 2026-11-15: the same for a recurrence and an incident): the big title, a line with the category and the reference, a status at the right. The close button is placed by the panel, at its top right. */
+export function CaseHeader({ title, category, reference, locality, pill }: { title: string; category: string; reference: string; locality: string | undefined; pill: ReactNode }) {
   return (
     <>
       <div className="flex items-start gap-4 pt-5 pr-[68px] pb-5 pl-5">
@@ -132,7 +127,6 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
         </div>
         <div className="ml-auto flex items-start">{pill}</div>
       </div>
-      <div className="desk:hidden"><PanelMenuRow kind={kind} /></div> {/* on desktop the Modules button floats at the map's top right (CaseActions) */}
     </>
   )
 }
@@ -184,8 +178,8 @@ export function IncidentOverview({ incident, localityName }: { incident: Inciden
   return (
     <div className="flex flex-col gap-2 rounded-lg bg-(--neutral-900)">
       <HistoryTitle title="Overview" />
-      <div className="flex flex-col gap-2.5 p-3"> {/* Figma (owner, 2026-11-27): the address with the status pill at its right, then the description */}
-        <div className="flex items-start gap-2.5">
+      <div className="flex flex-col gap-4 p-3"> {/* Figma (owner, 2026-11-28): the address with the status pill 32 px to its right, 16 px to the description */}
+        <div className="flex items-start gap-8">
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <h4 className="font-display-semi text-display-xs-strong whitespace-pre-line text-(--fg-emphasis)">{twoLines(incident.location_description)}</h4>
             <p className="text-meta text-(--fg-secondary)">{incident.reference}{localityName ? ` · ${localityName}` : ''}</p>
@@ -223,8 +217,11 @@ export function Overview({ problem, event, newest, ...sort }: HistorySort & { pr
   return (
     <div className="hidden flex-col gap-2 rounded-lg bg-(--neutral-900) desk:flex">
       <HistoryTitle title="Recurrence Overview" {...sort} />
-      <div className="flex flex-col gap-2.5 p-3"> {/* the address, on two lines, and the newest report's description (owner's Figma, 2026-11-28; a recurrence has no description of its own) */}
-        <h4 className="font-display-semi text-display-xs-strong whitespace-pre-line text-(--fg-emphasis)">{twoLines(problem.location_description)}</h4>
+      <div className="flex flex-col gap-4 p-3"> {/* the address with the status pill at its right, and the newest report's description (owner's Figma, 2026-11-28; a recurrence has no description of its own) */}
+        <div className="flex items-start gap-8">
+          <h4 className="min-w-0 flex-1 font-display-semi text-display-xs-strong whitespace-pre-line text-(--fg-emphasis)">{twoLines(problem.location_description)}</h4>
+          <ProblemStatusPill status={problem.status} />
+        </div>
         {newest && <p className="text-body-sm text-(--fg-primary)">{newest.description}</p>}
       </div>
       <div className="flex flex-col gap-4 p-3">

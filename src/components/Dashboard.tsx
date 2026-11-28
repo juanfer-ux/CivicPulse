@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import { CaretDown, CaretUp, ChatCircleDots, SlidersHorizontal, Sparkle, X } from '@phosphor-icons/react'
 import { ModuleDock } from '@/components/modules/ModuleDock'
 import { useModules } from '@/components/modules/ModulesProvider'
-import { inArea, pushOf } from '@/lib/modules'
+import { pushOf } from '@/lib/modules'
 import { IncidentMap } from '@/components/IncidentMap'
 import { StatCard } from '@/components/ui/stat-card'
 import { buckets } from '@/lib/sparkline'
@@ -271,8 +271,8 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
   const open = !!selected || !!panelProblem
   // The open panel (incident or recurrence). It leaves the screen the moment it closes (owner, 2026-11-26): the 350 ms hold for the old slide-out left the numbers card stuck on the map.
   const item = useMemo(() => (selected ? { kind: 'incident' as const, incident: selected } : panelProblem ? { kind: 'problem' as const, problem: panelProblem, detail: problemDetail } : null), [selected, panelProblem, problemDetail])
-  // Is something in the right column? A recurrence always (its History); an incident only with a module docked there. The Modules button, the X and the map controls sit beside it, otherwise at the right edge (owner, 2026-11-27).
-  const rightCol = item?.kind === 'problem' || (item?.kind === 'incident' && modules.on && inArea(modules.placed, 'right', modules.follow, item.incident.id).length > 0)
+  // An open case has its right sidebar (History and Modules; owner, 2026-11-29): the X and the map controls sit beside it. With modules off (/?modules=0) only a recurrence has one.
+  const rightCol = item?.kind === 'problem' || (item?.kind === 'incident' && modules.on)
   useEffect(() => {
     const t = setTimeout(() => onInspect(open), open && !selected ? 0 : SIDEBAR_DELAY_MS)
     return () => clearTimeout(t)
@@ -532,7 +532,7 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
   useRestoreFocus(panel)
   return (
     <>
-    <CaseActions kind="incident" onClose={onClose} />
+    <CaseActions onClose={onClose} />
     <Card
       ref={panel}
       tabIndex={-1}
@@ -546,7 +546,7 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
       <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="absolute top-5 right-5 z-10 desk:hidden">
         <X />
       </Button>
-      <CaseHeader title={incident.title} category={categoryName ?? label(incident.category)} reference={incident.reference} locality={localityName} pill={<Badge variant="secondary">{label(incident.status)}</Badge>} kind="incident" />
+      <CaseHeader title={incident.title} category={categoryName ?? label(incident.category)} reference={incident.reference} locality={localityName} pill={<Badge variant="secondary">{label(incident.status)}</Badge>} />
       <CardContent className="flex flex-col gap-3 pt-4 text-body-sm">
         <div className="flex flex-wrap gap-1">
           <Badge variant="secondary">{label(incident.status)}</Badge>

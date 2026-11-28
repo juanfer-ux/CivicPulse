@@ -22,3 +22,7 @@ The sidebar's Modules section is gone. A **menu row under the details in the hea
 
 ## Consequences
 Everything is additive and reversible. The browser-only library does not sync across devices and is per user on a shared computer. Phones need their own design (modules stacked in the bottom sheet, the library as a list with "Add"), to be agreed before building.
+
+## Update 2026-11-29 (owner): modules live in the right sidebar
+The **Modules button and its menu are gone**. An open case has a right sidebar with two windows, **History** (a recurrence only) and **Modules**, like Photoshop's panels: drag a title row onto the other window (or use the arrow keys on its grip) to swap them; the order is saved in the browser. Every module of the case is always in the Modules window. A module can still be **dragged out** to the left or the bottom of the map; closing it, or dropping it on the sidebar, brings it back. The agent's offer still docks a module. The "follow or stay" choice went with the menu: docked modules follow the open case. The older notes above about the menu and the right docking column are superseded.
+
