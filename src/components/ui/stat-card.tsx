@@ -4,20 +4,20 @@ import { ArrowDown, ArrowRight, ArrowUp, TrendDown } from '@phosphor-icons/react
 import { smoothPath, sparkPoints } from '@/lib/sparkline'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
-/** The trend mark (Figma Stat Trend, owner 2026-11-27): the **bold** arrow alone in a 24 px box at the right of the name, no fill: above `red-400` (14 px), about `blue-400`, low `yellow-400`, below `green-500` (12 px). */
+/** The trend mark (Figma Stat Trend, owner 2026-11-27): the **bold** arrow alone in a 24 px box at the right of the name, no fill: 16 px: above `red-400`, about `blue-400`, low `yellow-400`, below `green-500`. */
 // whole class strings, so Tailwind sees them
-const SPARK = '[--spark:linear-gradient(90deg,var(--cobalt-700),var(--cobalt-300)_50.5%)]'
-const SPARK_HOVER = 'enabled:hover:shadow-[0_0_0_2px_var(--neutral-400)] enabled:hover:[--spark:linear-gradient(90deg,var(--cobalt-500),var(--cobalt-300)_90.1%)]'
-const SPARK_ON = 'shadow-[0_0_0_2px_var(--neutral-400)] [--spark:linear-gradient(90deg,var(--cobalt-500),var(--cobalt-300)_90.1%)]'
+const SPARK = '[--spark:linear-gradient(90deg,var(--cobalt-700),var(--cobalt-300)_46.6%)]'
+const SPARK_HOVER = 'enabled:hover:shadow-[0_0_0_2px_var(--neutral-400)] enabled:hover:[--spark:linear-gradient(90deg,var(--cobalt-500),var(--cobalt-300)_83.9%)]'
+const SPARK_ON = 'shadow-[0_0_0_2px_var(--neutral-400)] [--spark:linear-gradient(90deg,var(--cobalt-500),var(--cobalt-300)_83.9%)]'
 const GRAPH_H = 40 // Figma Graph / Vector 1 (owner's Figma, 2026-11-23: 40 px high; 50 in the seventh look of 2026-11-20; 48 in the sixth, 32 before)
 const TREND = {
-  above: { Icon: ArrowUp, text: 'Above usual', why: 'Reports in the last 30 days are 20 % or more higher than in the 30 days before.', icon: 'size-3.5 text-(--red-400)' },
-  about: { Icon: ArrowRight, text: 'About usual', why: 'Reports in the last 30 days are within 20 % of the 30 days before.', icon: 'size-3 text-(--blue-400)' },
-  low: { Icon: TrendDown, text: 'Low reporting', why: 'Fewer than 5 reports in the last 60 days: too few to tell a trend.', caution: 'Read the number with caution.', icon: 'size-3 text-(--yellow-400)' },
-  below: { Icon: ArrowDown, text: 'Below usual', why: 'Reports in the last 30 days are 20 % or more lower than in the 30 days before.', icon: 'size-3 text-(--green-500)' },
+  above: { Icon: ArrowUp, text: 'Above usual', why: 'Reports in the last 30 days are 20 % or more higher than in the 30 days before.', icon: 'size-4 text-(--red-400)' },
+  about: { Icon: ArrowRight, text: 'About usual', why: 'Reports in the last 30 days are within 20 % of the 30 days before.', icon: 'size-4 text-(--blue-400)' },
+  low: { Icon: TrendDown, text: 'Low reporting', why: 'Fewer than 5 reports in the last 60 days: too few to tell a trend.', caution: 'Read the number with caution.', icon: 'size-4 text-(--yellow-400)' },
+  below: { Icon: ArrowDown, text: 'Below usual', why: 'Reports in the last 30 days are 20 % or more lower than in the 30 days before.', icon: 'size-4 text-(--green-500)' },
 } as const
 
-/** A number with its name (Figma Stat Card, owner 2026-11-27): `neutral-900`, 4 px radius, 16 px padding, 12 px between the header (name and trend mark) and the number row (the number with "Reports" under it, and a 40 px graph). Default: a 1 px `neutral-500` line inside, the graph line `cobalt-700` to `cobalt-300` at the middle. Hover or selected: a 2 px `neutral-400` ring outside (so the grid must not clip it, `desk:overflow-visible` in `Dashboard.tsx`), the line `cobalt-500` to `cobalt-300`. The peak is a 4 px `cobalt-100` dot with a 2 px `neutral-900` ring. */
+/** A number with its name (Figma Stat Card, owner 2026-11-27): `neutral-900`, 6 px radius, 16 px padding inside the 1 px line (17 px in code, the same in every state so nothing jumps), 12 px between the header (name and trend mark) and the number row (the number with "Reports" under it, and a 40 px graph). Default: a 1 px `neutral-500` line inside, the graph line `cobalt-700` to `cobalt-300` at the middle. Hover or selected: a 2 px `neutral-400` ring outside (so the grid must not clip it, `desk:overflow-visible` in `Dashboard.tsx`), the line `cobalt-500` to `cobalt-300`. The peak is a 4 px `cobalt-100` dot with a 2 px `neutral-900` ring. */
 export function StatCard({ label, value, trend, selected, onClick, series }: { label: ReactNode; value: ReactNode; trend?: Trend; selected?: boolean; onClick?: () => void; series?: number[] }) {
   const Tag = onClick ? 'button' : 'div'
   const t = trend && TREND[trend]
@@ -34,7 +34,7 @@ export function StatCard({ label, value, trend, selected, onClick, series }: { l
   const g = series && w > 0 ? sparkPoints(series, w, GRAPH_H) : null
   return (
     <Tag
-      className={`@container flex min-w-0 flex-col gap-3 rounded-[4px] bg-(--neutral-900) p-4 text-left ${selected ? SPARK_ON : `shadow-[inset_0_0_0_1px_var(--neutral-500)] ${SPARK} ${SPARK_HOVER}`}`}
+      className={`@container flex min-w-0 flex-col gap-3 rounded-[6px] bg-(--neutral-900) p-[17px] text-left ${selected ? SPARK_ON : `shadow-[inset_0_0_0_1px_var(--neutral-500)] ${SPARK} ${SPARK_HOVER}`}`}
       {...(onClick ? { type: 'button' as const, onClick, 'aria-pressed': !!selected } : {})}
     >
       <span className="flex h-6 items-center justify-between gap-2 px-px"> {/* Figma Header (owner's Figma, 2026-11-20, fifth look): the name and the trend mark only, 24 px high ("Reports" went back down to the number row) */}

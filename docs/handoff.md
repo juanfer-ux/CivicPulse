@@ -3,6 +3,8 @@
 For a new session (local or cloud) that has no memory of the earlier chats. Updated 2026-11-27. This is the only place for "where did we stop"; the decisions and the specs live in their own documents.
 
 ## 📍 Where we stopped
+- **Stat cards and trends (owner, 2026-11-27, Figma):** **6 px** corners (4), 16 px padding inside the line (cards 133 px), all trend arrows **16 px** (14 and 12), new graph gradient stops. `ui/stat-card.tsx`.
+- **Incidents sit where recurrences do (owner, 2026-11-27):** the incident card takes the Overview card's place and 320 px width; the Modules button and X float at the same top-right spot; docked modules use the same columns and margins; the map column is flush for both.
 - **Selector chips (owner, 2026-11-27, Figma):** no longer pills (**8 px**); new colors per state (see components.md). `ui/selector-chip.tsx`.
 - **Time of day area (owner, 2026-11-27, Figma):** **`cobalt-300`** to `cobalt-800` at **35 %** (400 at 45 %).
 - **Panel note and Overview spacing (owner, 2026-11-27, Figma):** note fill **`neutral-800` at 60 %**, icon **`cobalt-200`**, **64 px** under the greeting (48). Overview: address `fg-emphasis`, **16 px** between blocks (12), status rows 4 px box and 2 px sides, **no placeholder note** under the photos.
