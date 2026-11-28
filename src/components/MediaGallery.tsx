@@ -46,7 +46,7 @@ export function MediaGallery({ incidentId, carousel: asStrip = false, cover = fa
     }
   }, [incidentId])
 
-  if (loaded?.id !== incidentId) return <div className="aspect-video rounded-md bg-muted/40" aria-hidden />
+  if (loaded?.id !== incidentId) return <div className={`${asStrip && !cover ? 'h-[300px]' : 'aspect-video'} rounded-md bg-muted/40`} aria-hidden /> // a report card reserves the carousel's height (tile, dots, note), so its opening animation ends at the right size
 
   const photos = loaded.rows.filter((m) => m.kind === 'photo')
   // The seed gives a report at most one placeholder photo, so the carousel would never show (owner, 2026-11-09): until real files exist, a report with fewer than two items shows two to five placeholder tiles, a number fixed by its id. Set PROTOTYPE_PLACEHOLDERS to false to show only what the database has.

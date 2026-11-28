@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { HistoryColumn } from '@/components/HistoryColumn'
@@ -13,7 +13,7 @@ const detail = {
     { occurrence_id: 'b', subject_key: 'FIC-602', first_report_at: '2026-08-12T10:00:00', reports_n: 1 },
   ],
   links: [{ incident_id: 'i1', occurrence_id: 'a', state: 'confirmed' }, { incident_id: 'i2', occurrence_id: 'b', state: 'confirmed' }],
-  incidents: [{ id: 'i1', reference: 'PRK-0001', occurred_at: '2026-08-02T10:00:00', status: 'received' }, { id: 'i2', reference: 'PRK-0002', occurred_at: '2026-08-12T10:00:00', status: 'validated' }],
+  incidents: [{ id: 'i1', reference: 'PRK-0001', occurred_at: '2026-08-02T10:00:00', status: 'received', vehicle_type: 'car', validation_status: 'pending' }, { id: 'i2', reference: 'PRK-0002', occurred_at: '2026-08-12T10:00:00', status: 'validated' }],
   sources: { i1: 'SIMUR', i2: 'Bogotá te Escucha' },
   interventions: [{ id: 'v', action_type: 'tow', agency: 'Movilidad', performed_at: '2026-08-16T10:00:00', description: 'Vehicle removed', outcome: 'cleared' }],
   events: [],
@@ -33,6 +33,15 @@ describe('HistoryColumn', () => {
     expect(screen.getByText('PRK-0002')).toBeInTheDocument()
     expect(screen.getByText('PRK-0001')).toBeInTheDocument()
     expect(screen.getByText('Road Cleared')).toBeInTheDocument()
+  })
+  it('keeps a report\'s details only while it is open', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true })) // reduced motion: the animation is instant
+    const column = (openReportId: string | null) => <HistoryColumn category="parking" status="resolved" detail={detail} openReportId={openReportId} onSelectIncident={() => {}} focus={null} viewport={{ current: null }} oldestFirst={false} onSort={() => {}} />
+    const { rerender } = render(column('i1'))
+    expect(screen.getByText('Vehicle')).toBeInTheDocument()
+    rerender(column(null))
+    await waitFor(() => expect(screen.queryByText('Vehicle')).toBeNull())
+    vi.unstubAllGlobals()
   })
   it('sorts oldest first and searches by reference or source', () => {
     show()

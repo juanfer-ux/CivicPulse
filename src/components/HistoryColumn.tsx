@@ -1,4 +1,5 @@
-import { useState, type RefObject } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { gsap } from 'gsap'
 import { CarSimple, Check, Trash, Wrench } from '@phosphor-icons/react'
 import { HistoryTitle, type HistorySort } from '@/components/HistoryTitle'
 import { MediaGallery } from '@/components/MediaGallery'
@@ -13,6 +14,29 @@ import type { LinkRow, ProblemDetailData } from '@/lib/problems'
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 const clock = (iso: string) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }) // 24 h, no AM or PM (owner, 2026-11-07)
 const RING = ' rounded-sm outline outline-1 outline-offset-4 outline-(--neutral-200)'
+
+/** A report's details open and close by height with GSAP, so everything under them is pushed down or pulled up (owner, 2026-11-27): 0.32 s, power2.out, the sidebar's curve; instant with reduced motion. They stay mounted until the closing ends, and `onOpened` runs once they have their full height. */
+function Collapse({ open, onOpened, children }: { open: boolean; onOpened: (el: HTMLElement) => void; children: () => ReactNode }) {
+  const [mounted, setMounted] = useState(open)
+  if (open && !mounted) setMounted(true)
+  const box = useRef<HTMLDivElement>(null)
+  const done = useRef(onOpened)
+  useLayoutEffect(() => void (done.current = onOpened))
+  useLayoutEffect(() => {
+    const el = box.current
+    if (!el) return
+    const duration = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 0.32
+    const tween = open
+      ? gsap.fromTo(el, { height: el.style.height ? el.offsetHeight : 0, opacity: el.style.opacity || 0 }, { height: () => el.scrollHeight, opacity: 1, duration, ease: 'power2.out', clearProps: 'height,opacity', onComplete: () => done.current(el) }) // a half-closed one reopens from where it is
+      : gsap.to(el, { height: 0, opacity: 0, duration, ease: 'power2.out', onComplete: () => setMounted(false) })
+    return () => void tween.kill()
+  }, [open, mounted])
+  return mounted ? (
+    <div ref={box} className="overflow-hidden" inert={!open}>
+      {children()}
+    </div>
+  ) : null
+}
 
 /**
  * The right column of an open recurrence (owner's Figma History, node 1418:7408, 2026-11-25): the title with the sort button, a search field, then one group per occurrence, newest first, all open (no collapsing, owner 2026-11-25). Each group has a header (date and plate), its reports (a dot in the recurrence's status color, as on the map, the reference over the source, the date over the time) and, attached under them, the interventions that followed it. Replaces the flat list of all occurrences.
@@ -57,8 +81,9 @@ export function HistoryColumn({ category, status, detail, openReportId, onSelect
           </span>
           {when(i.occurred_at)}
         </button>
-        {open && (
-          <div className="flex flex-col gap-3 px-2 pt-2 pb-4">
+        {/* a report opened from the map (or from its row) scrolls into view once it is open */}
+        <Collapse open={open} onOpened={(el) => el.parentElement?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' })}>
+          {() => <div className="flex flex-col gap-3 bg-(--neutral-800) px-2 pt-2 pb-4">
             <MediaGallery incidentId={i.id} carousel />
             <p className="px-1 text-body-sm text-foreground">{i.description}</p>
             <dl className="grid grid-cols-[66px_1fr] gap-x-3 gap-y-1 px-1 text-meta">
@@ -77,8 +102,8 @@ export function HistoryColumn({ category, status, detail, openReportId, onSelect
                 </>
               )}
             </dl>
-          </div>
-        )}
+          </div>}
+        </Collapse>
       </li>
     )
   }
