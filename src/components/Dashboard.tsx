@@ -13,7 +13,7 @@ import { twoLines } from '@/lib/address'
 /** DEMO (owner, 2026-11-05, released): the four cards show the four trend statuses, one each (Above, About, Below usual, Low reporting), whatever the data says, so the design can be reviewed. The incident data is synthetic anyway. Delete this line and `DEMO_TRENDS[i] ??` below to show the real trends again. */
 const DEMO_TRENDS: Trend[] = ['above', 'about', 'below', 'low']
 import { MediaGallery } from '@/components/MediaGallery'
-import { CaseHeader, HEADER, ProblemDetail } from '@/components/ProblemDetail'
+import { CaseActions, CaseHeader, HEADER, ProblemDetail } from '@/components/ProblemDetail'
 import { ProblemTimelineCard } from '@/components/ProblemTimelineCard'
 import { Badge } from '@/components/ui/badge'
 import { MapTypeChips, NO_FILTERS, type Filters } from '@/components/FilterBar'
@@ -231,10 +231,9 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
   const placeList = placesFor && places?.id === placesFor.id && places.list !== 'error' ? places.list : undefined
   // The modules' right column (decision 0049, behind /?modules=1) pushes the map content: --dock-w feeds .map-col.
   const modules = useModules()
-  const recurrenceOpen = !!selectedProblem && !selectedId // an open incident hides the recurrence panel
   const caseOpen = !!selectedProblem || !!selectedId // modules exist only while a case is open: with none open they push nothing (owner, 2026-11-20: the stat cards stayed squeezed to the right, leaving an empty strip)
-  const dockW = modules.on && caseOpen ? pushOf(modules.placed, 'right', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
-  const dockL = modules.on && caseOpen ? pushOf(modules.placed, 'left', modules.follow, selectedProblem?.id ?? null, recurrenceOpen) : 0
+  const dockW = modules.on && caseOpen ? pushOf(modules.placed, 'right', modules.follow, selectedProblem?.id ?? null, caseOpen) : 0
+  const dockL = modules.on && caseOpen ? pushOf(modules.placed, 'left', modules.follow, selectedProblem?.id ?? null, caseOpen) : 0
   const filtersPush = FILTERS_PUSH && filtersOpen ? FILTERS_W : 0 // the panel, flush with the window's right edge (no page padding around it since 2026-11-15)
   // The map holds the loose incidents plus, while a problem is open, that problem's own incidents (drawn as tiny dots around its marker).
   const problemIncidents = useMemo(() => (selectedProblem ? (problemDetail?.incidents ?? []) : []), [selectedProblem, problemDetail])
@@ -366,7 +365,7 @@ export function Dashboard({ placesFor: askedPlaces = null, highlightIds, areas, 
   const historySort = (id: string) => ({ oldestFirst: oldestFirstFor === id, onSort: () => setOldestFirstFor((v) => (v === id ? null : id)) })
 
   return (
-    <div className="contents map-col" data-history={item?.kind === 'problem' && HEADER !== '3' ? '' : undefined} data-rp={item?.kind === 'problem' && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': `${dockW + filtersPush}px`, '--filters-push': `${filtersPush}px`, '--dock-l': `${dockL}px`, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
+    <div className="contents map-col" data-history={item?.kind === 'problem' && HEADER !== '3' ? '' : undefined} data-rp={item && HEADER === '3' ? '' : undefined} style={{ '--map-base': mapBase, '--map-left': mapBase, '--dock-w': `${dockW + filtersPush}px`, '--filters-push': `${filtersPush}px`, '--dock-l': `${dockL}px`, '--banner-offset': chatMode ? 'calc(var(--answer-banner-h) + var(--page-pad))' : '0px' } as CSSProperties}>
       <h1 className="sr-only">Civic Pulse incident map and investigations</h1>
       <IncidentMap
         incidents={mapIncidents}
@@ -530,15 +529,17 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
   const panel = useRef<HTMLDivElement>(null)
   useRestoreFocus(panel)
   return (
+    <>
+    <CaseActions kind="incident" onClose={onClose} />
     <Card
       ref={panel}
       tabIndex={-1}
       role="region"
       data-float
       aria-label="Incident details"
-      className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-[calc(var(--map-pad)+var(--banner-offset,0px))] desk:left-(--col-left) desk:z-20 desk:max-h-[calc(100%-var(--map-pad)-var(--map-pad)-var(--banner-offset,0px))] desk:w-[360px] desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]"
+      className="max-h-[45%] shrink-0 gap-0 overflow-auto bg-card/95 py-0 outline-none desk:absolute desk:top-3 desk:left-[calc(var(--col-left)+12px)] desk:z-20 desk:max-h-[calc(100%-24px)] desk:w-[320px] desk:border desk:border-(--neutral-900) desk:bg-[color-mix(in_srgb,var(--neutral-700)_95%,transparent)]" /* the same place and width as the recurrence's Overview card (owner, 2026-11-27) */
     >
-      <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="absolute top-5 right-5 z-10">
+      <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="absolute top-5 right-5 z-10 desk:hidden">
         <X />
       </Button>
       <CaseHeader title={incident.title} category={categoryName ?? label(incident.category)} reference={incident.reference} locality={localityName} pill={<Badge variant="secondary">{label(incident.status)}</Badge>} kind="incident" />
@@ -579,5 +580,6 @@ function IncidentDetail({ incident, localityName, categoryName, onClose }: { inc
         </dl>
       </CardContent>
     </Card>
+    </>
   )
 }

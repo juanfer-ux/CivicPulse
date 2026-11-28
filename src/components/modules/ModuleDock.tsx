@@ -16,6 +16,7 @@ const LABEL: Record<Area, string> = { left: 'Left column', right: 'Right column'
 export function ModuleDock({ problems, openProblemId, openDetail, openKind, openIncident }: { problems: ProblemRow[]; openProblemId: string | null; openDetail: ProblemDetailData | null; openKind: 'recurrence' | 'incident' | null; openIncident: Incident | null }) {
   const { on, placed, follow, drag, message, setOpen, remove, setRightSlot, startDrag } = useModules()
   const recurrenceOpen = openKind === 'recurrence'
+  const flush = openKind !== null // an incident's modules sit exactly where a recurrence's do (owner, 2026-11-27)
   useEffect(() => setOpen({ id: openProblemId, kind: openKind }), [openProblemId, openKind, setOpen])
   const mods = (a: Area) => (openKind ? inArea(placed, a, follow, openProblemId) : []) // modules show only while a recurrence or an incident is open, and take no room otherwise (owner, 2026-11-20); the layout is kept and saved
   const [left, right, bottom] = [mods('left'), mods('right'), mods('bottom')]
@@ -67,19 +68,19 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind, open
       </div>
     )
 
-  const columnTop = recurrenceOpen ? 'calc(var(--map-pad) + var(--banner-offset, 0px))' : 'calc(var(--section-header-h) + var(--map-pad) + var(--banner-offset, 0px))'
+  const columnTop = flush ? 'calc(var(--map-pad) + var(--banner-offset, 0px))' : 'calc(var(--section-header-h) + var(--map-pad) + var(--banner-offset, 0px))'
   const column = (area: 'left' | 'right', list: Placed[]) => {
     const hasSlot = area === 'right' && recurrenceOpen
     if (!list.length && !drag && !hasSlot) return null
-    const edge = area === 'left' ? { left: recurrenceOpen ? 'var(--col-left)' : 'calc(var(--map-left) + var(--group-gap))' } : { right: recurrenceOpen ? 'var(--col-right)' : 'var(--map-pad)' }
+    const edge = area === 'left' ? { left: flush ? 'var(--col-left)' : 'calc(var(--map-left) + var(--group-gap))' } : { right: flush ? 'var(--col-right)' : 'var(--map-pad)' }
     // The bottom strip keeps its full width (owner, 2026-11-09): with a recurrence open the left column stops above it instead of pushing it aside.
-    const lift = area === 'left' && recurrenceOpen && (bottom.length || drag) ? BOTTOM_H + DOCK_GAP : 0
+    const lift = area === 'left' && flush && (bottom.length || drag) ? BOTTOM_H + DOCK_GAP : 0
     // Top to bottom by pos; the recurrence's history card is an item with pos 0, so a module dropped on its upper half goes above it.
     const items: { pos: number; node: ReactNode }[] = list.map((m) => ({ pos: m.pos, node: card(m, area) }))
     if (hasSlot) items.push({ pos: 0, node: <div key="history" data-pos="0" data-type="history" ref={setRightSlot} className="min-h-[200px] flex-1 basis-0 [&>*]:h-full [&>*]:pointer-events-auto" /> })
     items.sort((a, b) => a.pos - b.pos)
     return (
-      <div data-col={area} data-float={list.length || hasSlot ? '' : undefined} className="pointer-events-none absolute z-20 hidden flex-col gap-3 desk:flex" style={{ ...edge, top: columnTop, bottom: `calc(var(--map-pad) + ${lift}px)`, width: hasSlot ? HISTORY_W : COLUMN_W }}>
+      <div data-col={area} data-float={list.length || hasSlot ? '' : undefined} className="pointer-events-none absolute z-20 hidden flex-col gap-3 desk:flex" style={{ ...edge, top: columnTop, bottom: `calc(var(--map-pad) + ${lift}px)`, width: area === 'right' && flush ? HISTORY_W : COLUMN_W }}>
         {items.map((i) => i.node)}
         {overlay(area)}
       </div>
@@ -96,7 +97,7 @@ export function ModuleDock({ problems, openProblemId, openDetail, openKind, open
           data-col="bottom"
           data-float={bottom.length ? '' : undefined}
           className="pointer-events-none absolute z-20 hidden gap-3 desk:flex"
-          style={{ left: 'var(--col-left)', right: recurrenceOpen ? `calc(var(--col-right) + ${HISTORY_W + DOCK_GAP}px)` : 'calc(var(--col-right) + 44px)', bottom: 'var(--map-pad)', height: BOTTOM_H }}
+          style={{ left: 'var(--col-left)', right: flush ? `calc(var(--col-right) + ${HISTORY_W + DOCK_GAP}px)` : 'calc(var(--col-right) + 44px)', bottom: 'var(--map-pad)', height: BOTTOM_H }}
         >
           {bottom.map((m) => card(m, 'bottom'))}
           {overlay('bottom')}

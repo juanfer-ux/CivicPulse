@@ -42,17 +42,9 @@ export function ProblemDetail({
 }) {
   const panel = useRef<HTMLDivElement>(null)
   useRestoreFocus(panel)
-  const { on: modulesOn } = useModules()
   return (
     <>
-    {WIDE && (
-      <div className="hidden items-center gap-2 desk:absolute desk:top-3 desk:right-[calc(var(--col-right)+326px+12px)] desk:z-20 desk:flex"> {/* the Modules button and the close X float at the map's top right corner, just left of the history column (owner, 2026-11-26; they were above the numbers card), like the map buttons of Google Maps */}
-        {modulesOn && <div className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg"><ModulesMenu kind="recurrence" /></div>}
-        <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg hover:bg-(--neutral-700)">
-          <X />
-        </Button>
-      </div>
-    )}
+    {WIDE && <CaseActions kind="recurrence" onClose={onClose} />}
     <Card
       ref={panel}
       tabIndex={-1}
@@ -102,6 +94,19 @@ export function ProblemDetail({
   )
 }
 
+/** The Modules button and the close X at the map's top right corner, just left of the right column (owner, 2026-11-26), the same place for a recurrence and an incident (owner, 2026-11-27). */
+export function CaseActions({ kind, onClose }: { kind: 'recurrence' | 'incident'; onClose: () => void }) {
+  const { on } = useModules()
+  return (
+    <div className="hidden items-center gap-2 desk:absolute desk:top-3 desk:right-[calc(var(--col-right)+326px+12px)] desk:z-20 desk:flex">
+      {on && <div className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg"><ModulesMenu kind={kind} /></div>}
+      <Button size="icon" variant="ghost" aria-label="Close" onClick={onClose} className="rounded-md border border-(--neutral-600) bg-(--neutral-900) shadow-lg hover:bg-(--neutral-700)">
+        <X />
+      </Button>
+    </div>
+  )
+}
+
 export const stats = (p: ProblemRow) => [
   { Icon: Stack, label: 'Occurrences', value: String(p.occurrences_n) },
   { Icon: ArrowsClockwise, label: 'Returns', value: String(p.recurrences_n) },
@@ -125,7 +130,7 @@ export function CaseHeader({ title, category, reference, locality, pill, kind }:
         </div>
         <div className="ml-auto flex items-start">{pill}</div>
       </div>
-      <PanelMenuRow kind={kind} />
+      <div className="desk:hidden"><PanelMenuRow kind={kind} /></div> {/* on desktop the Modules button floats at the map's top right (CaseActions) */}
     </>
   )
 }
