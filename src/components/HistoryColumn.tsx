@@ -55,8 +55,9 @@ export function HistoryColumn({ category, status, detail, openReportId, onSelect
   const unplaced = links.filter((l) => !l.occurrence_id && matches(l))
   const shown = (oldestFirst ? groups : [...groups].reverse()).filter((g) => !q || rowsOf(g.occurrence.occurrence_id).length)
 
+  // Figma: the date column is 52 px; it grows for a longer date such as "20 Sept", which stays on one line
   const when = (iso: string) => (
-    <span className="flex w-[52px] shrink-0 flex-col items-end">
+    <span className="flex min-w-[52px] shrink-0 flex-col items-end whitespace-nowrap">
       <span className="text-body text-(--fg-primary)">{day(iso)}</span>
       <span className="text-meta tabular-nums text-(--fg-secondary)">{clock(iso)}</span>
     </span>

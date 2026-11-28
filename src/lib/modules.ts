@@ -18,7 +18,7 @@ export const MODULES: Record<ModuleType, { title: string; areas: Area[]; about: 
 export const modulesFor = (kind: 'recurrence' | 'incident') => (Object.keys(MODULES) as ModuleType[]).filter((t) => MODULES[t].about === 'any' || kind === 'recurrence')
 
 export const COLUMN_W = 360 // px: a column's width
-export const HISTORY_W = 326 // px: the right column while a recurrence is open (Figma History). The map controls and the Modules buttons sit beside it (`--case-right` in index.css)
+export const HISTORY_W = 331 // px: the right column while a recurrence is open (Figma History). The map controls and the Modules buttons sit beside it (`--case-right` in index.css)
 export const DOCK_GAP = 12
 export const BOTTOM_H = 200 // px: the bottom strip's height
 export const COLUMN_NATURAL_H = 270 // px: a module's height in a column before anything has to shrink

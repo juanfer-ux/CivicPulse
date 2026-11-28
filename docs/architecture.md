@@ -23,7 +23,7 @@ flowchart TB
 ## 🧱 Stack
 | Layer | Choice |
 |---|---|
-| Frontend | React 19, TypeScript (strict), Vite, Tailwind v4, shadcn/ui (Radix), GSAP (free, core only; for transitions, not used yet) |
+| Frontend | React 19, TypeScript (strict), Vite, Tailwind v4, shadcn/ui (Radix), GSAP (free, core only; used for the agent panel and sidebar widths, the History reports, the map's flights and the landing star's glow) |
 | Map | MapLibre GL, dark CARTO basemap (OpenStreetMap data, no key) |
 | Backend | Supabase: Auth, Postgres, RLS, SQL functions |
 | Hosting | Vercel (auto-deploys every push to `main`) |

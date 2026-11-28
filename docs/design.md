@@ -23,7 +23,7 @@
 - **Basemap:** dark CARTO (OpenStreetMap data). Place and street names are shown in Spanish (the local names, not the English ones CARTO asks for first; owner, 2026-10-25). The credit is required by their licenses, so it stays on the map as a small dark ⓘ that opens on tap (compact MapLibre control, styled in `src/index.css`). Never remove it.
 
 ## 📱 Screen sizes
-> **Panel widths (2026-11-27):** map Filters 360 px, Overview 320 px, History 326 px, Users panel 420 px. Map greys and Resolved blue: [foundations](design-system/foundations.md).
+> **Panel widths (2026-11-28):** map Filters 360 px, Overview 320 px, History 331 px, Users panel 420 px. Map greys and Resolved blue: [foundations](design-system/foundations.md).
 >
 > **Desktop screens in Figma are always 1880 × 1000 (owner, 2026-11-12).** The platform is mostly used on very large screens, so "desktop" means 1,880 px wide and above, and the other size is tablet (not designed yet; do not touch it until the owner says). Every new or changed desktop screen, frame, mock-up and screen documentation uses 1880 × 1000, never 1440 × 900. Frame names that still say "Desktop 1440" are old names. The code's `desk:` breakpoint (1,440 px) is unchanged for now.
 >

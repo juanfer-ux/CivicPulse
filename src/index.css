@@ -431,7 +431,7 @@
   --col-right: calc(var(--map-pad) + var(--dock-w, 0px) + (100% - var(--col-l) - var(--map-pad) - var(--dock-w, 0px) - var(--col-w)) / 2);
 }
 .map-col { --case-right: 12px; } /* from the right edge to the Modules button, the X and the map controls of an open case */
-.map-col[data-rcol] { --case-right: calc(326px + 12px); } /* ... past the right column when there is one */
+.map-col[data-rcol] { --case-right: calc(331px + 12px); } /* ... past the right column when there is one */
 .map-col[data-rp] { --map-pad: 0px; --map-max: 100000px; --group-gap: 0px; } /* a recurrence is open (owner's Figma Map · Recurrence selected, 2026-11-23): the header and the right column touch the map area's top, left, right and bottom edges, no padding and no maximum width (owner, 2026-11-23: they fill the map area at any window size) */
 
 @utility gradient-border {
